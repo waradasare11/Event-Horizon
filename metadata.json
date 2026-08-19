@@ -1,0 +1,6 @@
+{
+  "name": "PeakForm AI",
+  "description": "Evidence-based workout and nutrition coaching platform with interactive progress tracking and AI meal analysis.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

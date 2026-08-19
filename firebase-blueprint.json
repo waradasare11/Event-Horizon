@@ -1,0 +1,168 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User fitness goals, body composition metrics, calorie targets, and dietary preferences",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "format": "email", "maxLength": 120 },
+        "age": { "type": "number" },
+        "sex": { "type": "string", "enum": ["male", "female"] },
+        "heightCm": { "type": "number" },
+        "weightKg": { "type": "number" },
+        "targetWeightKg": { "type": "number" },
+        "targetDate": { "type": "string", "maxLength": 30 },
+        "bodyFatPct": { "type": "number" },
+        "goal": { "type": "string", "enum": ["lose_fat", "build_muscle", "recomp"] },
+        "dietType": { "type": "string", "enum": ["non_veg", "vegetarian", "eggetarian", "vegan", "flexible"] },
+        "experienceLevel": { "type": "string", "enum": ["beginner", "intermediate", "advanced"] },
+        "trainingDaysPerWeek": { "type": "number" },
+        "sessionDurationMin": { "type": "number" },
+        "preferredTime": { "type": "string", "enum": ["morning", "afternoon", "evening", "flexible"] },
+        "musclePriority": { "type": "string", "enum": ["chest", "back", "shoulders", "arms", "quads", "glutes_hamstrings", "balanced"] },
+        "bmr": { "type": "number" },
+        "tdee": { "type": "number" },
+        "dailyCalories": { "type": "number" },
+        "dailyProtein": { "type": "number" },
+        "dailyCarbs": { "type": "number" },
+        "dailyFat": { "type": "number" },
+        "hydrationLiters": { "type": "number" },
+        "weeklyRateKg": { "type": "number" },
+        "isOnboarded": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "updatedAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "name", "goal", "dailyCalories", "dailyProtein", "weightKg", "targetWeightKg"]
+    },
+    "MealLog": {
+      "title": "MealLog",
+      "description": "Logged nutrition entry with macro- and micronutrients",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "mealLogId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 20 },
+        "time": { "type": "string", "maxLength": 10 },
+        "mealType": { "type": "string", "maxLength": 30 },
+        "mealTitle": { "type": "string", "maxLength": 150 },
+        "calories": { "type": "number" },
+        "proteinG": { "type": "number" },
+        "carbsG": { "type": "number" },
+        "fatG": { "type": "number" },
+        "fiberG": { "type": "number" },
+        "sodiumMg": { "type": "number" },
+        "calciumMg": { "type": "number" },
+        "potassiumMg": { "type": "number" },
+        "userNotes": { "type": "string", "maxLength": 500 },
+        "isEstimated": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "date", "mealTitle", "calories", "proteinG", "carbsG", "fatG"]
+    },
+    "WorkoutLog": {
+      "title": "WorkoutLog",
+      "description": "Daily workout completion record supporting consistency tracking",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "workoutLogId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 20 },
+        "dayId": { "type": "string", "maxLength": 64 },
+        "dayName": { "type": "string", "maxLength": 100 },
+        "durationMin": { "type": "number" },
+        "exercisesCompleted": { "type": "number" },
+        "totalExercises": { "type": "number" },
+        "rpeAverage": { "type": "number" },
+        "isRestDay": { "type": "boolean" },
+        "notes": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "date", "dayName", "exercisesCompleted", "totalExercises"]
+    },
+    "BodyMetric": {
+      "title": "BodyMetric",
+      "description": "Periodic weigh-in and body composition tracking entry",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "metricId": { "type": "string", "maxLength": 128 },
+        "date": { "type": "string", "maxLength": 20 },
+        "weightKg": { "type": "number" },
+        "bodyFatPct": { "type": "number" },
+        "waistCm": { "type": "number" },
+        "notes": { "type": "string", "maxLength": 300 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "date", "weightKg"]
+    },
+    "CustomRecipe": {
+      "title": "CustomRecipe",
+      "description": "Saved AI-generated macro-friendly recipe with culinary steps",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "recipeId": { "type": "string", "maxLength": 128 },
+        "recipeName": { "type": "string", "maxLength": 150 },
+        "headlineTag": { "type": "string", "maxLength": 100 },
+        "description": { "type": "string", "maxLength": 500 },
+        "mealCategory": { "type": "string", "maxLength": 50 },
+        "prepTimeMin": { "type": "number" },
+        "cookTimeMin": { "type": "number" },
+        "servings": { "type": "number" },
+        "totalCalories": { "type": "number" },
+        "proteinG": { "type": "number" },
+        "carbsG": { "type": "number" },
+        "fatG": { "type": "number" },
+        "fiberG": { "type": "number" },
+        "chefScienceTip": { "type": "string", "maxLength": 500 },
+        "bodyCompBenefit": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "recipeName", "totalCalories", "proteinG", "carbsG", "fatG"]
+    },
+    "FormAnalysis": {
+      "title": "FormAnalysis",
+      "description": "AI Biomechanics audit for video/image lift performance",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "analysisId": { "type": "string", "maxLength": 128 },
+        "exerciseName": { "type": "string", "maxLength": 100 },
+        "formScore": { "type": "number" },
+        "verdict": { "type": "string", "maxLength": 100 },
+        "overallAssessment": { "type": "string", "maxLength": 1000 },
+        "injuryRiskRating": { "type": "string", "enum": ["Low", "Moderate", "High"] },
+        "createdAt": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "exerciseName", "formScore", "verdict", "injuryRiskRating"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile with calculated metabolic rates and targets"
+    },
+    "/users/{userId}/mealLogs/{mealLogId}": {
+      "schema": "MealLog",
+      "description": "Nutrition entries and meal analyses logged by user"
+    },
+    "/users/{userId}/workoutLogs/{workoutLogId}": {
+      "schema": "WorkoutLog",
+      "description": "Workout sessions and consistency streak logs"
+    },
+    "/users/{userId}/bodyMetrics/{metricId}": {
+      "schema": "BodyMetric",
+      "description": "Weight and body composition tracking history"
+    },
+    "/users/{userId}/customRecipes/{recipeId}": {
+      "schema": "CustomRecipe",
+      "description": "Bookmarked customized macro-friendly recipes"
+    },
+    "/users/{userId}/formAnalyses/{analysisId}": {
+      "schema": "FormAnalysis",
+      "description": "Exercise technique and biomechanics feedback"
+    }
+  }
+}

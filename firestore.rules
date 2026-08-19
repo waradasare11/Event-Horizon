@@ -1,0 +1,134 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default Deny Catch-All
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Entity Validations
+    function isValidUserProfile(data, userId) {
+      return data.userId == userId &&
+        data.name is string && data.name.size() <= 100 &&
+        data.dailyCalories is number && data.dailyCalories > 0 && data.dailyCalories < 10000 &&
+        data.dailyProtein is number && data.dailyProtein >= 0 && data.dailyProtein < 1000;
+    }
+
+    function isValidMealLog(data, userId) {
+      return data.userId == userId &&
+        data.mealTitle is string && data.mealTitle.size() <= 150 &&
+        data.date is string && data.date.size() <= 20 &&
+        data.calories is number && data.calories >= 0 &&
+        data.proteinG is number && data.proteinG >= 0;
+    }
+
+    function isValidWorkoutLog(data, userId) {
+      return data.userId == userId &&
+        data.date is string && data.date.size() <= 20 &&
+        data.dayName is string && data.dayName.size() <= 100 &&
+        data.exercisesCompleted is number && data.exercisesCompleted >= 0;
+    }
+
+    function isValidBodyMetric(data, userId) {
+      return data.userId == userId &&
+        data.date is string && data.date.size() <= 20 &&
+        data.weightKg is number && data.weightKg > 0 && data.weightKg < 500;
+    }
+
+    function isValidCustomRecipe(data, userId) {
+      return data.userId == userId &&
+        data.recipeName is string && data.recipeName.size() <= 150 &&
+        data.totalCalories is number && data.totalCalories >= 0;
+    }
+
+    function isValidFormAnalysis(data, userId) {
+      return data.userId == userId &&
+        data.exerciseName is string && data.exerciseName.size() <= 100 &&
+        data.formScore is number && data.formScore >= 0 && data.formScore <= 100;
+    }
+
+    // User Profile Document
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUserProfile(incoming(), userId);
+      allow update: if isOwner(userId) && isValidUserProfile(incoming(), userId) && incoming().userId == existing().userId;
+      allow delete: if isOwner(userId);
+
+      // Meal Logs Subcollection
+      match /mealLogs/{mealLogId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(mealLogId) && isValidMealLog(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(mealLogId) && isValidMealLog(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(mealLogId);
+      }
+
+      // Workout Logs Subcollection
+      match /workoutLogs/{workoutLogId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(workoutLogId) && isValidWorkoutLog(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(workoutLogId) && isValidWorkoutLog(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(workoutLogId);
+      }
+
+      // Body Metrics Subcollection
+      match /bodyMetrics/{metricId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(metricId) && isValidBodyMetric(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(metricId) && isValidBodyMetric(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(metricId);
+      }
+
+      // Custom Recipes Subcollection
+      match /customRecipes/{recipeId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(recipeId) && isValidCustomRecipe(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(recipeId) && isValidCustomRecipe(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(recipeId);
+      }
+
+      // Form Analyses Subcollection
+      match /formAnalyses/{analysisId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(analysisId) && isValidFormAnalysis(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(analysisId) && isValidFormAnalysis(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(analysisId);
+      }
+
+      // Smart Shopping List Subcollection
+      match /shoppingList/{itemId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(itemId);
+        allow update: if isOwner(userId) && isValidId(itemId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(itemId);
+      }
+    }
+
+    // Connection Health Verification
+    match /test/{docId} {
+      allow read: if true;
+    }
+  }
+}
