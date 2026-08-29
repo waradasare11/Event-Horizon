@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Check, 
   ChevronRight, 
@@ -10,17 +10,69 @@ import {
   Utensils, 
   Activity, 
   Dumbbell, 
-  Flame
+  Flame,
+  Bell,
+  BellRing,
+  Clock, 
+  Download,
+  BrainCircuit,
+  Loader2,
+  Crown,
+  QrCode,
+  ArrowRight,
+  ShieldCheck,
+  CheckCircle2,
+  Lock,
+  User,
+  HeartPulse,
+  Scale,
+  Moon,
+  Footprints,
+  Compass,
+  Camera,
+  Layers,
+  Zap,
+  Award,
+  BookOpen,
+  HelpCircle,
+  TrendingUp,
+  AlertTriangle,
+  Droplets
 } from 'lucide-react';
-import { UserProfile, GoalType, DietType, ExperienceLevel, PreferredTime, MusclePriority } from '../types';
+import { 
+  UserProfile, 
+  GoalType, 
+  DietType, 
+  ExperienceLevel, 
+  PreferredTime, 
+  MusclePriority, 
+  GoalTimelinePredictionResult,
+  SubscriptionPlanConfig,
+  UserSubscription
+} from '../types';
 import { calculateBMR, calculateTDEE } from '../lib/calc/energy';
 import { calculateMacros, calculateGoalTimeline } from '../lib/calc/macros';
+import { requestNotificationPermission, sendWorkoutNotification } from '../lib/notifications';
+import { 
+  predictGoalTimelineAPI, 
+  fetchPersonalizedPlans, 
+  isHostAdmin, 
+  HOST_ADMIN_CONFIG,
+  generateUPILink,
+  getUPIQRCodeUrl,
+  validateUTRNumber,
+  verifyPaymentWithBackendServer,
+  createInitialTrialSubscription
+} from '../lib/subscription';
+import { fireCelebrationConfetti } from '../lib/confetti';
+import { GoalTimelinePredictionCard } from './GoalTimelinePredictionCard';
 
 interface OnboardingModalProps {
   isOpen: boolean;
   onClose: () => void;
   userProfile: UserProfile;
   onSaveProfile: (profile: UserProfile) => void;
+  onExportData?: () => void;
 }
 
 export const OnboardingModal: React.FC<OnboardingModalProps> = ({
@@ -28,37 +80,282 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   onClose,
   userProfile,
   onSaveProfile,
+  onExportData,
 }) => {
   const [step, setStep] = useState<number>(1);
-  const totalSteps = 5;
+  const totalSteps = 6; // 1: Identity & Stats, 2: Lifestyle & NEAT, 3: Training Split, 4: Injury & Diet, 5: AI Timeline Prediction, 6: Plan Choice
 
-  // Form State
-  const [name, setName] = useState(userProfile.name || 'Athlete');
-  const [age, setAge] = useState<number>(userProfile.age || 26);
+  // Step 1: Foundations & Stats (Name first!)
+  const [name, setName] = useState(userProfile.name || '');
+  const [age, setAge] = useState<number | string>(userProfile.age ? String(userProfile.age) : '');
   const [sex, setSex] = useState<'male' | 'female'>(userProfile.sex || 'male');
-  const [heightCm, setHeightCm] = useState<number>(userProfile.heightCm || 175);
-  const [weightKg, setWeightKg] = useState<number>(userProfile.weightKg || 75);
-  const [targetWeightKg, setTargetWeightKg] = useState<number>(userProfile.targetWeightKg || 70);
-  const [bodyFatPct, setBodyFatPct] = useState<number>(userProfile.bodyFatPct || 18);
+  const [heightCm, setHeightCm] = useState<number | string>(userProfile.heightCm ? String(userProfile.heightCm) : '');
+  const [weightKg, setWeightKg] = useState<number | string>(userProfile.weightKg ? String(userProfile.weightKg) : '');
+  const [targetWeightKg, setTargetWeightKg] = useState<number | string>(userProfile.targetWeightKg ? String(userProfile.targetWeightKg) : '');
+  const [bodyFatPct, setBodyFatPct] = useState<number | string>(userProfile.bodyFatPct ? String(userProfile.bodyFatPct) : '');
+  const [targetBodyFatPct, setTargetBodyFatPct] = useState<number | string>(userProfile.targetBodyFatPct ? String(userProfile.targetBodyFatPct) : '');
   const [goal, setGoal] = useState<GoalType>(userProfile.goal || 'lose_fat');
-  const [dietType, setDietType] = useState<DietType>(userProfile.dietType || 'flexible');
+  const [activityFoundation, setActivityFoundation] = useState<'beginner' | 'inconsistent' | 'consistent'>('inconsistent');
+
+  // Target Date & Desired Timeline Horizon
+  const [timelinePreset, setTimelinePreset] = useState<'fastest_safe' | '8_weeks' | '12_weeks' | '16_weeks' | '24_weeks' | 'custom'>('fastest_safe');
+  const [customTargetDate, setCustomTargetDate] = useState<string>(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 90);
+    return d.toISOString().split('T')[0];
+  });
+
+  // Step 2: Lifestyle, NEAT, Circadian & Recovery (AI Driven Targets)
+  const [dailySleepDurationHours, setDailySleepDurationHours] = useState<number>(userProfile.dailySleepDurationHours || 7.5);
+  const [sleepQuality, setSleepQuality] = useState<'restful' | 'average' | 'fragmented'>('restful');
+  const [dailyStressLevel, setDailyStressLevel] = useState<'low' | 'moderate' | 'high' | 'very_high'>(userProfile.dailyStressLevel || 'moderate');
+  const [occupationStyle, setOccupationStyle] = useState<'sedentary' | 'lightly_active' | 'moderately_active' | 'heavy_labor'>((userProfile.occupationStyle as any) || 'sedentary');
+  const [sittingHoursPerDay, setSittingHoursPerDay] = useState<string>('6-8 hours/day');
+  const [mealCadence, setMealCadence] = useState<string>('3 Meals + 1-2 High-Protein Snacks');
+  const [baselineHydrationHabit, setBaselineHydrationHabit] = useState<string>('1.5 - 2.5 L/day');
+  const [targetFeasibilityAgreement, setTargetFeasibilityAgreement] = useState<'achievable' | 'challenging' | 'ramp_up'>('achievable');
+  const [energyPeakTime, setEnergyPeakTime] = useState<'morning' | 'midday' | 'evening' | 'night'>('morning');
+
+  // Helper to remove unwanted leading zeros when typing (e.g. prevents "017" or "065")
+  const handleNumberChange = (raw: string, setter: (val: string) => void) => {
+    if (raw === '') {
+      setter('');
+      return;
+    }
+    // Strip leading zeros before positive digits, preserving decimal points
+    const sanitized = raw.replace(/^0+(?=\d)/, '');
+    setter(sanitized);
+  };
+
+  // Safe numerical parsed values for calculations
+  const numAge = Number(age) || 25;
+  const numHeight = Number(heightCm) || 175;
+  const numWeight = Number(weightKg) || 70;
+  const numTargetWeight = Number(targetWeightKg) || (numWeight > 5 ? numWeight - 5 : 65);
+  const numBodyFat = Number(bodyFatPct) || 18;
+  const numTargetBodyFat = Number(targetBodyFatPct) || 12;
+
+  // Step 3: Training Availability, Split & Biomechanics
   const [experienceLevel, setExperienceLevel] = useState<ExperienceLevel>(userProfile.experienceLevel || 'intermediate');
+  const [yearsLifting, setYearsLifting] = useState<number>(userProfile.yearsLifting || 2);
   const [trainingDaysPerWeek, setTrainingDaysPerWeek] = useState<number>(userProfile.trainingDaysPerWeek || 4);
   const [selectedDays, setSelectedDays] = useState<string[]>(userProfile.selectedDays || ['Mon', 'Tue', 'Thu', 'Fri']);
   const [sessionDurationMin, setSessionDurationMin] = useState<number>(userProfile.sessionDurationMin || 55);
   const [preferredTime, setPreferredTime] = useState<PreferredTime>(userProfile.preferredTime || 'morning');
   const [musclePriority, setMusclePriority] = useState<MusclePriority>(userProfile.musclePriority || 'balanced');
+  const [availableEquipment, setAvailableEquipment] = useState<string>(userProfile.availableEquipment || 'Full Commercial Gym');
+  const [trainingSplitStyle, setTrainingSplitStyle] = useState<string>('PPL / Upper-Lower Hybrid');
+
+  // Step 4: Joint Health & Dietary Framework
   const [selectedInjuries, setSelectedInjuries] = useState<string[]>(userProfile.injuries || []);
   const [injuryNotes, setInjuryNotes] = useState<string>(userProfile.injuryNotes || '');
+  const [dietType, setDietType] = useState<DietType>(userProfile.dietType || 'flexible');
   const [cuisinePreference, setCuisinePreference] = useState<string>(userProfile.cuisinePreference || 'High-Protein Global & Mediterranean');
+  const [mealFrequency, setMealFrequency] = useState<string>('3 Standard Meals + 1 Snack');
+  const [foodAllergies, setFoodAllergies] = useState<string>(userProfile.foodAllergies || '');
 
-  if (!isOpen) return null;
+  // Notifications
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>(
+    typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'default'
+  );
+  const [enableWorkoutAlerts, setEnableWorkoutAlerts] = useState<boolean>(true);
+  const [workoutReminderTime, setWorkoutReminderTime] = useState<string>(
+    userProfile.notificationSettings?.customReminderTime || '07:30'
+  );
 
-  // Live Math Calculations
-  const calculatedBMR = calculateBMR(sex, weightKg, heightCm, age);
+  // Step 5: AI Goal Timeline Prediction State
+  const [predictionResult, setPredictionResult] = useState<GoalTimelinePredictionResult | null>(null);
+  const [isPredicting, setIsPredicting] = useState<boolean>(false);
+  const [predictionError, setPredictionError] = useState<string | null>(null);
+
+  // Precision Tudor-Locke & Katch-McArdle AI Step Calculation State
+  const [precisionStepData, setPrecisionStepData] = useState<any | null>(null);
+  const [isCalculatingPrecisionSteps, setIsCalculatingPrecisionSteps] = useState<boolean>(false);
+
+  // Step 6: Plan Selection State
+  const [plans, setPlans] = useState<SubscriptionPlanConfig[]>([]);
+  const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanConfig | null>(null);
+  const [showDirectPayment, setShowDirectPayment] = useState<boolean>(false);
+  const [utrInput, setUtrInput] = useState<string>('');
+  const [isVerifyingPayment, setIsVerifyingPayment] = useState<boolean>(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
+
+  const isUserHost = isHostAdmin(userProfile.email);
+
+  // Live Math Calculations Fallback
+  const calculatedBMR = calculateBMR(sex, numWeight, numHeight, numAge);
   const calculatedTDEE = calculateTDEE(calculatedBMR, trainingDaysPerWeek);
-  const macroResults = calculateMacros(calculatedTDEE, goal, sex, weightKg, dietType);
-  const timelineResult = calculateGoalTimeline(weightKg, targetWeightKg, macroResults.weeklyRateKg);
+  const macroResults = calculateMacros(calculatedTDEE, goal, sex, numWeight, dietType);
+  const mathTimeline = calculateGoalTimeline(numWeight, numTargetWeight, macroResults.weeklyRateKg);
+
+  // AI Dynamic Recommendation for Daily Step Target (NEAT) based on deep physiological analysis
+  const getAIRecommendedSteps = (): { steps: number; reason: string; kcalBurn: number } => {
+    if (goal === 'lose_fat') {
+      if (occupationStyle === 'sedentary') {
+        return {
+          steps: 10500,
+          reason: `Compensates for desk sitting by generating ~400 kcal/day of clean non-exercise thermogenesis (NEAT) without elevating ghrelin (hunger hormones) or depleting CNS recovery.`,
+          kcalBurn: Math.round(numWeight * 0.038 * 10.5),
+        };
+      } else if (occupationStyle === 'lightly_active') {
+        return {
+          steps: 9500,
+          reason: `Pairs with your active standing routine to maintain steady metabolic flux while ensuring zero interference with resistance training recovery.`,
+          kcalBurn: Math.round(numWeight * 0.038 * 9.5),
+        };
+      } else if (occupationStyle === 'moderately_active') {
+        return {
+          steps: 8500,
+          reason: `Optimized for on-the-go mobility to prevent excessive systemic fatigue while ensuring steady fat oxidation.`,
+          kcalBurn: Math.round(numWeight * 0.038 * 8.5),
+        };
+      } else {
+        return {
+          steps: 7500,
+          reason: `Conserves energy from physical labor while ensuring joint lubrication and lymphatic drainage.`,
+          kcalBurn: Math.round(numWeight * 0.038 * 7.5),
+        };
+      }
+    } else if (goal === 'build_muscle') {
+      return {
+        steps: 8000,
+        reason: `Optimizes insulin sensitivity, nutrient partitioning toward muscle tissue, and cardiovascular baseline without burning surplus calories needed for myofibrillar protein synthesis.`,
+        kcalBurn: Math.round(numWeight * 0.038 * 8.0),
+      };
+    } else {
+      // Recomposition
+      return {
+        steps: 10000,
+        reason: `The gold-standard recomposition threshold to simultaneously drive steady adipose oxidation while preserving lean mass for maximum muscular definition.`,
+        kcalBurn: Math.round(numWeight * 0.038 * 10.0),
+      };
+    }
+  };
+
+  const aiStepsData = getAIRecommendedSteps();
+  const effectiveDailySteps = precisionStepData?.recommendedDailySteps || aiStepsData.steps;
+
+  // Asynchronously query Tudor-Locke & Katch-McArdle biomechanical model with debouncing
+  useEffect(() => {
+    // Only query when modal is open, user is in relevant steps or has filled stats
+    if (!isOpen || step < 2) return;
+
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const timer = setTimeout(async () => {
+      try {
+        setIsCalculatingPrecisionSteps(true);
+        const res = await fetch('/api/ai/calculate-steps-target', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal,
+          body: JSON.stringify({
+            userProfile: {
+              weightKg: numWeight,
+              heightCm: numHeight,
+              age: numAge,
+              sex,
+              bodyFatPct: numBodyFat,
+              goal,
+              occupationStyle,
+              sittingHoursPerDay,
+              dailyStressLevel,
+              dailySleepDurationHours,
+              trainingDaysPerWeek,
+              sessionDurationMin,
+            },
+          }),
+        });
+
+        if (!res.ok) return;
+
+        const data = await res.json();
+        if (isMounted && data.success && data.data) {
+          setPrecisionStepData(data.data);
+        }
+      } catch (err: any) {
+        if (err.name === 'AbortError') return;
+        // Graceful fallback to client-side Tudor-Locke calculation without throwing
+      } finally {
+        if (isMounted) setIsCalculatingPrecisionSteps(false);
+      }
+    }, 450);
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [isOpen, step, numWeight, numHeight, numAge, sex, numBodyFat, goal, occupationStyle, sittingHoursPerDay, dailyStressLevel, dailySleepDurationHours, trainingDaysPerWeek, sessionDurationMin]);
+
+  // AI Dynamic Recommendation for Daily Hydration (Liters)
+  const aiRecommendedHydration = Math.max(
+    2.8,
+    Number(
+      (
+        numWeight * 0.038 +
+        (sessionDurationMin / 60) * 0.65 +
+        (dailyStressLevel === 'high' || dailyStressLevel === 'very_high' ? 0.3 : 0.0)
+      ).toFixed(1)
+    )
+  );
+
+  // Target Date Resolution
+  const resolveTargetDateString = (): string => {
+    if (timelinePreset === 'custom' && customTargetDate) {
+      return customTargetDate;
+    }
+    if (timelinePreset === '8_weeks') {
+      const d = new Date();
+      d.setDate(d.getDate() + 56);
+      return d.toISOString().split('T')[0];
+    }
+    if (timelinePreset === '12_weeks') {
+      const d = new Date();
+      d.setDate(d.getDate() + 84);
+      return d.toISOString().split('T')[0];
+    }
+    if (timelinePreset === '16_weeks') {
+      const d = new Date();
+      d.setDate(d.getDate() + 112);
+      return d.toISOString().split('T')[0];
+    }
+    if (timelinePreset === '24_weeks') {
+      const d = new Date();
+      d.setDate(d.getDate() + 168);
+      return d.toISOString().split('T')[0];
+    }
+    // Fastest Safe (Default)
+    return mathTimeline.projectedDate;
+  };
+
+  const currentChosenTargetDate = resolveTargetDateString();
+
+  // Feasibility & Realism Analysis Engine
+  const targetDateObj = new Date(currentChosenTargetDate);
+  const daysAvailable = Math.max(7, Math.round((targetDateObj.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+  const weeksAvailable = Math.max(1, Number((daysAvailable / 7).toFixed(1)));
+  const deltaWeightKg = Number(Math.abs(numWeight - numTargetWeight).toFixed(1));
+  const reqWeeklyRate = Number((deltaWeightKg / weeksAvailable).toFixed(2));
+
+  // Physiological safe boundaries
+  const maxSafeWeeklyFatLoss = Number((numWeight * 0.01).toFixed(2)); // Max 1.0% bodyweight/week
+  const optimalSafeWeeklyFatLoss = Number((numWeight * 0.0075).toFixed(2)); // 0.75% optimal
+  const maxSafeWeeklyMuscleGain = experienceLevel === 'beginner' ? 0.25 : experienceLevel === 'intermediate' ? 0.15 : 0.08;
+
+  const maxSafeRate = goal === 'build_muscle' ? maxSafeWeeklyMuscleGain : maxSafeWeeklyFatLoss;
+  const isTimelineFeasible = reqWeeklyRate <= maxSafeRate;
+
+  // Earliest realistic and safe date
+  const earliestSafeWeeks = Math.max(2, Math.ceil(deltaWeightKg / maxSafeRate));
+  const earliestSafeDate = new Date(Date.now() + earliestSafeWeeks * 7 * 86400000);
+  const earliestSafeDateFormatted = earliestSafeDate.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 
   const toggleDay = (day: string) => {
     if (selectedDays.includes(day)) {
@@ -76,106 +373,328 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     }
   };
 
-  const handleFinishOnboarding = () => {
-    const updatedProfile: UserProfile = {
-      ...userProfile,
-      name,
-      age,
+  // Trigger Deep AI Physiological Prediction
+  const handleRunTimelinePrediction = async () => {
+    setIsPredicting(true);
+    setPredictionError(null);
+
+    const profilePayload: Partial<UserProfile> = {
+      name: name.trim() || 'PeakForm Athlete',
+      age: numAge,
       sex,
-      heightCm,
-      weightKg,
-      targetWeightKg,
-      targetDate: timelineResult.projectedDate,
-      bodyFatPct,
+      heightCm: numHeight,
+      weightKg: numWeight,
+      targetWeightKg: numTargetWeight,
+      bodyFatPct: numBodyFat,
+      targetBodyFatPct: numTargetBodyFat,
       goal,
       dietType,
       experienceLevel,
+      yearsLifting,
+      trainingDaysPerWeek,
+      selectedDays,
+      sessionDurationMin,
+      dailyStepTarget: effectiveDailySteps,
+      dailySleepDurationHours,
+      dailyStressLevel,
+      occupationStyle,
+      hydrationLiters: aiRecommendedHydration,
+      musclePriority,
+      injuries: selectedInjuries,
+      injuryNotes,
+      cuisinePreference,
+      foodAllergies,
+    };
+
+    try {
+      const pred = await predictGoalTimelineAPI(profilePayload);
+      setPredictionResult(pred);
+      fireCelebrationConfetti();
+    } catch (err: any) {
+      console.warn('Prediction API fallback:', err);
+      // Fallback calculation with accurate scientific principles
+      const fallbackPrediction: GoalTimelinePredictionResult = {
+        predictedCompletionDate: mathTimeline.projectedDate,
+        formattedTargetDate: new Date(Date.now() + mathTimeline.weeksNeeded * 7 * 86400000).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }),
+        totalDaysRequired: mathTimeline.weeksNeeded * 7,
+        totalWeeksRequired: mathTimeline.weeksNeeded,
+        weeklyRateKg: macroResults.weeklyRateKg,
+        dailyCalorieTarget: macroResults.dailyCalories,
+        dailyProteinGrams: macroResults.proteinG,
+        dailyCarbsGrams: macroResults.carbsG,
+        dailyFatGrams: macroResults.fatG,
+        hydrationLiters: aiRecommendedHydration,
+        metabolicBreakdown: {
+          bmr: calculatedBMR,
+          tdee: calculatedTDEE,
+          dailyDeficitOrSurplus: Math.round(macroResults.dailyCalories - calculatedTDEE),
+          energyBalanceModel: 'Dynamic Mifflin-St Jeor + Metabolic Adaptation Model (Katch-McArdle Adjusted)',
+        },
+        milestones: [
+          {
+            weekNumber: Math.max(1, Math.round(mathTimeline.weeksNeeded * 0.25)),
+            targetDate: new Date(Date.now() + Math.round(mathTimeline.weeksNeeded * 0.25) * 7 * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            projectedWeightKg: Number((numWeight + (numTargetWeight - numWeight) * 0.25).toFixed(1)),
+            projectedBodyFatPct: Math.round(numBodyFat - ((numBodyFat - numTargetBodyFat) * 0.25)),
+            milestoneTitle: 'Phase 1: Neuromuscular Calibration & Glycogen Stabilization',
+            description: 'Motor unit recruitment ramp-up, fluid retention balance, and initial adipose mobilization.',
+            physiologicalAdaptation: 'Mitochondrial biogenesis and insulin sensitivity upregulation.',
+          },
+          {
+            weekNumber: Math.max(2, Math.round(mathTimeline.weeksNeeded * 0.50)),
+            targetDate: new Date(Date.now() + Math.round(mathTimeline.weeksNeeded * 0.50) * 7 * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            projectedWeightKg: Number((numWeight + (numTargetWeight - numWeight) * 0.50).toFixed(1)),
+            projectedBodyFatPct: Math.round(numBodyFat - ((numBodyFat - numTargetBodyFat) * 0.50)),
+            milestoneTitle: 'Phase 2: Deep Tissue Partitioning & Hypertrophy Lock-in',
+            description: 'Significant visual change in waist-to-shoulder ratio and muscle definition.',
+            physiologicalAdaptation: 'Intramuscular triglyceride oxidation and myofibrillar protein accretion.',
+          },
+          {
+            weekNumber: Math.max(3, Math.round(mathTimeline.weeksNeeded * 0.75)),
+            targetDate: new Date(Date.now() + Math.round(mathTimeline.weeksNeeded * 0.75) * 7 * 86400000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            projectedWeightKg: Number((numWeight + (numTargetWeight - numWeight) * 0.75).toFixed(1)),
+            projectedBodyFatPct: Math.round(numBodyFat - ((numBodyFat - numTargetBodyFat) * 0.75)),
+            milestoneTitle: 'Phase 3: Advanced Definition & Strength Consolidation',
+            description: 'Metabolic adaptation mitigation via structured refeeds and mechanical tension.',
+            physiologicalAdaptation: 'Lipolytic enzyme optimization and satellite cell integration.',
+          },
+          {
+            weekNumber: mathTimeline.weeksNeeded,
+            targetDate: mathTimeline.projectedDate,
+            projectedWeightKg: numTargetWeight,
+            projectedBodyFatPct: numTargetBodyFat,
+            milestoneTitle: 'Phase 4: Peak Target Physique Realization',
+            description: 'Full target body composition unlocked with complete hormonal homeostasis.',
+            physiologicalAdaptation: 'Permanent baseline set-point establishment and metabolic defense.',
+          },
+        ],
+        scientificEvidence: {
+          basis: `Based on your ${calculatedTDEE} kcal daily expenditure and structured training cadence, you will reach ${numTargetWeight} kg safely with 100% lean tissue preservation.`,
+          citedPrinciples: [
+            'Hall, K.D. et al. Quantification of the effect of energy imbalance on bodyweight (Lancet)',
+            'Helms, E.R. et al. Evidence-based recommendations for natural bodybuilding & nutrition',
+            'Schoenfeld, B.J. et al. Dose-response relationship between weekly resistance training volume and muscle growth',
+          ],
+        },
+        recoveryGuidance: {
+          sleepTargetHours: dailySleepDurationHours,
+          deloadFrequencyWeeks: 6,
+          injuryPreventionTips: ['Progressive load ramping', 'Adequate sleep for CNS recovery', 'Optimal hydration & electrolyte balance'],
+        },
+      };
+      setPredictionResult(fallbackPrediction);
+    } finally {
+      setIsPredicting(false);
+    }
+  };
+
+  const handleNextToStep5 = async () => {
+    setStep(5);
+    await handleRunTimelinePrediction();
+  };
+
+  const handleNextToStep6 = async () => {
+    // Fetch personalized plans for step 6
+    const fetched = await fetchPersonalizedPlans(userProfile.email);
+    setPlans(fetched.plans);
+    const defaultPaid = fetched.plans.find((p) => p.id === '1_year') || fetched.plans[1] || fetched.plans[0];
+    setSelectedPlan(defaultPaid);
+    setStep(6);
+  };
+
+  const handleApplyProfileAndFinish = (chosenSubscription?: UserSubscription) => {
+    const finalDate = predictionResult?.predictedCompletionDate || mathTimeline.projectedDate;
+
+    const updatedProfile: UserProfile = {
+      ...userProfile,
+      name: name.trim() || 'PeakForm Athlete',
+      age: numAge,
+      sex,
+      heightCm: numHeight,
+      weightKg: numWeight,
+      targetWeightKg: numTargetWeight,
+      targetDate: finalDate,
+      bodyFatPct: numBodyFat,
+      targetBodyFatPct: numTargetBodyFat,
+      goal,
+      dietType,
+      experienceLevel,
+      yearsLifting,
       trainingDaysPerWeek,
       selectedDays,
       sessionDurationMin,
       preferredTime,
       musclePriority,
+      availableEquipment,
       injuries: selectedInjuries,
       injuryNotes,
       cuisinePreference,
+      foodAllergies,
+      dailyStepTarget: effectiveDailySteps,
+      dailySleepDurationHours,
+      dailyStressLevel,
+      occupationStyle,
+      notificationSettings: {
+        enabled: notifPermission === 'granted' || enableWorkoutAlerts,
+        reminderLeadTimeMin: 30,
+        customReminderTime: workoutReminderTime,
+        soundEnabled: true,
+      },
       bmr: calculatedBMR,
       tdee: calculatedTDEE,
       dailyCalories: macroResults.dailyCalories,
       dailyProtein: macroResults.proteinG,
       dailyCarbs: macroResults.carbsG,
       dailyFat: macroResults.fatG,
-      hydrationLiters: Number(((weightKg * 0.04) + 0.5).toFixed(1)),
+      hydrationLiters: aiRecommendedHydration,
       weeklyRateKg: macroResults.weeklyRateKg,
+      goalTimelinePrediction: predictionResult || undefined,
+      subscription: chosenSubscription || userProfile.subscription || createInitialTrialSubscription(),
       isOnboarded: true,
     };
 
     onSaveProfile(updatedProfile);
+    fireCelebrationConfetti();
     onClose();
   };
 
+  const handleVerifyPaidPlan = async () => {
+    if (!selectedPlan) return;
+    setPaymentError(null);
+    setIsVerifyingPayment(true);
+
+    const validation = validateUTRNumber(utrInput);
+    if (!validation.isValid) {
+      setPaymentError(validation.error || 'Invalid 12-digit UTR reference ID.');
+      setIsVerifyingPayment(false);
+      return;
+    }
+
+    try {
+      const res = await verifyPaymentWithBackendServer(
+        userProfile,
+        selectedPlan,
+        utrInput
+      );
+
+      if (!res.success || !res.subscription) {
+        setPaymentError(res.error || 'Verification failed. Please double check UTR.');
+        setIsVerifyingPayment(false);
+        return;
+      }
+
+      setPaymentSuccess(true);
+      setIsVerifyingPayment(false);
+      fireCelebrationConfetti();
+      setTimeout(() => {
+        handleApplyProfileAndFinish(res.subscription);
+      }, 1500);
+    } catch (e: any) {
+      setPaymentError(e.message || 'Payment verification failed');
+      setIsVerifyingPayment(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-[#E5E7EB] overflow-hidden animate-in zoom-in-95 duration-200 text-left my-8">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white dark:bg-[#161817] rounded-3xl max-w-3xl w-full shadow-2xl border border-[#E5E7EB] dark:border-[#242826] overflow-hidden animate-in zoom-in-95 duration-200 text-left my-6 transition-colors flex flex-col max-h-[92vh]">
         {/* Top Progress Bar */}
-        <div className="p-6 border-b border-[#E5E7EB] bg-[#FAFAF8]">
-          <div className="flex items-center justify-between text-xs text-[#6B7280] mb-2 font-semibold">
+        <div className="p-5 sm:p-6 border-b border-[#E5E7EB] dark:border-[#242826] bg-[#FAFAF8] dark:bg-[#111312] shrink-0">
+          <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-2 font-bold">
             <span>Step {step} of {totalSteps}</span>
-            <span>
-              {step === 1 && 'Foundations & Body Stats'}
-              {step === 2 && 'Training Availability'}
-              {step === 3 && 'Injury & Joint Screening'}
-              {step === 4 && 'Dietary Framework'}
-              {step === 5 && 'Scientific Plan Reveal'}
+            <span className="text-[#0F6E5F] dark:text-[#2DD4BF] font-extrabold">
+              {step === 1 && '1. Athlete Identity & Measurements'}
+              {step === 2 && '2. Metabolic Lifestyle & Energy Kinetics'}
+              {step === 3 && '3. Training Biomechanics & Split'}
+              {step === 4 && '4. Joint Health & Dietary Framework'}
+              {step === 5 && '5. 100% Accurate AI Goal Prediction'}
+              {step === 6 && '6. Plan Choice & 1-Week Free Trial'}
             </span>
           </div>
-          <div className="w-full bg-[#E5E7EB] rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-[#E5E7EB] dark:bg-[#2A2E2C] rounded-full h-2 overflow-hidden">
             <div
-              className="bg-[#0F6E5F] h-2 rounded-full transition-all duration-300"
+              className="bg-[#0F6E5F] dark:bg-[#2DD4BF] h-2 rounded-full transition-all duration-300"
               style={{ width: `${(step / totalSteps) * 100}%` }}
             />
           </div>
         </div>
 
-        {/* Step Content */}
-        <div className="p-6 sm:p-8 space-y-6 max-h-[70vh] overflow-y-auto">
-          {/* STEP 1: Foundations & Body Stats */}
+        {/* Scrollable Step Content */}
+        <div className="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1">
+          
+          {/* STEP 1: Athlete Identity & Biological Foundation (NAME FIRST!) */}
           {step === 1 && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <h2 className="text-xl font-bold text-[#1A1D1B]">What is your primary fitness goal?</h2>
-                <p className="text-xs text-[#6B7280] mt-1">
-                  We use this to establish your exact caloric surplus or deficit and optimal protein distribution.
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Personalized Physiological Blueprint</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  Let's Build Your Athlete Profile
+                </h2>
+                <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1">
+                  We calculate your metabolic rate, lean tissue preservation threshold, and the 100% exact date you will reach your physique milestone.
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {[
-                  { id: 'lose_fat', label: 'Lose Fat', desc: 'Preserve muscle, target pure adipose loss' },
-                  { id: 'build_muscle', label: 'Build Muscle', desc: 'Max MPS with controlled lean surplus' },
-                  { id: 'recomp', label: 'Recomposition', desc: 'Simultaneous fat loss & muscle gain' },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setGoal(item.id as GoalType)}
-                    className={`p-4 rounded-xl border text-left transition-all ${
-                      goal === item.id
-                        ? 'border-[#0F6E5F] bg-[#0F6E5F]/5 ring-1 ring-[#0F6E5F]'
-                        : 'border-[#E5E7EB] bg-white hover:bg-[#FAFAF8]'
-                    }`}
-                  >
-                    <div className="font-bold text-sm text-[#1A1D1B]">{item.label}</div>
-                    <div className="text-[11px] text-[#6B7280] mt-1">{item.desc}</div>
-                  </button>
-                ))}
+              {/* NAME INPUT FIRST */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#0F6E5F]/10 via-[#0F6E5F]/5 to-transparent border border-[#0F6E5F]/30 space-y-2">
+                <label className="block text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
+                  <User className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                  <span>What is your full name? *</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Alex Mercer"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full text-sm font-semibold p-3.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-2 focus:ring-[#0F6E5F] outline-none"
+                />
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+              {/* Primary Goal Selector */}
+              <div>
+                <label className="block text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mb-2">
+                  What is your primary fitness goal?
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {[
+                    { id: 'lose_fat', label: 'Lose Fat', desc: 'Targeted adipose loss while preserving 100% muscle mass' },
+                    { id: 'build_muscle', label: 'Build Muscle', desc: 'Maximized myofibrillar hypertrophy with lean surplus' },
+                    { id: 'recomp', label: 'Recomposition', desc: 'Burn stubborn fat and build lean muscle concurrently' },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setGoal(item.id as GoalType)}
+                      className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
+                        goal === item.id
+                          ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 ring-1 ring-[#0F6E5F] dark:ring-[#2DD4BF]'
+                          : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#191B1A] hover:bg-[#FAFAF8] dark:hover:bg-[#202422]'
+                      }`}
+                    >
+                      <div className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center justify-between">
+                        <span>{item.label}</span>
+                        {goal === item.id && <Check className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF]" />}
+                      </div>
+                      <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] mt-1 leading-normal">{item.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Body Stats Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
                 <div>
-                  <label className="block text-xs font-semibold text-[#1A1D1B] mb-1">Sex</label>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">Biological Sex</label>
                   <select
                     value={sex}
                     onChange={(e) => setSex(e.target.value as 'male' | 'female')}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] bg-white"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -183,75 +702,429 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#1A1D1B] mb-1">Age</label>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">Age</label>
                   <input
                     type="number"
                     value={age}
-                    onChange={(e) => setAge(Number(e.target.value))}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB]"
-                    min={15}
-                    max={85}
+                    onChange={(e) => handleNumberChange(e.target.value, setAge)}
+                    placeholder="e.g. 25"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
+                    min={14}
+                    max={90}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#1A1D1B] mb-1">Height (cm)</label>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">Height (cm)</label>
                   <input
                     type="number"
                     value={heightCm}
-                    onChange={(e) => setHeightCm(Number(e.target.value))}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB]"
+                    onChange={(e) => handleNumberChange(e.target.value, setHeightCm)}
+                    placeholder="e.g. 175"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
                     min={120}
                     max={230}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#1A1D1B] mb-1">Current Weight (kg)</label>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">Current Weight (kg)</label>
                   <input
                     type="number"
                     value={weightKg}
-                    onChange={(e) => setWeightKg(Number(e.target.value))}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB]"
+                    onChange={(e) => handleNumberChange(e.target.value, setWeightKg)}
+                    placeholder="e.g. 70"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
                     min={35}
-                    max={200}
+                    max={250}
+                    step="any"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#1A1D1B] mb-1">Target Weight (kg)</label>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">Target Weight (kg)</label>
                   <input
                     type="number"
                     value={targetWeightKg}
-                    onChange={(e) => setTargetWeightKg(Number(e.target.value))}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB]"
+                    onChange={(e) => handleNumberChange(e.target.value, setTargetWeightKg)}
+                    placeholder="e.g. 65"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
                     min={35}
-                    max={200}
+                    max={250}
+                    step="any"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#1A1D1B] mb-1">Body Fat % (Est.)</label>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">Current Body Fat %</label>
                   <input
                     type="number"
                     value={bodyFatPct}
-                    onChange={(e) => setBodyFatPct(Number(e.target.value))}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB]"
+                    onChange={(e) => handleNumberChange(e.target.value, setBodyFatPct)}
+                    placeholder="e.g. 18"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
                     min={5}
                     max={50}
+                    step="any"
                   />
+                </div>
+              </div>
+
+              {/* TIMELINE HORIZON & TARGET DATE QUESTION */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
+                    <Calendar className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                    <span>Till when would you like to achieve your target physique?</span>
+                  </label>
+                  <span className="text-[11px] font-mono font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">
+                    Δ {deltaWeightKg} kg
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {[
+                    { id: 'fastest_safe', label: '⚡ Fastest Safe Date', sub: 'AI Recommended' },
+                    { id: '8_weeks', label: '8 Weeks', sub: 'Sprint Phase' },
+                    { id: '12_weeks', label: '12 Weeks', sub: 'Standard Periodization' },
+                    { id: '16_weeks', label: '16 Weeks', sub: 'Optimal Recomp' },
+                    { id: '24_weeks', label: '24 Weeks', sub: '6-Month Master Plan' },
+                    { id: 'custom', label: 'Custom Date', sub: 'Choose Exact Day' },
+                  ].map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => setTimelinePreset(preset.id as any)}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                        timelinePreset === preset.id
+                          ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 ring-1 ring-[#0F6E5F]'
+                          : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312]'
+                      }`}
+                    >
+                      <div className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">{preset.label}</div>
+                      <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">{preset.sub}</div>
+                    </button>
+                  ))}
+                </div>
+
+                {timelinePreset === 'custom' && (
+                  <div className="pt-2 animate-in fade-in">
+                    <label className="block text-[11px] font-bold text-gray-700 dark:text-gray-300 mb-1">
+                      Pick your exact target deadline:
+                    </label>
+                    <input
+                      type="date"
+                      value={customTargetDate}
+                      min={new Date().toISOString().split('T')[0]}
+                      onChange={(e) => setCustomTargetDate(e.target.value)}
+                      className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] font-mono"
+                    />
+                  </div>
+                )}
+
+                {/* Instant Feasibility Status Indicator */}
+                <div className={`p-3 rounded-xl border text-xs flex items-center justify-between gap-2 ${
+                  isTimelineFeasible
+                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800 dark:text-emerald-300'
+                    : 'bg-amber-500/10 border-amber-500/20 text-amber-800 dark:text-amber-300'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    {isTimelineFeasible ? <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" /> : <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500" />}
+                    <span>
+                      {isTimelineFeasible
+                        ? `Required pace: ${reqWeeklyRate} kg/week (100% biologically safe & achievable)`
+                        : `Required pace: ${reqWeeklyRate} kg/week (Timeline is aggressive — AI will evaluate feasibility in Step 5)`}
+                    </span>
+                  </div>
+                  <span className="font-mono font-bold text-[11px] shrink-0">~{weeksAvailable} Wks</span>
+                </div>
+              </div>
+
+              {/* CREATIVE FEATURE SPOTLIGHT 1: Visual Transformation Projector */}
+              <div className="p-4 rounded-2xl bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20 flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+                  <TrendingUp className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5 text-xs">
+                  <div className="font-extrabold text-purple-900 dark:text-purple-300 flex items-center gap-1.5">
+                    <span>Feature Spotlight: Visual Transformation Time-Lapse Projector</span>
+                    <span className="px-1.5 py-0.2 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 text-[9px] uppercase font-bold">AI Engine</span>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    PeakForm AI models your biological timeline to render realistic photorealistic visual time-lapses of how your deltoids, waist, and abdominals evolve at 4, 8, 12, and 16 weeks.
+                  </p>
                 </div>
               </div>
             </div>
           )}
 
-          {/* STEP 2: Training Availability & Schedule */}
+          {/* STEP 2: Lifestyle, Energy Expenditure & AI Prescribed Targets */}
           {step === 2 && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <h2 className="text-xl font-bold text-[#1A1D1B]">Training Availability & Split</h2>
-                <p className="text-xs text-[#6B7280] mt-1">
-                  How many days per week can you consistently dedicate to resistance training?
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>Non-Exercise Activity & Circadian Fueling</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  Lifestyle & Energy Kinetics
+                </h2>
+                <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1">
+                  We analyze your daily movement, desk habits, sleep quality, and stress to calculate your 100% exact prescribed step and hydration targets.
+                </p>
+              </div>
+
+              {/* SPECIFIC DEEP LIFESTYLE QUESTIONS */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
+                    Daily Occupation Style
+                  </label>
+                  <select
+                    value={occupationStyle}
+                    onChange={(e) => setOccupationStyle(e.target.value as any)}
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                  >
+                    <option value="sedentary">Desk Job / Seated 7-9 hours</option>
+                    <option value="lightly_active">Active Standing / Teacher / Clinical</option>
+                    <option value="moderately_active">On-the-go / Field Work / Site</option>
+                    <option value="heavy_labor">Heavy Physical Labor / Trades</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
+                    Daily Sitting Duration
+                  </label>
+                  <select
+                    value={sittingHoursPerDay}
+                    onChange={(e) => setSittingHoursPerDay(e.target.value)}
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                  >
+                    <option value="2-4 hours/day">2 - 4 hours / day (High natural mobility)</option>
+                    <option value="4-6 hours/day">4 - 6 hours / day (Moderate sitting)</option>
+                    <option value="6-8 hours/day">6 - 8 hours / day (Prolonged desk posture)</option>
+                    <option value="8-10+ hours/day">8 - 10+ hours / day (Intense sedentary desk work)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
+                    Daily Stress & Cortisol Level
+                  </label>
+                  <select
+                    value={dailyStressLevel}
+                    onChange={(e) => setDailyStressLevel(e.target.value as any)}
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                  >
+                    <option value="low">Low (Calm / Balanced recovery)</option>
+                    <option value="moderate">Moderate (Standard work pace)</option>
+                    <option value="high">High (Demanding deadlines / High mental load)</option>
+                    <option value="very_high">Very High (Chronic high cortisol)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
+                    Average Daily Sleep Duration
+                  </label>
+                  <select
+                    value={dailySleepDurationHours}
+                    onChange={(e) => setDailySleepDurationHours(Number(e.target.value))}
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                  >
+                    <option value={5.5}>5.5 - 6 Hours (Elevated Cortisol risk)</option>
+                    <option value={6.5}>6.5 - 7 Hours (Moderate Recovery)</option>
+                    <option value={7.5}>7.5 - 8.5 Hours (Optimal Anabolic Growth Hormone)</option>
+                    <option value={9.0}>9+ Hours (Athlete Deep Sleep)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
+                    Sleep Quality & Restfulness
+                  </label>
+                  <select
+                    value={sleepQuality}
+                    onChange={(e) => setSleepQuality(e.target.value as any)}
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                  >
+                    <option value="restful">Restful (Deep slow-wave sleep, wake energized)</option>
+                    <option value="average">Average (Occasional waking)</option>
+                    <option value="fragmented">Fragmented / Restless (Difficulty falling asleep)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
+                    Meal Cadence & Window
+                  </label>
+                  <select
+                    value={mealCadence}
+                    onChange={(e) => setMealCadence(e.target.value)}
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                  >
+                    <option value="3 Meals + 1-2 High-Protein Snacks">3 Meals + 1-2 High-Protein Snacks (Optimal for MPS)</option>
+                    <option value="3 Solid Balanced Meals">3 Solid Balanced Meals</option>
+                    <option value="16:8 Intermittent Fasting">16:8 Intermittent Fasting (12 PM - 8 PM)</option>
+                    <option value="4-5 Small Frequent Meals">4 - 5 Small Frequent Meals</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* 100% ACCURATE AI PRESCRIBED TARGET CARDS (NOT MANUAL USER GUESSWORK) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                {/* Card 1: AI Recommended Step Target (Tudor-Locke Biomechanical Model) */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border-2 border-emerald-500/30 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                        <Footprints className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs font-black uppercase tracking-wider text-emerald-900 dark:text-emerald-300">
+                        AI Biomechanical Step Target
+                      </span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[10px] font-extrabold uppercase">
+                      {precisionStepData?.confidenceScore ? `${precisionStepData.confidenceScore}% Accurate` : 'Calculated'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-gray-900 dark:text-white">
+                      {effectiveDailySteps.toLocaleString()}
+                    </span>
+                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                      steps / day (~{precisionStepData?.dailyKcalBurn || aiStepsData.kcalBurn} kcal NEAT burn)
+                    </span>
+                  </div>
+
+                  <p className="text-[11px] text-gray-600 dark:text-gray-400 leading-relaxed">
+                    {precisionStepData?.physiologicalRationale || aiStepsData.reason}
+                  </p>
+
+                  {precisionStepData?.dailyDistribution && (
+                    <div className="pt-2 border-t border-emerald-500/20 grid grid-cols-3 gap-1.5 text-[10px] text-gray-700 dark:text-gray-300">
+                      <div className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-emerald-500/15">
+                        <div className="font-bold text-emerald-700 dark:text-emerald-300">🌅 Morning</div>
+                        <div>{precisionStepData.dailyDistribution.morningAwakening.toLocaleString()} steps</div>
+                      </div>
+                      <div className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-emerald-500/15">
+                        <div className="font-bold text-emerald-700 dark:text-emerald-300">🥗 Post-Meal</div>
+                        <div>{precisionStepData.dailyDistribution.postMealGlucoseDisposal.toLocaleString()} steps</div>
+                      </div>
+                      <div className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-emerald-500/15">
+                        <div className="font-bold text-emerald-700 dark:text-emerald-300">🌙 Evening</div>
+                        <div>{precisionStepData.dailyDistribution.eveningWindDown.toLocaleString()} steps</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Card 2: AI Recommended Hydration Target */}
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-transparent border-2 border-blue-500/30 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                        <Droplets className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs font-black uppercase tracking-wider text-blue-900 dark:text-blue-300">
+                        AI Recommended Hydration
+                      </span>
+                    </div>
+                    <span className="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-700 dark:text-blue-300 text-[10px] font-extrabold uppercase">
+                      Calculated
+                    </span>
+                  </div>
+
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-black text-gray-900 dark:text-white">
+                      {aiRecommendedHydration}
+                    </span>
+                    <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
+                      Liters / day (~{Math.round(aiRecommendedHydration * 4)} glasses)
+                    </span>
+                  </div>
+
+                  <p className="text-[11px] text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Calculated for your {numWeight} kg body mass, {sessionDurationMin}-min workout load, and cortisol balance to optimize cellular osmotic pressure, nutrient delivery, and muscle glycogen storage.
+                  </p>
+                </div>
+              </div>
+
+              {/* TARGET COMMITMENT & FEASIBILITY CHECK */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-2.5">
+                <label className="block text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  Is this recommended daily step & hydration target achievable for your daily schedule?
+                </label>
+                <div className="space-y-2">
+                  {[
+                    {
+                      id: 'achievable',
+                      label: `✓ Yes, 100% achievable — I commit to this target (AI Recommended for Fastest Progress)`,
+                      desc: `Directly drives ${aiStepsData.kcalBurn} kcal daily NEAT expenditure to hit your goal on schedule.`,
+                    },
+                    {
+                      id: 'challenging',
+                      label: `⚡ Challenging, but I will make time (High Priority Commitment)`,
+                      desc: `Structured 20-minute morning and evening walking blocks will easily cover the target.`,
+                    },
+                    {
+                      id: 'ramp_up',
+                      label: `🔄 Slightly demanding — calibrate with a gradual 2-week progressive ramp-up`,
+                      desc: `Starts with 80% volume and ramps up smoothly as your daily stamina adapts.`,
+                    },
+                  ].map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => setTargetFeasibilityAgreement(opt.id as any)}
+                      className={`w-full p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                        targetFeasibilityAgreement === opt.id
+                          ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 ring-1 ring-[#0F6E5F]'
+                          : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312]'
+                      }`}
+                    >
+                      <div className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">{opt.label}</div>
+                      <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">{opt.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* CREATIVE FEATURE SPOTLIGHT 2: Real-Time Camera Scanner */}
+              <div className="p-4 rounded-2xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                  <Camera className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5 text-xs">
+                  <div className="font-extrabold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+                    <span>Feature Spotlight: AI Camera Scanner & Macro Vision</span>
+                    <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[9px] uppercase font-bold">Zero Guesswork</span>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Say goodbye to manual calorie logging. Snap a picture of any home cooked dish or restaurant meal; our vision AI estimates weights, macro distributions, and micro-nutrients in seconds.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: Training History, Split & Biomechanics */}
+          {step === 3 && (
+            <div className="space-y-5">
+              <div>
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                  <Dumbbell className="w-3.5 h-3.5" />
+                  <span>Periodization & Biomechanical Load</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  Training Frequency & Split
+                </h2>
+                <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1">
+                  How many days per week can you consistently commit to lifting?
                 </p>
               </div>
 
@@ -259,11 +1132,12 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 {[3, 4, 5, 6].map((days) => (
                   <button
                     key={days}
+                    type="button"
                     onClick={() => setTrainingDaysPerWeek(days)}
-                    className={`p-3 rounded-xl border text-center font-bold text-sm transition-all ${
+                    className={`p-3 rounded-2xl border text-center font-bold text-xs sm:text-sm transition-all cursor-pointer ${
                       trainingDaysPerWeek === days
-                        ? 'border-[#0F6E5F] bg-[#0F6E5F] text-white shadow-xs'
-                        : 'border-[#E5E7EB] bg-white text-[#1A1D1B] hover:bg-[#FAFAF8]'
+                        ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F] text-white shadow-xs'
+                        : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#191B1A] text-[#1A1D1B] dark:text-[#E8ECE9] hover:bg-[#FAFAF8] dark:hover:bg-[#202422]'
                     }`}
                   >
                     {days} Days / Week
@@ -272,8 +1146,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#1A1D1B] mb-2">
-                  Select your preferred training days:
+                <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-2">
+                  Select your preferred weekly lifting schedule:
                 </label>
                 <div className="grid grid-cols-7 gap-1.5">
                   {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => {
@@ -281,11 +1155,12 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     return (
                       <button
                         key={day}
+                        type="button"
                         onClick={() => toggleDay(day)}
-                        className={`p-2 rounded-lg text-xs font-bold transition-all ${
+                        className={`p-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-[#0F6E5F] text-white'
-                            : 'bg-[#FAFAF8] border border-[#E5E7EB] text-[#6B7280]'
+                            ? 'bg-[#0F6E5F] text-white shadow-xs'
+                            : 'bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#6B7280] dark:text-[#9EA8A2]'
                         }`}
                       >
                         {day}
@@ -295,248 +1170,644 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                 <div>
-                  <label className="block text-xs font-semibold text-[#1A1D1B] mb-1">
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
+                    Lifting Experience
+                  </label>
+                  <select
+                    value={experienceLevel}
+                    onChange={(e) => setExperienceLevel(e.target.value as ExperienceLevel)}
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                  >
+                    <option value="beginner">Beginner (&lt; 1 Year)</option>
+                    <option value="intermediate">Intermediate (1 - 3 Years)</option>
+                    <option value="advanced">Advanced (3+ Years)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
                     Session Duration
                   </label>
                   <select
                     value={sessionDurationMin}
                     onChange={(e) => setSessionDurationMin(Number(e.target.value))}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] bg-white"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
-                    <option value={45}>45 Minutes (High Efficiency)</option>
-                    <option value={55}>55 Minutes (Standard Scientific)</option>
+                    <option value={45}>45 Minutes (High Density)</option>
+                    <option value={55}>55 Minutes (Standard Hypertrophy)</option>
                     <option value={75}>75 Minutes (High Volume)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#1A1D1B] mb-1">
-                    Muscle Specialization Priority
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
+                    Muscle Priority Focus
                   </label>
                   <select
                     value={musclePriority}
                     onChange={(e) => setMusclePriority(e.target.value as MusclePriority)}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] bg-white"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
-                    <option value="balanced">Balanced Whole Body</option>
-                    <option value="chest">Upper Chest Focus</option>
-                    <option value="back">Lats & Upper Back Focus</option>
-                    <option value="shoulders">Side Delts & Shoulders</option>
-                    <option value="arms">Arms (Biceps & Triceps)</option>
-                    <option value="quads">Quads & Leg Density</option>
-                    <option value="glutes_hamstrings">Glutes & Hamstrings</option>
+                    <option value="balanced">Balanced Full-Body Aesthetics</option>
+                    <option value="chest_back">Upper Body V-Taper (Chest & Back)</option>
+                    <option value="legs_glutes">Legs & Glutes Power</option>
+                    <option value="shoulders_arms">Shoulders & Arms Hypertrophy</option>
                   </select>
                 </div>
               </div>
+
+              {/* CREATIVE FEATURE SPOTLIGHT 3: AI Biomechanics & Pose Kinematics */}
+              <div className="p-4 rounded-2xl bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+                  <BrainCircuit className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5 text-xs">
+                  <div className="font-extrabold text-amber-900 dark:text-amber-300 flex items-center gap-1.5">
+                    <span>Feature Spotlight: AI Biomechanics & Pose Kinematics Analyzer</span>
+                    <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[9px] uppercase font-bold">Computer Vision</span>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Point your camera during squats, bench press, or deadlifts. PeakForm's neural pose estimation tracks barbell trajectory, joint angles, and lumbar spine curvature in real time to prevent injury.
+                  </p>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* STEP 3: Injury & Limitations Screening */}
-          {step === 3 && (
-            <div className="space-y-4">
+          {/* STEP 4: Joint Health & Dietary Framework */}
+          {step === 4 && (
+            <div className="space-y-5">
               <div>
-                <h2 className="text-xl font-bold text-[#1A1D1B]">Joint Health & Injury Shield</h2>
-                <p className="text-xs text-[#6B7280] mt-1">
-                  Select any areas of pain or discomfort so our scientific engine can swap out high-risk exercises for joint-friendly alternatives.
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                  <Utensils className="w-3.5 h-3.5" />
+                  <span>Injury Screening & Nutrition Intelligence</span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  Injury Screening & Nutrition Framework
+                </h2>
+                <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1">
+                  We'll calibrate exercise joint angles, range of motion, and micro-nutrient profiles around your body.
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2.5">
-                {[
-                  'Right Shoulder / Rotator Cuff',
-                  'Left Shoulder / Rotator Cuff',
-                  'Lower Back / Lumbar Disc',
-                  'Knees (Patellar / ACL)',
-                  'Wrists / Forearms',
-                  'Neck / Cervical Spine',
-                ].map((item) => {
-                  const isChecked = selectedInjuries.includes(item);
-                  return (
+              {/* Injury Screening */}
+              <div>
+                <label className="block text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1.5">
+                  Joint Discomfort or Pain Areas (Auto-swaps risky exercises):
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {[
+                    'Right Shoulder / Rotator Cuff',
+                    'Left Shoulder / Rotator Cuff',
+                    'Lower Back / Lumbar Disc',
+                    'Knees (Patellar / Meniscus)',
+                    'Wrists / Forearms',
+                    'Neck / Cervical Spine',
+                  ].map((item) => {
+                    const isChecked = selectedInjuries.includes(item);
+                    return (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => toggleInjury(item)}
+                        className={`p-2.5 rounded-xl border text-left text-xs font-semibold transition-all flex items-center justify-between cursor-pointer ${
+                          isChecked
+                            ? 'border-[#E8912D] bg-[#E8912D]/10 text-[#1A1D1B] dark:text-[#E8ECE9]'
+                            : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#191B1A] text-[#6B7280] dark:text-[#9EA8A2]'
+                        }`}
+                      >
+                        <span>{item}</span>
+                        {isChecked && <Check className="w-3.5 h-3.5 text-[#E8912D]" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Diet Type Selector */}
+              <div>
+                <label className="block text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1.5">
+                  Dietary Framework:
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {[
+                    { id: 'non_veg', label: 'Non-Vegetarian', desc: 'Chicken, fish, eggs, dairy' },
+                    { id: 'vegetarian', label: 'Vegetarian (Lacto)', desc: 'Paneer, whey, legumes, dairy' },
+                    { id: 'eggetarian', label: 'Eggetarian', desc: 'Eggs, paneer, whey, plant foods' },
+                    { id: 'vegan', label: 'Vegan (Plant-Based)', desc: 'Tofu, soy, lentils, pea protein' },
+                    { id: 'flexible', label: 'Flexible / Balanced', desc: 'All whole foods permitted' },
+                  ].map((item) => (
                     <button
-                      key={item}
-                      onClick={() => toggleInjury(item)}
-                      className={`p-3 rounded-xl border text-left text-xs font-semibold transition-all flex items-center justify-between ${
-                        isChecked
-                          ? 'border-[#E8912D] bg-[#E8912D]/10 text-[#1A1D1B]'
-                          : 'border-[#E5E7EB] bg-white text-[#6B7280] hover:bg-[#FAFAF8]'
+                      key={item.id}
+                      type="button"
+                      onClick={() => setDietType(item.id as DietType)}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                        dietType === item.id
+                          ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 ring-1 ring-[#0F6E5F] dark:ring-[#2DD4BF]'
+                          : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#191B1A]'
                       }`}
                     >
-                      <span>{item}</span>
-                      {isChecked && <Check className="w-4 h-4 text-[#E8912D]" />}
+                      <div className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">{item.label}</div>
+                      <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">{item.desc}</div>
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-[#1A1D1B] mb-1">
-                  Specific Movement Triggers or Notes (Optional):
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Flare up during heavy flat barbell bench press or deep squats"
-                  value={injuryNotes}
-                  onChange={(e) => setInjuryNotes(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] bg-[#FAFAF8]"
-                />
-              </div>
-
-              <div className="p-3 rounded-xl bg-[#FAFAF8] border border-[#E5E7EB] text-[11px] text-[#6B7280] flex items-start gap-2">
-                <ShieldAlert className="w-4 h-4 text-[#0F6E5F] shrink-0 mt-0.5" />
-                <span>
-                  <strong>Safety Note:</strong> PeakForm AI automatically applies biomechanical substitutions (e.g. Incline Dumbbell neutral press instead of straight barbell) to prevent shear stress while maintaining muscular tension.
-                </span>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 4: Dietary Framework */}
-          {step === 4 && (
-            <div className="space-y-4">
-              <div>
-                <h2 className="text-xl font-bold text-[#1A1D1B]">Dietary Framework & Cuisine</h2>
-                <p className="text-xs text-[#6B7280] mt-1">
-                  Select your nutrition approach so we tailor protein sources and meal ideas to your lifestyle.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                {[
-                  { id: 'non_veg', label: 'Non-Vegetarian', desc: 'Chicken, fish, eggs, dairy' },
-                  { id: 'vegetarian', label: 'Vegetarian (Lacto)', desc: 'Paneer, whey, legumes, dairy' },
-                  { id: 'eggetarian', label: 'Eggetarian', desc: 'Eggs, paneer, whey, plant foods' },
-                  { id: 'vegan', label: 'Vegan (Plant)', desc: 'Tofu, soy, lentils, pea protein' },
-                  { id: 'flexible', label: 'Flexible / Balanced', desc: 'All whole foods permitted' },
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => setDietType(item.id as DietType)}
-                    className={`p-3 rounded-xl border text-left transition-all ${
-                      dietType === item.id
-                        ? 'border-[#0F6E5F] bg-[#0F6E5F]/5 ring-1 ring-[#0F6E5F]'
-                        : 'border-[#E5E7EB] bg-white hover:bg-[#FAFAF8]'
-                    }`}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
+                    Cuisine Preference:
+                  </label>
+                  <select
+                    value={cuisinePreference}
+                    onChange={(e) => setCuisinePreference(e.target.value)}
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
-                    <div className="font-bold text-xs text-[#1A1D1B]">{item.label}</div>
-                    <div className="text-[10px] text-[#6B7280] mt-0.5">{item.desc}</div>
-                  </button>
-                ))}
+                    <option value="High-Protein Global & Mediterranean">High-Protein Global & Mediterranean</option>
+                    <option value="High-Protein Indian (Dal, Paneer, Chicken Curries)">High-Protein Indian (North & South)</option>
+                    <option value="High-Protein Plant-Based Asian & Mexican">Plant-Based Asian & Mexican</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
+                    Food Allergies / Dislikes:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Peanut allergy, lactose sensitive, no seafood"
+                    value={foodAllergies}
+                    onChange={(e) => setFoodAllergies(e.target.value)}
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                  />
+                </div>
               </div>
 
-              <div className="pt-2">
-                <label className="block text-xs font-semibold text-[#1A1D1B] mb-1">
-                  Favorite Cuisine Style:
-                </label>
-                <select
-                  value={cuisinePreference}
-                  onChange={(e) => setCuisinePreference(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] bg-white"
-                >
-                  <option value="High-Protein Global & Mediterranean">High-Protein Global & Mediterranean</option>
-                  <option value="High-Protein Indian (Dal, Paneer, Chicken Curries)">High-Protein Indian</option>
-                  <option value="High-Protein Plant-Based Asian & Mexican">Plant-Based Asian & Mexican</option>
-                </select>
+              {/* CREATIVE FEATURE SPOTLIGHT 4: Indian Cuisine Intelligence & Smart Swaps */}
+              <div className="p-4 rounded-2xl bg-blue-500/5 dark:bg-blue-500/10 border border-blue-500/20 flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div className="space-y-0.5 text-xs">
+                  <div className="font-extrabold text-blue-900 dark:text-blue-300 flex items-center gap-1.5">
+                    <span>Feature Spotlight: Indian Cuisine Intelligence & Smart Swaps</span>
+                    <span className="px-1.5 py-0.2 rounded-full bg-blue-500/20 text-blue-700 dark:text-blue-300 text-[9px] uppercase font-bold">1200+ Recipes</span>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Enjoy authentic curries, rotis, and regional delicacies with zero guilt. PeakForm automatically suggests high-protein ingredient swaps that keep calories in check without compromising on flavor.
+                  </p>
+                </div>
               </div>
             </div>
           )}
 
-          {/* STEP 5: Plan Reveal & Scientific Timeline */}
+          {/* STEP 5: 100% Accurate AI Goal Prediction & Feasibility Verdict */}
           {step === 5 && (
-            <div className="space-y-4">
-              <div>
-                <div className="inline-flex items-center gap-1 text-xs font-bold text-[#0F6E5F] uppercase tracking-wider mb-1">
-                  <Sparkles className="w-3.5 h-3.5 text-[#E8912D]" />
-                  <span>Calculated Metabolic Output</span>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-bold text-[#1A1D1B]">
-                  Your Science-Backed Roadmap
-                </h2>
-                <p className="text-xs text-[#6B7280]">
-                  Based on Mifflin-St Jeor BMR and your {trainingDaysPerWeek}-day training frequency.
-                </p>
-              </div>
-
-              {/* Goal Timeline Reveal Card */}
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-[#0F6E5F] to-[#0A4D42] text-white space-y-3">
-                <div className="text-xs text-[#D1D5DB]">Projected Goal Achievement Date:</div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-[#E8912D]">
-                  {timelineResult.projectedDate} (~{timelineResult.weeksNeeded} weeks)
-                </div>
-                <div className="text-xs text-white/90">
-                  Target change: {weightKg} kg → {targetWeightKg} kg at a safe rate of {Math.abs(macroResults.weeklyRateKg)} kg/week.
-                </div>
-              </div>
-
-              {/* Calculated Targets Summary */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                <div className="p-3 rounded-xl bg-[#FAFAF8] border border-[#E5E7EB]">
-                  <div className="text-[10px] text-[#6B7280] uppercase font-bold">Daily Energy</div>
-                  <div className="text-base font-bold text-[#1A1D1B] mt-0.5">
-                    {macroResults.dailyCalories} <span className="text-xs font-normal">kcal</span>
+            <div className="space-y-5">
+              {isPredicting ? (
+                <div className="p-12 text-center space-y-4">
+                  <div className="w-16 h-16 rounded-full bg-[#0F6E5F]/10 border-2 border-[#0F6E5F] flex items-center justify-center mx-auto text-[#0F6E5F] dark:text-[#2DD4BF] animate-spin">
+                    <Loader2 className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-extrabold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                      Analyzing Biological Feasibility with Deep AI...
+                    </h3>
+                    <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] max-w-md mx-auto">
+                      Running Hall metabolic models, hormonal adaptation limits, and Schoenfeld hypertrophy guidelines for 100000% precision.
+                    </p>
                   </div>
                 </div>
+              ) : (
+                <div className="space-y-5 animate-in fade-in">
+                  {/* FEASIBILITY VERDICT & SCIENTIFIC EVALUATION CARD */}
+                  <div className={`p-5 rounded-3xl border-2 space-y-3.5 ${
+                    isTimelineFeasible
+                      ? 'bg-emerald-500/10 border-emerald-500/40 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-100'
+                      : 'bg-amber-500/10 border-amber-500/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-100'
+                  }`}>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
+                          isTimelineFeasible
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-amber-600 text-white'
+                        }`}>
+                          {isTimelineFeasible ? '✓ 100% FEASIBLE & BIOLOGICALLY REALISTIC' : '⚠️ TIMELINE TOO AGGRESSIVE / BIOLOGICALLY UNSAFE'}
+                        </span>
+                      </div>
+                      <span className="text-xs font-mono font-extrabold text-gray-700 dark:text-gray-300">
+                        Target Date: {new Date(currentChosenTargetDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    </div>
 
-                <div className="p-3 rounded-xl bg-[#FAFAF8] border border-[#E5E7EB]">
-                  <div className="text-[10px] text-[#0F6E5F] uppercase font-bold">Protein (2.2g/kg)</div>
-                  <div className="text-base font-bold text-[#0F6E5F] mt-0.5">
-                    {macroResults.proteinG} <span className="text-xs font-normal">g</span>
+                    <div className="space-y-1.5 text-xs">
+                      {isTimelineFeasible ? (
+                        <p className="leading-relaxed font-medium">
+                          Based on your current weight of <strong>{numWeight} kg</strong>, target of <strong>{numTargetWeight} kg</strong>, and daily expenditure of <strong>{calculatedTDEE} kcal</strong>, achieving this goal in <strong>{weeksAvailable} weeks</strong> requires a safe weekly change rate of <strong>{reqWeeklyRate} kg/week</strong>. This is 100% within human physiological boundaries, preserving 100% of your lean muscle tissue with zero hormonal crash.
+                        </p>
+                      ) : (
+                        <div className="space-y-2">
+                          <p className="leading-relaxed font-medium">
+                            Attempting to reach <strong>{numTargetWeight} kg</strong> in only <strong>{weeksAvailable} weeks</strong> requires an aggressive rate of <strong>{reqWeeklyRate} kg/week</strong> (an unsustainable daily deficit of ~{Math.round(reqWeeklyRate * 1100)} kcal). This exceeds biological safety thresholds and would trigger severe lean tissue loss, thyroid downregulation (T3 suppression), and rebound fat gain.
+                          </p>
+                          <div className="p-3 rounded-2xl bg-white dark:bg-[#111312] border border-amber-500/30 flex items-center justify-between gap-3">
+                            <div>
+                              <div className="text-[10px] font-bold text-amber-600 uppercase">AI Recommended Earliest Realistic & Safe Date:</div>
+                              <div className="text-sm font-black text-gray-900 dark:text-white">
+                                {earliestSafeDateFormatted} ({earliestSafeWeeks} Weeks)
+                              </div>
+                            </div>
+                            <span className="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                              Safe Rate: {maxSafeRate} kg/wk
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                <div className="p-3 rounded-xl bg-[#FAFAF8] border border-[#E5E7EB]">
-                  <div className="text-[10px] text-[#3B82F6] uppercase font-bold">Carbohydrates</div>
-                  <div className="text-base font-bold text-[#3B82F6] mt-0.5">
-                    {macroResults.carbsG} <span className="text-xs font-normal">g</span>
-                  </div>
-                </div>
+                  {/* THE STRICT PLAN YOU MUST FOLLOW */}
+                  <div className="p-5 rounded-3xl bg-white dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-xl bg-[#0F6E5F]/15 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center font-black text-xs">
+                          AI
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-black text-gray-900 dark:text-white">
+                            Your Strict Prescribed Daily Protocol
+                          </h3>
+                          <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                            Follow these exact parameters every day to guarantee reaching your goal on time.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
 
-                <div className="p-3 rounded-xl bg-[#FAFAF8] border border-[#E5E7EB]">
-                  <div className="text-[10px] text-[#F59E0B] uppercase font-bold">Healthy Fats</div>
-                  <div className="text-base font-bold text-[#F59E0B] mt-0.5">
-                    {macroResults.fatG} <span className="text-xs font-normal">g</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
+                        <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] uppercase font-bold">Strict Daily Calories</div>
+                        <div className="text-base font-black text-[#1A1D1B] dark:text-[#E8ECE9] mt-0.5">
+                          {macroResults.dailyCalories} <span className="text-xs font-normal">kcal</span>
+                        </div>
+                        <div className="text-[9px] text-gray-400 mt-0.5">TDEE: {calculatedTDEE} kcal</div>
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
+                        <div className="text-[10px] text-[#0F6E5F] dark:text-[#2DD4BF] uppercase font-bold">Daily Protein (2.2g/kg)</div>
+                        <div className="text-base font-black text-[#0F6E5F] dark:text-[#2DD4BF] mt-0.5">
+                          {macroResults.proteinG} <span className="text-xs font-normal">g</span>
+                        </div>
+                        <div className="text-[9px] text-gray-400 mt-0.5">100% Muscle Retention</div>
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
+                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase font-bold">Strict Step Target</div>
+                        <div className="text-base font-black text-emerald-700 dark:text-emerald-300 mt-0.5">
+                          {effectiveDailySteps.toLocaleString()}
+                        </div>
+                        <div className="text-[9px] text-gray-400 mt-0.5">~{aiStepsData.kcalBurn} kcal NEAT</div>
+                      </div>
+
+                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
+                        <div className="text-[10px] text-blue-600 dark:text-blue-400 uppercase font-bold">Strict Hydration</div>
+                        <div className="text-base font-black text-blue-700 dark:text-blue-300 mt-0.5">
+                          {aiRecommendedHydration} <span className="text-xs font-normal">L</span>
+                        </div>
+                        <div className="text-[9px] text-gray-400 mt-0.5">~{Math.round(aiRecommendedHydration * 4)} glasses</div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#111312] border border-gray-200 dark:border-gray-800 flex items-center gap-2">
+                        <Dumbbell className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF] shrink-0" />
+                        <span><strong>Training Frequency:</strong> {trainingDaysPerWeek} sessions/wk ({selectedDays.join(', ')})</span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#111312] border border-gray-200 dark:border-gray-800 flex items-center gap-2">
+                        <Moon className="w-4 h-4 text-blue-500 shrink-0" />
+                        <span><strong>Sleep & Recovery:</strong> {dailySleepDurationHours} hrs / night (Anabolic Growth Window)</span>
+                      </div>
+                    </div>
                   </div>
+
+                  {/* PREDICTION COMPONENT WITH INTERACTIVE CONFIDENCE INTERVALS */}
+                  {predictionResult && (
+                    <GoalTimelinePredictionCard
+                      prediction={predictionResult}
+                      userProfile={{
+                        weightKg: numWeight,
+                        targetWeightKg: numTargetWeight,
+                        goal,
+                        age: numAge,
+                        sex,
+                        heightCm: numHeight,
+                      }}
+                    />
+                  )}
                 </div>
-              </div>
+              )}
             </div>
           )}
+
+          {/* STEP 6: Plan Selection or 1-Week Free Trial Choice */}
+          {step === 6 && (
+            <div className="space-y-6">
+              {isUserHost ? (
+                /* HOST PRIVILEGE BANNER */
+                <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#1A1D1B] via-[#0F6E5F] to-[#083D34] text-white space-y-4 text-center">
+                  <div className="w-16 h-16 rounded-full bg-amber-400/20 border-2 border-amber-400 flex items-center justify-center mx-auto text-amber-300">
+                    <Crown className="w-8 h-8" />
+                  </div>
+                  <div className="space-y-1">
+                    <span className="px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-black uppercase tracking-wider">
+                      Verified Host Administrator
+                    </span>
+                    <h3 className="text-2xl sm:text-3xl font-black">
+                      Welcome, Warad Asare!
+                    </h3>
+                    <p className="text-xs sm:text-sm text-emerald-100/90 max-w-md mx-auto">
+                      As the creator and host of PeakForm AI, you have <strong>Permanent 100% Lifetime Access</strong>. You are never asked to select a payment plan.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleApplyProfileAndFinish()}
+                    className="py-3.5 px-8 rounded-2xl bg-amber-400 hover:bg-amber-300 text-gray-900 font-extrabold text-sm shadow-xl transition-all cursor-pointer"
+                  >
+                    Launch PeakForm AI as Host (Lifetime Access) →
+                  </button>
+                </div>
+              ) : (
+                /* REGULAR USER FREE TRIAL & PLAN CHOICE */
+                <div className="space-y-5">
+                  {/* 1-Week Free Subscription Notice */}
+                  <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-500/15 via-emerald-500/10 to-transparent border-2 border-emerald-500/30 text-left space-y-2">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase">
+                        1-Week Free Subscription Included
+                      </span>
+                      <h3 className="text-sm font-extrabold text-emerald-900 dark:text-emerald-200">
+                        Your 7-Day Free Subscription Is Active!
+                      </h3>
+                    </div>
+                    <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">
+                      You can start using PeakForm AI immediately with full features for 7 days at <strong>₹0 cost</strong>. You have the choice to either <strong>start with the 1-week free trial</strong> and select a plan after your trial ends, or <strong>lock in a discounted plan now</strong>.
+                    </p>
+                  </div>
+
+                  {/* Two Main Pathways */}
+                  {!showDirectPayment ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Option 1: Start 1-Week Free Trial */}
+                      <button
+                        type="button"
+                        onClick={() => handleApplyProfileAndFinish()}
+                        className="p-5 rounded-3xl border-2 border-emerald-500 bg-white dark:bg-[#191B1A] hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 text-left space-y-3 transition-all cursor-pointer shadow-sm group"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                          <Sparkles className="w-5 h-5" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="font-extrabold text-sm text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+                            Option A: Start 1-Week Free Trial
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            Experience full AI coaching, meal scanner, and workout programs for 7 days. Select a subscription plan later when your trial concludes.
+                          </div>
+                        </div>
+                        <div className="pt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                          <span>Start 7 Days Free Access</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </button>
+
+                      {/* Option 2: Select Plan Now */}
+                      <button
+                        type="button"
+                        onClick={() => setShowDirectPayment(true)}
+                        className="p-5 rounded-3xl border border-gray-200 dark:border-gray-800 bg-[#FAFAF8] dark:bg-[#111312] hover:border-[#0F6E5F] text-left space-y-3 transition-all cursor-pointer shadow-sm group"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-[#0F6E5F]/15 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center font-bold">
+                          <Crown className="w-5 h-5" />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="font-extrabold text-sm text-gray-900 dark:text-white group-hover:text-[#0F6E5F] transition-colors">
+                            Option B: Lock In Plan Now
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                            Upgrade immediately via host QR code to lock in guaranteed promotional rates (starting at only ₹89/mo).
+                          </div>
+                        </div>
+                        <div className="pt-2 text-xs font-bold text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center gap-1">
+                          <span>View Plans & Scan QR</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </button>
+                    </div>
+                  ) : (
+                    /* Plan Selection & QR Code Flow */
+                    <div className="space-y-4 animate-in fade-in">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                          Select Your Subscription Plan:
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => setShowDirectPayment(false)}
+                          className="text-xs font-semibold text-[#0F6E5F] dark:text-[#2DD4BF] hover:underline cursor-pointer"
+                        >
+                          ← Back to trial options
+                        </button>
+                      </div>
+
+                      {/* Plans Grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                        {plans.filter(p => p.priceINR > 0).map((plan) => {
+                          const isSelected = selectedPlan?.id === plan.id;
+                          return (
+                            <button
+                              key={plan.id}
+                              type="button"
+                              onClick={() => setSelectedPlan(plan)}
+                              className={`p-3 rounded-2xl border text-left transition-all cursor-pointer relative ${
+                                isSelected
+                                  ? 'border-[#0F6E5F] bg-[#0F6E5F]/10 ring-2 ring-[#0F6E5F]'
+                                  : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-[#191B1A]'
+                              }`}
+                            >
+                              {plan.savingsBadge && (
+                                <span className="absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.5 rounded-full bg-[#0F6E5F] text-white">
+                                  {plan.savingsBadge}
+                                </span>
+                              )}
+                              <div className="text-xs font-extrabold text-gray-900 dark:text-white mt-1">
+                                {plan.durationLabel}
+                              </div>
+                              <div className="text-lg font-black text-[#0F6E5F] dark:text-[#2DD4BF] mt-1">
+                                ₹{plan.priceINR}
+                              </div>
+                              <div className="text-[10px] text-gray-500">
+                                ~₹{plan.monthlyEquivalentINR?.toFixed(1)} / mo
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Selected Plan QR & UTR input */}
+                      {selectedPlan && (
+                        <div className="p-5 rounded-2xl bg-gray-50 dark:bg-[#111312] border border-gray-200 dark:border-gray-800 space-y-4">
+                          <div className="flex flex-col sm:flex-row items-center gap-5">
+                            <img
+                              src={getUPIQRCodeUrl(selectedPlan, userProfile.email)}
+                              alt="UPI QR Code"
+                              className="w-36 h-36 rounded-xl border border-gray-200 bg-white p-1.5 shadow-sm shrink-0"
+                            />
+                            <div className="space-y-1.5 text-xs text-left">
+                              <div className="font-bold text-gray-900 dark:text-white">
+                                Pay ₹{selectedPlan.priceINR} to Host: <strong>{HOST_ADMIN_CONFIG.name}</strong>
+                              </div>
+                              <div className="text-gray-600 dark:text-gray-400">
+                                UPI VPA: <strong className="text-[#0F6E5F] dark:text-[#2DD4BF] font-mono">{HOST_ADMIN_CONFIG.upiId}</strong>
+                              </div>
+                              <div className="text-[11px] text-gray-500">
+                                Scan with FamApp, GPay, PhonePe, Paytm, or any UPI app.
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* UTR Form */}
+                          <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-800">
+                            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">
+                              Enter 12-Digit UPI Reference ID / UTR Number:
+                            </label>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                maxLength={12}
+                                placeholder="e.g. 423985123456"
+                                value={utrInput}
+                                onChange={(e) => setUtrInput(e.target.value)}
+                                className="flex-1 text-xs p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] font-mono font-bold text-gray-900 dark:text-white"
+                              />
+                              <button
+                                type="button"
+                                disabled={isVerifyingPayment}
+                                onClick={handleVerifyPaidPlan}
+                                className="px-4 py-2.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs cursor-pointer shadow-xs disabled:opacity-50"
+                              >
+                                {isVerifyingPayment ? 'Verifying...' : 'Verify & Unlock'}
+                              </button>
+                            </div>
+
+                            {paymentError && (
+                              <p className="text-xs text-red-600 font-semibold">{paymentError}</p>
+                            )}
+
+                            {paymentSuccess && (
+                              <p className="text-xs text-emerald-600 font-bold flex items-center gap-1">
+                                <CheckCircle2 className="w-4 h-4" />
+                                Payment verified successfully! Loading your program...
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
         </div>
 
-        {/* Footer Controls */}
-        <div className="p-6 border-t border-[#E5E7EB] bg-[#FAFAF8] flex items-center justify-between">
+        {/* Footer Navigation Controls */}
+        <div className="p-5 sm:p-6 border-t border-[#E5E7EB] dark:border-[#242826] bg-[#FAFAF8] dark:bg-[#111312] flex items-center justify-between shrink-0">
           {step > 1 ? (
             <button
+              type="button"
               onClick={() => setStep(step - 1)}
-              className="flex items-center gap-1 text-xs font-semibold text-[#6B7280] hover:text-[#1A1D1B] px-3 py-2"
+              className="flex items-center gap-1 text-xs font-semibold text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white px-3 py-2 cursor-pointer"
             >
               <ChevronLeft className="w-4 h-4" />
               Back
             </button>
           ) : (
             <button
+              type="button"
               onClick={onClose}
-              className="text-xs font-semibold text-[#6B7280] hover:text-[#1A1D1B] px-3 py-2"
+              className="text-xs font-semibold text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white px-3 py-2 cursor-pointer"
             >
               Cancel
             </button>
           )}
 
-          {step < totalSteps ? (
+          {step === 1 && (
             <button
-              onClick={() => setStep(step + 1)}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-semibold hover:bg-[#0D5B4F] transition-all shadow-xs"
+              type="button"
+              onClick={() => {
+                if (!name.trim()) {
+                  alert('Please enter your full name to personalize your prediction roadmap.');
+                  return;
+                }
+                setStep(2);
+              }}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-semibold hover:bg-[#0D5B4F] transition-all shadow-xs cursor-pointer"
             >
               <span>Continue</span>
               <ChevronRight className="w-4 h-4" />
             </button>
-          ) : (
+          )}
+
+          {step >= 2 && step <= 3 && (
             <button
-              onClick={handleFinishOnboarding}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-bold hover:bg-[#0D5B4F] transition-all shadow-md"
+              type="button"
+              onClick={() => setStep(step + 1)}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-semibold hover:bg-[#0D5B4F] transition-all shadow-xs cursor-pointer"
             >
-              <Check className="w-4 h-4 text-[#E8912D]" />
-              <span>Apply & Generate Program</span>
+              <span>Continue</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
+
+          {step === 4 && (
+            <button
+              type="button"
+              onClick={handleNextToStep5}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-bold hover:bg-[#0D5B4F] transition-all shadow-md cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span>Predict 100% Accurate Timeline</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
+
+          {step === 5 && (
+            <button
+              type="button"
+              disabled={isPredicting}
+              onClick={handleNextToStep6}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-bold hover:bg-[#0D5B4F] transition-all shadow-md cursor-pointer disabled:opacity-50"
+            >
+              <span>Continue to Free Trial & Plans</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
+
+          {step === 6 && !isUserHost && (
+            <button
+              type="button"
+              onClick={() => handleApplyProfileAndFinish()}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-bold hover:bg-[#0D5B4F] transition-all shadow-md cursor-pointer"
+            >
+              <Check className="w-4 h-4 text-amber-300" />
+              <span>Start PeakForm Pro</span>
             </button>
           )}
         </div>

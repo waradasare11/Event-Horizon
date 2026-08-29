@@ -19,7 +19,9 @@ import {
   Printer,
   Share2,
   RefreshCw,
-  Info
+  Info,
+  Activity,
+  Check
 } from 'lucide-react';
 import { UserProfile, MealLog, WorkoutCompletionLog, BodyMetric } from '../types';
 
@@ -180,39 +182,34 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
     };
   }, [userProfile, mealLogs, workoutLogs, bodyMetrics, dateList, startDateStr, endDateStr]);
 
+  const [structuredAiSummary, setStructuredAiSummary] = useState<{
+    headline: string;
+    executiveSummary: string;
+    physiologicalTrajectory: string;
+    trainingVolumeVerdict: string;
+    nutritionAdherenceVerdict: string;
+    recoveryScore: number;
+    keyStrengths: string[];
+    recommendedActionPlan: string[];
+    scientificTakeaway: string;
+  } | null>(null);
+
   const handleGenerateAiWeeklyAudit = async () => {
     setIsGeneratingAiInsight(true);
     try {
-      const response = await fetch('/api/ai/coach-chat', {
+      const response = await fetch('/api/ai/generate-weekly-summary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [
-            {
-              role: 'user',
-              content: `Please generate a concise, rigorous, evidence-based Weekly Progress Audit and recommendation for my current training cycle.
-Here are my weekly aggregated stats:
-- Goal: ${userProfile.goal} (target rate: ${userProfile.weeklyRateKg} kg/week)
-- Workouts completed: ${stats.completedWorkouts} / ${stats.targetWorkouts} planned sessions (${stats.totalTrainingMin} mins, avg RPE ${stats.avgRpe})
-- Nutrition: Avg ${stats.avgDailyCals} kcal/day (Target: ${userProfile.dailyCalories} kcal, delta: ${stats.calDeltaFromTarget > 0 ? '+' : ''}${stats.calDeltaFromTarget} kcal), Avg Protein: ${stats.avgDailyProtein}g/day (Target: ${userProfile.dailyProtein}g)
-- Weight: Changed from ${stats.startWeight}kg to ${stats.endWeight}kg (delta: ${stats.weightDelta > 0 ? '+' : ''}${stats.weightDelta}kg)
-- Composite Adherence Score: ${stats.compositeScore}/100
-
-Provide:
-1. Executive Summary (1-2 sentences on physiological trajectory).
-2. Key Positive Strengths.
-3. Recommended Micro-Adjustment for Next Week (e.g. holding calories, adding 100 kcal refeed, adjusting step count, or maintaining progressive overload).`
-            }
-          ],
           userProfile,
-          useSearchGrounding: false,
-          enableThinking: false,
+          weeklyStats: stats,
         }),
       });
 
       const data = await response.json();
-      if (data.success && data.message) {
-        setCustomAiInsight(data.message);
+      if (data.success && data.data) {
+        setStructuredAiSummary(data.data);
+        setCustomAiInsight(data.data.executiveSummary);
       }
     } catch (err) {
       console.error('Failed to generate AI weekly audit:', err);
@@ -547,7 +544,94 @@ Provide:
           </button>
         </div>
 
-        {customAiInsight ? (
+        {structuredAiSummary ? (
+          <div className="space-y-4 animate-in fade-in">
+            {/* Header & Recovery Score */}
+            <div className="p-5 rounded-2xl bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/10 border border-[#0F6E5F]/20 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h4 className="font-bold text-base text-[#0F6E5F] dark:text-[#5FD1B8]">
+                  {structuredAiSummary.headline}
+                </h4>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <span className="text-xs font-semibold text-[#6B7280] dark:text-[#9EA8A2]">Recovery & Adaptation:</span>
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#0F6E5F] text-white">
+                    {structuredAiSummary.recoveryScore}/100
+                  </span>
+                </div>
+              </div>
+              <p className="text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9] leading-relaxed">
+                {structuredAiSummary.executiveSummary}
+              </p>
+            </div>
+
+            {/* Verdicts Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+              <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#282C2A] space-y-1.5">
+                <div className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
+                  <Activity className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+                  <span>Physiological & Weight Trajectory</span>
+                </div>
+                <p className="text-[#4B5563] dark:text-[#D1D5DB] leading-relaxed">
+                  {structuredAiSummary.physiologicalTrajectory}
+                </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#282C2A] space-y-1.5">
+                <div className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
+                  <Dumbbell className="w-3.5 h-3.5 text-sky-500" />
+                  <span>Training Stimulus & Volume</span>
+                </div>
+                <p className="text-[#4B5563] dark:text-[#D1D5DB] leading-relaxed">
+                  {structuredAiSummary.trainingVolumeVerdict}
+                </p>
+              </div>
+            </div>
+
+            {/* Strengths & Action Plan */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
+              {/* Key Strengths */}
+              <div className="p-4 rounded-xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 space-y-2">
+                <div className="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Standout Execution Strengths</span>
+                </div>
+                <ul className="space-y-1.5 text-[#374151] dark:text-[#D1D5DB]">
+                  {structuredAiSummary.keyStrengths.map((st, i) => (
+                    <li key={i} className="flex items-start gap-1.5">
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">•</span>
+                      <span>{st}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Action Plan */}
+              <div className="p-4 rounded-xl bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 space-y-2">
+                <div className="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>Next Week's Actionable Micro-Plan</span>
+                </div>
+                <ul className="space-y-1.5 text-[#374151] dark:text-[#D1D5DB]">
+                  {structuredAiSummary.recommendedActionPlan.map((act, i) => (
+                    <li key={i} className="flex items-start gap-1.5">
+                      <span className="text-amber-600 dark:text-amber-400 font-bold shrink-0">{i + 1}.</span>
+                      <span>{act}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Scientific Takeaway */}
+            <div className="p-3.5 rounded-xl bg-gray-50 dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#282C2A] text-xs flex items-start gap-2">
+              <Sparkles className="w-4 h-4 text-[#E8912D] shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">Physiological Principle: </span>
+                <span className="text-[#4B5563] dark:text-[#9EA8A2]">{structuredAiSummary.scientificTakeaway}</span>
+              </div>
+            </div>
+          </div>
+        ) : customAiInsight ? (
           <div className="p-5 rounded-2xl bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/10 border border-[#0F6E5F]/20 text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9] leading-relaxed whitespace-pre-wrap">
             {customAiInsight}
           </div>

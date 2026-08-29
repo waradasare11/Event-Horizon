@@ -14,11 +14,17 @@ import {
   LogIn, 
   LogOut,
   Cloud,
-  CheckCircle2
+  CheckCircle2,
+  Download,
+  Crown,
+  ShieldCheck,
+  QrCode
 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { ThemeToggle } from './ThemeToggle';
 import { ThemeMode } from '../lib/theme';
+import { SyncStatusIndicator } from './SyncStatusIndicator';
+import { isHostAdmin, computeSubscriptionStatus } from '../lib/subscription';
 import { User } from 'firebase/auth';
 
 interface HeaderProps {
@@ -27,6 +33,11 @@ interface HeaderProps {
   userProfile: UserProfile;
   onOpenCheckIn: () => void;
   onOpenOnboarding: () => void;
+  onOpenSubscriptionModal?: () => void;
+  onOpenHostAdminModal?: () => void;
+  onOpenPerformanceDashboard?: () => void;
+  onExportData?: () => void;
+  onForceSync?: () => void;
   caloriesConsumedToday: number;
   proteinConsumedToday: number;
   currentStreak?: number;
@@ -45,6 +56,11 @@ export const Header: React.FC<HeaderProps> = ({
   userProfile,
   onOpenCheckIn,
   onOpenOnboarding,
+  onOpenSubscriptionModal,
+  onOpenHostAdminModal,
+  onOpenPerformanceDashboard,
+  onExportData,
+  onForceSync,
   caloriesConsumedToday,
   proteinConsumedToday,
   currentStreak = 14,
@@ -59,14 +75,18 @@ export const Header: React.FC<HeaderProps> = ({
   const caloriePercent = Math.min(100, Math.round((caloriesConsumedToday / (userProfile.dailyCalories || 2000)) * 100));
   const proteinPercent = Math.min(100, Math.round((proteinConsumedToday / (userProfile.dailyProtein || 150)) * 100));
 
+  const isHost = isHostAdmin(userProfile.email) || isHostAdmin(currentUser?.email);
+  const activeSub = computeSubscriptionStatus(userProfile.subscription);
+
   const navItems = [
-    { id: 'scan', label: 'AI Meal Scanner', icon: Camera, badge: 'Vision' },
-    { id: 'nutrition', label: 'AI Nutrition & Plans', icon: Utensils, badge: 'Adaptive' },
-    { id: 'workouts', label: 'Science Workouts', icon: Dumbbell, badge: 'EMG-Backed' },
-    { id: 'form', label: 'AI Lift Form Auditor', icon: Activity, badge: 'Video AI' },
-    { id: 'progress', label: 'Body Comp & Trends', icon: TrendingUp },
-    { id: 'research', label: 'Science Research', icon: Globe, badge: 'Grounded' },
-    { id: 'coach', label: 'AI Coach Chat', icon: Bot, badge: 'Gemini' },
+    { id: 'scan', label: 'Meal Scanner', icon: Camera },
+    { id: 'nutrition', label: 'Meals & Food', icon: Utensils },
+    { id: 'workouts', label: 'Workout Plans', icon: Dumbbell },
+    { id: 'form', label: 'Posture & Form', icon: Activity },
+    { id: 'projector', label: 'Body Preview', icon: Sparkles },
+    { id: 'progress', label: 'My Progress', icon: TrendingUp },
+    { id: 'research', label: 'Fitness Guides', icon: Globe },
+    { id: 'coach', label: 'Ask AI Coach', icon: Bot },
   ];
 
   return (
@@ -83,11 +103,11 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center gap-2">
                 <span className="font-bold text-lg tracking-tight text-[#1A1D1B] dark:text-[#E8ECE9]">PeakForm</span>
                 <span className="text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:bg-[#0F6E5F]/20 dark:text-[#2DD4BF]">
-                  AI Science
+                  AI
                 </span>
               </div>
               <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] hidden sm:block">
-                Evidence-Based Coaching • Built With Science Principles
+                Evidence-Based Fitness & Nutrition
               </p>
             </div>
           </div>
@@ -129,12 +149,62 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Action Buttons, Auth, & Theme Toggle */}
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Persistent Firestore Sync & Drift Status Indicator */}
+            <SyncStatusIndicator
+              isSyncing={isSyncing}
+              currentUser={currentUser}
+              onForceSync={onForceSync}
+            />
+
             {/* Theme Toggle Button */}
             <ThemeToggle
               theme={theme}
               effectiveTheme={effectiveTheme}
               onThemeChange={onThemeChange}
             />
+
+            {/* Subscription Pro Status & Upgrade Trigger */}
+            <button
+              onClick={onOpenSubscriptionModal}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border transition-all shadow-2xs cursor-pointer ${
+                activeSub.status === 'active'
+                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-500/25'
+                  : 'bg-amber-500/15 border-amber-500/30 text-amber-900 dark:text-amber-300 hover:bg-amber-500/25'
+              }`}
+              title="View PeakForm AI Pro Subscription, QR Payment & Active Tier"
+            >
+              <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+              <span>
+                {activeSub.status === 'active' 
+                  ? `${activeSub.daysRemaining}d Pro` 
+                  : `${activeSub.daysRemaining}d Trial`}
+              </span>
+            </button>
+
+            {/* Host Master Admin Portal Button (Warad Asare) */}
+            {isHost && (
+              <>
+                <button
+                  onClick={onOpenHostAdminModal}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-xl bg-purple-600 hover:bg-purple-700 text-white shadow-xs transition-all cursor-pointer"
+                  title="Host Admin Portal (Warad Asare) - View Verified Payments Ledger & Revenue"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-purple-200" />
+                  <span className="hidden sm:inline">Host Ledger</span>
+                </button>
+
+                {onOpenPerformanceDashboard && (
+                  <button
+                    onClick={onOpenPerformanceDashboard}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-xl bg-teal-600 hover:bg-teal-700 text-white shadow-xs transition-all cursor-pointer"
+                    title="Host Latency & Service Telemetry Sparklines (Warad Asare)"
+                  >
+                    <Activity className="w-3.5 h-3.5 text-teal-200" />
+                    <span className="hidden sm:inline">Latency Telemetry</span>
+                  </button>
+                )}
+              </>
+            )}
 
             <button
               onClick={() => setActiveTab('workouts')}
@@ -162,6 +232,17 @@ export const Header: React.FC<HeaderProps> = ({
               <UserCheck className="w-3.5 h-3.5 text-white" />
               <span>Profile</span>
             </button>
+
+            {onExportData && (
+              <button
+                onClick={onExportData}
+                className="hidden xl:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-white dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] hover:bg-[#F9FAFB] dark:hover:bg-[#232726] hover:border-[#0F6E5F] transition-all shadow-xs cursor-pointer"
+                title="Export user logs to CSV"
+              >
+                <Download className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                <span>Export CSV</span>
+              </button>
+            )}
 
             {/* Google Sign-in / Cloud Sync status */}
             {currentUser ? (
@@ -217,15 +298,6 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-[#6B7280] dark:text-[#9EA8A2]'}`} />
                 <span>{item.label}</span>
-                {item.badge && (
-                  <span
-                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-[#E5E7EB] dark:bg-[#2A2E2C] text-[#4B5563] dark:text-[#D1D5DB]'
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                )}
               </button>
             );
           })}

@@ -124,6 +124,56 @@ service cloud.firestore {
         allow update: if isOwner(userId) && isValidId(itemId) && incoming().userId == existing().userId;
         allow delete: if isOwner(userId) && isValidId(itemId);
       }
+
+      // Improvement Reports Subcollection
+      match /improvementReports/{reportId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(reportId);
+        allow update: if isOwner(userId) && isValidId(reportId);
+        allow delete: if isOwner(userId) && isValidId(reportId);
+      }
+
+      // Correction Queue Subcollection
+      match /correctionQueue/{correctionId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(correctionId);
+        allow update: if isOwner(userId) && isValidId(correctionId);
+        allow delete: if isOwner(userId) && isValidId(correctionId);
+      }
+
+      // App Error Reports Subcollection
+      match /appErrorReports/{reportId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(reportId);
+        allow update: if isOwner(userId) && isValidId(reportId);
+        allow delete: if isOwner(userId) && isValidId(reportId);
+      }
+    }
+
+    // Global Host Accuracy Correction Queue (supports PascalCase and camelCase)
+    match /AccuracyCorrectionQueue/{correctionId} {
+      allow read, write: if isSignedIn() && isValidId(correctionId);
+    }
+    match /accuracyCorrectionQueue/{correctionId} {
+      allow read, write: if isSignedIn() && isValidId(correctionId);
+    }
+
+    // Global Host Correction Queue (supports PascalCase and camelCase)
+    match /CorrectionQueue/{correctionId} {
+      allow read, write: if isSignedIn() && isValidId(correctionId);
+    }
+    match /correctionQueue/{correctionId} {
+      allow read, write: if isSignedIn() && isValidId(correctionId);
+    }
+
+    // Global Host Improvement Queue
+    match /improvementQueue/{reportId} {
+      allow read, write: if isSignedIn() && isValidId(reportId);
+    }
+
+    // Global Host App Error Reports
+    match /appErrorReports/{reportId} {
+      allow read, write: if isSignedIn() && isValidId(reportId);
     }
 
     // Connection Health Verification

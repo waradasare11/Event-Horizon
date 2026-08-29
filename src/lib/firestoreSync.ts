@@ -16,6 +16,61 @@ import {
   FormAnalysisResult,
   ShoppingListItem
 } from '../types';
+import { addMealLog, deleteMealLog, addBodyMetric } from './storage';
+import { 
+  sanitizeUserProfile, 
+  sanitizeMealLog, 
+  sanitizeWorkoutLog, 
+  sanitizeBodyMetric,
+  sanitizeString,
+  sanitizeNumber 
+} from './securityMiddleware';
+
+/**
+ * Optimistically sync a MealLog: updates local state immediately,
+ * then asynchronously writes to Firestore.
+ */
+export async function optimisticSyncMealLog(
+  meal: MealLog, 
+  onOptimisticUpdate?: (meals: MealLog[]) => void
+): Promise<MealLog[]> {
+  // 1. Immediately update local storage and execute callback for instant 0ms UI update
+  const updatedMeals = addMealLog(meal);
+  if (onOptimisticUpdate) {
+    onOptimisticUpdate(updatedMeals);
+  }
+
+  // 2. Fire and await Firestore sync in the background
+  try {
+    await syncMealLog(meal);
+  } catch (err) {
+    console.warn('Firestore sync will retry automatically:', err);
+  }
+
+  return updatedMeals;
+}
+
+/**
+ * Optimistically delete a MealLog: updates local state immediately,
+ * then asynchronously deletes from Firestore.
+ */
+export async function optimisticDeleteMealLog(
+  mealId: string, 
+  onOptimisticUpdate?: (meals: MealLog[]) => void
+): Promise<MealLog[]> {
+  const updatedMeals = deleteMealLog(mealId);
+  if (onOptimisticUpdate) {
+    onOptimisticUpdate(updatedMeals);
+  }
+
+  try {
+    await deleteMealLogFirestore(mealId);
+  } catch (err) {
+    console.warn('Firestore delete sync warning:', err);
+  }
+
+  return updatedMeals;
+}
 
 /**
  * Save or update the user's master profile in Firestore
@@ -24,35 +79,37 @@ export async function syncUserProfile(profile: UserProfile): Promise<void> {
   const user = auth.currentUser;
   if (!user) return;
 
+  const sanitized = sanitizeUserProfile(profile);
   const path = `users/${user.uid}`;
   try {
     const payload = {
       userId: user.uid,
-      name: profile.name || user.displayName || 'Peak Athlete',
-      email: user.email || '',
-      age: profile.age,
-      sex: profile.sex,
-      heightCm: profile.heightCm,
-      weightKg: profile.weightKg,
-      targetWeightKg: profile.targetWeightKg,
-      targetDate: profile.targetDate || '',
-      bodyFatPct: profile.bodyFatPct || null,
-      goal: profile.goal,
-      dietType: profile.dietType,
-      experienceLevel: profile.experienceLevel,
-      trainingDaysPerWeek: profile.trainingDaysPerWeek,
-      sessionDurationMin: profile.sessionDurationMin,
-      preferredTime: profile.preferredTime,
-      musclePriority: profile.musclePriority,
-      bmr: profile.bmr,
-      tdee: profile.tdee,
-      dailyCalories: profile.dailyCalories,
-      dailyProtein: profile.dailyProtein,
-      dailyCarbs: profile.dailyCarbs,
-      dailyFat: profile.dailyFat,
-      hydrationLiters: profile.hydrationLiters,
-      weeklyRateKg: profile.weeklyRateKg,
-      isOnboarded: profile.isOnboarded,
+      name: sanitized.name || user.displayName || 'Peak Athlete',
+      email: user.email || sanitized.email || '',
+      age: sanitized.age,
+      sex: sanitized.sex,
+      heightCm: sanitized.heightCm,
+      weightKg: sanitized.weightKg,
+      targetWeightKg: sanitized.targetWeightKg,
+      targetDate: sanitized.targetDate || '',
+      bodyFatPct: sanitized.bodyFatPct || null,
+      goal: sanitized.goal,
+      dietType: sanitized.dietType,
+      experienceLevel: sanitized.experienceLevel,
+      trainingDaysPerWeek: sanitized.trainingDaysPerWeek,
+      sessionDurationMin: sanitized.sessionDurationMin,
+      preferredTime: sanitized.preferredTime,
+      musclePriority: sanitized.musclePriority,
+      bmr: sanitized.bmr,
+      tdee: sanitized.tdee,
+      dailyCalories: sanitized.dailyCalories,
+      dailyProtein: sanitized.dailyProtein,
+      dailyCarbs: sanitized.dailyCarbs,
+      dailyFat: sanitized.dailyFat,
+      hydrationLiters: sanitized.hydrationLiters,
+      weeklyRateKg: sanitized.weeklyRateKg,
+      isOnboarded: sanitized.isOnboarded,
+      subscription: sanitized.subscription || null,
       updatedAt: new Date().toISOString(),
     };
     await setDoc(doc(db, 'users', user.uid), payload, { merge: true });

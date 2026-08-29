@@ -1,13 +1,19 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut as fbSignOut, onAuthStateChanged, User } from 'firebase/auth';
-import { getFirestore, doc, getDocFromServer, collection, getDocs, setDoc, deleteDoc, onSnapshot, Unsubscribe } from 'firebase/firestore';
+import { initializeFirestore, doc, getDocFromServer, collection, getDocs, setDoc, deleteDoc, onSnapshot, Unsubscribe } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
 // Initialize Firebase App
 const app = initializeApp(firebaseConfig);
 
-// CRITICAL: Must pass firebaseConfig.firestoreDatabaseId as second parameter
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+// CRITICAL: Must pass firebaseConfig.firestoreDatabaseId as third parameter to initializeFirestore
+export const db = initializeFirestore(
+  app,
+  {
+    experimentalAutoDetectLongPolling: true,
+  },
+  firebaseConfig.firestoreDatabaseId
+);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 

@@ -1,5 +1,6 @@
-import { UserProfile, MealLog, BodyMetric, WorkoutProgram, CheckInRecord, AIAdjustedMealPlan, CustomGeneratedRecipe, WorkoutCompletionLog, FormAnalysisResult, SmartShoppingList, ShoppingListItem } from '../types';
-import { INITIAL_USER_PROFILE, INITIAL_SAMPLE_MEAL_LOGS, INITIAL_SAMPLE_BODY_METRICS, SAMPLE_WORKOUT_PROGRAMS, INITIAL_SAMPLE_WORKOUT_LOGS } from './sample-data';
+import { UserProfile, MealLog, BodyMetric, WorkoutProgram, CheckInRecord, AIAdjustedMealPlan, CustomGeneratedRecipe, WorkoutCompletionLog, FormAnalysisResult, SmartShoppingList, ShoppingListItem, Exercise } from '../types';
+import { INITIAL_USER_PROFILE, INITIAL_SAMPLE_MEAL_LOGS, INITIAL_SAMPLE_BODY_METRICS, INITIAL_SAMPLE_WORKOUT_LOGS } from './sample-data';
+import { MASTER_WORKOUT_PROGRAMS } from '../data/workoutPrograms';
 
 const STORAGE_KEYS = {
   PROFILE: 'peakform_user_profile',
@@ -17,7 +18,19 @@ const STORAGE_KEYS = {
 export function getStoredProfile(): UserProfile {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.PROFILE);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      // If profile has no valid email, ensure it strictly starts unauthenticated & not onboarded
+      if (!parsed.email || !parsed.email.includes('@')) {
+        return {
+          ...INITIAL_USER_PROFILE,
+          ...parsed,
+          email: '',
+          isOnboarded: false,
+        };
+      }
+      return parsed;
+    }
   } catch (e) {
     console.error('Failed reading user profile from storage', e);
   }
@@ -92,11 +105,16 @@ export function addBodyMetric(metric: BodyMetric): BodyMetric[] {
 export function getStoredWorkoutPrograms(): WorkoutProgram[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.WORKOUT_PROGRAMS);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
   } catch (e) {
     console.error('Failed reading workout programs from storage', e);
   }
-  return SAMPLE_WORKOUT_PROGRAMS;
+  return MASTER_WORKOUT_PROGRAMS;
 }
 
 export function saveStoredWorkoutPrograms(programs: WorkoutProgram[]): void {
@@ -105,6 +123,88 @@ export function saveStoredWorkoutPrograms(programs: WorkoutProgram[]): void {
   } catch (e) {
     console.error('Failed saving workout programs to storage', e);
   }
+}
+
+export function resetWorkoutProgramsToDefault(): WorkoutProgram[] {
+  saveStoredWorkoutPrograms(MASTER_WORKOUT_PROGRAMS);
+  return MASTER_WORKOUT_PROGRAMS;
+}
+
+export function reorderWorkoutExercise(
+  programId: string,
+  dayId: string,
+  fromIndex: number,
+  toIndex: number
+): WorkoutProgram[] {
+  const programs = getStoredWorkoutPrograms();
+  const updated = programs.map((p) => {
+    if (p.id !== programId) return p;
+    return {
+      ...p,
+      days: p.days.map((d) => {
+        if (d.id !== dayId) return d;
+        const exercises = [...d.exercises];
+        if (fromIndex < 0 || fromIndex >= exercises.length || toIndex < 0 || toIndex >= exercises.length) {
+          return d;
+        }
+        const [moved] = exercises.splice(fromIndex, 1);
+        exercises.splice(toIndex, 0, moved);
+        return {
+          ...d,
+          exercises,
+        };
+      }),
+    };
+  });
+  saveStoredWorkoutPrograms(updated);
+  return updated;
+}
+
+export function removeWorkoutExercise(
+  programId: string,
+  dayId: string,
+  exerciseIndex: number
+): WorkoutProgram[] {
+  const programs = getStoredWorkoutPrograms();
+  const updated = programs.map((p) => {
+    if (p.id !== programId) return p;
+    return {
+      ...p,
+      days: p.days.map((d) => {
+        if (d.id !== dayId) return d;
+        const exercises = d.exercises.filter((_, idx) => idx !== exerciseIndex);
+        return {
+          ...d,
+          exercises,
+        };
+      }),
+    };
+  });
+  saveStoredWorkoutPrograms(updated);
+  return updated;
+}
+
+export function addExerciseToDay(
+  programId: string,
+  dayId: string,
+  exercise: Exercise
+): WorkoutProgram[] {
+  const programs = getStoredWorkoutPrograms();
+  const updated = programs.map((p) => {
+    if (p.id !== programId) return p;
+    return {
+      ...p,
+      days: p.days.map((d) => {
+        if (d.id !== dayId) return d;
+        return {
+          ...d,
+          exercises: [...d.exercises, exercise],
+        };
+      }),
+    };
+  });
+  saveStoredWorkoutPrograms(updated);
+  return updated;
 }
 
 export function getStoredAIMealPlan(): AIAdjustedMealPlan | null {
@@ -182,7 +282,27 @@ export function addWorkoutLog(log: WorkoutCompletionLog): WorkoutCompletionLog[]
   return updated;
 }
 
-export function toggleWorkoutDayLog(date: string, dayId: string, dayName: string, durationMin: number, exercisesCompleted: number, totalExercises: number, isRestDay: boolean = false): WorkoutCompletionLog[] {
+export function toggleWorkoutDayLog(
+  date: string, 
+  dayId: string, 
+  dayName: string, 
+  durationMin: number, 
+  exercisesCompleted: number, 
+  totalExercises: number, 
+  isRestDay: boolean = false,
+  rpeAverage?: number,
+  loggedExercises?: Array<{
+    exerciseId: string;
+    exerciseName: string;
+    targetMuscle?: string;
+    sets: number;
+    reps: number;
+    weightKg: number;
+    rpeLogged?: number;
+    volumeKg: number;
+  }>,
+  totalVolumeKg?: number
+): WorkoutCompletionLog[] {
   const current = getStoredWorkoutLogs();
   const existingIndex = current.findIndex((l) => l.date === date && (l.dayId === dayId || (isRestDay && l.isRestDay)));
   
@@ -198,9 +318,11 @@ export function toggleWorkoutDayLog(date: string, dayId: string, dayName: string
       durationMin,
       exercisesCompleted,
       totalExercises,
-      rpeAverage: isRestDay ? undefined : 8.3,
+      rpeAverage: isRestDay ? undefined : (rpeAverage ?? 8.0),
+      loggedExercises: loggedExercises || [],
+      totalVolumeKg: totalVolumeKg || 0,
       isRestDay,
-      notes: isRestDay ? 'Active recovery and central nervous system replenishment' : 'Full workout completed according to prescribed progressive overload targets',
+      notes: isRestDay ? 'Active recovery and central nervous system replenishment' : `Full workout completed with average RPE ${rpeAverage?.toFixed(1) || '8.0'}/10`,
     };
     updated = [newLog, ...current];
   }

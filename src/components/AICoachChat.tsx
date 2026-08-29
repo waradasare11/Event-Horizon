@@ -133,14 +133,11 @@ Ask me anything about fat loss biology, muscle hypertrophy mechanics, EMG muscle
           <div>
             <div className="flex items-center gap-2">
               <h2 className="font-bold text-sm sm:text-base text-[#1A1D1B] dark:text-[#E8ECE9]">
-                PeakForm Science Coach
+                AI Fitness Coach
               </h2>
-              <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8]">
-                Gemini 3.7 Flash
-              </span>
             </div>
             <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">
-              Sports science literature, biomechanics & real-time search grounding
+              Evidence-based exercise physiology and nutrition guidance
             </p>
           </div>
         </div>
@@ -155,10 +152,9 @@ Ask me anything about fat loss biology, muscle hypertrophy mechanics, EMG muscle
                 ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 font-bold'
                 : 'bg-white dark:bg-[#1E201F] text-[#6B7280] dark:text-[#9EA8A2] border-[#E5E7EB] dark:border-[#2A2E2C]'
             }`}
-            title="Enable Deep Thinking Mode for complex questions and reasoning"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>Deep Thinking: {enableThinking ? 'ON' : 'OFF'}</span>
+            <span>Deep Thinking: {enableThinking ? 'On' : 'Off'}</span>
           </button>
 
           {/* Grounding Toggle */}
@@ -170,16 +166,14 @@ Ask me anything about fat loss biology, muscle hypertrophy mechanics, EMG muscle
                 ? 'bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8] border-[#0F6E5F]/30'
                 : 'bg-white dark:bg-[#1E201F] text-[#6B7280] dark:text-[#9EA8A2] border-[#E5E7EB] dark:border-[#2A2E2C]'
             }`}
-            title="Toggle Google Search Grounding for live research retrieval"
           >
             <Globe className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#5FD1B8]" />
-            <span>Search Grounding: {useSearchGrounding ? 'ON' : 'OFF'}</span>
+            <span>Search: {useSearchGrounding ? 'On' : 'Off'}</span>
           </button>
 
           <button
             onClick={() => setMessages([messages[0]])}
             className="text-xs text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white flex items-center gap-1 font-medium px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#242826] transition-all cursor-pointer"
-            title="Reset conversation"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Clear</span>

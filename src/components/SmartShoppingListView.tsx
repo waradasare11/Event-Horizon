@@ -93,7 +93,7 @@ const CATEGORY_COLORS: Record<GroceryCategory, { bg: string; text: string; borde
   },
 };
 
-const DEFAULT_SAMPLE_ITEMS: ShoppingListItem[] = [
+const DEFAULT_OMNIVORE_ITEMS: ShoppingListItem[] = [
   { id: 'item_1', name: 'Boneless Skinless Chicken Breast', category: 'Lean Protein', amount: '1.4 kg (3.1 lbs)', isPurchased: false, notes: 'Look for air-chilled bulk packs to save 20-30%', mealSources: ['Lunch', 'Dinner'] },
   { id: 'item_2', name: 'Pasture-Raised Whole Eggs', category: 'Lean Protein', amount: '2 Dozen (24 eggs)', isPurchased: true, notes: 'High choline and lutein density', mealSources: ['Breakfast'] },
   { id: 'item_3', name: 'Liquid Egg Whites', category: 'Lean Protein', amount: '2 Cartons (1L total)', isPurchased: false, notes: 'Pure albumin protein booster for scrambles', mealSources: ['Breakfast'] },
@@ -110,23 +110,56 @@ const DEFAULT_SAMPLE_ITEMS: ShoppingListItem[] = [
   { id: 'item_14', name: 'Pink Himalayan Salt & Black Peppercorns', category: 'Pantry Essentials & Seasonings', amount: '1 Grinder set', isPurchased: true, notes: 'Sodium electrolyte optimization for gym pump', mealSources: ['All Meals'] },
 ];
 
+const DEFAULT_VEGETARIAN_ITEMS: ShoppingListItem[] = [
+  { id: 'veg_item_1', name: 'Low-Fat Organic Paneer (or Extra-Firm Tofu)', category: 'Lean Protein', amount: '1.2 kg (3 blocks)', isPurchased: false, notes: 'High-leucine complete vegetarian protein (36g protein per 200g)', mealSources: ['Lunch', 'Dinner'] },
+  { id: 'veg_item_2', name: 'Shelled Edamame & Organic Tempeh', category: 'Lean Protein', amount: '800g (Frozen / Vacuum Packed)', isPurchased: true, notes: 'Rich in plant isoflavones and gut-friendly fermented protein', mealSources: ['Lunch', 'Post-Workout'] },
+  { id: 'veg_item_3', name: '0% Fat Plain Greek Yogurt / Skyr', category: 'Dairy & High-Protein Alternatives', amount: '2 Large Tubs (900g each)', isPurchased: true, notes: 'Provides 23g slow-digesting casein per cup', mealSources: ['Breakfast', 'Pre-Bed Snack'] },
+  { id: 'veg_item_4', name: 'Dry Brown Lentils / Chickpeas (Kabuli Chana)', category: 'Lean Protein', amount: '1 Bag (1 kg)', isPurchased: false, notes: 'High resistant starch & prebiotic dietary fiber', mealSources: ['Dinner'] },
+  { id: 'veg_item_5', name: 'Tricolor Quinoa & Brown Basmati Rice', category: 'Complex Carbs', amount: '1 Bag (1 kg)', isPurchased: false, notes: 'Complete amino acid carb source with low glycemic index', mealSources: ['Lunch', 'Dinner'] },
+  { id: 'veg_item_6', name: 'Old Fashioned Rolled Oats & Chia Seeds', category: 'Complex Carbs', amount: '1 Canister (1 kg)', isPurchased: true, notes: 'Beta-glucan soluble fiber for cardiac & satiety health', mealSources: ['Breakfast'] },
+  { id: 'veg_item_7', name: 'Sweet Potatoes (Yams)', category: 'Complex Carbs', amount: '5 Medium (approx. 1 kg)', isPurchased: false, notes: 'Rich in beta-carotene and potassium electrolytes', mealSources: ['Dinner'] },
+  { id: 'veg_item_8', name: 'Fresh Broccoli Crowns & Asparagus', category: 'Fibrous Veggies & Greens', amount: '2 Bunches (800g)', isPurchased: false, notes: 'Cruciferous sulforaphane for hormone and cellular recovery', mealSources: ['Lunch', 'Dinner'] },
+  { id: 'veg_item_9', name: 'Baby Spinach & Cherry Tomatoes', category: 'Fibrous Veggies & Greens', amount: '1 Large Clamshell (350g)', isPurchased: false, notes: 'Natural nitrates & lycopene', mealSources: ['Breakfast', 'Lunch'] },
+  { id: 'veg_item_10', name: 'Wild Blueberries (Frozen)', category: 'Fruits & Antioxidants', amount: '1 Bag (1 kg)', isPurchased: false, notes: 'Anthocyanin polyphenols to buffer exercise oxidative stress', mealSources: ['Smoothie / Oats'] },
+  { id: 'veg_item_11', name: 'Bananas & Avocados', category: 'Fruits & Antioxidants', amount: '1 Bunch + 3 Avocados', isPurchased: true, notes: 'Potassium + heart-healthy monounsaturated fats', mealSources: ['Pre-Workout / Salads'] },
+  { id: 'veg_item_12', name: 'Extra Virgin Olive Oil & Ghee', category: 'Healthy Fats & Nuts', amount: '1 Bottle (500ml)', isPurchased: true, notes: 'Cold-pressed polyphenols for hormone optimization', mealSources: ['Cooking & Dressings'] },
+  { id: 'veg_item_13', name: 'Raw Almonds, Walnuts & Pumpkin Seeds', category: 'Healthy Fats & Nuts', amount: '1 Bag (400g)', isPurchased: false, notes: 'Plant omega-3 ALA, zinc, and magnesium', mealSources: ['Snacks'] },
+  { id: 'veg_item_14', name: 'Turmeric, Cumin, Garam Masala, Himalayan Salt', category: 'Pantry Essentials & Seasonings', amount: '1 Set', isPurchased: true, notes: 'Anti-inflammatory curcumin and bio-enhancing spices', mealSources: ['All Meals'] },
+];
+
 export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
   userProfile,
   aiMealPlan,
   onNavigateToBlueprint,
 }) => {
+  const isVegetarianUser = userProfile.dietType === 'vegetarian' || userProfile.dietType === 'vegan' || userProfile.dietType === 'eggetarian';
+
   const [shoppingList, setShoppingList] = useState<SmartShoppingList>(() => {
     const stored = getStoredSmartShoppingList();
-    if (stored) return stored;
+    if (stored) {
+      // If user is vegetarian, verify no meat items in stored list
+      if (isVegetarianUser) {
+        const NON_VEG_WORDS = ['chicken', 'salmon', 'beef', 'turkey', 'pork', 'tuna', 'fish', 'meat', 'shrimp', 'bacon'];
+        const hasMeat = stored.items.some((i) => NON_VEG_WORDS.some((kw) => i.name.toLowerCase().includes(kw)));
+        if (!hasMeat) return stored;
+      } else {
+        return stored;
+      }
+    }
     return {
       id: 'list_initial',
-      name: `${userProfile.goal} Weekly Meal Prep Grocery List`,
+      name: `${userProfile.goal} ${isVegetarianUser ? '🌱 Vegetarian' : ''} Weekly Grocery Blueprint`,
       daysMultiplier: 7,
-      items: DEFAULT_SAMPLE_ITEMS,
-      estimatedCostRange: '$75 - $95 USD',
-      bulkPrepTips: [
+      items: isVegetarianUser ? DEFAULT_VEGETARIAN_ITEMS : DEFAULT_OMNIVORE_ITEMS,
+      estimatedCostRange: isVegetarianUser ? '$60 - $80 USD' : '$75 - $95 USD',
+      bulkPrepTips: isVegetarianUser ? [
+        'Buy low-fat paneer, extra-firm tofu, and Greek yogurt in multi-packs to save 25–30% per gram of complete protein.',
+        'Cook whole lentils, chickpeas, and tricolor quinoa in 3-day batches in an Instant Pot or pressure cooker for effortless grab-and-go meal prep.',
+        'Keep pre-washed leafy greens lined with a dry paper towel in your refrigerator crisper drawer to double shelf life and prevent moisture spoilage.',
+        'Frozen wild blueberries and edamame retain full antioxidant and protein integrity at half the price of fresh out-of-season produce.',
+      ] : [
         'Buy chicken breast and lean beef in bulk family packs or frozen wild salmon fillets to save 25–35% per gram of pure protein.',
-        'Cook your complex carbohydrates (brown rice, quinoa, sweet potatoes) in 3-day batches with low-sodium bone broth for enhanced micronutrient uptake.',
+        'Cook your complex carbohydrates (brown rice, quinoa, sweet potatoes) in 3-day batches with low-sodium broth for enhanced micronutrient uptake.',
         'Keep pre-washed leafy greens lined with a dry paper towel in your refrigerator crisper drawer to double shelf life and prevent moisture spoilage.',
         'Frozen wild blueberries offer equal or superior antioxidant polyphenol potency compared to fresh berries at half the price per serving.',
       ],
@@ -138,8 +171,41 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
   const [isCompiling, setIsCompiling] = useState<boolean>(false);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [copiedNotification, setCopiedNotification] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+
+  // Auto-sanitize list if user profile dietType updates to vegetarian
+  useEffect(() => {
+    if (isVegetarianUser) {
+      const NON_VEG_WORDS = ['chicken', 'salmon', 'beef', 'turkey', 'pork', 'tuna', 'fish', 'meat', 'shrimp', 'bacon'];
+      const hasNonVeg = shoppingList.items.some((i) => NON_VEG_WORDS.some((kw) => i.name.toLowerCase().includes(kw)));
+      if (hasNonVeg) {
+        const sanitizedItems = shoppingList.items.map((it) => {
+          const isNonVeg = NON_VEG_WORDS.some((kw) => it.name.toLowerCase().includes(kw));
+          if (isNonVeg) {
+            return {
+              ...it,
+              name: 'Low-Fat Organic Paneer / Extra-Firm Tofu',
+              notes: 'High biological value vegetarian protein staple',
+            };
+          }
+          return it;
+        });
+        const sanitizedList = {
+          ...shoppingList,
+          items: sanitizedItems,
+          bulkPrepTips: [
+            'Buy low-fat paneer, extra-firm tofu, and Greek yogurt in multi-packs to save 25–30% per gram of complete protein.',
+            'Cook whole lentils, chickpeas, and tricolor quinoa in 3-day batches in an Instant Pot or pressure cooker for effortless grab-and-go meal prep.',
+            'Keep pre-washed leafy greens lined with a dry paper towel in your refrigerator crisper drawer to double shelf life and prevent moisture spoilage.',
+            'Frozen wild blueberries and edamame retain full antioxidant and protein integrity at half the price of fresh out-of-season produce.',
+          ]
+        };
+        setShoppingList(sanitizedList);
+        saveStoredSmartShoppingList(sanitizedList);
+      }
+    }
+  }, [isVegetarianUser, userProfile.dietType]);
+  const [copiedNotification, setCopiedNotification] = useState<boolean>(false);
 
   // New Item Form State
   const [isAddingItem, setIsAddingItem] = useState<boolean>(false);
@@ -221,7 +287,50 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
       setStatusMessage(null);
 
       // Fallback if no meal plan exists yet
-      const activePlan = aiMealPlan || {
+      const activePlan = aiMealPlan || (isVegetarianUser ? {
+        planName: `${userProfile.goal} Vegetarian Blueprint`,
+        meals: [
+          {
+            mealType: 'Breakfast',
+            dishName: 'Anabolic High-Protein Rolled Oats with Greek Yogurt & Chia Seeds',
+            ingredients: [
+              { item: 'Rolled Oats', amount: '80g' },
+              { item: '0% Fat Plain Greek Yogurt', amount: '200g' },
+              { item: 'Blueberries', amount: '100g' },
+              { item: 'Chia Seeds', amount: '15g' },
+            ],
+          },
+          {
+            mealType: 'Lunch',
+            dishName: 'Grilled Paneer Steak with Brown Basmati Rice & Broccoli',
+            ingredients: [
+              { item: 'Low-Fat Organic Paneer', amount: '200g' },
+              { item: 'Brown Basmati Rice', amount: '150g cooked' },
+              { item: 'Steamed Broccoli Crowns', amount: '150g' },
+              { item: 'Extra Virgin Olive Oil', amount: '10ml' },
+            ],
+          },
+          {
+            mealType: 'Dinner',
+            dishName: 'Tricolor Quinoa & Organic Edamame Sauté with Asparagus',
+            ingredients: [
+              { item: 'Shelled Edamame', amount: '180g' },
+              { item: 'Cooked Quinoa', amount: '180g' },
+              { item: 'Tender Asparagus Spears', amount: '150g' },
+              { item: 'Avocado', amount: '50g' },
+            ],
+          },
+          {
+            mealType: 'Evening Snack',
+            dishName: 'High-Protein Casein Cottage Cheese / Greek Yogurt Bowl',
+            ingredients: [
+              { item: 'Low-Fat Cottage Cheese or Greek Yogurt', amount: '220g' },
+              { item: 'Raw Walnuts or Almonds', amount: '20g' },
+              { item: 'Raw Honey or Stevia', amount: '10g' },
+            ],
+          },
+        ],
+      } : {
         planName: `${userProfile.goal} Standard Blueprint`,
         meals: [
           {
@@ -264,7 +373,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
             ],
           },
         ],
-      };
+      });
 
       const res = await fetch('/api/ai/compile-shopping-list', {
         method: 'POST',

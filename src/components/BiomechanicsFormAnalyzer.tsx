@@ -20,6 +20,7 @@ import {
   Info
 } from 'lucide-react';
 import { UserProfile, FormAnalysisResult } from '../types';
+import { ReportAccuracyModal } from './ReportAccuracyModal';
 
 interface BiomechanicsFormAnalyzerProps {
   userProfile: UserProfile;
@@ -68,6 +69,7 @@ export function BiomechanicsFormAnalyzer({
   const [specificConcern, setSpecificConcern] = useState<string>('Check bar path verticality, hip-knee coordination, and spinal neutrality');
   
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState<boolean>(false);
   const [currentAnalysis, setCurrentAnalysis] = useState<FormAnalysisResult | null>(
     formAnalyses.length > 0 ? formAnalyses[0] : null
   );
@@ -194,13 +196,13 @@ export function BiomechanicsFormAnalyzer({
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8] text-xs font-semibold uppercase tracking-wider">
               <Zap className="w-3.5 h-3.5" />
-              Gemini Multimodal Biomechanics Engine
+              Form Analysis
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#1A1D1B] dark:text-[#E8ECE9]">
-              AI Lift Technique & Form Auditor
+              Lift Form & Technique Analyzer
             </h1>
             <p className="text-sm text-[#525B56] dark:text-[#9EA8A2] max-w-2xl">
-              Upload exercise clips or photos to inspect bar path verticality, joint angles, lumbar shear stress, and receive instant science-backed corrective cues before your next set.
+              Inspect bar path, joint angles, and spinal alignment from video or photo clips, and receive instant corrective cues.
             </p>
           </div>
 
@@ -529,6 +531,18 @@ export function BiomechanicsFormAnalyzer({
                   </div>
                 </div>
               )}
+
+              {/* Report AI Biomechanics Feedback */}
+              <div className="pt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsReportModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 rounded-xl border border-amber-300 dark:border-amber-800/60 transition-colors cursor-pointer"
+                >
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <span>Report Form Audit Accuracy / Suggest Improvement</span>
+                </button>
+              </div>
             </div>
           ) : (
             <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-2xl p-12 text-center space-y-4">
@@ -545,6 +559,18 @@ export function BiomechanicsFormAnalyzer({
           )}
         </div>
       </div>
+
+      {currentAnalysis && (
+        <ReportAccuracyModal
+          isOpen={isReportModalOpen}
+          onClose={() => setIsReportModalOpen(false)}
+          feature="biomechanics"
+          targetId={currentAnalysis.exerciseIdentified || 'Lift Analysis'}
+          aiOutputSummary={`${currentAnalysis.exerciseIdentified} - Score: ${currentAnalysis.formScore}/100, Risk: ${currentAnalysis.injuryRiskRating}, Verdict: ${currentAnalysis.verdict}`}
+          confidenceScoreAtScan={currentAnalysis.formScore}
+          originalPayload={currentAnalysis}
+        />
+      )}
     </div>
   );
 }

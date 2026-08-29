@@ -8,7 +8,10 @@ import {
   Tooltip, 
   ResponsiveContainer, 
   BarChart, 
-  Bar 
+  Bar,
+  RadialBarChart,
+  RadialBar,
+  PolarAngleAxis
 } from 'recharts';
 import { 
   TrendingUp, 
@@ -21,18 +24,39 @@ import {
   AlertCircle,
   Activity,
   Award,
-  BarChart2
+  BarChart2,
+  Download,
+  Flame,
+  Dumbbell,
+  Wheat,
+  Droplet,
+  PieChart as PieIcon
 } from 'lucide-react';
-import { BodyMetric, UserProfile, MealLog, WorkoutCompletionLog } from '../types';
+import { BodyMetric, UserProfile, MealLog, WorkoutCompletionLog, WorkoutProgram } from '../types';
 import { WeeklyProgressReport } from './WeeklyProgressReport';
+import { WorkoutActivityHeatmap } from './WorkoutActivityHeatmap';
+import { D3MuscleIntensityHeatmap } from './D3MuscleIntensityHeatmap';
+import { WeeklyLiftingVolumeChart } from './WeeklyLiftingVolumeChart';
+import { GoalTimelinePredictor } from './GoalTimelinePredictor';
+import { exportUserDataToCSV } from '../lib/csvExport';
 
 interface ProgressAnalyticsProps {
   bodyMetrics: BodyMetric[];
   userProfile: UserProfile;
   mealLogs: MealLog[];
   workoutLogs: WorkoutCompletionLog[];
+  workoutPrograms?: WorkoutProgram[];
   onAddBodyMetric: (metric: BodyMetric) => void;
   onOpenCheckIn: () => void;
+  onToggleWorkoutLog?: (
+    date: string,
+    dayId: string,
+    dayName: string,
+    durationMin: number,
+    exercisesCompleted: number,
+    totalExercises: number,
+    isRestDay?: boolean
+  ) => void;
 }
 
 export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
@@ -40,13 +64,28 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
   userProfile,
   mealLogs,
   workoutLogs,
+  workoutPrograms = [],
   onAddBodyMetric,
   onOpenCheckIn,
+  onToggleWorkoutLog,
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'weekly' | 'trends'>('weekly');
+  const [activeSubTab, setActiveSubTab] = useState<'weekly' | 'predictor' | 'muscle_heatmap' | 'heatmap' | 'trends'>('weekly');
   const [newWeight, setNewWeight] = useState<number>(userProfile.weightKg);
   const [newBodyFat, setNewBodyFat] = useState<number>(userProfile.bodyFatPct || 18);
   const [showAddMetricModal, setShowAddMetricModal] = useState<boolean>(false);
+  const [exportSuccess, setExportSuccess] = useState<boolean>(false);
+
+  const handleExportData = () => {
+    exportUserDataToCSV(
+      userProfile,
+      bodyMetrics,
+      [],
+      workoutLogs,
+      mealLogs
+    );
+    setExportSuccess(true);
+    setTimeout(() => setExportSuccess(false), 4000);
+  };
 
   // Format data for weight progression chart
   const initialWeight = bodyMetrics[0]?.weightKg || userProfile.weightKg;
@@ -65,6 +104,60 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
       bodyFatPct: m.bodyFatPct || 18,
     };
   });
+
+  // Calculate today's logged macros vs profile targets
+  const todayStr = new Date().toISOString().split('T')[0];
+  const todayLogs = mealLogs.filter((m) => m.date === todayStr);
+  const consumedCalories = todayLogs.reduce((sum, m) => sum + m.calories, 0);
+  const consumedProtein = Number(todayLogs.reduce((sum, m) => sum + m.proteinG, 0).toFixed(1));
+  const consumedCarbs = Number(todayLogs.reduce((sum, m) => sum + m.carbsG, 0).toFixed(1));
+  const consumedFat = Number(todayLogs.reduce((sum, m) => sum + m.fatG, 0).toFixed(1));
+
+  const targetCalories = userProfile.dailyCalories || 2000;
+  const targetProtein = userProfile.dailyProtein || 140;
+  const targetCarbs = userProfile.dailyCarbs || 200;
+  const targetFat = userProfile.dailyFat || 60;
+
+  const proteinPct = Math.min(100, Math.round((consumedProtein / Math.max(1, targetProtein)) * 100));
+  const carbsPct = Math.min(100, Math.round((consumedCarbs / Math.max(1, targetCarbs)) * 100));
+  const fatPct = Math.min(100, Math.round((consumedFat / Math.max(1, targetFat)) * 100));
+  const calPct = Math.min(100, Math.round((consumedCalories / Math.max(1, targetCalories)) * 100));
+
+  // Circular progress radial bar chart data (ordered from outermost to innermost ring)
+  const macroRadialData = [
+    {
+      name: 'Calories',
+      value: consumedCalories,
+      target: targetCalories,
+      unit: 'kcal',
+      percentage: calPct,
+      fill: '#8B5CF6',
+    },
+    {
+      name: 'Carbs',
+      value: consumedCarbs,
+      target: targetCarbs,
+      unit: 'g',
+      percentage: carbsPct,
+      fill: '#3B82F6',
+    },
+    {
+      name: 'Fats',
+      value: consumedFat,
+      target: targetFat,
+      unit: 'g',
+      percentage: fatPct,
+      fill: '#E8912D',
+    },
+    {
+      name: 'Protein',
+      value: consumedProtein,
+      target: targetProtein,
+      unit: 'g',
+      percentage: proteinPct,
+      fill: '#0F6E5F',
+    },
+  ];
 
   // Recent 7-day adherence data
   const adherenceData = [
@@ -96,19 +189,28 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8]">
-              Body Composition Analytics
+              Progress Dashboard
             </span>
-            <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Actual vs. Scientific Target</span>
+            <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Daily Targets & Trends</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-2">
-            Progress & Performance Center
+            Progress & Analytics
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#9EA8A2] mt-1 max-w-2xl">
-            Track your weekly consistency across workouts and nutrition, alongside long-term trajectory toward target body composition.
+            View your daily nutrition intake against target macros and track your weight trajectory over time.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={handleExportData}
+            title="Export all data to CSV"
+            className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs sm:text-sm font-semibold hover:bg-[#F9FAFB] dark:hover:bg-[#232726] transition-all shadow-xs cursor-pointer"
+          >
+            <Download className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+            <span>Export CSV</span>
+          </button>
+
           <button
             onClick={() => setShowAddMetricModal(true)}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs sm:text-sm font-semibold hover:bg-[#F9FAFB] dark:hover:bg-[#232726] transition-all shadow-xs cursor-pointer"
@@ -127,42 +229,345 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
         </div>
       </div>
 
-      {/* Sub-view switcher: Weekly Progress Report vs Long-Term Trends */}
-      <div className="flex items-center gap-2 border-b border-[#E5E7EB] dark:border-[#242826] pb-2">
+      {/* Export feedback toast */}
+      {exportSuccess && (
+        <div className="bg-[#0F6E5F]/10 border border-[#0F6E5F]/30 text-[#0F6E5F] dark:text-[#5FD1B8] px-4 py-3 rounded-xl flex items-center justify-between text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+            <span>Data exported successfully to CSV.</span>
+          </div>
+          <span className="text-xs opacity-75 font-mono">CSV Ready</span>
+        </div>
+      )}
+
+      {/* CIRCULAR PROGRESS CHART: Daily Macronutrient & Calorie Intake vs Calculated Targets */}
+      <div className="bg-white dark:bg-[#161817] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-6 transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] dark:border-[#242826] pb-4">
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
+              <PieIcon className="w-5 h-5 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+              <span>Today's Macronutrient Intake</span>
+            </h2>
+            <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
+              Circular progress tracking your logged daily protein, fats, carbs, and calories against calculated targets.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8]">
+              {todayLogs.length} {todayLogs.length === 1 ? 'meal' : 'meals'} logged today
+            </span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          {/* Recharts Circular RadialBar Progress Chart */}
+          <div className="lg:col-span-6 flex flex-col items-center justify-center relative min-h-[260px]">
+            <div className="w-full h-64 relative">
+              <ResponsiveContainer width="100%" height="100%">
+                <RadialBarChart
+                  cx="50%"
+                  cy="50%"
+                  innerRadius="25%"
+                  outerRadius="100%"
+                  barSize={14}
+                  data={macroRadialData}
+                  startAngle={90}
+                  endAngle={-270}
+                >
+                  <PolarAngleAxis
+                    type="number"
+                    domain={[0, 100]}
+                    angleAxisId={0}
+                    tick={false}
+                  />
+                  <RadialBar
+                    background={{ fill: 'rgba(150, 150, 150, 0.12)' }}
+                    dataKey="percentage"
+                    cornerRadius={8}
+                  />
+                  <Tooltip
+                    content={({ active, payload }) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-[#1E201F] text-white text-xs p-3 rounded-xl shadow-lg border border-[#2A2E2C]">
+                            <div className="font-bold flex items-center gap-1.5" style={{ color: data.fill }}>
+                              <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: data.fill }} />
+                              {data.name}
+                            </div>
+                            <div className="mt-1 text-gray-200">
+                              {data.value} / {data.target} {data.unit} ({data.percentage}%)
+                            </div>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
+                  />
+                </RadialBarChart>
+              </ResponsiveContainer>
+
+              {/* Center Summary Indicator */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+                <div className="text-xl sm:text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  {calPct}%
+                </div>
+                <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] uppercase font-semibold">
+                  Calories
+                </div>
+              </div>
+            </div>
+
+            <div className="text-[11px] text-[#6B7280] dark:text-[#9EA8A2] mt-1 text-center">
+              Outer ring: Calories • Carbs • Fats • Inner ring: Protein
+            </div>
+          </div>
+
+          {/* Detailed Macro Status Cards */}
+          <div className="lg:col-span-6 grid grid-cols-2 gap-3.5">
+            {/* Protein Card */}
+            <div className="p-4 rounded-xl border border-[#0F6E5F]/30 bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/10 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#0F6E5F] dark:text-[#5FD1B8] flex items-center gap-1.5">
+                  <Dumbbell className="w-4 h-4" />
+                  Protein
+                </span>
+                <span className="text-xs font-bold text-[#0F6E5F] dark:text-[#5FD1B8]">
+                  {proteinPct}%
+                </span>
+              </div>
+              <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                {consumedProtein} <span className="text-xs font-normal text-[#6B7280] dark:text-[#9EA8A2]">/ {targetProtein}g</span>
+              </div>
+              <div className="w-full bg-[#E5E7EB] dark:bg-[#242826] h-1.5 rounded-full overflow-hidden">
+                <div 
+                  className="bg-[#0F6E5F] h-full rounded-full transition-all" 
+                  style={{ width: `${Math.min(100, proteinPct)}%` }} 
+                />
+              </div>
+              <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">
+                {targetProtein - consumedProtein > 0 
+                  ? `${(targetProtein - consumedProtein).toFixed(1)}g left to reach target` 
+                  : 'Daily goal reached'}
+              </div>
+            </div>
+
+            {/* Fats Card */}
+            <div className="p-4 rounded-xl border border-[#E8912D]/30 bg-[#E8912D]/5 dark:bg-[#E8912D]/10 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#E8912D] flex items-center gap-1.5">
+                  <Droplet className="w-4 h-4" />
+                  Fats
+                </span>
+                <span className="text-xs font-bold text-[#E8912D]">
+                  {fatPct}%
+                </span>
+              </div>
+              <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                {consumedFat} <span className="text-xs font-normal text-[#6B7280] dark:text-[#9EA8A2]">/ {targetFat}g</span>
+              </div>
+              <div className="w-full bg-[#E5E7EB] dark:bg-[#242826] h-1.5 rounded-full overflow-hidden">
+                <div 
+                  className="bg-[#E8912D] h-full rounded-full transition-all" 
+                  style={{ width: `${Math.min(100, fatPct)}%` }} 
+                />
+              </div>
+              <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">
+                {targetFat - consumedFat > 0 
+                  ? `${(targetFat - consumedFat).toFixed(1)}g remaining` 
+                  : 'Daily budget met'}
+              </div>
+            </div>
+
+            {/* Carbs Card */}
+            <div className="p-4 rounded-xl border border-[#3B82F6]/30 bg-[#3B82F6]/5 dark:bg-[#3B82F6]/10 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#3B82F6] flex items-center gap-1.5">
+                  <Wheat className="w-4 h-4" />
+                  Carbohydrates
+                </span>
+                <span className="text-xs font-bold text-[#3B82F6]">
+                  {carbsPct}%
+                </span>
+              </div>
+              <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                {consumedCarbs} <span className="text-xs font-normal text-[#6B7280] dark:text-[#9EA8A2]">/ {targetCarbs}g</span>
+              </div>
+              <div className="w-full bg-[#E5E7EB] dark:bg-[#242826] h-1.5 rounded-full overflow-hidden">
+                <div 
+                  className="bg-[#3B82F6] h-full rounded-full transition-all" 
+                  style={{ width: `${Math.min(100, carbsPct)}%` }} 
+                />
+              </div>
+              <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">
+                {targetCarbs - consumedCarbs > 0 
+                  ? `${(targetCarbs - consumedCarbs).toFixed(1)}g remaining` 
+                  : 'Target reached'}
+              </div>
+            </div>
+
+            {/* Calories Card */}
+            <div className="p-4 rounded-xl border border-[#8B5CF6]/30 bg-[#8B5CF6]/5 dark:bg-[#8B5CF6]/10 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-[#8B5CF6] flex items-center gap-1.5">
+                  <Flame className="w-4 h-4" />
+                  Total Calories
+                </span>
+                <span className="text-xs font-bold text-[#8B5CF6]">
+                  {calPct}%
+                </span>
+              </div>
+              <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                {consumedCalories} <span className="text-xs font-normal text-[#6B7280] dark:text-[#9EA8A2]">/ {targetCalories} kcal</span>
+              </div>
+              <div className="w-full bg-[#E5E7EB] dark:bg-[#242826] h-1.5 rounded-full overflow-hidden">
+                <div 
+                  className="bg-[#8B5CF6] h-full rounded-full transition-all" 
+                  style={{ width: `${Math.min(100, calPct)}%` }} 
+                />
+              </div>
+              <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">
+                {targetCalories - consumedCalories > 0 
+                  ? `${targetCalories - consumedCalories} kcal remaining today` 
+                  : 'Target calories met'}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sub-view switcher: Weekly Progress Report vs Goal Timeline Predictor vs Muscle Volume Heatmap vs Consistency Matrix vs Weight Trends */}
+      <div className="flex items-center gap-2 border-b border-[#E5E7EB] dark:border-[#242826] pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveSubTab('weekly')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeSubTab === 'weekly'
               ? 'bg-[#0F6E5F] text-white shadow-xs'
               : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
           }`}
         >
           <Award className="w-4 h-4" />
-          <span>Weekly Progress Report</span>
+          <span>Weekly Report</span>
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab('predictor')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+            activeSubTab === 'predictor'
+              ? 'bg-[#0F6E5F] text-white shadow-xs'
+              : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
+          }`}
+        >
+          <Target className="w-4 h-4 text-amber-400" />
+          <span>Goal Timeline Predictor</span>
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab('muscle_heatmap')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+            activeSubTab === 'muscle_heatmap'
+              ? 'bg-[#0F6E5F] text-white shadow-xs'
+              : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
+          }`}
+        >
+          <Activity className="w-4 h-4" />
+          <span>Muscle Intensity Heatmap (D3)</span>
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab('heatmap')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+            activeSubTab === 'heatmap'
+              ? 'bg-[#0F6E5F] text-white shadow-xs'
+              : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          <span>Consistency Matrix</span>
         </button>
 
         <button
           onClick={() => setActiveSubTab('trends')}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeSubTab === 'trends'
               ? 'bg-[#0F6E5F] text-white shadow-xs'
               : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
           }`}
         >
           <TrendingUp className="w-4 h-4" />
-          <span>Long-Term Trajectory & Charts</span>
+          <span>Weight Trends</span>
         </button>
       </div>
 
+      {/* Sub-Tab Content: Goal Timeline Predictor */}
+      {activeSubTab === 'predictor' && (
+        <div className="space-y-6">
+          <GoalTimelinePredictor
+            userProfile={userProfile}
+            bodyMetrics={bodyMetrics}
+            workoutLogs={workoutLogs}
+          />
+        </div>
+      )}
+
       {/* Sub-Tab Content: Weekly Progress Report */}
       {activeSubTab === 'weekly' && (
-        <WeeklyProgressReport
-          userProfile={userProfile}
-          mealLogs={mealLogs}
-          workoutLogs={workoutLogs}
-          bodyMetrics={bodyMetrics}
-          onOpenCheckIn={onOpenCheckIn}
-        />
+        <div className="space-y-8">
+          {/* Quick Predictor Banner in Weekly View */}
+          <GoalTimelinePredictor
+            userProfile={userProfile}
+            bodyMetrics={bodyMetrics}
+            workoutLogs={workoutLogs}
+            compact={true}
+          />
+          <WeeklyProgressReport
+            userProfile={userProfile}
+            mealLogs={mealLogs}
+            workoutLogs={workoutLogs}
+            bodyMetrics={bodyMetrics}
+            onOpenCheckIn={onOpenCheckIn}
+          />
+          {/* 3-Month Weekly Total Lifting Volume Line Chart */}
+          <WeeklyLiftingVolumeChart
+            workoutLogs={workoutLogs}
+            userProfile={userProfile}
+          />
+          {/* D3 Muscle Volume Heatmap in Weekly Tab */}
+          <D3MuscleIntensityHeatmap
+            workoutLogs={workoutLogs}
+            workoutPrograms={workoutPrograms}
+            userProfile={userProfile}
+          />
+          {/* Quick Heatmap preview in Weekly tab for effortless consistency glance */}
+          <WorkoutActivityHeatmap
+            workoutLogs={workoutLogs}
+            userProfile={userProfile}
+            onToggleWorkoutLog={onToggleWorkoutLog}
+          />
+        </div>
+      )}
+
+      {/* Sub-Tab Content: Dedicated D3 Muscle Intensity & Volume Heatmap */}
+      {activeSubTab === 'muscle_heatmap' && (
+        <div className="space-y-8 animate-in fade-in duration-300">
+          <D3MuscleIntensityHeatmap
+            workoutLogs={workoutLogs}
+            workoutPrograms={workoutPrograms}
+            userProfile={userProfile}
+          />
+        </div>
+      )}
+
+      {/* Sub-Tab Content: Dedicated 52-Week Workout Activity Heatmap */}
+      {activeSubTab === 'heatmap' && (
+        <div className="space-y-8 animate-in fade-in duration-300">
+          <WorkoutActivityHeatmap
+            workoutLogs={workoutLogs}
+            userProfile={userProfile}
+            onToggleWorkoutLog={onToggleWorkoutLog}
+          />
+        </div>
       )}
 
       {/* Sub-Tab Content: Long-Term Trends */}
@@ -191,22 +596,22 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
             </div>
 
             <div className="bg-white dark:bg-[#161817] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs">
-              <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Estimated Body Fat</div>
+              <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Body Fat %</div>
               <div className="text-2xl sm:text-3xl font-bold text-[#E8912D] mt-1">
                 {bodyMetrics[bodyMetrics.length - 1]?.bodyFatPct || userProfile.bodyFatPct || 18.5} <span className="text-sm font-normal text-[#6B7280] dark:text-[#9EA8A2]">%</span>
               </div>
               <div className="text-xs text-[#16A34A] font-semibold mt-1">
-                Lean Mass Preserved
+                Estimated
               </div>
             </div>
 
             <div className="bg-white dark:bg-[#161817] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs">
-              <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Projected Goal Date</div>
+              <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Target Date</div>
               <div className="text-xl sm:text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-1 truncate">
-                {userProfile.targetDate || 'Nov 20, 2026'}
+                {userProfile.targetDate || 'Target Phase'}
               </div>
               <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1">
-                Safe rate: {userProfile.weeklyRateKg} kg / week
+                Rate: {userProfile.weeklyRateKg} kg / week
               </div>
             </div>
           </div>
@@ -217,10 +622,10 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
               <div>
                 <h2 className="text-lg sm:text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-[#0F6E5F] dark:text-[#5FD1B8]" />
-                  <span>Weight Trajectory vs. Scientific Goal Path</span>
+                  <span>Weight Trajectory vs. Target Path</span>
                 </h2>
                 <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
-                  Green line represents your logged weigh-ins; amber dashed line represents projected trajectory.
+                  Solid green line is your logged weigh-ins; amber dashed line is your projected trajectory.
                 </p>
               </div>
               <div className="flex items-center gap-4 text-xs font-semibold">
@@ -275,6 +680,12 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
             </div>
           </div>
 
+          {/* 3-Month Weekly Lifting Volume Progression */}
+          <WeeklyLiftingVolumeChart
+            workoutLogs={workoutLogs}
+            userProfile={userProfile}
+          />
+
           {/* Adherence & Nutrition Consistency Chart */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white dark:bg-[#161817] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-4">
@@ -286,7 +697,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
                   <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Target: {userProfile.dailyCalories} kcal/day</p>
                 </div>
                 <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#16A34A]/10 text-[#16A34A]">
-                  96% Target Adherence
+                  Active
                 </span>
               </div>
 
@@ -320,7 +731,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
                   <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Target: {userProfile.dailyProtein}g/day</p>
                 </div>
                 <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8]">
-                  Optimal Leucine Spikes
+                  Target: {userProfile.dailyProtein}g
                 </span>
               </div>
 
@@ -353,7 +764,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white dark:bg-[#161817] rounded-2xl p-6 max-w-sm w-full shadow-xl border border-[#E5E7EB] dark:border-[#242826] animate-in zoom-in-95 duration-200 text-left">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">Log New Body Weight</h3>
+              <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">Log Body Weight</h3>
               <button
                 onClick={() => setShowAddMetricModal(false)}
                 className="text-[#9CA3AF] hover:text-[#1A1D1B] dark:hover:text-white cursor-pointer"
@@ -379,7 +790,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
-                  Body Fat % (Optional estimate):
+                  Body Fat % (Optional):
                 </label>
                 <input
                   type="number"

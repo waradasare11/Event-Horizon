@@ -137,6 +137,51 @@
         "createdAt": { "type": "string", "maxLength": 50 }
       },
       "required": ["userId", "exerciseName", "formScore", "verdict", "injuryRiskRating"]
+    },
+    "AIAccuracyReport": {
+      "title": "AIAccuracyReport",
+      "description": "User flagged AI prediction inaccuracy for continuous model improvement",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "id": { "type": "string", "maxLength": 128 },
+        "feature": { "type": "string", "maxLength": 50 },
+        "userFeedback": { "type": "string", "maxLength": 2000 },
+        "reportedAt": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "id", "feature", "userFeedback", "reportedAt", "status"]
+    },
+    "AppErrorReport": {
+      "title": "AppErrorReport",
+      "description": "App error / defect / user feedback with diagnostic snapshot",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "id": { "type": "string", "maxLength": 128 },
+        "errorType": { "type": "string", "maxLength": 50 },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 2000 },
+        "reportedAt": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "id", "errorType", "title", "description", "reportedAt", "status"]
+    },
+    "CorrectionQueue": {
+      "title": "CorrectionQueue",
+      "description": "Logged AI meal scanner ingredient confidence breakdown and user manual correction tagged with consensus rating for host model fine-tuning",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "id": { "type": "string", "maxLength": 128 },
+        "mealTitle": { "type": "string", "maxLength": 150 },
+        "suggestedCorrection": { "type": "string", "maxLength": 2000 },
+        "modelConsensusRating": { "type": "string", "maxLength": 100 },
+        "consensusScore": { "type": "number" },
+        "createdAt": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "maxLength": 50 }
+      },
+      "required": ["userId", "id", "mealTitle", "suggestedCorrection", "createdAt", "status"]
     }
   },
   "firestore": {
@@ -163,6 +208,26 @@
     "/users/{userId}/formAnalyses/{analysisId}": {
       "schema": "FormAnalysis",
       "description": "Exercise technique and biomechanics feedback"
+    },
+    "/users/{userId}/correctionQueue/{correctionId}": {
+      "schema": "CorrectionQueue",
+      "description": "User specific correction records for meal AI accuracy"
+    },
+    "/correctionQueue/{correctionId}": {
+      "schema": "CorrectionQueue",
+      "description": "Global host queue of meal scanner corrections with ingredient breakdown and consensus tags"
+    },
+    "/AccuracyCorrectionQueue/{correctionId}": {
+      "schema": "CorrectionQueue",
+      "description": "Global host queue of meal scanner corrections with original image prompt, detected ingredients, and user corrections"
+    },
+    "/improvementQueue/{reportId}": {
+      "schema": "AIAccuracyReport",
+      "description": "Global queue for host triage of AI prediction flags"
+    },
+    "/appErrorReports/{reportId}": {
+      "schema": "AppErrorReport",
+      "description": "Global queue for host triage of user defects and suggestions"
     }
   }
 }
