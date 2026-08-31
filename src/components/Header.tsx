@@ -148,7 +148,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Action Buttons, Auth, & Theme Toggle */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Persistent Firestore Sync & Drift Status Indicator */}
             <SyncStatusIndicator
               isSyncing={isSyncing}
@@ -166,7 +166,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Subscription Pro Status & Upgrade Trigger */}
             <button
               onClick={onOpenSubscriptionModal}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl border transition-all shadow-2xs cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl border transition-all shadow-2xs cursor-pointer ${
                 activeSub.status === 'active'
                   ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-500/25'
                   : 'bg-amber-500/15 border-amber-500/30 text-amber-900 dark:text-amber-300 hover:bg-amber-500/25'
@@ -181,101 +181,58 @@ export const Header: React.FC<HeaderProps> = ({
               </span>
             </button>
 
-            {/* Host Master Admin Portal Button (Warad Asare) */}
-            {isHost && (
-              <>
-                <button
-                  onClick={onOpenHostAdminModal}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-xl bg-purple-600 hover:bg-purple-700 text-white shadow-xs transition-all cursor-pointer"
-                  title="Host Admin Portal (Warad Asare) - View Verified Payments Ledger & Revenue"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-purple-200" />
-                  <span className="hidden sm:inline">Host Ledger</span>
-                </button>
-
-                {onOpenPerformanceDashboard && (
-                  <button
-                    onClick={onOpenPerformanceDashboard}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black rounded-xl bg-teal-600 hover:bg-teal-700 text-white shadow-xs transition-all cursor-pointer"
-                    title="Host Latency & Service Telemetry Sparklines (Warad Asare)"
-                  >
-                    <Activity className="w-3.5 h-3.5 text-teal-200" />
-                    <span className="hidden sm:inline">Latency Telemetry</span>
-                  </button>
-                )}
-              </>
-            )}
-
+            {/* Streak Quick Badge */}
             <button
               onClick={() => setActiveTab('workouts')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-amber-500/15 to-orange-500/15 dark:from-amber-500/20 dark:to-orange-500/20 border border-amber-500/30 dark:border-amber-500/40 text-amber-900 dark:text-amber-300 hover:scale-105 transition-all shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-amber-500/15 to-orange-500/15 dark:from-amber-500/20 dark:to-orange-500/20 border border-amber-500/30 dark:border-amber-500/40 text-amber-900 dark:text-amber-300 hover:scale-105 transition-all shadow-2xs cursor-pointer"
               title="View Training Consistency Streak & 28-Day Matrix"
             >
               <Flame className="w-3.5 h-3.5 text-[#E8912D] fill-[#E8912D]" />
-              <span>{currentStreak}d Streak</span>
+              <span>{currentStreak}d</span>
             </button>
 
-            <button
-              onClick={onOpenCheckIn}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-white dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] hover:bg-[#F9FAFB] dark:hover:bg-[#232726] hover:border-[#0F6E5F] transition-all shadow-xs cursor-pointer"
-              title="Record weekly body weight and trigger AI plan adjustments"
-            >
-              <RefreshCw className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-              <span className="hidden sm:inline">Weekly</span> Check-In
-            </button>
-
+            {/* Profile Button */}
             <button
               onClick={onOpenOnboarding}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-[#0F6E5F] text-white hover:bg-[#0D5B4F] transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-[#0F6E5F] text-white hover:bg-[#0D5B4F] transition-all shadow-xs cursor-pointer"
               title="Update profile stats, goal, injuries, or preferences"
             >
               <UserCheck className="w-3.5 h-3.5 text-white" />
-              <span>Profile</span>
+              <span className="hidden sm:inline">Profile</span>
             </button>
-
-            {onExportData && (
-              <button
-                onClick={onExportData}
-                className="hidden xl:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-white dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] hover:bg-[#F9FAFB] dark:hover:bg-[#232726] hover:border-[#0F6E5F] transition-all shadow-xs cursor-pointer"
-                title="Export user logs to CSV"
-              >
-                <Download className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                <span>Export CSV</span>
-              </button>
-            )}
 
             {/* Google Sign-in / Cloud Sync status */}
             {currentUser ? (
-              <div className="flex items-center gap-2 pl-1 border-l border-[#E5E7EB] dark:border-[#242826]">
+              <div className="flex items-center gap-1.5 pl-1 border-l border-[#E5E7EB] dark:border-[#242826]">
                 {currentUser.photoURL ? (
                   <img
                     src={currentUser.photoURL}
                     alt={currentUser.displayName || 'User Avatar'}
                     referrerPolicy="no-referrer"
-                    className="w-8 h-8 rounded-full border border-[#0F6E5F]/30 object-cover"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[#0F6E5F]/30 object-cover"
                     title={`Signed in as ${currentUser.email || currentUser.displayName}`}
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-[#0F6E5F] text-white font-bold text-xs flex items-center justify-center">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#0F6E5F] text-white font-bold text-xs flex items-center justify-center">
                     {(currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()}
                   </div>
                 )}
                 <button
                   onClick={onSignOut}
-                  className="p-2 rounded-lg text-[#6B7280] dark:text-[#9EA8A2] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg text-[#6B7280] dark:text-[#9EA8A2] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                   title="Sign out of Firebase"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-3.5 h-3.5" />
                 </button>
               </div>
             ) : (
               <button
                 onClick={onSignIn}
-                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg bg-white dark:bg-[#1A1D1C] border border-[#0F6E5F]/40 text-[#0F6E5F] dark:text-[#5FD1B8] hover:bg-[#0F6E5F]/5 transition-all shadow-xs cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-[#1A1D1C] border border-[#0F6E5F]/40 text-[#0F6E5F] dark:text-[#5FD1B8] hover:bg-[#0F6E5F]/5 transition-all shadow-xs cursor-pointer"
                 title="Sign in with Google to sync workouts, meals & analyses across devices"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">Google</span> Sign In
+                <span>Sign In</span>
               </button>
             )}
           </div>

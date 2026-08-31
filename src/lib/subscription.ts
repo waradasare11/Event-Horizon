@@ -1,4 +1,5 @@
-import { SubscriptionPlanConfig, SubscriptionPlanId, UserProfile, UserSubscription, PaymentTransaction, HostAuditLogEntry } from '../types';
+import { SubscriptionPlanConfig, SubscriptionPlanId, UserProfile, UserSubscription, PaymentTransaction, HostAuditLogEntry, HostGrantedSubscription } from '../types';
+import { syncHostGrantedSubscription, deleteHostGrantedSubscription, fetchAllHostGrantedSubscriptions } from './firestoreSync';
 
 export const HOST_ADMIN_CONFIG = {
   name: 'Warad Asare',
@@ -90,7 +91,54 @@ export function createInitialTrialSubscription(): UserSubscription {
   };
 }
 
-export function computeSubscriptionStatus(sub?: UserSubscription): UserSubscription {
+export function createHostLifetimeSubscription(): UserSubscription {
+  return {
+    status: 'active',
+    planId: '3_years',
+    planName: 'VIP Host Lifetime Pro (Warad Asare)',
+    trialStartDate: '2024-01-01T00:00:00.000Z',
+    trialEndDate: '2024-01-01T00:00:00.000Z',
+    subscriptionStartDate: new Date().toISOString(),
+    subscriptionEndDate: '2099-12-31T23:59:59.000Z',
+    amountPaidINR: 0,
+    paymentMethod: 'HOST_LIFETIME_VIP',
+    isTrialActive: false,
+    daysRemaining: 27000,
+    verifiedBy: 'Warad Asare (Host)',
+    lastPaymentVerifiedAt: new Date().toISOString(),
+  };
+}
+
+export function createGrantedUserSubscription(grant: Partial<HostGrantedSubscription>): UserSubscription {
+  let planId: SubscriptionPlanId = '3_years';
+  if (grant.planId === 'plan_1m' || grant.planId === '1_month') planId = '1_month';
+  else if (grant.planId === 'plan_3m' || grant.planId === '3_months') planId = '3_months';
+  else if (grant.planId === 'plan_1y' || grant.planId === '1_year') planId = '1_year';
+  else if (grant.planId === 'plan_2y' || grant.planId === '2_years') planId = '2_years';
+  else if (grant.planId === 'plan_3y' || grant.planId === '3_years' || grant.planId === 'all_plans') planId = '3_years';
+
+  return {
+    status: 'active',
+    planId,
+    planName: grant.planName || 'VIP Free Lifetime Access (Host Grant)',
+    trialStartDate: grant.grantedAt || new Date().toISOString(),
+    trialEndDate: grant.grantedAt || new Date().toISOString(),
+    subscriptionStartDate: grant.grantedAt || new Date().toISOString(),
+    subscriptionEndDate: grant.expiresAt || '2099-12-31T23:59:59.000Z',
+    amountPaidINR: 0,
+    paymentMethod: 'MANUAL_GRANT',
+    isTrialActive: false,
+    daysRemaining: 36500,
+    verifiedBy: 'Warad Asare (Host VIP Grant)',
+    lastPaymentVerifiedAt: new Date().toISOString(),
+  };
+}
+
+export function computeSubscriptionStatus(sub?: UserSubscription, userEmail?: string): UserSubscription {
+  if (isHostAdmin(userEmail) || (sub?.verifiedBy && sub.verifiedBy.includes('Host Lifetime')) || sub?.paymentMethod === 'HOST_LIFETIME_VIP') {
+    return createHostLifetimeSubscription();
+  }
+
   if (!sub) {
     return createInitialTrialSubscription();
   }
@@ -359,6 +407,216 @@ export async function deleteHostDiscountRule(ruleId: string, pin: string, email:
     return false;
   }
 }
+
+/**
+ * Grant a free lifetime or plan-specific subscription directly to a user's Gmail ID
+ * Persists in both Firestore and Backend Server Memory + Audit Trail
+ */
+export async function grantUserFreeSubscription(params: {
+  pin: string;
+  email: string;
+  targetEmail: string;
+  planId: string;
+  isLifetime: boolean;
+  notes?: string;
+}): Promise<{ success: boolean; message?: string; error?: string; grant?: HostGrantedSubscription }> {
+  const cleanTargetEmail = params.targetEmail.trim().toLowerCase();
+  const selectedPlan = SUBSCRIPTION_PLANS.find((p) => p.id === params.planId);
+  const planName = params.planId === 'all_plans' ? 'All Plans (Full VIP Access)' : (selectedPlan?.durationLabel || 'Pro Plan');
+  const now = new Date();
+  const durationMonths = params.isLifetime ? 1200 : (selectedPlan?.durationMonths || 12);
+  const durationDays = params.isLifetime ? 36500 : (selectedPlan?.durationDays || 365);
+  const expiresAt = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000).toISOString();
+
+  const grantData: HostGrantedSubscription = {
+    id: `grant_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    email: cleanTargetEmail,
+    sanitizedEmail: cleanTargetEmail.replace(/[^a-zA-Z0-9_]/g, '_'),
+    planId: params.planId || 'all_plans',
+    planName,
+    grantedBy: params.email,
+    grantedByName: 'Warad Asare (Host Master)',
+    grantedAt: now.toISOString(),
+    status: 'active',
+    isLifetime: !!params.isLifetime,
+    durationMonths,
+    durationDays,
+    notes: params.notes || 'Granted Free Subscription by Host Warad Asare',
+    expiresAt,
+  };
+
+  // Local storage caching for instant client-side lookup
+  try {
+    const cachedGrantsRaw = localStorage.getItem('peakform_host_grants_cache');
+    let cachedGrants: HostGrantedSubscription[] = cachedGrantsRaw ? JSON.parse(cachedGrantsRaw) : [];
+    cachedGrants = cachedGrants.filter((g) => g.email.toLowerCase() !== cleanTargetEmail);
+    cachedGrants.unshift(grantData);
+    localStorage.setItem('peakform_host_grants_cache', JSON.stringify(cachedGrants));
+
+    // Update any cached user profile for this target email
+    const profileKey = `peakform_user_profile_${cleanTargetEmail}`;
+    const rawProfile = localStorage.getItem(profileKey);
+    if (rawProfile) {
+      const p = JSON.parse(rawProfile);
+      p.subscription = createGrantedUserSubscription(grantData);
+      localStorage.setItem(profileKey, JSON.stringify(p));
+    }
+  } catch (e) {
+    console.warn('LocalStorage grant caching notice:', e);
+  }
+
+  try {
+    // 1. Sync to Firestore hostGrantedSubscriptions collection
+    await syncHostGrantedSubscription(grantData);
+
+    // 2. Call backend server route to synchronize serverLedger, hostAuditLogs & discountRules
+    const res = await fetch('/api/host/grant-free-subscription', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      return {
+        success: true,
+        message: data.message || `Free subscription granted to ${cleanTargetEmail}!`,
+        grant: data.grant || grantData,
+      };
+    }
+    return {
+      success: true,
+      message: `Free subscription granted in Firestore to ${cleanTargetEmail}!`,
+      grant: grantData,
+    };
+  } catch (e: any) {
+    // Firestore-only fallback
+    try {
+      await syncHostGrantedSubscription(grantData);
+      return {
+        success: true,
+        message: `Free subscription registered in Firestore for ${cleanTargetEmail}!`,
+        grant: grantData,
+      };
+    } catch (fsErr: any) {
+      return { success: false, error: e.message || 'Failed to grant subscription' };
+    }
+  }
+}
+
+/**
+ * Fetch all host-granted subscriptions from server & Firestore
+ */
+export async function fetchHostGrantedSubscriptions(pin: string, email: string): Promise<HostGrantedSubscription[]> {
+  try {
+    const res = await fetch(`/api/host/granted-subscriptions?email=${encodeURIComponent(email)}`, {
+      headers: {
+        'x-host-pin': pin,
+        'x-host-email': email,
+      },
+    });
+    const data = await res.json();
+    if (data.success && Array.isArray(data.grants) && data.grants.length > 0) {
+      return data.grants;
+    }
+  } catch (e) {
+    console.warn('Server fetch grants fallback to Firestore');
+  }
+
+  try {
+    return await fetchAllHostGrantedSubscriptions();
+  } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * Revoke a host granted subscription from Firestore & server
+ */
+export async function revokeHostGrantedSubscription(email: string, pin: string, hostEmail: string): Promise<boolean> {
+  const cleanEmail = email.trim().toLowerCase();
+  try {
+    await deleteHostGrantedSubscription(cleanEmail);
+    await fetch(`/api/host/revoke-granted-subscription/${encodeURIComponent(cleanEmail)}`, {
+      method: 'DELETE',
+      headers: {
+        'x-host-pin': pin,
+        'x-host-email': hostEmail,
+      },
+    });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * Check if a user's Gmail has a free subscription grant
+ */
+export async function checkUserHostGrant(email: string): Promise<{ hasGrant: boolean; isHost?: boolean; grant?: HostGrantedSubscription }> {
+  const cleanEmail = String(email || '').trim().toLowerCase();
+  if (!cleanEmail) return { hasGrant: false };
+
+  if (isHostAdmin(cleanEmail)) {
+    return {
+      hasGrant: true,
+      isHost: true,
+      grant: {
+        id: 'host_master_grant',
+        email: cleanEmail,
+        sanitizedEmail: cleanEmail.replace(/[^a-zA-Z0-9_]/g, '_'),
+        planId: 'all_plans',
+        planName: 'Host Lifetime Master Access',
+        grantedBy: cleanEmail,
+        grantedByName: 'Warad Asare (Host)',
+        grantedAt: '2024-01-01T00:00:00.000Z',
+        status: 'active',
+        isLifetime: true,
+        durationMonths: 1200,
+        durationDays: 36500,
+      },
+    };
+  }
+
+  // 1. Check local cached grants
+  try {
+    const rawGrants = localStorage.getItem('peakform_host_grants_cache');
+    if (rawGrants) {
+      const grants: HostGrantedSubscription[] = JSON.parse(rawGrants);
+      const matched = grants.find((g) => g.email.toLowerCase() === cleanEmail && g.status === 'active');
+      if (matched) {
+        return { hasGrant: true, isHost: false, grant: matched };
+      }
+    }
+  } catch (e) {
+    // continue
+  }
+
+  // 2. Query backend server
+  try {
+    const res = await fetch(`/api/subscription/check-user-grant?email=${encodeURIComponent(cleanEmail)}`);
+    const data = await res.json();
+    if (data.success && data.hasGrant && data.grant) {
+      return { hasGrant: true, isHost: false, grant: data.grant };
+    }
+  } catch (e) {
+    // fallback to firestore
+  }
+
+  // 3. Query Firestore
+  try {
+    const { fetchHostGrantedSubscriptionByEmail } = await import('./firestoreSync');
+    const firestoreGrant = await fetchHostGrantedSubscriptionByEmail(cleanEmail);
+    if (firestoreGrant && firestoreGrant.status === 'active') {
+      return { hasGrant: true, isHost: false, grant: firestoreGrant };
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  return { hasGrant: false };
+}
+
 
 /**
  * Generate a client-side cryptographic security challenge token for high-risk operations

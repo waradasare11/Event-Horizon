@@ -4,6 +4,16 @@ export type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced';
 export type PreferredTime = 'morning' | 'afternoon' | 'evening' | 'flexible';
 export type MusclePriority = 'chest' | 'back' | 'shoulders' | 'arms' | 'quads' | 'glutes_hamstrings' | 'balanced';
 export type EquipmentType = 'full_gym' | 'dumbbells_bench' | 'pullup_bands' | 'bodyweight_only';
+export type MealCadenceOption =
+  | '3 Meals + 1-2 High-Protein Snacks'
+  | '3 Solid Balanced Meals'
+  | '2 meals per day'
+  | '1 meal per day (Intermittent Fasting)'
+  | '2 Meals only a day (rest fasting)'
+  | '1 Meal only a day (OMAD - rest fasting)'
+  | '16:8 Intermittent Fasting'
+  | '4-5 Small Frequent Meals'
+  | string;
 
 export interface WorkoutNotificationSettings {
   enabled: boolean;
@@ -59,6 +69,7 @@ export interface UserProfile {
   goalWeeksRequired?: number;
   goalPredictionReport?: GoalTimelinePredictionResult;
   goalTimelinePrediction?: GoalTimelinePredictionResult;
+  cameraCalibration?: CameraCalibrationData;
 
   // Calculated Nutrition Targets
   bmr: number;
@@ -102,7 +113,7 @@ export interface UserSubscription {
   subscriptionEndDate?: string;
   amountPaidINR?: number;
   utrNumber?: string;
-  paymentMethod?: 'UPI_QR' | 'UPI_DIRECT' | 'PROMO_TRIAL';
+  paymentMethod?: 'UPI_QR' | 'UPI_DIRECT' | 'PROMO_TRIAL' | 'HOST_LIFETIME_VIP' | 'MANUAL_GRANT';
   isTrialActive: boolean;
   daysRemaining: number;
   lastPaymentVerifiedAt?: string;
@@ -153,6 +164,8 @@ export interface FoodItemBreakdown {
   verifiedByDatabase?: boolean; // Cross-referenced against USDA/IFCT
   verifiedDatabaseName?: string; // 'USDA FoodData Central' | 'ICMR-IFCT'
 }
+
+export type MealItem = FoodItemBreakdown;
 
 export interface ModelConsensusBreakdown {
   overallConsensusScore: number; // 0-100%
@@ -790,6 +803,59 @@ export interface ReconciliationReport {
   details: string[];
   repairedItemsSummary: string;
 }
+
+export interface CameraCalibrationData {
+  calibrated: boolean;
+  referenceObjectType: 'credit_card' | 'coin' | 'standard_spoon' | 'smart_card' | 'device_preset';
+  pixelScaleRatio: number; // pixels per millimeter
+  focalLengthMm: number;
+  depthAccuracyPct: number;
+  calibratedAt: string;
+  samplePhotoUrl?: string;
+  notes?: string;
+}
+
+export interface AccuracyCategoryStat {
+  categoryId: string;
+  categoryName: string;
+  cuisineTag: string;
+  totalScans: number;
+  flaggedCount: number;
+  errorRatePct: number;
+  avgCalorieDiscrepancyPct: number;
+  primaryRootCause: string;
+  systemPromptVersion: string;
+  lastRetrainedAt: string;
+  activeOptimizationPrompt: string;
+  isRetraining?: boolean;
+}
+
+export interface PromptRetrainResult {
+  success: boolean;
+  categoryId: string;
+  updatedPromptDirectives: string[];
+  benchmarkAccuracyProjectedPct: number;
+  retrainedAt: string;
+  auditLogId: string;
+}
+
+export interface HostGrantedSubscription {
+  id: string;
+  email: string;
+  sanitizedEmail: string;
+  planId: string;
+  planName: string;
+  grantedBy: string;
+  grantedByName: string;
+  grantedAt: string;
+  status: 'active' | 'revoked';
+  isLifetime: boolean;
+  durationMonths: number;
+  durationDays: number;
+  notes?: string;
+  expiresAt?: string;
+}
+
 
 
 

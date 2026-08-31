@@ -26,7 +26,9 @@ import {
   recordPaymentTransaction,
   verifyPaymentWithBackendServer,
   fetchPersonalizedPlans,
-  isHostAdmin
+  isHostAdmin,
+  createHostLifetimeSubscription,
+  createGrantedUserSubscription
 } from '../lib/subscription';
 import { SubscriptionPlanConfig, UserProfile, UserSubscription } from '../types';
 
@@ -258,134 +260,197 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
               </div>
             </div>
 
-            {/* 2. QR Code & UPI Transfer Details */}
-            <div className="bg-[#FAFAF8] dark:bg-[#1A1D1C] p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-4">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                  <QrCode className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                  <span>2. Scan QR Code or Pay via UPI (Exact Amount: ₹{selectedPlan.priceINR})</span>
-                </label>
-                <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
-                  0% Convenience Fee
-                </span>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center gap-6">
-                {/* Visual QR Code */}
-                <div className="bg-white p-3 rounded-2xl shadow-md border border-gray-200 shrink-0 text-center">
-                  <img
-                    src={qrCodeUrl}
-                    alt={`UPI QR Code for ₹${selectedPlan.priceINR} to Warad Asare`}
-                    referrerPolicy="no-referrer"
-                    className="w-44 h-44 object-contain rounded-lg mx-auto"
-                  />
-                  <div className="mt-1 text-[10px] font-bold text-gray-600">
-                    Scan with GPay / PhonePe / Paytm / BHIM
-                  </div>
+            {/* Free VIP Access Box if Price is ₹0 */}
+            {selectedPlan.priceINR === 0 && (
+              <div className="bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-emerald-500/15 p-6 rounded-2xl border-2 border-emerald-500/40 dark:border-emerald-500/20 text-center space-y-4 shadow-sm">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-md">
+                  <Crown className="w-6 h-6 text-amber-300 fill-amber-300" />
                 </div>
-
-                {/* Direct Pay Options */}
-                <div className="flex-1 space-y-3 w-full text-xs">
-                  <div className="p-3 rounded-xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-700 space-y-1.5">
-                    <div className="text-gray-500 dark:text-gray-400 font-semibold">Verified Host & Payee</div>
-                    <div className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
-                      <span>{HOST_ADMIN_CONFIG.name}</span>
-                      <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                    </div>
-                  </div>
-
-                  {/* Copy UPI VPA */}
-                  <div className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-700">
-                    <div>
-                      <div className="text-gray-500 dark:text-gray-400 font-semibold">Host UPI ID</div>
-                      <div className="font-mono font-bold text-gray-900 dark:text-white text-xs sm:text-sm">
-                        {HOST_ADMIN_CONFIG.upiId}
-                      </div>
-                    </div>
-                    <button
-                      onClick={handleCopyUPI}
-                      className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-800 dark:text-gray-200 font-bold flex items-center gap-1 cursor-pointer transition-colors"
-                    >
-                      {copiedUPI ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-500" />
-                          <span className="text-emerald-600">Copied</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5 text-gray-500" />
-                          <span>Copy UPI</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* 1-Tap Mobile UPI Trigger */}
-                  <a
-                    href={upiDeepLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold flex items-center justify-center gap-2 shadow-xs transition-all text-xs"
-                  >
-                    <Smartphone className="w-4 h-4" />
-                    <span>Tap to Pay ₹{selectedPlan.priceINR} in UPI App (Mobile)</span>
-                    <ExternalLink className="w-3.5 h-3.5 ml-1 opacity-80" />
-                  </a>
+                <div className="space-y-1">
+                  <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded-md">
+                    Host VIP Pass Active
+                  </span>
+                  <h4 className="text-lg font-black text-gray-900 dark:text-white">
+                    100% Free Lifetime Pro Access Granted
+                  </h4>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 max-w-md mx-auto">
+                    Host <strong>Warad Asare</strong> has granted your Gmail ID (<strong>{userProfile.email}</strong>) full VIP membership. No payment, UPI transfer, or UTR entry is required!
+                  </p>
                 </div>
-              </div>
-            </div>
-
-            {/* 3. Anti-Scam UTR Verification Box */}
-            <div className="space-y-3">
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
-                3. Enter 12-Digit UPI Reference Number (UTR) to Verify
-              </label>
-              
-              <form onSubmit={handleVerifyPayment} className="space-y-3">
-                <div className="relative">
-                  <input
-                    type="text"
-                    maxLength={12}
-                    value={utrInput}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/\D/g, '');
-                      setUtrInput(val);
-                      setVerificationError(null);
-                    }}
-                    placeholder="e.g. 423985123456 (12 digits)"
-                    className="w-full text-sm font-mono tracking-wider p-3.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1A1D1C] text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-[#0F6E5F]"
-                  />
-                  <div className="absolute right-3 top-3.5 text-xs font-semibold text-gray-400">
-                    {utrInput.length}/12 digits
-                  </div>
-                </div>
-
-                {verificationError && (
-                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-300 text-xs flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                    <span>{verificationError}</span>
-                  </div>
-                )}
 
                 <button
-                  type="submit"
-                  disabled={isVerifying || utrInput.length < 12}
-                  className="w-full py-3.5 px-4 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
+                  type="button"
+                  onClick={async () => {
+                    setIsVerifying(true);
+                    try {
+                      const res = await verifyPaymentWithBackendServer(
+                        userProfile,
+                        selectedPlan,
+                        'HOST_LIFETIME_GRANT'
+                      );
+                      if (res.subscription) {
+                        setVerificationSuccess(true);
+                        onSubscriptionUpdated(res.subscription);
+                      }
+                    } catch (e) {
+                      const fallbackSub = isUserHost
+                        ? createHostLifetimeSubscription()
+                        : createGrantedUserSubscription({
+                            id: `grant_${Date.now()}`,
+                            email: userProfile.email || '',
+                            planId: selectedPlan.id as any,
+                            planName: selectedPlan.name,
+                            isLifetime: true,
+                            grantedAt: new Date().toISOString(),
+                            expiresAt: '2099-12-31T23:59:59.000Z',
+                            grantedBy: 'Warad Asare (Host VIP)',
+                          });
+                      onSubscriptionUpdated(fallbackSub);
+                    } finally {
+                      setIsVerifying(false);
+                    }
+                  }}
+                  disabled={isVerifying}
+                  className="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <ShieldCheck className="w-4 h-4 text-emerald-300" />
-                  <span>
-                    {isVerifying ? 'Verifying Transaction with Host Gateway...' : `Verify UTR & Activate ${selectedPlan.durationLabel} Pro`}
-                  </span>
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <span>{isVerifying ? 'Activating VIP Membership...' : `Activate 100% Free ${selectedPlan.name} Now`}</span>
                 </button>
-              </form>
-
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-800 dark:text-amber-300 flex items-start gap-2">
-                <Info className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>
-                  <strong>Anti-Fraud Protection:</strong> Each UTR is cryptographically cross-checked against our ledger to guarantee exact recipient matching to <strong>Warad Asare</strong> (`9284160309@fam`). Submissions with duplicate or falsified references are automatically rejected.
-                </span>
               </div>
-            </div>
+            )}
+
+            {/* 2. QR Code & UPI Transfer Details */}
+            {selectedPlan.priceINR > 0 && (
+              <>
+                <div className="bg-[#FAFAF8] dark:bg-[#1A1D1C] p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                      <QrCode className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                      <span>2. Scan QR Code or Pay via UPI (Exact Amount: ₹{selectedPlan.priceINR})</span>
+                    </label>
+                    <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                      0% Convenience Fee
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-6">
+                    {/* Visual QR Code */}
+                    <div className="bg-white p-3 rounded-2xl shadow-md border border-gray-200 shrink-0 text-center">
+                      <img
+                        src={qrCodeUrl}
+                        alt={`UPI QR Code for ₹${selectedPlan.priceINR} to Warad Asare`}
+                        referrerPolicy="no-referrer"
+                        className="w-44 h-44 object-contain rounded-lg mx-auto"
+                      />
+                      <div className="mt-1 text-[10px] font-bold text-gray-600">
+                        Scan with GPay / PhonePe / Paytm / BHIM
+                      </div>
+                    </div>
+
+                    {/* Direct Pay Options */}
+                    <div className="flex-1 space-y-3 w-full text-xs">
+                      <div className="p-3 rounded-xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-700 space-y-1.5">
+                        <div className="text-gray-500 dark:text-gray-400 font-semibold">Verified Host & Payee</div>
+                        <div className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                          <span>{HOST_ADMIN_CONFIG.name}</span>
+                          <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                        </div>
+                      </div>
+
+                      {/* Copy UPI VPA */}
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-700">
+                        <div>
+                          <div className="text-gray-500 dark:text-gray-400 font-semibold">Host UPI ID</div>
+                          <div className="font-mono font-bold text-gray-900 dark:text-white text-xs sm:text-sm">
+                            {HOST_ADMIN_CONFIG.upiId}
+                          </div>
+                        </div>
+                        <button
+                          onClick={handleCopyUPI}
+                          className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-800 dark:text-gray-200 font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                        >
+                          {copiedUPI ? (
+                            <>
+                              <Check className="w-3.5 h-3.5 text-emerald-500" />
+                              <span className="text-emerald-600">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5 text-gray-500" />
+                              <span>Copy UPI</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+
+                      {/* 1-Tap Mobile UPI Trigger */}
+                      <a
+                        href={upiDeepLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold flex items-center justify-center gap-2 shadow-xs transition-all text-xs"
+                      >
+                        <Smartphone className="w-4 h-4" />
+                        <span>Tap to Pay ₹{selectedPlan.priceINR} in UPI App (Mobile)</span>
+                        <ExternalLink className="w-3.5 h-3.5 ml-1 opacity-80" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Anti-Scam UTR Verification Box */}
+                <div className="space-y-3">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                    3. Enter 12-Digit UPI Reference Number (UTR) to Verify
+                  </label>
+                  
+                  <form onSubmit={handleVerifyPayment} className="space-y-3">
+                    <div className="relative">
+                      <input
+                        type="text"
+                        maxLength={12}
+                        value={utrInput}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '');
+                          setUtrInput(val);
+                          setVerificationError(null);
+                        }}
+                        placeholder="e.g. 423985123456 (12 digits)"
+                        className="w-full text-sm font-mono tracking-wider p-3.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1A1D1C] text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-[#0F6E5F]"
+                      />
+                      <div className="absolute right-3 top-3.5 text-xs font-semibold text-gray-400">
+                        {utrInput.length}/12 digits
+                      </div>
+                    </div>
+
+                    {verificationError && (
+                      <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-300 text-xs flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                        <span>{verificationError}</span>
+                      </div>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={isVerifying || utrInput.length < 12}
+                      className="w-full py-3.5 px-4 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-emerald-300" />
+                      <span>
+                        {isVerifying ? 'Verifying Transaction with Host Gateway...' : `Verify UTR & Activate ${selectedPlan.durationLabel} Pro`}
+                      </span>
+                    </button>
+                  </form>
+
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-800 dark:text-amber-300 flex items-start gap-2">
+                    <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                    <span>
+                      <strong>Anti-Fraud Protection:</strong> Each UTR is cryptographically cross-checked against our ledger to guarantee exact recipient matching to <strong>Warad Asare</strong> (`9284160309@fam`). Submissions with duplicate or falsified references are automatically rejected.
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         )}
 

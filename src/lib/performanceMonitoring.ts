@@ -304,6 +304,53 @@ export const ServiceLatencyMonitor = {
   },
 
   /**
+   * Decorator / Wrapper pattern that wraps any async API call, records latency,
+   * and automatically flags execution time exceeding 2500ms.
+   */
+  async wrap<T>(
+    featureName: string,
+    endpoint: string,
+    operation: () => Promise<T>,
+    metadata?: { model?: string; payloadSizeKb?: number }
+  ): Promise<T> {
+    const start = performance.now();
+    try {
+      const result = await operation();
+      const durationMs = Math.round(performance.now() - start);
+      const isHighLatency = durationMs > 2500;
+
+      recordPerformanceMetric({
+        featureName: isHighLatency ? `[High Latency >2.5s] ${featureName}` : featureName,
+        endpoint,
+        durationMs,
+        status: isHighLatency ? 'fallback' : 'success',
+        statusCode: 200,
+        modelUsed: metadata?.model || 'gemini-3.7-flash',
+        errorMessage: isHighLatency ? `Execution latency (${durationMs}ms) exceeded 2500ms threshold.` : undefined,
+        payloadSizeKb: metadata?.payloadSizeKb,
+      });
+
+      if (isHighLatency) {
+        console.warn(`[ServiceLatencyMonitor Warning] High latency detected on ${featureName} (${endpoint}): ${durationMs}ms > 2500ms threshold.`);
+      }
+
+      return result;
+    } catch (err: any) {
+      const durationMs = Math.round(performance.now() - start);
+      recordPerformanceMetric({
+        featureName,
+        endpoint,
+        durationMs,
+        status: 'error',
+        statusCode: 500,
+        errorMessage: err?.message || 'External service call failed',
+        modelUsed: metadata?.model,
+      });
+      throw err;
+    }
+  },
+
+  /**
    * Runs a live probe against an API endpoint to verify response time
    */
   async runLiveProbe(endpoint: string = '/api/ai/analyze-meal'): Promise<{ success: boolean; latencyMs: number; error?: string }> {

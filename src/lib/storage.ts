@@ -15,9 +15,53 @@ const STORAGE_KEYS = {
   SMART_SHOPPING_LIST: 'peakform_smart_shopping_list',
 };
 
-export function getStoredProfile(): UserProfile {
+export function getUserScopedKey(baseKey: string, userEmail?: string): string {
+  let email = userEmail;
+  if (!email && typeof window !== 'undefined') {
+    try {
+      email = localStorage.getItem('peakform_current_active_email') || '';
+      if (!email) {
+        const rawProf = localStorage.getItem(STORAGE_KEYS.PROFILE);
+        if (rawProf) {
+          const parsed = JSON.parse(rawProf);
+          email = parsed.email || '';
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  if (!email || !email.includes('@')) return baseKey;
+  const sanitized = email.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
+  return `${baseKey}__usr_${sanitized}`;
+}
+
+export function setCurrentActiveEmail(email: string): void {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.PROFILE);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('peakform_current_active_email', email.trim().toLowerCase());
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
+export function getCurrentActiveEmail(): string {
+  try {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('peakform_current_active_email') || '';
+    }
+  } catch (e) {
+    // ignore
+  }
+  return '';
+}
+
+export function getStoredProfile(userEmail?: string): UserProfile {
+  try {
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.PROFILE, userEmail);
+    const raw = localStorage.getItem(scopedKey) || localStorage.getItem(STORAGE_KEYS.PROFILE);
     if (raw) {
       const parsed = JSON.parse(raw);
       // If profile has no valid email, ensure it strictly starts unauthenticated & not onboarded
@@ -25,7 +69,7 @@ export function getStoredProfile(): UserProfile {
         return {
           ...INITIAL_USER_PROFILE,
           ...parsed,
-          email: '',
+          email: userEmail || '',
           isOnboarded: false,
         };
       }
@@ -34,20 +78,30 @@ export function getStoredProfile(): UserProfile {
   } catch (e) {
     console.error('Failed reading user profile from storage', e);
   }
-  return INITIAL_USER_PROFILE;
+  return {
+    ...INITIAL_USER_PROFILE,
+    email: userEmail || '',
+  };
 }
 
 export function saveStoredProfile(profile: UserProfile): void {
   try {
-    localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
+    if (profile.email) {
+      setCurrentActiveEmail(profile.email);
+    }
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.PROFILE, profile.email);
+    const serialized = JSON.stringify(profile);
+    localStorage.setItem(scopedKey, serialized);
+    localStorage.setItem(STORAGE_KEYS.PROFILE, serialized);
   } catch (e) {
     console.error('Failed saving user profile to storage', e);
   }
 }
 
-export function getStoredMealLogs(): MealLog[] {
+export function getStoredMealLogs(userEmail?: string): MealLog[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.MEAL_LOGS);
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.MEAL_LOGS, userEmail);
+    const raw = localStorage.getItem(scopedKey) || localStorage.getItem(STORAGE_KEYS.MEAL_LOGS);
     if (raw) return JSON.parse(raw);
   } catch (e) {
     console.error('Failed reading meal logs from storage', e);
@@ -55,9 +109,12 @@ export function getStoredMealLogs(): MealLog[] {
   return INITIAL_SAMPLE_MEAL_LOGS;
 }
 
-export function saveStoredMealLogs(logs: MealLog[]): void {
+export function saveStoredMealLogs(logs: MealLog[], userEmail?: string): void {
   try {
-    localStorage.setItem(STORAGE_KEYS.MEAL_LOGS, JSON.stringify(logs));
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.MEAL_LOGS, userEmail);
+    const serialized = JSON.stringify(logs);
+    localStorage.setItem(scopedKey, serialized);
+    localStorage.setItem(STORAGE_KEYS.MEAL_LOGS, serialized);
   } catch (e) {
     console.error('Failed saving meal logs to storage', e);
   }
@@ -77,9 +134,10 @@ export function deleteMealLog(id: string): MealLog[] {
   return updated;
 }
 
-export function getStoredBodyMetrics(): BodyMetric[] {
+export function getStoredBodyMetrics(userEmail?: string): BodyMetric[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.BODY_METRICS);
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.BODY_METRICS, userEmail);
+    const raw = localStorage.getItem(scopedKey) || localStorage.getItem(STORAGE_KEYS.BODY_METRICS);
     if (raw) return JSON.parse(raw);
   } catch (e) {
     console.error('Failed reading body metrics from storage', e);
@@ -87,9 +145,12 @@ export function getStoredBodyMetrics(): BodyMetric[] {
   return INITIAL_SAMPLE_BODY_METRICS;
 }
 
-export function saveStoredBodyMetrics(metrics: BodyMetric[]): void {
+export function saveStoredBodyMetrics(metrics: BodyMetric[], userEmail?: string): void {
   try {
-    localStorage.setItem(STORAGE_KEYS.BODY_METRICS, JSON.stringify(metrics));
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.BODY_METRICS, userEmail);
+    const serialized = JSON.stringify(metrics);
+    localStorage.setItem(scopedKey, serialized);
+    localStorage.setItem(STORAGE_KEYS.BODY_METRICS, serialized);
   } catch (e) {
     console.error('Failed saving body metrics to storage', e);
   }
@@ -257,9 +318,10 @@ export function deleteStoredCustomRecipe(id: string): CustomGeneratedRecipe[] {
   return updated;
 }
 
-export function getStoredWorkoutLogs(): WorkoutCompletionLog[] {
+export function getStoredWorkoutLogs(userEmail?: string): WorkoutCompletionLog[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.WORKOUT_LOGS);
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.WORKOUT_LOGS, userEmail);
+    const raw = localStorage.getItem(scopedKey) || localStorage.getItem(STORAGE_KEYS.WORKOUT_LOGS);
     if (raw) return JSON.parse(raw);
   } catch (e) {
     console.error('Failed reading workout logs from storage', e);
@@ -267,9 +329,12 @@ export function getStoredWorkoutLogs(): WorkoutCompletionLog[] {
   return INITIAL_SAMPLE_WORKOUT_LOGS;
 }
 
-export function saveStoredWorkoutLogs(logs: WorkoutCompletionLog[]): void {
+export function saveStoredWorkoutLogs(logs: WorkoutCompletionLog[], userEmail?: string): void {
   try {
-    localStorage.setItem(STORAGE_KEYS.WORKOUT_LOGS, JSON.stringify(logs));
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.WORKOUT_LOGS, userEmail);
+    const serialized = JSON.stringify(logs);
+    localStorage.setItem(scopedKey, serialized);
+    localStorage.setItem(STORAGE_KEYS.WORKOUT_LOGS, serialized);
   } catch (e) {
     console.error('Failed saving workout logs to storage', e);
   }

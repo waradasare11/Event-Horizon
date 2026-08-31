@@ -4,7 +4,11 @@ import {
   deleteDoc, 
   collection, 
   onSnapshot, 
-  Unsubscribe 
+  Unsubscribe,
+  getDoc,
+  getDocs,
+  query,
+  where
 } from 'firebase/firestore';
 import { db, auth, handleFirestoreError, OperationType } from './firebase';
 import { 
@@ -14,7 +18,8 @@ import {
   BodyMetric, 
   CustomGeneratedRecipe, 
   FormAnalysisResult,
-  ShoppingListItem
+  ShoppingListItem,
+  HostGrantedSubscription
 } from '../types';
 import { addMealLog, deleteMealLog, addBodyMetric } from './storage';
 import { 
@@ -509,4 +514,76 @@ export function subscribeUserData(
   );
 
   return unsubs;
+}
+
+/**
+ * Sanitize email to be a safe Firestore document ID
+ */
+export function sanitizeEmailForDocId(email: string): string {
+  return email.trim().toLowerCase().replace(/[^a-zA-Z0-9_]/g, '_');
+}
+
+/**
+ * Save or update a host granted subscription in Firestore
+ */
+export async function syncHostGrantedSubscription(grant: HostGrantedSubscription): Promise<void> {
+  const docId = sanitizeEmailForDocId(grant.email);
+  const docRef = doc(db, 'hostGrantedSubscriptions', docId);
+  try {
+    await setDoc(docRef, {
+      ...grant,
+      sanitizedEmail: docId,
+      updatedAt: new Date().toISOString(),
+    }, { merge: true });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, `hostGrantedSubscriptions/${docId}`);
+    throw error;
+  }
+}
+
+/**
+ * Fetch a host granted subscription by user email from Firestore
+ */
+export async function fetchHostGrantedSubscriptionByEmail(email: string): Promise<HostGrantedSubscription | null> {
+  if (!email) return null;
+  const docId = sanitizeEmailForDocId(email);
+  const docRef = doc(db, 'hostGrantedSubscriptions', docId);
+  try {
+    const snap = await getDoc(docRef);
+    if (snap.exists()) {
+      return snap.data() as HostGrantedSubscription;
+    }
+    return null;
+  } catch (error) {
+    handleFirestoreError(error, OperationType.GET, `hostGrantedSubscriptions/${docId}`);
+    return null;
+  }
+}
+
+/**
+ * Fetch all active and historical host granted subscriptions from Firestore
+ */
+export async function fetchAllHostGrantedSubscriptions(): Promise<HostGrantedSubscription[]> {
+  try {
+    const colRef = collection(db, 'hostGrantedSubscriptions');
+    const snap = await getDocs(colRef);
+    return snap.docs.map((d) => d.data() as HostGrantedSubscription);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.LIST, 'hostGrantedSubscriptions');
+    return [];
+  }
+}
+
+/**
+ * Delete / revoke a host granted subscription from Firestore
+ */
+export async function deleteHostGrantedSubscription(email: string): Promise<void> {
+  const docId = sanitizeEmailForDocId(email);
+  const docRef = doc(db, 'hostGrantedSubscriptions', docId);
+  try {
+    await deleteDoc(docRef);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, `hostGrantedSubscriptions/${docId}`);
+    throw error;
+  }
 }

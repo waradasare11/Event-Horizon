@@ -182,9 +182,33 @@
         "status": { "type": "string", "maxLength": 50 }
       },
       "required": ["userId", "id", "mealTitle", "suggestedCorrection", "createdAt", "status"]
+    },
+    "HostGrantedSubscription": {
+      "title": "HostGrantedSubscription",
+      "description": "Host granted lifetime free or plan-specific subscription assigned by Gmail ID",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email", "maxLength": 120 },
+        "sanitizedEmail": { "type": "string", "maxLength": 128 },
+        "planId": { "type": "string", "maxLength": 50 },
+        "planName": { "type": "string", "maxLength": 100 },
+        "grantedBy": { "type": "string", "maxLength": 120 },
+        "grantedByName": { "type": "string", "maxLength": 100 },
+        "grantedAt": { "type": "string", "maxLength": 50 },
+        "status": { "type": "string", "enum": ["active", "revoked"] },
+        "isLifetime": { "type": "boolean" },
+        "durationMonths": { "type": "number" },
+        "durationDays": { "type": "number" },
+        "notes": { "type": "string", "maxLength": 500 }
+      },
+      "required": ["email", "planId", "status", "grantedAt", "grantedBy"]
     }
   },
   "firestore": {
+    "/hostGrantedSubscriptions/{grantId}": {
+      "schema": "HostGrantedSubscription",
+      "description": "Cross-referenced user subscriptions granted by host admin"
+    },
     "/users/{userId}": {
       "schema": "UserProfile",
       "description": "User profile with calculated metabolic rates and targets"

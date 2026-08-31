@@ -3,15 +3,18 @@ import {
   getStoredProfile, 
   saveStoredProfile, 
   getStoredMealLogs, 
+  saveStoredMealLogs,
   addMealLog, 
   deleteMealLog, 
   getStoredBodyMetrics, 
+  saveStoredBodyMetrics,
   addBodyMetric, 
   getStoredWorkoutPrograms, 
   saveStoredWorkoutPrograms,
   getStoredAIMealPlan, 
   saveStoredAIMealPlan,
   getStoredWorkoutLogs,
+  saveStoredWorkoutLogs,
   toggleWorkoutDayLog,
   getStoredFormAnalyses,
   addFormAnalysis
@@ -58,13 +61,15 @@ import { SubscriptionPaywallModal } from './components/SubscriptionPaywallModal'
 import { HostAdminPortalModal } from './components/HostAdminPortalModal';
 import { ReportAppErrorModal } from './components/ReportAppErrorModal';
 import { PerformanceDashboardModal } from './components/PerformanceDashboardModal';
+import { MainDashboardControlHub } from './components/MainDashboardControlHub';
 import { SyncRepairNotification } from './components/SyncRepairNotification';
 import { DailyMotivationWidget } from './components/DailyMotivationWidget';
 import { GlobalSyncStatus } from './components/GlobalSyncStatus';
 import { calculateDailyMacrosSum, calculateWorkoutStreak } from './lib/calc/dailyStats';
-import { createInitialTrialSubscription, isHostAdmin } from './lib/subscription';
+import { createInitialTrialSubscription, createHostLifetimeSubscription, createGrantedUserSubscription, isHostAdmin, checkUserHostGrant } from './lib/subscription';
 import { auditWorkoutPrograms, WorkoutProgramAuditReport } from './data/ExerciseRegistry';
 import { runAutomatedDataReconciliation } from './lib/reconciliationWorker';
+import { setCurrentActiveEmail, getCurrentActiveEmail } from './lib/storage';
 import { Activity } from 'lucide-react';
 
 export default function App() {
@@ -72,11 +77,11 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
 
-  const [userProfile, setUserProfile] = useState<UserProfile>(getStoredProfile());
-  const [mealLogs, setMealLogs] = useState<MealLog[]>(getStoredMealLogs());
-  const [bodyMetrics, setBodyMetrics] = useState<BodyMetric[]>(getStoredBodyMetrics());
+  const [userProfile, setUserProfile] = useState<UserProfile>(() => getStoredProfile(getCurrentActiveEmail()));
+  const [mealLogs, setMealLogs] = useState<MealLog[]>(() => getStoredMealLogs(getCurrentActiveEmail()));
+  const [bodyMetrics, setBodyMetrics] = useState<BodyMetric[]>(() => getStoredBodyMetrics(getCurrentActiveEmail()));
   const [workoutPrograms, setWorkoutPrograms] = useState<WorkoutProgram[]>(getStoredWorkoutPrograms());
-  const [workoutLogs, setWorkoutLogs] = useState<WorkoutCompletionLog[]>(getStoredWorkoutLogs());
+  const [workoutLogs, setWorkoutLogs] = useState<WorkoutCompletionLog[]>(() => getStoredWorkoutLogs(getCurrentActiveEmail()));
   const [formAnalyses, setFormAnalyses] = useState<FormAnalysisResult[]>(getStoredFormAnalyses());
   const [aiMealPlan, setAiMealPlan] = useState<AIAdjustedMealPlan | null>(getStoredAIMealPlan());
 
@@ -126,12 +131,66 @@ export default function App() {
     const unsubAuth = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       if (user) {
+        const email = user.email || '';
+        setCurrentActiveEmail(email);
+
+        const isHost = isHostAdmin(email);
+        const stored = getStoredProfile(email);
+        const updatedInitial: UserProfile = {
+          ...stored,
+          email,
+          name: stored.name || user.displayName || 'Peak Athlete',
+          subscription: isHost ? createHostLifetimeSubscription() : (stored.subscription || createInitialTrialSubscription()),
+        };
+        setUserProfile(updatedInitial);
+        saveStoredProfile(updatedInitial);
+        setMealLogs(getStoredMealLogs(email));
+        setBodyMetrics(getStoredBodyMetrics(email));
+        setWorkoutLogs(getStoredWorkoutLogs(email));
+
+        // Check if host has granted free access to this athlete's Gmail ID
+        checkUserHostGrant(email).then(({ hasGrant, isHost: hostUser, grant }) => {
+          if (hasGrant && grant) {
+            setUserProfile((prev) => {
+              const activeGrantSub = hostUser ? createHostLifetimeSubscription() : createGrantedUserSubscription(grant);
+              const updated = {
+                ...prev,
+                subscription: activeGrantSub,
+              };
+              saveStoredProfile(updated);
+              syncUserProfile(updated).catch(console.error);
+              return updated;
+            });
+          }
+        }).catch(console.warn);
+
         // Subscribe to real-time Firestore collections
         const unsubs = subscribeUserData(user.uid, {
           onProfile: (remoteProfile) => {
             if (remoteProfile) {
               setUserProfile((prev) => {
-                const merged = { ...prev, ...remoteProfile } as UserProfile;
+                let merged = { ...prev, ...remoteProfile } as UserProfile;
+                if (isHostAdmin(user.email)) {
+                  merged.subscription = createHostLifetimeSubscription();
+                } else if (
+                  prev.subscription?.paymentMethod === 'MANUAL_GRANT' ||
+                  prev.subscription?.paymentMethod === 'HOST_LIFETIME_VIP' ||
+                  prev.subscription?.verifiedBy?.includes('Host VIP Grant')
+                ) {
+                  merged.subscription = prev.subscription;
+                } else {
+                  // Check if this remote subscription is expired and if a grant exists
+                  checkUserHostGrant(email).then(({ hasGrant, grant }) => {
+                    if (hasGrant && grant) {
+                      const activeGrantSub = createGrantedUserSubscription(grant);
+                      setUserProfile((curr) => {
+                        const updated = { ...curr, subscription: activeGrantSub };
+                        saveStoredProfile(updated);
+                        return updated;
+                      });
+                    }
+                  }).catch(() => {});
+                }
                 saveStoredProfile(merged);
                 return merged;
               });
@@ -140,16 +199,19 @@ export default function App() {
           onMealLogs: (remoteMeals) => {
             if (remoteMeals && remoteMeals.length > 0) {
               setMealLogs(remoteMeals);
+              saveStoredMealLogs(remoteMeals, email);
             }
           },
           onWorkoutLogs: (remoteWorkouts) => {
             if (remoteWorkouts && remoteWorkouts.length > 0) {
               setWorkoutLogs(remoteWorkouts);
+              saveStoredWorkoutLogs(remoteWorkouts, email);
             }
           },
           onBodyMetrics: (remoteMetrics) => {
             if (remoteMetrics && remoteMetrics.length > 0) {
               setBodyMetrics(remoteMetrics);
+              saveStoredBodyMetrics(remoteMetrics, email);
             }
           },
           onFormAnalyses: (remoteAnalyses) => {
@@ -160,7 +222,7 @@ export default function App() {
         });
 
         // Push initial local profile to cloud if first login
-        syncUserProfile(userProfile).catch(console.error);
+        syncUserProfile(updatedInitial).catch(console.error);
 
         return () => {
           unsubs.forEach((u) => u());
@@ -204,6 +266,12 @@ export default function App() {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      setCurrentActiveEmail('');
+      const defaultProf = getStoredProfile('');
+      setUserProfile(defaultProf);
+      setMealLogs(getStoredMealLogs(''));
+      setBodyMetrics(getStoredBodyMetrics(''));
+      setWorkoutLogs(getStoredWorkoutLogs(''));
     } catch (err: any) {
       console.error('Sign Out Error:', err);
     }
@@ -420,7 +488,23 @@ export default function App() {
         />
 
         {/* Main View Container */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 overflow-x-hidden">
+          {/* Main Dashboard Control Hub (Streak, Weekly Check-In, Profile, Pro Plan, Export, Sign Out in Main View) */}
+          <MainDashboardControlHub
+            userProfile={userProfile}
+            currentStreak={calculatedStreak}
+            currentUser={currentUser}
+            onOpenCheckIn={() => setIsCheckInOpen(true)}
+            onOpenOnboarding={() => setIsOnboardingOpen(true)}
+            onOpenSubscriptionModal={() => setIsPaywallOpen(true)}
+            onOpenHostAdminModal={() => setIsHostAdminOpen(true)}
+            onOpenPerformanceDashboard={() => setIsPerformanceDashboardOpen(true)}
+            onExportData={handleExportData}
+            onSignIn={handleSignIn}
+            onSignOut={handleSignOut}
+            onSelectTab={setActiveTab}
+          />
+
           {/* Daily Motivation, Water Tracker & 3 Quick Wins for normal users */}
           <DailyMotivationWidget
             userName={userProfile.name || 'Athlete'}

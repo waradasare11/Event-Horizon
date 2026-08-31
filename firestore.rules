@@ -176,6 +176,17 @@ service cloud.firestore {
       allow read, write: if isSignedIn() && isValidId(reportId);
     }
 
+    // Host Granted Subscriptions Collection (Accessible by signed-in users for grant checks & host management)
+    match /hostGrantedSubscriptions/{grantId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && isValidId(grantId);
+    }
+
+    // Global Subscription Audit Logs
+    match /subscriptionAuditLogs/{logId} {
+      allow read, write: if isSignedIn() && isValidId(logId);
+    }
+
     // Connection Health Verification
     match /test/{docId} {
       allow read: if true;
