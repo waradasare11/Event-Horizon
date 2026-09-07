@@ -19,7 +19,8 @@ export const HOST_ADMIN_CONFIG = {
   email: 'waradasare11@gmail.com',
   appName: 'PeakForm AI Pro',
   merchantCode: '5411',
-  defaultPin: '9284',
+  // Administrative credentials never belong in the browser bundle.
+  defaultPin: '',
 };
 
 // Dedicated Immutable Storage Keys for LIFETIME_VIP Overrides

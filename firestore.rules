@@ -152,56 +152,56 @@ service cloud.firestore {
 
     // Global Host Accuracy Correction Queue (supports PascalCase and camelCase)
     match /AccuracyCorrectionQueue/{correctionId} {
-      allow read, write: if isSignedIn() && isValidId(correctionId);
+      allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
     }
     match /accuracyCorrectionQueue/{correctionId} {
-      allow read, write: if isSignedIn() && isValidId(correctionId);
+      allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
     }
 
     // Global Host Correction Queue (supports PascalCase and camelCase)
     match /CorrectionQueue/{correctionId} {
-      allow read, write: if isSignedIn() && isValidId(correctionId);
+      allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
     }
     match /correctionQueue/{correctionId} {
-      allow read, write: if isSignedIn() && isValidId(correctionId);
+      allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
     }
 
     // Global Host Improvement Queue
     match /improvementQueue/{reportId} {
-      allow read, write: if isSignedIn() && isValidId(reportId);
+      allow create: if isSignedIn() && isValidId(reportId) && incoming().userId == request.auth.uid;
     }
 
     // Global Host App Error Reports
     match /appErrorReports/{reportId} {
-      allow read, write: if isSignedIn() && isValidId(reportId);
+      allow create: if isSignedIn() && isValidId(reportId) && incoming().userId == request.auth.uid;
     }
 
     // Host Granted Subscriptions & Ledger Collections (Accessible for grant checks & host management)
     match /hostGrantedSubscriptions/{grantId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     match /host_ledger/{ledgerId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     // Global Subscription Audit Logs
     match /subscriptionAuditLogs/{logId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     // Athlete Login Sessions & Telemetry for Host Ledger
     match /athlete_logins/{loginId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     match /athleteLogins/{loginId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     // Registered Athletes Directory for Host Ledger
     match /all_registered_athletes/{athleteId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     // Connection Health Verification

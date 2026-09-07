@@ -11,9 +11,40 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-// Middleware for parsing JSON with a generous limit for base64 image data
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+app.use((_req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("Permissions-Policy", "camera=(self), microphone=(), geolocation=()");
+  next();
+});
+
+// Images are accepted by a few AI routes. Keep the limit bounded to avoid memory-exhaustion attacks.
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
+
+type RateLimitEntry = { count: number; resetAt: number };
+const requestLimits = new Map<string, RateLimitEntry>();
+app.use((req, res, next) => {
+  const isSensitive = req.path.startsWith("/api/host") || req.path.startsWith("/api/admin") || req.path.startsWith("/api/subscription");
+  const limit = isSensitive ? 30 : 120;
+  const windowMs = 60_000;
+  const key = `${req.ip}:${isSensitive ? "sensitive" : "api"}`;
+  const now = Date.now();
+  const entry = requestLimits.get(key);
+  if (!entry || entry.resetAt <= now) {
+    requestLimits.set(key, { count: 1, resetAt: now + windowMs });
+    return next();
+  }
+  entry.count += 1;
+  if (entry.count > limit) {
+    res.setHeader("Retry-After", String(Math.ceil((entry.resetAt - now) / 1000)));
+    return res.status(429).json({ error: "Too many requests. Please try again shortly." });
+  }
+  next();
+});
 
 // Lazy-initialized Gemini client with telemetry header
 let aiClient: GoogleGenAI | null = null;
@@ -4104,13 +4135,16 @@ Return ONLY a valid JSON object matching this schema:
 });
 
 // 14. Subscription Plans, Host Master PIN Security & Tamper-Proof Financial Gateway
-const HOST_SECRET_KEY = process.env.HOST_SECRET_KEY || "WARAD_ASARE_PEAKFORM_9284160309_FAM_SECRET";
+const HOST_SECRET_KEY = process.env.HOST_SECRET_KEY || "";
 const HOST_VPA = "9284160309@fam";
 const HOST_NAME = "Warad Asare";
 const HOST_EMAIL = "waradasare11@gmail.com";
 
-// Configurable Host Security PIN (Default: 9284)
-let hostSecurityPin = process.env.HOST_SECURITY_PIN || "9284";
+// Administrative credentials must be supplied by the deployment environment.
+let hostSecurityPin = process.env.HOST_SECURITY_PIN || "";
+if (!HOST_SECRET_KEY || !hostSecurityPin) {
+  console.error("Host administration is disabled: set HOST_SECRET_KEY and HOST_SECURITY_PIN in the deployment environment.");
+}
 
 const BASE_OFFICIAL_PLANS = [
   {
@@ -4546,28 +4580,15 @@ function savePersistedHostData() {
 
 // Helper to compute HMAC SHA-256
 function computeTransactionHMAC(payload: string): string {
+  if (!HOST_SECRET_KEY) throw new Error("HOST_SECRET_KEY is not configured");
   return crypto.createHmac("sha256", HOST_SECRET_KEY).update(payload).digest("hex");
 }
 
 function verifyHostPin(inputPin?: string | null): boolean {
-  if (!inputPin) return false;
-  const cleanInput = String(inputPin).trim().toLowerCase();
-  const currentPinClean = String(hostSecurityPin).trim().toLowerCase();
-  
-  // Accept current configured PIN or any of the verified Host Master passcodes
-  const validPasscodes = new Set([
-    currentPinClean,
-    "9284",
-    "warad",
-    "waradasare",
-    "waradasare11",
-    "peakform",
-    "admin",
-    "host",
-    "9284160309"
-  ]);
-
-  return validPasscodes.has(cleanInput);
+  if (!inputPin || !hostSecurityPin) return false;
+  const actual = Buffer.from(hostSecurityPin.trim());
+  const supplied = Buffer.from(String(inputPin).trim());
+  return actual.length === supplied.length && crypto.timingSafeEqual(actual, supplied);
 }
 
 // Compute effective price for a user on a given plan
@@ -4738,7 +4759,7 @@ app.post("/api/subscription/verify-payment", async (req, res) => {
     const cleanUtr = String(utrNumber || "").trim().toUpperCase();
 
     // If free (100% discount, trial, or Host privilege)
-    if (pricing.isFree || isHost) {
+    if (pricing.isFree) {
       const now = new Date();
       const expiryDate = new Date(now);
       expiryDate.setDate(expiryDate.getDate() + matchedBasePlan.durationDays);
@@ -4747,13 +4768,13 @@ app.post("/api/subscription/verify-payment", async (req, res) => {
         id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
         userId,
         userEmail: cleanEmail,
-        userName: userName || (isHost ? "Host Admin" : "PeakForm Athlete"),
+        userName: userName || "PeakForm Athlete",
         planId: matchedBasePlan.id,
         planName: matchedBasePlan.durationLabel,
         durationMonths: matchedBasePlan.durationMonths,
         durationDays: matchedBasePlan.durationDays,
         amountINR: 0,
-        utrNumber: isHost ? "HOST_MASTER_LIFETIME" : cleanUtr || "HOST_GRANT_FREE",
+        utrNumber: cleanUtr || "HOST_GRANT_FREE",
         recipientVpa: HOST_VPA,
         status: "verified",
         verifiedAt: now.toISOString(),
@@ -4775,7 +4796,7 @@ app.post("/api/subscription/verify-payment", async (req, res) => {
 
       return res.json({
         success: true,
-        message: isHost ? "Host Lifetime Access Unlocked!" : "Free Subscription Activated Successfully!",
+        message: "Free Subscription Activated Successfully!",
         transaction: grantRecord,
         subscription: {
           status: "active",
@@ -4784,7 +4805,7 @@ app.post("/api/subscription/verify-payment", async (req, res) => {
           amountINR: 0,
           utrNumber: grantRecord.utrNumber,
           paymentDate: now.toISOString(),
-          subscriptionEndDate: isHost ? new Date(Date.now() + 3650 * 24 * 60 * 60 * 1000).toISOString() : expiryDate.toISOString(),
+          subscriptionEndDate: expiryDate.toISOString(),
           durationMonths: matchedBasePlan.durationMonths,
           isVerified: true,
           checksum: grantRecord.checksum,
@@ -4833,6 +4854,14 @@ app.post("/api/subscription/verify-payment", async (req, res) => {
         error: "This UPI Reference (UTR) has already been claimed and verified for another athlete profile. Duplicate submissions are rejected by anti-scam security.",
       });
     }
+
+    // A UTR format check is not payment-provider verification. Never grant paid access
+    // from client-supplied details; the host must approve the payment separately.
+    return res.status(202).json({
+      success: true,
+      pending: true,
+      message: "Payment details require manual verification. No access has been activated.",
+    });
 
     const now = new Date();
     const expiryDate = new Date(now);
@@ -4909,8 +4938,32 @@ app.post("/api/host/verify-pin", (req, res) => {
     return res.status(401).json({ success: false, error: "Invalid Host Security PIN." });
   }
 
+  const issuedAt = Date.now();
+  const payload = `${issuedAt}:${HOST_EMAIL.toLowerCase()}`;
+  const signature = crypto.createHmac("sha256", HOST_SECRET_KEY).update(payload).digest("hex");
+  res.setHeader("Set-Cookie", `host_session=${issuedAt}.${signature}; HttpOnly; SameSite=Strict; Path=/; Max-Age=28800${process.env.NODE_ENV === "production" ? "; Secure" : ""}`);
   return res.json({ success: true, message: "Host Security PIN verified successfully." });
 });
+
+function requireHostSession(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (!HOST_SECRET_KEY) return res.status(503).json({ success: false, error: "Host administration is not configured." });
+  const rawCookie = req.headers.cookie?.split(";").map((v) => v.trim()).find((v) => v.startsWith("host_session="))?.slice("host_session=".length);
+  const [issuedAt, signature] = (rawCookie || "").split(".");
+  const timestamp = Number(issuedAt);
+  if (!timestamp || !signature || Date.now() - timestamp > 8 * 60 * 60 * 1000) {
+    return res.status(401).json({ success: false, error: "Host session required." });
+  }
+  const expected = crypto.createHmac("sha256", HOST_SECRET_KEY).update(`${issuedAt}:${HOST_EMAIL.toLowerCase()}`).digest("hex");
+  const expectedBuffer = Buffer.from(expected);
+  const signatureBuffer = Buffer.from(signature);
+  if (expectedBuffer.length !== signatureBuffer.length || !crypto.timingSafeEqual(expectedBuffer, signatureBuffer)) {
+    return res.status(401).json({ success: false, error: "Invalid host session." });
+  }
+  next();
+}
+
+// Every administrative route after PIN verification requires the short-lived HttpOnly session too.
+app.use(["/api/host", "/api/admin"], requireHostSession);
 
 app.post("/api/host/update-pin", (req, res) => {
   const { currentPin, newPin, email } = req.body;
@@ -5786,7 +5839,7 @@ app.post("/api/host/clear-ledger", (req, res) => {
 });
 
 // 14.6 View Verified Ledger
-app.get("/api/subscription/ledger", (req, res) => {
+app.get("/api/subscription/ledger", requireHostSession, (req, res) => {
   const authEmail = req.headers["x-host-email"] || req.query.email;
   const pin = req.headers["x-host-pin"];
 
