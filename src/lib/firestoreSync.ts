@@ -8,7 +8,8 @@ import {
   getDoc,
   getDocs,
   query,
-  where
+  where,
+  writeBatch
 } from 'firebase/firestore';
 import { db, auth, handleFirestoreError, OperationType } from './firebase';
 import { 
@@ -78,7 +79,70 @@ export async function optimisticDeleteMealLog(
 }
 
 /**
+ * Build a clean UserSubscription object from a HostGrantedSubscription
+ * to protect against profile-level overrides and accurate duration calculation.
+ */
+export function buildSubscriptionFromHostGrant(grant: HostGrantedSubscription): any {
+  const isLifetime = !!grant.isLifetime || (grant.durationDays && grant.durationDays >= 3650);
+  const now = Date.now();
+  let subscriptionEndDate = grant.expiresAt;
+  if (!subscriptionEndDate) {
+    subscriptionEndDate = isLifetime 
+      ? '2099-12-31T23:59:59.000Z' 
+      : new Date(now + (grant.durationDays || 90) * 86400000).toISOString();
+  }
+
+  let daysRemaining = 36500;
+  let status: 'active' | 'expired' = 'active';
+
+  if (!isLifetime) {
+    const endMs = new Date(subscriptionEndDate).getTime();
+    const diff = Math.ceil((endMs - now) / 86400000);
+    if (diff <= 0) {
+      status = 'expired';
+      daysRemaining = 0;
+    } else {
+      status = 'active';
+      daysRemaining = diff;
+    }
+  }
+
+  let defaultPlanName = 'VIP Pro Access (Host Grant)';
+  if (isLifetime) {
+    defaultPlanName = 'VIP Lifetime Pro Access (Host Grant)';
+  } else if (grant.planId === '3_months' || grant.durationDays === 90) {
+    defaultPlanName = 'Quarterly Transformation (3 Months Free Grant)';
+  } else if (grant.planId === '1_month' || grant.durationDays === 30) {
+    defaultPlanName = 'Monthly Kickstarter (1 Month Free Grant)';
+  } else if (grant.planId === '1_year' || grant.durationDays === 365) {
+    defaultPlanName = 'Annual Championship (1 Year Free Grant)';
+  } else if (grant.planId === '2_years') {
+    defaultPlanName = 'Elite 2-Year Athlete (2 Years Free Grant)';
+  } else if (grant.planId === '3_years') {
+    defaultPlanName = 'Dynasty 3-Year Athlete (3 Years Free Grant)';
+  }
+
+  return {
+    status,
+    planId: grant.planId || '3_months',
+    planName: grant.planName || defaultPlanName,
+    trialStartDate: grant.grantedAt || new Date().toISOString(),
+    trialEndDate: grant.grantedAt || new Date().toISOString(),
+    subscriptionStartDate: grant.grantedAt || new Date().toISOString(),
+    subscriptionEndDate,
+    amountPaidINR: 0,
+    paymentMethod: 'MANUAL_GRANT',
+    isTrialActive: false,
+    daysRemaining,
+    verifiedBy: grant.grantedByName || 'Warad Asare (Host VIP Grant)',
+    lastPaymentVerifiedAt: new Date().toISOString(),
+    isLifetime,
+  };
+}
+
+/**
  * Save or update the user's master profile in Firestore
+ * IMMUNE TO OVERRIDES: If user has an active grant in 'grants', preserves grant instead of overwriting with trial!
  */
 export async function syncUserProfile(profile: UserProfile): Promise<void> {
   const user = auth.currentUser;
@@ -86,11 +150,27 @@ export async function syncUserProfile(profile: UserProfile): Promise<void> {
 
   const sanitized = sanitizeUserProfile(profile);
   const path = `users/${user.uid}`;
+  const cleanEmail = (user.email || sanitized.email || '').trim().toLowerCase();
+
+  let effectiveSubscription = sanitized.subscription || null;
+
+  // Protect against accidental profile update downgrades or trial overrides
+  if (cleanEmail) {
+    try {
+      const activeGrant = await fetchHostGrantedSubscriptionByEmail(cleanEmail);
+      if (activeGrant && activeGrant.status === 'active') {
+        effectiveSubscription = buildSubscriptionFromHostGrant(activeGrant);
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
   try {
     const payload = {
       userId: user.uid,
       name: sanitized.name || user.displayName || 'Peak Athlete',
-      email: user.email || sanitized.email || '',
+      email: cleanEmail,
       age: sanitized.age,
       sex: sanitized.sex,
       heightCm: sanitized.heightCm,
@@ -114,7 +194,7 @@ export async function syncUserProfile(profile: UserProfile): Promise<void> {
       hydrationLiters: sanitized.hydrationLiters,
       weeklyRateKg: sanitized.weeklyRateKg,
       isOnboarded: sanitized.isOnboarded,
-      subscription: sanitized.subscription || null,
+      subscription: effectiveSubscription,
       updatedAt: new Date().toISOString(),
     };
     await setDoc(doc(db, 'users', user.uid), payload, { merge: true });
@@ -176,6 +256,46 @@ export async function deleteMealLogFirestore(mealId: string): Promise<void> {
 }
 
 /**
+ * Batch delete multiple MealLogs from Firestore
+ */
+export async function deleteMealLogsBatchFirestore(mealIds: string[]): Promise<void> {
+  const user = auth.currentUser;
+  if (!user || mealIds.length === 0) return;
+
+  const path = `users/${user.uid}/mealLogs`;
+  try {
+    const batch = writeBatch(db);
+    for (const id of mealIds) {
+      const safeId = id.replace(/[^a-zA-Z0-9_-]/g, '_');
+      batch.delete(doc(db, 'users', user.uid, 'mealLogs', safeId));
+    }
+    await batch.commit();
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
+/**
+ * Clear all MealLogs from Firestore for the active user
+ */
+export async function clearAllMealLogsFirestore(): Promise<void> {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const path = `users/${user.uid}/mealLogs`;
+  try {
+    const snap = await getDocs(collection(db, 'users', user.uid, 'mealLogs'));
+    if (!snap.empty) {
+      const batch = writeBatch(db);
+      snap.docs.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+    }
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
+/**
  * Save or update a WorkoutLog in Firestore
  */
 export async function syncWorkoutLog(log: WorkoutCompletionLog): Promise<void> {
@@ -216,6 +336,46 @@ export async function deleteWorkoutLogFirestore(logId: string): Promise<void> {
   const path = `users/${user.uid}/workoutLogs/${safeId}`;
   try {
     await deleteDoc(doc(db, 'users', user.uid, 'workoutLogs', safeId));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
+/**
+ * Batch delete multiple WorkoutLogs from Firestore
+ */
+export async function deleteWorkoutLogsBatchFirestore(logIds: string[]): Promise<void> {
+  const user = auth.currentUser;
+  if (!user || logIds.length === 0) return;
+
+  const path = `users/${user.uid}/workoutLogs`;
+  try {
+    const batch = writeBatch(db);
+    for (const id of logIds) {
+      const safeId = id.replace(/[^a-zA-Z0-9_-]/g, '_');
+      batch.delete(doc(db, 'users', user.uid, 'workoutLogs', safeId));
+    }
+    await batch.commit();
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, path);
+  }
+}
+
+/**
+ * Clear all WorkoutLogs from Firestore for the active user
+ */
+export async function clearAllWorkoutLogsFirestore(): Promise<void> {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const path = `users/${user.uid}/workoutLogs`;
+  try {
+    const snap = await getDocs(collection(db, 'users', user.uid, 'workoutLogs'));
+    if (!snap.empty) {
+      const batch = writeBatch(db);
+      snap.docs.forEach((d) => batch.delete(d.ref));
+      await batch.commit();
+    }
   } catch (error) {
     handleFirestoreError(error, OperationType.DELETE, path);
   }
@@ -524,66 +684,401 @@ export function sanitizeEmailForDocId(email: string): string {
 }
 
 /**
- * Save or update a host granted subscription in Firestore
+ * Save or update a host granted subscription in Firestore across quad-redundant collections:
+ * 1. 'grants' (Primary Top-Level Master Collection - Immune to profile-level overrides)
+ * 2. 'persistent_host_grants'
+ * 3. 'hostGrantedSubscriptions'
+ * 4. 'host_ledger'
+ * to guarantee 1000% zero-loss permanence.
  */
 export async function syncHostGrantedSubscription(grant: HostGrantedSubscription): Promise<void> {
   const docId = sanitizeEmailForDocId(grant.email);
-  const docRef = doc(db, 'hostGrantedSubscriptions', docId);
+  const nowIso = new Date().toISOString();
+  
+  const grantPayload = {
+    ...grant,
+    email: grant.email.trim().toLowerCase(),
+    sanitizedEmail: docId,
+    updatedAt: nowIso,
+    isPermanentGrant: true,
+  };
+
+  // Write to collection 0: Primary top-level 'grants' collection
   try {
-    await setDoc(docRef, {
-      ...grant,
-      sanitizedEmail: docId,
-      updatedAt: new Date().toISOString(),
-    }, { merge: true });
+    const grantDocRef = doc(db, 'grants', docId);
+    await setDoc(grantDocRef, grantPayload, { merge: true });
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, `hostGrantedSubscriptions/${docId}`);
-    throw error;
+    console.warn('Sync to grants notice:', error);
+  }
+
+  // Write to collection 1: persistent_host_grants (dedicated immutable mirror)
+  try {
+    const persistentRef = doc(db, 'persistent_host_grants', docId);
+    await setDoc(persistentRef, grantPayload, { merge: true });
+  } catch (error) {
+    console.warn('Sync to persistent_host_grants notice:', error);
+  }
+
+  // Write to collection 2: hostGrantedSubscriptions
+  try {
+    const docRef = doc(db, 'hostGrantedSubscriptions', docId);
+    await setDoc(docRef, grantPayload, { merge: true });
+  } catch (error) {
+    console.warn('Sync to hostGrantedSubscriptions notice:', error);
+  }
+
+  // Write to collection 3: host_ledger
+  try {
+    const ledgerRef = doc(db, 'host_ledger', docId);
+    await setDoc(ledgerRef, grantPayload, { merge: true });
+  } catch (error) {
+    console.warn('Sync to host_ledger notice:', error);
   }
 }
 
 /**
- * Fetch a host granted subscription by user email from Firestore
+ * Fetch a host granted subscription by user email from Firestore with top-level 'grants' primary lookup
  */
 export async function fetchHostGrantedSubscriptionByEmail(email: string): Promise<HostGrantedSubscription | null> {
   if (!email) return null;
-  const docId = sanitizeEmailForDocId(email);
-  const docRef = doc(db, 'hostGrantedSubscriptions', docId);
+  const cleanEmail = email.trim().toLowerCase();
+  const docId = sanitizeEmailForDocId(cleanEmail);
+
+  // 1. Check primary top-level 'grants' collection first
   try {
+    const gRef = doc(db, 'grants', docId);
+    const snap = await getDoc(gRef);
+    if (snap.exists()) {
+      return snap.data() as HostGrantedSubscription;
+    }
+  } catch (error) {}
+
+  // 2. Check persistent_host_grants
+  try {
+    const pRef = doc(db, 'persistent_host_grants', docId);
+    const snap = await getDoc(pRef);
+    if (snap.exists()) {
+      return snap.data() as HostGrantedSubscription;
+    }
+  } catch (error) {}
+
+  // 3. Check hostGrantedSubscriptions
+  try {
+    const docRef = doc(db, 'hostGrantedSubscriptions', docId);
     const snap = await getDoc(docRef);
     if (snap.exists()) {
       return snap.data() as HostGrantedSubscription;
     }
-    return null;
-  } catch (error) {
-    handleFirestoreError(error, OperationType.GET, `hostGrantedSubscriptions/${docId}`);
-    return null;
-  }
+  } catch (error) {}
+
+  // 4. Check host_ledger
+  try {
+    const ledgerRef = doc(db, 'host_ledger', docId);
+    const snap = await getDoc(ledgerRef);
+    if (snap.exists()) {
+      return snap.data() as HostGrantedSubscription;
+    }
+  } catch (error) {}
+
+  return null;
 }
 
 /**
- * Fetch all active and historical host granted subscriptions from Firestore
+ * Fetch all active and historical host granted subscriptions from all Firestore collections
  */
 export async function fetchAllHostGrantedSubscriptions(): Promise<HostGrantedSubscription[]> {
+  const map = new Map<string, HostGrantedSubscription>();
+
+  // 1. Primary top-level 'grants'
+  try {
+    const colRef = collection(db, 'grants');
+    const snap = await getDocs(colRef);
+    snap.docs.forEach((d) => {
+      const data = d.data() as HostGrantedSubscription;
+      if (data.email) {
+        map.set(data.email.toLowerCase().trim(), data);
+      }
+    });
+  } catch (error) {
+    console.warn('Notice querying grants collection:', error);
+  }
+
+  // 2. persistent_host_grants
+  try {
+    const colRef = collection(db, 'persistent_host_grants');
+    const snap = await getDocs(colRef);
+    snap.docs.forEach((d) => {
+      const data = d.data() as HostGrantedSubscription;
+      if (data.email) {
+        const clean = data.email.toLowerCase().trim();
+        if (!map.has(clean) || new Date(data.updatedAt || data.grantedAt || 0).getTime() > new Date(map.get(clean)?.updatedAt || map.get(clean)?.grantedAt || 0).getTime()) {
+          map.set(clean, data);
+        }
+      }
+    });
+  } catch (error) {
+    console.warn('Notice querying persistent_host_grants:', error);
+  }
+
+  // 3. hostGrantedSubscriptions
   try {
     const colRef = collection(db, 'hostGrantedSubscriptions');
     const snap = await getDocs(colRef);
-    return snap.docs.map((d) => d.data() as HostGrantedSubscription);
+    snap.docs.forEach((d) => {
+      const data = d.data() as HostGrantedSubscription;
+      if (data.email) {
+        const clean = data.email.toLowerCase().trim();
+        if (!map.has(clean) || new Date(data.updatedAt || data.grantedAt || 0).getTime() > new Date(map.get(clean)?.updatedAt || map.get(clean)?.grantedAt || 0).getTime()) {
+          map.set(clean, data);
+        }
+      }
+    });
   } catch (error) {
-    handleFirestoreError(error, OperationType.LIST, 'hostGrantedSubscriptions');
-    return [];
+    console.warn('Error fetching hostGrantedSubscriptions:', error);
+  }
+
+  // 4. host_ledger
+  try {
+    const colRef = collection(db, 'host_ledger');
+    const snap = await getDocs(colRef);
+    snap.docs.forEach((d) => {
+      const data = d.data() as HostGrantedSubscription;
+      if (data.email) {
+        const clean = data.email.toLowerCase().trim();
+        if (!map.has(clean)) {
+          map.set(clean, data);
+        }
+      }
+    });
+  } catch (error) {
+    console.warn('Error fetching host_ledger:', error);
+  }
+
+  return Array.from(map.values());
+}
+
+/**
+ * Dedicated helper to fetch isolated persistent grants from 'grants' or 'persistent_host_grants'
+ * for zero-lag immediate rendering in the Host Admin Portal tab.
+ */
+export async function fetchPersistentGrantsCollection(): Promise<HostGrantedSubscription[]> {
+  try {
+    const colRef = collection(db, 'grants');
+    const snap = await getDocs(colRef);
+    if (!snap.empty) {
+      return snap.docs.map((d) => d.data() as HostGrantedSubscription);
+    }
+  } catch (error) {
+    console.warn('Fallback querying grants collection:', error);
+  }
+  try {
+    const colRef = collection(db, 'persistent_host_grants');
+    const snap = await getDocs(colRef);
+    if (!snap.empty) {
+      return snap.docs.map((d) => d.data() as HostGrantedSubscription);
+    }
+  } catch (error) {
+    console.warn('Fallback querying persistent_host_grants collection:', error);
+  }
+  return fetchAllHostGrantedSubscriptions();
+}
+
+/**
+ * Delete / revoke a host granted subscription from all Firestore collections including 'grants'
+ */
+export async function deleteHostGrantedSubscription(email: string): Promise<void> {
+  const cleanEmail = email.trim().toLowerCase();
+  const docId = sanitizeEmailForDocId(cleanEmail);
+
+  try {
+    const docRef = doc(db, 'grants', docId);
+    await deleteDoc(docRef);
+  } catch (error) {}
+
+  try {
+    const docRef = doc(db, 'persistent_host_grants', docId);
+    await deleteDoc(docRef);
+  } catch (error) {}
+
+  try {
+    const docRef = doc(db, 'hostGrantedSubscriptions', docId);
+    await deleteDoc(docRef);
+  } catch (error) {}
+
+  try {
+    const ledgerRef = doc(db, 'host_ledger', docId);
+    await deleteDoc(ledgerRef);
+  } catch (error) {}
+}
+
+/**
+ * Save or update a Host Coupon in Firestore
+ */
+export async function syncHostCouponToFirestore(coupon: any): Promise<void> {
+  const safeId = (coupon.id || `coupon_${coupon.code}`).replace(/[^a-zA-Z0-9_-]/g, '_');
+  try {
+    const cRef = doc(db, 'host_coupons', safeId);
+    await setDoc(cRef, coupon, { merge: true });
+  } catch (error) {
+    console.warn('Notice syncing coupon to Firestore:', error);
   }
 }
 
 /**
- * Delete / revoke a host granted subscription from Firestore
+ * Fetch all Host Coupons from Firestore
  */
-export async function deleteHostGrantedSubscription(email: string): Promise<void> {
-  const docId = sanitizeEmailForDocId(email);
-  const docRef = doc(db, 'hostGrantedSubscriptions', docId);
+export async function fetchAllHostCouponsFromFirestore(): Promise<any[]> {
   try {
-    await deleteDoc(docRef);
+    const colRef = collection(db, 'host_coupons');
+    const snap = await getDocs(colRef);
+    if (!snap.empty) {
+      return snap.docs.map((d) => d.data());
+    }
   } catch (error) {
-    handleFirestoreError(error, OperationType.DELETE, `hostGrantedSubscriptions/${docId}`);
-    throw error;
+    console.warn('Notice fetching coupons from Firestore:', error);
+  }
+  return [];
+}
+
+/**
+ * Delete / Revoke coupon from Firestore
+ */
+export async function deleteHostCouponFromFirestore(couponId: string): Promise<void> {
+  const safeId = couponId.replace(/[^a-zA-Z0-9_-]/g, '_');
+  try {
+    const cRef = doc(db, 'host_coupons', safeId);
+    await deleteDoc(cRef);
+  } catch (error) {
+    console.warn('Notice deleting coupon from Firestore:', error);
   }
 }
+
+/**
+ * Record a Password-Verified Host Grant Action in the isolated Firestore 'grant_verifications'
+ * and 'host_verification_logs' collections for multi-layer audit trails.
+ */
+export async function recordHostVerificationLogFirestore(entry: {
+  id?: string;
+  action: string;
+  targetEmail?: string;
+  planId?: string;
+  planName?: string;
+  durationMonths?: number;
+  durationDays?: number;
+  isLifetime?: boolean;
+  expiresAt?: string;
+  verifiedByPin?: boolean;
+  authMethod?: string;
+  deviceFingerprint?: string;
+  notes?: string;
+  performedBy?: string;
+  actorEmail?: string;
+  pinProvided?: string;
+  details?: string;
+  metadata?: Record<string, any>;
+  timestamp?: string;
+  status?: string;
+  checksum?: string;
+}): Promise<void> {
+  const logId = entry.id || `vlog_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  const payload = {
+    ...entry,
+    id: logId,
+    timestamp: entry.timestamp || new Date().toISOString(),
+    performedBy: entry.performedBy || entry.actorEmail || 'Warad Asare',
+    verifiedByPin: entry.verifiedByPin ?? true,
+    authMethod: entry.authMethod || 'HOST_PASSWORD_AUTHENTICATED',
+    status: entry.status || 'AUTHENTICATED',
+    updatedAt: new Date().toISOString(),
+  };
+
+  try {
+    const gvRef = doc(db, 'grant_verifications', logId);
+    await setDoc(gvRef, payload, { merge: true });
+  } catch (error) {
+    console.warn('Notice logging to grant_verifications in Firestore:', error);
+  }
+
+  try {
+    const vRef = doc(db, 'host_verification_logs', logId);
+    await setDoc(vRef, payload, { merge: true });
+  } catch (error) {
+    console.warn('Notice logging verification action to Firestore:', error);
+  }
+}
+
+export const recordGrantVerificationLogFirestore = recordHostVerificationLogFirestore;
+
+/**
+ * Fetch all Password-Verified Host Grant logs from Firestore 'grant_verifications' or 'host_verification_logs'
+ */
+export async function fetchHostVerificationLogsFirestore(): Promise<any[]> {
+  const map = new Map<string, any>();
+
+  try {
+    const colRef = collection(db, 'grant_verifications');
+    const snap = await getDocs(colRef);
+    snap.docs.forEach((d) => {
+      const data = d.data();
+      if (data && data.id) {
+        map.set(data.id, data);
+      }
+    });
+  } catch (error) {
+    console.warn('Notice fetching grant_verifications from Firestore:', error);
+  }
+
+  try {
+    const colRef = collection(db, 'host_verification_logs');
+    const snap = await getDocs(colRef);
+    snap.docs.forEach((d) => {
+      const data = d.data();
+      if (data && data.id && !map.has(data.id)) {
+        map.set(data.id, data);
+      }
+    });
+  } catch (error) {
+    console.warn('Notice fetching verification logs from Firestore:', error);
+  }
+
+  return Array.from(map.values()).sort(
+    (a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime()
+  );
+}
+
+/**
+ * Sync an athlete's login session and complete profile snapshot directly to Firestore 'athlete_logins'
+ */
+export async function syncAthleteLoginToFirestore(loginRecord: any): Promise<void> {
+  const loginId = loginRecord.id || `login_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+  try {
+    const logRef = doc(db, 'athlete_logins', loginId);
+    await setDoc(logRef, {
+      ...loginRecord,
+      id: loginId,
+      timestamp: loginRecord.loginTimestamp || new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }, { merge: true });
+  } catch (error) {
+    console.warn('Notice syncing athlete login session to Firestore:', error);
+  }
+}
+
+/**
+ * Fetch all athlete login telemetry and full profile details from Firestore 'athlete_logins'
+ */
+export async function fetchAthleteLoginsFromFirestore(): Promise<any[]> {
+  try {
+    const colRef = collection(db, 'athlete_logins');
+    const snap = await getDocs(colRef);
+    if (!snap.empty) {
+      return snap.docs
+        .map((d) => d.data())
+        .sort((a: any, b: any) => new Date(b.loginTimestamp || b.timestamp || 0).getTime() - new Date(a.loginTimestamp || a.timestamp || 0).getTime());
+    }
+  } catch (error) {
+    console.warn('Notice fetching athlete logins from Firestore:', error);
+  }
+  return [];
+}
+

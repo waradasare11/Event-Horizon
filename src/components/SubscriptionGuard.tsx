@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Lock, 
   Crown, 
@@ -7,10 +7,19 @@ import {
   ShieldCheck, 
   AlertCircle,
   QrCode,
-  ArrowRight
+  ArrowRight,
+  RefreshCw,
+  Gift
 } from 'lucide-react';
 import { UserProfile, UserSubscription } from '../types';
-import { computeSubscriptionStatus, HOST_ADMIN_CONFIG } from '../lib/subscription';
+import { 
+  computeSubscriptionStatus, 
+  HOST_ADMIN_CONFIG, 
+  isHostAdmin, 
+  checkUserHostGrant, 
+  createGrantedUserSubscription, 
+  createHostLifetimeSubscription 
+} from '../lib/subscription';
 import { SubscriptionPaywallModal } from './SubscriptionPaywallModal';
 import { AuthGateModal } from './AuthGateModal';
 import { OnboardingModal } from './OnboardingModal';
@@ -33,9 +42,64 @@ export const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
   children,
 }) => {
   const [isPaywallOpen, setIsPaywallOpen] = useState(false);
+  const [isCheckingGrant, setIsCheckingGrant] = useState(false);
+  const [grantCheckNotice, setGrantCheckNotice] = useState<string | null>(null);
+
+  // Proactive Grant Check on Mount / Email Change
+  useEffect(() => {
+    if (!userProfile.email) return;
+
+    const email = userProfile.email.trim().toLowerCase();
+    if (isHostAdmin(email)) {
+      const hostSub = createHostLifetimeSubscription();
+      if (userProfile.subscription?.paymentMethod !== 'HOST_LIFETIME_VIP') {
+        onUpdateSubscription(hostSub);
+        onSaveProfile({ ...userProfile, subscription: hostSub });
+      }
+      return;
+    }
+
+    checkUserHostGrant(email).then(({ hasGrant, grant }) => {
+      if (hasGrant && grant) {
+        const grantedSub = createGrantedUserSubscription(grant);
+        if (
+          userProfile.subscription?.paymentMethod !== 'MANUAL_GRANT' ||
+          userProfile.subscription?.status !== 'active'
+        ) {
+          onUpdateSubscription(grantedSub);
+          onSaveProfile({ ...userProfile, subscription: grantedSub });
+        }
+      }
+    }).catch(console.warn);
+  }, [userProfile.email]);
+
+  const handleManualGrantCheck = async () => {
+    if (!userProfile.email) return;
+    setIsCheckingGrant(true);
+    setGrantCheckNotice(null);
+    try {
+      const email = userProfile.email.trim().toLowerCase();
+      const { hasGrant, isHost, grant } = await checkUserHostGrant(email);
+      if (hasGrant) {
+        const sub = isHost ? createHostLifetimeSubscription() : createGrantedUserSubscription(grant || { email });
+        onUpdateSubscription(sub);
+        onSaveProfile({ ...userProfile, subscription: sub });
+        setGrantCheckNotice('🎉 VIP Free Subscription Verified! Unlocking PeakForm Pro...');
+      } else {
+        setGrantCheckNotice('No VIP grant found for this Gmail yet. Ask the Host to add your Gmail ID.');
+      }
+    } catch (err: any) {
+      setGrantCheckNotice('Check failed. Please check network connection.');
+    } finally {
+      setIsCheckingGrant(false);
+    }
+  };
 
   // Compute live subscription status and days remaining
-  const activeSub = computeSubscriptionStatus(userProfile.subscription);
+  const isHost = isHostAdmin(userProfile.email);
+  const activeSub = isHost
+    ? createHostLifetimeSubscription()
+    : computeSubscriptionStatus(userProfile.subscription, userProfile.email);
 
   // Step 1: Authentication Check (strictly requires valid signed in email)
   const isAuthenticated = Boolean(userProfile.email && userProfile.email.includes('@'));
@@ -45,7 +109,7 @@ export const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
 
   // Step 3: Subscription & Access Check
   const isTrialActive = activeSub.status === 'trial' && activeSub.daysRemaining > 0;
-  const isPaidActive = activeSub.status === 'active' && activeSub.daysRemaining > 0;
+  const isPaidActive = (activeSub.status === 'active' && activeSub.daysRemaining > 0) || isHost;
   const hasAccess = isTrialActive || isPaidActive;
 
   // Step 1 Enforcement: If unauthenticated, render ONLY the AuthGateModal.
@@ -96,6 +160,12 @@ export const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
             </p>
           </div>
 
+          {grantCheckNotice && (
+            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
+              {grantCheckNotice}
+            </div>
+          )}
+
           <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-gray-200 dark:border-gray-800 text-xs text-left space-y-1.5">
             <div className="flex justify-between">
               <span className="text-gray-500">1 Month:</span>
@@ -119,14 +189,26 @@ export const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
             </div>
           </div>
 
-          <button
-            onClick={() => setIsPaywallOpen(true)}
-            className="w-full py-3.5 px-4 rounded-2xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
-          >
-            <QrCode className="w-4 h-4" />
-            <span>Scan FamApp QR Code & Unlock Pro</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={() => setIsPaywallOpen(true)}
+              className="w-full py-3.5 px-4 rounded-2xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
+            >
+              <QrCode className="w-4 h-4" />
+              <span>Scan FamApp QR Code & Unlock Pro</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+
+            <button
+              type="button"
+              onClick={handleManualGrantCheck}
+              disabled={isCheckingGrant}
+              className="w-full py-2.5 px-4 rounded-xl bg-gray-100 dark:bg-[#202422] hover:bg-emerald-500/10 hover:text-emerald-600 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-gray-200 dark:border-gray-800 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isCheckingGrant ? 'animate-spin text-emerald-500' : ''}`} />
+              <span>{isCheckingGrant ? 'Verifying Host VIP Grant...' : 'Check Host VIP Free Pass'}</span>
+            </button>
+          </div>
         </div>
 
         {/* Subscription Paywall Modal */}

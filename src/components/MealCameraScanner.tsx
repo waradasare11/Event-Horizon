@@ -28,12 +28,16 @@ import { AIAnalysisResult, MealLog, UserProfile } from '../types';
 import { MealAnalysisResultCard } from './MealAnalysisResultCard';
 import { IndianCuisineIntelligence } from './IndianCuisineIntelligence';
 import { ReverseVisualRecipeMatcher } from './ReverseVisualRecipeMatcher';
+import { ClearHistoryConfirmModal } from './ClearHistoryConfirmModal';
+import { GoogleKeepSyncModal } from './GoogleKeepSyncModal';
 
 interface MealCameraScannerProps {
   userProfile: UserProfile;
   mealLogs: MealLog[];
   onSaveMealLog: (log: MealLog) => void;
   onDeleteMealLog: (id: string) => void;
+  onBatchDeleteMealLogs?: (ids: string[]) => void;
+  onClearAllMealLogs?: () => void;
 }
 
 // Preset meal sample images for instant 1-click test drive
@@ -80,17 +84,45 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
   mealLogs,
   onSaveMealLog,
   onDeleteMealLog,
+  onBatchDeleteMealLogs,
+  onClearAllMealLogs,
 }) => {
   const [activeTab, setActiveTab] = useState<'camera' | 'web_match' | 'indian_intelligence' | 'manual' | 'indian_recipes'>('camera');
+  const [isClearHistoryModalOpen, setIsClearHistoryModalOpen] = useState<boolean>(false);
+  const [isBatchDeleteModalOpen, setIsBatchDeleteModalOpen] = useState<boolean>(false);
+  const [selectedMealIds, setSelectedMealIds] = useState<string[]>([]);
+  const [isKeepModalOpen, setIsKeepModalOpen] = useState<boolean>(false);
+
+  const toggleSelectMeal = (id: string) => {
+    setSelectedMealIds((prev) =>
+      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllMeals = () => {
+    if (selectedMealIds.length === mealLogs.length) {
+      setSelectedMealIds([]);
+    } else {
+      setSelectedMealIds(mealLogs.map((m) => m.id));
+    }
+  };
+
+  const handleConfirmBatchDelete = () => {
+    if (selectedMealIds.length === 0) return;
+    if (onBatchDeleteMealLogs) {
+      onBatchDeleteMealLogs(selectedMealIds);
+    } else {
+      selectedMealIds.forEach((id) => onDeleteMealLog(id));
+    }
+    setSelectedMealIds([]);
+    setIsBatchDeleteModalOpen(false);
+  };
 
   
-  // Camera & Image State
+  // Camera & Multi-Angle Image State (Supports 1 to 4 photos)
   const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
   const [facingMode, setFacingMode] = useState<'environment' | 'user'>('environment');
-  const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [secondaryCapturedImage, setSecondaryCapturedImage] = useState<string | null>(null);
-  const [selectedReferenceObject, setSelectedReferenceObject] = useState<'card' | 'coin' | 'spoon' | 'none'>('card');
-  const [showReferenceGuide, setShowReferenceGuide] = useState<boolean>(true);
+  const [mealPhotos, setMealPhotos] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [analysisProgress, setAnalysisProgress] = useState<string>('');
   const [analysisResult, setAnalysisResult] = useState<AIAnalysisResult | null>(null);
@@ -170,30 +202,39 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
     if (ctx) {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-      setCapturedImage(dataUrl);
+      const nextPhotos = [...mealPhotos, dataUrl].slice(0, 4);
+      setMealPhotos(nextPhotos);
       setIsCameraActive(false);
-      triggerAIAnalysis(dataUrl, customPromptNote);
     }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      setCapturedImage(dataUrl);
+    const readPromises = files.slice(0, 4 - mealPhotos.length).map((file) => {
+      return new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => resolve(ev.target?.result as string);
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(readPromises).then((newPhotos) => {
+      const combined = [...mealPhotos, ...newPhotos].slice(0, 4);
+      setMealPhotos(combined);
       setIsCameraActive(false);
-      triggerAIAnalysis(dataUrl, customPromptNote);
-    };
-    reader.readAsDataURL(file);
+    });
+  };
+
+  const handleRemovePhoto = (indexToRemove: number) => {
+    setMealPhotos((prev) => prev.filter((_, idx) => idx !== indexToRemove));
   };
 
   const handleSelectPresetMeal = async (preset: typeof PRESET_SAMPLE_MEALS[0]) => {
     try {
       setIsAnalyzing(true);
-      setAnalysisProgress('Loading meal image & calculating nutrition...');
+      setAnalysisProgress('Loading sample meal image and calculating per-gram macros...');
       setErrorMessage(null);
 
       const response = await fetch(preset.url);
@@ -201,32 +242,41 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64data = reader.result as string;
-        setCapturedImage(base64data);
-        triggerAIAnalysis(base64data, preset.notes);
+        setMealPhotos([base64data]);
+        triggerAIAnalysis([base64data], preset.notes);
       };
       reader.readAsDataURL(blob);
     } catch (err) {
       console.error('Failed to load preset meal', err);
-      setErrorMessage('Failed to load preset image. Please try uploading an image directly.');
+      setErrorMessage('Failed to load preset image. Please try uploading a photo directly.');
       setIsAnalyzing(false);
     }
   };
 
-  const triggerAIAnalysis = async (imageBase64: string, specificNotes?: string, secondaryImageBase64?: string) => {
+  const triggerAIAnalysis = async (photosToAnalyze?: string[], specificNotes?: string) => {
+    const photos = photosToAnalyze || mealPhotos;
+    if (!photos || photos.length === 0) {
+      setErrorMessage('Please capture or upload at least 1 photo of your meal (up to 4 angles for 95%–97% precision).');
+      return;
+    }
+
     try {
       setIsAnalyzing(true);
       setErrorMessage(null);
       setAnalysisResult(null);
 
-      const refObjectNote = selectedReferenceObject !== 'none' 
-        ? `[Reference Calibration Object: Standard ${selectedReferenceObject === 'card' ? 'Credit Card / ID (85.6mm × 53.98mm)' : selectedReferenceObject === 'coin' ? 'Coin (24.26mm diameter)' : 'Standard Spoon (150mm)'} placed next to plate for exact pixel-to-millimeter volumetric scaling]`
-        : '';
+      const primaryImage = photos[0];
+      const secondaryImage = photos.length > 1 ? photos[1] : undefined;
+      const additionalImages = photos.slice(2);
 
-      const fullCustomNotes = [specificNotes || customPromptNote, refObjectNote].filter(Boolean).join(' ');
+      const fullCustomNotes = [
+        specificNotes || customPromptNote,
+        `[Multi-Angle Vision: ${photos.length} angle photo(s) provided. Automatically detect and calibrate against any reference object (e.g. coin, utensil, plate rim) kept near the dish for 95%–97% volumetric calculation.]`
+      ].filter(Boolean).join(' ');
 
-      setAnalysisProgress('Decomposing ingredients & querying IFCT/USDA nutrition databases with multi-model consensus...');
+      setAnalysisProgress('Analyzing meal dimensions, standard measures & ingredients across high-reasoning vision models...');
       const timer1 = setTimeout(() => {
-        setAnalysisProgress('Calculating per-gram calories, protein, carbs & glycemic index across vision models...');
+        setAnalysisProgress('Calculating per-gram calories, protein, carbs & glycemic index across verified food databases...');
       }, 1200);
 
       const timer2 = setTimeout(() => {
@@ -237,8 +287,9 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          imageBase64,
-          secondaryImageBase64: secondaryImageBase64 || secondaryCapturedImage || undefined,
+          imageBase64: primaryImage,
+          secondaryImageBase64: secondaryImage,
+          additionalImagesBase64: additionalImages.length > 0 ? additionalImages : undefined,
           mimeType: 'image/jpeg',
           userProfile: {
             goal: userProfile.goal,
@@ -265,7 +316,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
       }
 
       setAnalysisResult(data.data);
-      if (data.data.requiresRefinedScan || (data.data.consensusScore && data.data.consensusScore < 95 && !secondaryImageBase64)) {
+      if (data.data.requiresRefinedScan || (data.data.consensusScore && data.data.consensusScore < 95 && photos.length === 1)) {
         setShowRefinedScanPrompt(true);
       } else {
         setShowRefinedScanPrompt(false);
@@ -376,7 +427,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
   };
 
   const handleReset = () => {
-    setCapturedImage(null);
+    setMealPhotos([]);
     setAnalysisResult(null);
     setErrorMessage(null);
     setIsCameraActive(false);
@@ -396,7 +447,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
             Meal Scanner & Macro Calculator
           </h1>
           <p className="text-sm sm:text-base text-[#D1D5DB] mt-2 leading-relaxed">
-            Snap a photo or type a meal description to analyze per-gram macros, calories, protein density, and micronutrient breakdown against verified Indian and global food databases.
+            Snap 1 to 4 photos from different angles or enter meal details to calculate exact grams, calories, and protein density (95%–97% estimated precision).
           </p>
         </div>
       </div>
@@ -472,12 +523,12 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
           {/* TAB 1: Photo Scanner */}
           {activeTab === 'camera' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Camera / Upload Container (2 cols) */}
+              {/* Camera / Multi-Angle Upload Container (2 cols) */}
               <div className="lg:col-span-2 bg-white dark:bg-[#161817] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs transition-colors">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <Camera className="w-5 h-5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                    <h2 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">Meal Camera & Photo Analysis</h2>
+                    <h2 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">Multi-Angle Food Scanner (1 to 4 Photos)</h2>
                   </div>
                   {isCameraActive && (
                     <button
@@ -498,7 +549,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                   </div>
                 )}
 
-                {/* Viewport: Live Camera Feed OR Preview OR Placeholder */}
+                {/* Viewport: Live Camera Feed OR Preview OR Multi-Angle Strip */}
                 <div className="relative aspect-4/3 w-full bg-[#1A1D1B] dark:bg-[#111312] rounded-xl overflow-hidden border border-[#E5E7EB] dark:border-[#242826] flex items-center justify-center">
                   {isAnalyzing ? (
                     <div className="flex flex-col items-center justify-center p-6 text-center space-y-4">
@@ -507,7 +558,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                         <Sparkles className="w-6 h-6 text-[#E8912D] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
                       </div>
                       <div>
-                        <h3 className="text-white font-bold text-base">Analyzing Meal with Gemini Vision AI</h3>
+                        <h3 className="text-white font-bold text-base">Analyzing Meal with High-Reasoning Vision</h3>
                         <p className="text-xs text-[#9CA3AF] mt-1">{analysisProgress || 'Extracting nutritional data...'}</p>
                       </div>
                     </div>
@@ -521,76 +572,68 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                         className="w-full h-full object-cover"
                       />
 
-                      {/* HUD Volumetric Instructional Overlay */}
-                      {showReferenceGuide && (
-                        <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between">
-                          {/* Top Status & Reference Object Selector (interactive with pointer-events-auto) */}
-                          <div className="pointer-events-auto bg-black/75 backdrop-blur-md rounded-xl p-2.5 border border-white/15 flex flex-wrap items-center justify-between gap-2 shadow-lg">
-                            <div className="flex items-center gap-2">
-                              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                              <span className="text-[11px] font-bold text-white tracking-wide flex items-center gap-1.5">
-                                <Scale className="w-3.5 h-3.5 text-amber-400" />
-                                Volumetric 3D Calibration
-                              </span>
-                            </div>
-
-                            {/* Reference Object Selector */}
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[10px] text-gray-300 hidden sm:inline">Reference Scale:</span>
-                              {(['card', 'coin', 'spoon', 'none'] as const).map((obj) => (
-                                <button
-                                  key={obj}
-                                  type="button"
-                                  onClick={() => setSelectedReferenceObject(obj)}
-                                  className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-all cursor-pointer ${
-                                    selectedReferenceObject === obj
-                                      ? 'bg-[#E8912D] text-white shadow-xs'
-                                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                                  }`}
-                                >
-                                  {obj === 'card' ? '💳 Card (85.6mm)' : obj === 'coin' ? '🪙 Coin (24.3mm)' : obj === 'spoon' ? '🥄 Spoon (150mm)' : 'Off'}
-                                </button>
-                              ))}
-                            </div>
+                      {/* Clean HUD Visual Guidance Overlay */}
+                      <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between">
+                        <div className="bg-black/75 backdrop-blur-md rounded-xl p-2.5 border border-white/15 flex items-center justify-between gap-2 shadow-lg">
+                          <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                            <span className="text-[11px] font-bold text-white tracking-wide flex items-center gap-1.5">
+                              <Scale className="w-3.5 h-3.5 text-amber-400" />
+                              Capturing Angle {mealPhotos.length + 1} of 4
+                            </span>
                           </div>
+                          <span className="text-[10px] text-gray-300">
+                            {mealPhotos.length === 0 ? 'Top Overhead View' : mealPhotos.length === 1 ? '45° Depth Angle' : mealPhotos.length === 2 ? 'Side / Close-up' : 'Serving Scale'}
+                          </span>
+                        </div>
 
-                          {/* Center Reticles for Food & Reference Object */}
-                          <div className="flex-1 flex items-center justify-center my-2 relative">
-                            {/* Main Meal Center Target */}
-                            <div className="w-48 sm:w-64 h-48 sm:h-64 border-2 border-white/60 border-dashed rounded-3xl flex items-center justify-center relative">
-                              <div className="absolute -top-3 bg-black/70 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-white/20">
-                                🍽️ Center Meal / Bowl Here
-                              </div>
-                              <div className="w-4 h-4 border-t-2 border-l-2 border-amber-400 absolute top-2 left-2" />
-                              <div className="w-4 h-4 border-t-2 border-r-2 border-amber-400 absolute top-2 right-2" />
-                              <div className="w-4 h-4 border-b-2 border-l-2 border-amber-400 absolute bottom-2 left-2" />
-                              <div className="w-4 h-4 border-b-2 border-r-2 border-amber-400 absolute bottom-2 right-2" />
+                        {/* Center Target Box */}
+                        <div className="flex-1 flex items-center justify-center my-2 relative">
+                          <div className="w-48 sm:w-64 h-48 sm:h-64 border-2 border-white/60 border-dashed rounded-3xl flex items-center justify-center relative">
+                            <div className="absolute -top-3 bg-black/70 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-white/20">
+                              🍽️ Center Meal / Bowl Here
                             </div>
-
-                            {/* Reference Object Target Reticle (if enabled) */}
-                            {selectedReferenceObject !== 'none' && (
-                              <div className="absolute right-3 sm:right-6 bottom-4 w-20 sm:w-24 h-14 sm:h-16 border-2 border-amber-400/80 border-dashed rounded-xl bg-amber-500/10 flex flex-col items-center justify-center text-center p-1 backdrop-blur-xs">
-                                <span className="text-[9px] font-black text-amber-300 uppercase tracking-tight leading-none">
-                                  {selectedReferenceObject === 'card' ? '💳 Place Card' : selectedReferenceObject === 'coin' ? '🪙 Place Coin' : '🥄 Place Spoon'}
-                                </span>
-                                <span className="text-[8px] text-amber-200/90 mt-0.5">Scale Object</span>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Bottom Instructional Note */}
-                          <div className="bg-black/70 backdrop-blur-xs text-white text-[10px] sm:text-[11px] px-3 py-1.5 rounded-xl border border-white/10 text-center font-medium">
-                            💡 Place reference object flat next to your plate. Hold device at a 45° to 60° angle.
+                            <div className="w-4 h-4 border-t-2 border-l-2 border-amber-400 absolute top-2 left-2" />
+                            <div className="w-4 h-4 border-t-2 border-r-2 border-amber-400 absolute top-2 right-2" />
+                            <div className="w-4 h-4 border-b-2 border-l-2 border-amber-400 absolute bottom-2 left-2" />
+                            <div className="w-4 h-4 border-b-2 border-r-2 border-amber-400 absolute bottom-2 right-2" />
                           </div>
                         </div>
-                      )}
+
+                        <div className="bg-black/70 backdrop-blur-xs text-white text-[10px] sm:text-[11px] px-3 py-1.5 rounded-xl border border-white/10 text-center font-medium">
+                          💡 Tip: Any coin, spoon, or utensil placed next to the bowl is automatically detected for 95%–97% volumetric calculation.
+                        </div>
+                      </div>
                     </>
-                  ) : capturedImage ? (
-                    <img
-                      src={capturedImage}
-                      alt="Captured meal"
-                      className="w-full h-full object-cover"
-                    />
+                  ) : mealPhotos.length > 0 ? (
+                    <div className="w-full h-full p-3 grid grid-cols-2 gap-2 bg-[#1A1D1B]">
+                      {mealPhotos.map((photo, idx) => (
+                        <div key={idx} className="relative w-full h-full rounded-lg overflow-hidden border border-white/10 group">
+                          <img src={photo} alt={`Meal angle ${idx + 1}`} className="w-full h-full object-cover" />
+                          <div className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded bg-black/75 text-[10px] text-white font-bold">
+                            Angle {idx + 1}
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemovePhoto(idx)}
+                            className="absolute top-1.5 right-1.5 p-1 rounded-full bg-rose-600/90 text-white hover:bg-rose-700 transition-all cursor-pointer"
+                            title="Remove this photo"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      ))}
+                      {mealPhotos.length < 4 && (
+                        <div
+                          onClick={() => setIsCameraActive(true)}
+                          className="flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-lg p-3 text-center cursor-pointer hover:border-amber-400/60 transition-all"
+                        >
+                          <Camera className="w-6 h-6 text-amber-400 mb-1" />
+                          <span className="text-[11px] text-gray-300 font-semibold">+ Add Angle {mealPhotos.length + 1}</span>
+                          <span className="text-[9px] text-gray-400">({4 - mealPhotos.length} slots left)</span>
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <div className="text-center p-8 space-y-3">
                       <div className="w-16 h-16 rounded-2xl bg-white/10 dark:bg-white/5 text-white flex items-center justify-center mx-auto">
@@ -599,7 +642,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                       <div>
                         <h3 className="text-white font-semibold text-sm sm:text-base">Camera is Ready</h3>
                         <p className="text-xs text-[#9CA3AF] max-w-sm mx-auto mt-1">
-                          Capture your plate with your camera or upload a photo to calculate exact grams and macros.
+                          Capture 1 to 4 photos from different angles (overhead, 45° angle, side) or upload meal photos to calculate exact macros.
                         </p>
                       </div>
                     </div>
@@ -616,7 +659,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                         className="px-8 py-3 rounded-full bg-[#E8912D] text-white font-bold text-sm shadow-md hover:bg-[#D97D1A] transition-all flex items-center gap-2 cursor-pointer"
                       >
                         <Camera className="w-4 h-4" />
-                        <span>Capture & Analyze</span>
+                        <span>Snap Photo (Slot {mealPhotos.length + 1})</span>
                       </button>
                       <button
                         onClick={() => setIsCameraActive(false)}
@@ -627,14 +670,16 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                     </>
                   ) : (
                     <>
-                      <button
-                        onClick={() => setIsCameraActive(true)}
-                        disabled={isAnalyzing}
-                        className="px-6 py-3 rounded-xl bg-[#0F6E5F] text-white font-semibold text-xs sm:text-sm hover:bg-[#0D5B4F] transition-all shadow-xs flex items-center gap-2 cursor-pointer"
-                      >
-                        <Camera className="w-4 h-4 text-[#E8912D]" />
-                        <span>Open Camera</span>
-                      </button>
+                      {mealPhotos.length < 4 && (
+                        <button
+                          onClick={() => setIsCameraActive(true)}
+                          disabled={isAnalyzing}
+                          className="px-6 py-3 rounded-xl bg-[#0F6E5F] text-white font-semibold text-xs sm:text-sm hover:bg-[#0D5B4F] transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+                        >
+                          <Camera className="w-4 h-4 text-[#E8912D]" />
+                          <span>{mealPhotos.length === 0 ? 'Open Camera' : `Snap Another Angle (${mealPhotos.length}/4)`}</span>
+                        </button>
+                      )}
 
                       <button
                         onClick={() => fileInputRef.current?.click()}
@@ -642,15 +687,27 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                         className="px-6 py-3 rounded-xl bg-white dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] font-semibold text-xs sm:text-sm hover:bg-[#F9FAFB] dark:hover:bg-[#242826] transition-all shadow-xs flex items-center gap-2 cursor-pointer"
                       >
                         <Upload className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                        <span>Upload Meal Photo</span>
+                        <span>{mealPhotos.length === 0 ? 'Upload Photos (1-4)' : 'Add More Photos'}</span>
                       </button>
                       <input
                         ref={fileInputRef}
                         type="file"
                         accept="image/*"
+                        multiple
                         onChange={handleFileUpload}
                         className="hidden"
                       />
+
+                      {mealPhotos.length > 0 && (
+                        <button
+                          onClick={() => triggerAIAnalysis()}
+                          disabled={isAnalyzing}
+                          className="px-8 py-3 rounded-xl bg-[#E8912D] text-white font-bold text-xs sm:text-sm hover:bg-[#D97D1A] transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          <span>Analyze {mealPhotos.length} Photo{mealPhotos.length > 1 ? 's' : ''} (95%–97% Precision)</span>
+                        </button>
+                      )}
                     </>
                   )}
                 </div>
@@ -662,11 +719,11 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
-                      <span>Volumetric 3D Calibration Standard</span>
-                      <span className="text-[10px] uppercase font-black tracking-wider bg-amber-500/20 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded">98%+ Precision</span>
+                      <span>Automated 3D Measure Reasoning</span>
+                      <span className="text-[10px] uppercase font-black tracking-wider bg-amber-500/20 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded">95%–97% Precision</span>
                     </h4>
                     <p className="text-[11px] text-amber-800/90 dark:text-amber-300/90 mt-0.5 leading-relaxed">
-                      For gram & volume accuracy, place a standard reference object (such as a <strong>standard coin, credit card, or standard spoon</strong>) next to your dish. The multi-vision AI scales pixel dimensions against physical standard dimensions for exact volume calculation.
+                      For highest precision, capture 2 to 4 photos from different angles (overhead and 45° angle) or place any standard item (coin, spoon, or card) next to your dish. The vision AI automatically scales pixel dimensions against physical boundaries.
                     </p>
                   </div>
                 </div>
@@ -678,7 +735,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                   </label>
                   <input
                     type="text"
-                    placeholder="Provide recipe context or ingredients for 1000% accurate per-gram mapping..."
+                    placeholder="Provide recipe context or ingredients for accurate per-gram mapping..."
                     value={customPromptNote}
                     onChange={(e) => setCustomPromptNote(e.target.value)}
                     className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F] dark:focus:ring-[#2DD4BF]"
@@ -1000,16 +1057,16 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                 </button>
               </div>
 
-              {/* Dual Angle Previews */}
+              {/* Multi Angle Previews */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 <div className="rounded-xl overflow-hidden border border-amber-500/30 bg-black/20 p-2 text-center">
                   <div className="text-[10px] font-bold text-amber-900 dark:text-amber-300 mb-1.5 flex items-center justify-center gap-1">
                     <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>Angle 1: Primary View (Captured)</span>
+                    <span>Primary Overhead View ({mealPhotos.length} photo{mealPhotos.length > 1 ? 's' : ''} captured)</span>
                   </div>
-                  {capturedImage && (
+                  {mealPhotos.length > 0 && (
                     <img
-                      src={capturedImage}
+                      src={mealPhotos[0]}
                       alt="Primary Angle"
                       className="w-full h-32 object-cover rounded-lg"
                     />
@@ -1017,14 +1074,14 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                 </div>
 
                 <div className="rounded-xl overflow-hidden border-2 border-dashed border-amber-500/40 bg-amber-500/5 p-2 text-center flex flex-col justify-center items-center min-h-[140px]">
-                  {secondaryCapturedImage ? (
+                  {mealPhotos.length > 1 ? (
                     <div>
                       <div className="text-[10px] font-bold text-amber-900 dark:text-amber-300 mb-1.5 flex items-center justify-center gap-1">
                         <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
-                        <span>Angle 2: 45° Cross View (Ready)</span>
+                        <span>Secondary 45° Cross Angle (Ready)</span>
                       </div>
                       <img
-                        src={secondaryCapturedImage}
+                        src={mealPhotos[1]}
                         alt="Secondary Angle"
                         className="w-full h-28 object-cover rounded-lg"
                       />
@@ -1033,12 +1090,11 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                     <div className="space-y-2 py-2">
                       <Camera className="w-6 h-6 text-amber-600 dark:text-amber-400 mx-auto" />
                       <div className="text-[11px] font-bold text-amber-900 dark:text-amber-200">
-                        Angle 2: 45° Side / Top-Down View
+                        Add Angle 2 (45° Side / Depth View)
                       </div>
                       <div className="flex items-center justify-center gap-2">
                         <button
                           onClick={() => {
-                            setCapturedImage(null);
                             setIsCameraActive(true);
                             setShowRefinedScanPrompt(false);
                           }}
@@ -1057,10 +1113,9 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                                 const reader = new FileReader();
                                 reader.onload = (ev) => {
                                   const base64 = ev.target?.result as string;
-                                  setSecondaryCapturedImage(base64);
-                                  if (capturedImage) {
-                                    triggerAIAnalysis(capturedImage, undefined, base64);
-                                  }
+                                  const next = [...mealPhotos, base64].slice(0, 4);
+                                  setMealPhotos(next);
+                                  triggerAIAnalysis(next);
                                 };
                                 reader.readAsDataURL(file);
                               }
@@ -1081,7 +1136,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
 
           <MealAnalysisResultCard
             analysis={analysisResult}
-            imagePreviewUrl={capturedImage || ''}
+            imagePreviewUrl={mealPhotos[0] || ''}
             userProfile={userProfile}
             onSaveMeal={(log) => {
               onSaveMealLog(log);
@@ -1101,20 +1156,68 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
             <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">({mealLogs.length} logged items)</span>
           </div>
 
-          {mealLogs.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+            {mealLogs.length > 0 && (
+              <>
+                <button
+                  type="button"
+                  onClick={handleSelectAllMeals}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-[#232726] dark:hover:bg-[#2A2E2C] text-[#374151] dark:text-[#D1D5DB] text-xs font-semibold transition-all cursor-pointer"
+                >
+                  <span>{selectedMealIds.length === mealLogs.length ? 'Deselect All' : 'Select All'}</span>
+                </button>
+
+                {selectedMealIds.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setIsBatchDeleteModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer animate-in fade-in"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Selected ({selectedMealIds.length})</span>
+                  </button>
+                )}
+              </>
+            )}
+
             <button
-              onClick={handleBatchVerifyLogs}
-              disabled={isBatchVerifying}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] text-xs font-bold hover:bg-[#0F6E5F]/20 transition-all border border-[#0F6E5F]/30 cursor-pointer self-start sm:self-auto disabled:opacity-50"
+              id="meal-scanner-google-keep-btn"
+              type="button"
+              onClick={() => setIsKeepModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold border border-amber-500/30 transition-all cursor-pointer"
+              title="Sync Meals & Macros to Google Keep"
             >
-              {isBatchVerifying ? (
-                <div className="w-3.5 h-3.5 rounded-full border-2 border-[#0F6E5F] border-t-transparent animate-spin" />
-              ) : (
-                <ShieldCheck className="w-3.5 h-3.5" />
-              )}
-              <span>{isBatchVerifying ? 'Cross-Checking Databases...' : 'Batch Re-Verify via USDA/IFCT'}</span>
+              <span>Keep Sync</span>
             </button>
-          )}
+
+            {mealLogs.length > 0 && (
+              <>
+                <button
+                  onClick={handleBatchVerifyLogs}
+                  disabled={isBatchVerifying}
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] text-xs font-bold hover:bg-[#0F6E5F]/20 transition-all border border-[#0F6E5F]/30 cursor-pointer disabled:opacity-50"
+                >
+                  {isBatchVerifying ? (
+                    <div className="w-3.5 h-3.5 rounded-full border-2 border-[#0F6E5F] border-t-transparent animate-spin" />
+                  ) : (
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                  )}
+                  <span>{isBatchVerifying ? 'Cross-Checking...' : 'Batch Re-Verify'}</span>
+                </button>
+
+                <button
+                  id="meal-scanner-clear-history-btn"
+                  type="button"
+                  onClick={() => setIsClearHistoryModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold border border-rose-500/30 transition-all cursor-pointer"
+                  title="Clear meal history (requires typing DELETE)"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Clear All</span>
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         {batchVerificationSummary && (
@@ -1130,50 +1233,101 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {mealLogs.map((log) => (
-              <div
-                key={log.id}
-                className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] flex items-center justify-between gap-3"
-              >
-                <div className="flex items-center gap-3">
-                  {log.photoUrl ? (
-                    <img
-                      src={log.photoUrl}
-                      alt={log.mealTitle}
-                      className="w-12 h-12 rounded-xl object-cover border border-[#E5E7EB] dark:border-[#2A2E2C]"
+            {mealLogs.map((log) => {
+              const isSelected = selectedMealIds.includes(log.id);
+              return (
+                <div
+                  key={log.id}
+                  className={`p-4 rounded-2xl border flex items-center justify-between gap-3 transition-colors ${
+                    isSelected
+                      ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-300 dark:border-rose-800 shadow-2xs'
+                      : 'bg-[#FAFAF8] dark:bg-[#1A1D1C] border-[#E5E7EB] dark:border-[#2A2E2C]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      onChange={() => toggleSelectMeal(log.id)}
+                      className="w-4 h-4 rounded text-[#0F6E5F] focus:ring-[#0F6E5F] border-gray-300 dark:border-zinc-700 cursor-pointer"
+                      title={isSelected ? 'Deselect meal log' : 'Select meal log for batch action'}
                     />
-                  ) : (
-                    <div className="w-12 h-12 rounded-xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center font-bold text-xs">
-                      {log.mealType[0]}
-                    </div>
-                  )}
-                  <div>
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">{log.mealTitle}</span>
-                      {log.analysis?.consensusScore && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
-                          {log.analysis.consensusScore}% Verified
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-[11px] text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
-                      {log.time} • {log.calories} kcal ({log.proteinG}g P • {log.carbsG}g C • {log.fatG}g F)
+                    {log.photoUrl ? (
+                      <img
+                        src={log.photoUrl}
+                        alt={log.mealTitle}
+                        className="w-12 h-12 rounded-xl object-cover border border-[#E5E7EB] dark:border-[#2A2E2C]"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center font-bold text-xs">
+                        {log.mealType[0]}
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">{log.mealTitle}</span>
+                        {log.analysis?.consensusScore && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+                            {log.analysis.consensusScore}% Verified
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-[11px] text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
+                        {log.time} • {log.calories} kcal ({log.proteinG}g P • {log.carbsG}g C • {log.fatG}g F)
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <button
-                  onClick={() => onDeleteMealLog(log.id)}
-                  className="p-1.5 text-[#9CA3AF] hover:text-[#DC2626] rounded-md transition-colors cursor-pointer"
-                  title="Delete log"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
+                  <button
+                    onClick={() => onDeleteMealLog(log.id)}
+                    className="p-1.5 text-[#9CA3AF] hover:text-[#DC2626] rounded-md transition-colors cursor-pointer"
+                    title="Delete log"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
+
+      {/* Bulk Batch Delete Confirmation Modal */}
+      <ClearHistoryConfirmModal
+        isOpen={isBatchDeleteModalOpen}
+        onClose={() => setIsBatchDeleteModalOpen(false)}
+        onConfirm={handleConfirmBatchDelete}
+        historyType="meals"
+        itemCount={selectedMealIds.length}
+        isBatchDelete={true}
+        selectedItemTitles={mealLogs
+          .filter((m) => selectedMealIds.includes(m.id))
+          .map((m) => m.mealTitle)}
+      />
+
+      {/* Confirmation Modal: Type DELETE to Confirm All Clear */}
+      <ClearHistoryConfirmModal
+        isOpen={isClearHistoryModalOpen}
+        onClose={() => setIsClearHistoryModalOpen(false)}
+        onConfirm={() => {
+          if (onClearAllMealLogs) {
+            onClearAllMealLogs();
+          } else {
+            mealLogs.forEach((l) => onDeleteMealLog(l.id));
+          }
+        }}
+        historyType="meals"
+        itemCount={mealLogs.length}
+      />
+
+      {/* Google Keep Integration Modal */}
+      <GoogleKeepSyncModal
+        isOpen={isKeepModalOpen}
+        onClose={() => setIsKeepModalOpen(false)}
+        userProfile={userProfile}
+        mealLogs={mealLogs}
+        initialCategory="nutrition"
+      />
     </div>
   );
 };

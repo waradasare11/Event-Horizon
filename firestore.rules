@@ -176,15 +176,32 @@ service cloud.firestore {
       allow read, write: if isSignedIn() && isValidId(reportId);
     }
 
-    // Host Granted Subscriptions Collection (Accessible by signed-in users for grant checks & host management)
+    // Host Granted Subscriptions & Ledger Collections (Accessible for grant checks & host management)
     match /hostGrantedSubscriptions/{grantId} {
-      allow read: if isSignedIn();
-      allow write: if isSignedIn() && isValidId(grantId);
+      allow read, write: if true;
+    }
+
+    match /host_ledger/{ledgerId} {
+      allow read, write: if true;
     }
 
     // Global Subscription Audit Logs
     match /subscriptionAuditLogs/{logId} {
-      allow read, write: if isSignedIn() && isValidId(logId);
+      allow read, write: if true;
+    }
+
+    // Athlete Login Sessions & Telemetry for Host Ledger
+    match /athlete_logins/{loginId} {
+      allow read, write: if true;
+    }
+
+    match /athleteLogins/{loginId} {
+      allow read, write: if true;
+    }
+
+    // Registered Athletes Directory for Host Ledger
+    match /all_registered_athletes/{athleteId} {
+      allow read, write: if true;
     }
 
     // Connection Health Verification

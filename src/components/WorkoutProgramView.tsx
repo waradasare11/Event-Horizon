@@ -33,8 +33,11 @@ import {
   Youtube,
   Copy,
   ExternalLink,
-  SlidersHorizontal
+  SlidersHorizontal,
+  FileText,
+  Edit3
 } from 'lucide-react';
+
 import { WorkoutProgram, Exercise, UserProfile, WorkoutCompletionLog, ExerciseSmartSwapOption, EquipmentType, WorkoutNotificationSettings } from '../types';
 import { ConsistencyStreakTracker } from './ConsistencyStreakTracker';
 import { SmartSwapModal } from './SmartSwapModal';
@@ -51,6 +54,8 @@ import {
   WorkoutProgramAuditReport 
 } from '../data/ExerciseRegistry';
 import { WorkoutAuditModal } from './WorkoutAuditModal';
+import { ClearHistoryConfirmModal } from './ClearHistoryConfirmModal';
+import { GoogleKeepSyncModal } from './GoogleKeepSyncModal';
 import { getExercisePhoto } from '../lib/exerciseImages';
 import { saveStoredWorkoutPrograms, getStoredWorkoutPrograms } from '../lib/storage';
 import { 
@@ -59,12 +64,17 @@ import {
   getYouTubeSearchUrl, 
   getStandardizedExerciseSearchTerm 
 } from '../lib/biomechanics';
+import { triggerHapticSetComplete, triggerHapticWorkoutComplete } from '../lib/haptics';
 import confetti from 'canvas-confetti';
 
 interface WorkoutProgramViewProps {
   workoutPrograms: WorkoutProgram[];
   userProfile: UserProfile;
   workoutLogs: WorkoutCompletionLog[];
+  onClearAllWorkoutLogs?: () => void;
+  onDeleteWorkoutLog?: (id: string) => void;
+  onBatchDeleteWorkoutLogs?: (ids: string[]) => void;
+  onUpdateWorkoutLogNotes?: (id: string, notes: string) => void;
   onToggleWorkoutLog: (
     date: string, 
     dayId: string, 
@@ -84,7 +94,8 @@ interface WorkoutProgramViewProps {
       rpeLogged?: number;
       volumeKg: number;
     }>,
-    totalVolumeKg?: number
+    totalVolumeKg?: number,
+    notes?: string
   ) => void;
   onUpdateWorkoutProgram?: (updatedProgram: WorkoutProgram) => void;
   onUpdateUserProfile?: (profile: UserProfile) => void;
@@ -94,10 +105,48 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
   workoutPrograms,
   userProfile,
   workoutLogs,
+  onClearAllWorkoutLogs,
+  onDeleteWorkoutLog,
+  onBatchDeleteWorkoutLogs,
+  onUpdateWorkoutLogNotes,
   onToggleWorkoutLog,
   onUpdateWorkoutProgram,
   onUpdateUserProfile,
 }) => {
+  const [isClearWorkoutModalOpen, setIsClearWorkoutModalOpen] = useState<boolean>(false);
+  const [isBatchDeleteModalOpen, setIsBatchDeleteModalOpen] = useState<boolean>(false);
+  const [selectedWorkoutIds, setSelectedWorkoutIds] = useState<string[]>([]);
+  const [showManageHistory, setShowManageHistory] = useState<boolean>(false);
+  const [isKeepModalOpen, setIsKeepModalOpen] = useState<boolean>(false);
+  const [activePostWorkoutNotes, setActivePostWorkoutNotes] = useState<string>('');
+  const [editingLogId, setEditingLogId] = useState<string | null>(null);
+  const [editingLogNotes, setEditingLogNotes] = useState<string>('');
+
+
+  const toggleSelectWorkout = (id: string) => {
+    setSelectedWorkoutIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectAllWorkouts = () => {
+    if (selectedWorkoutIds.length === workoutLogs.length) {
+      setSelectedWorkoutIds([]);
+    } else {
+      setSelectedWorkoutIds(workoutLogs.map((w) => w.id || `${w.date}_${w.dayId}`));
+    }
+  };
+
+  const handleConfirmBatchDelete = () => {
+    if (selectedWorkoutIds.length === 0) return;
+    if (onBatchDeleteWorkoutLogs) {
+      onBatchDeleteWorkoutLogs(selectedWorkoutIds);
+    } else if (onDeleteWorkoutLog) {
+      selectedWorkoutIds.forEach((id) => onDeleteWorkoutLog(id));
+    }
+    setSelectedWorkoutIds([]);
+    setIsBatchDeleteModalOpen(false);
+  };
   const initialPrograms = useMemo(() => {
     const stored = getStoredWorkoutPrograms();
     return stored && stored.length > 0 ? stored : MASTER_WORKOUT_PROGRAMS;
@@ -489,6 +538,10 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
         [exerciseId]: willBeCompleted,
       };
 
+      if (willBeCompleted) {
+        triggerHapticSetComplete();
+      }
+
       if (willBeCompleted && exName) {
         startRestForExercise(exName, restSec || 90);
       }
@@ -496,6 +549,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
       if (activeDay) {
         const allDone = activeDay.exercises.every((ex) => nextState[ex.id]);
         if (allDone) {
+          triggerHapticWorkoutComplete();
           try {
             confetti({
               particleCount: 80,
@@ -605,8 +659,13 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
       false,
       averageRpe,
       loggedItems,
-      Math.round(totalVolumeSum)
+      Math.round(totalVolumeSum),
+      activePostWorkoutNotes.trim() || undefined
     );
+
+    setActivePostWorkoutNotes('');
+    triggerHapticWorkoutComplete();
+
 
     try {
       confetti({
@@ -826,6 +885,202 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
             userProfile={userProfile}
             onToggleWorkoutLog={onToggleWorkoutLog}
           />
+
+          {/* Action Toolbar: Google Keep Sync, Batch Delete & Manage Workout History */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] flex-wrap">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">Workout History & Sync:</span>
+                <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">({workoutLogs.length} logged sessions)</span>
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                {workoutLogs.length > 0 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setShowManageHistory(!showManageHistory)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-[#232726] dark:hover:bg-[#2A2E2C] text-[#374151] dark:text-[#D1D5DB] text-xs font-semibold transition-all cursor-pointer"
+                    >
+                      <span>{showManageHistory ? 'Hide Sessions' : 'Manage Logs'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleSelectAllWorkouts}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-[#232726] dark:hover:bg-[#2A2E2C] text-[#374151] dark:text-[#D1D5DB] text-xs font-semibold transition-all cursor-pointer"
+                    >
+                      <span>{selectedWorkoutIds.length === workoutLogs.length ? 'Deselect All' : 'Select All'}</span>
+                    </button>
+
+                    {selectedWorkoutIds.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setIsBatchDeleteModalOpen(true)}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-xs cursor-pointer animate-in fade-in"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete Selected ({selectedWorkoutIds.length})</span>
+                      </button>
+                    )}
+                  </>
+                )}
+
+                <button
+                  id="workout-keep-sync-btn"
+                  type="button"
+                  onClick={() => setIsKeepModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold border border-amber-500/30 transition-all cursor-pointer"
+                  title="Sync today's workout routine to Google Keep"
+                >
+                  <span>Google Keep Sync</span>
+                </button>
+
+                {workoutLogs.length > 0 && (
+                  <button
+                    id="workout-clear-history-btn"
+                    type="button"
+                    onClick={() => setIsClearWorkoutModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 text-xs font-bold border border-rose-500/30 transition-all cursor-pointer"
+                    title="Clear workout history (requires typing DELETE to confirm)"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Clear All</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Expandable Workout Logs Batch Manager */}
+            {showManageHistory && workoutLogs.length > 0 && (
+              <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] space-y-2.5 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-1">
+                  <span>Select logs to batch delete or review details:</span>
+                  <span>{selectedWorkoutIds.length} of {workoutLogs.length} selected</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 max-h-80 overflow-y-auto pr-1">
+                  {workoutLogs.map((log) => {
+                    const logIdentifier = log.id || `${log.date}_${log.dayId}`;
+                    const isSelected = selectedWorkoutIds.includes(logIdentifier);
+
+                    return (
+                      <div
+                        key={logIdentifier}
+                        className={`p-3 rounded-xl border flex items-center justify-between gap-2.5 transition-colors ${
+                          isSelected
+                            ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-300 dark:border-rose-800'
+                            : 'bg-white dark:bg-[#1C1F1E] border-[#E5E7EB] dark:border-[#2A2E2C]'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelectWorkout(logIdentifier)}
+                            className="w-4 h-4 rounded text-[#0F6E5F] focus:ring-[#0F6E5F] border-gray-300 dark:border-zinc-700 cursor-pointer"
+                            title={isSelected ? 'Deselect workout' : 'Select workout for batch action'}
+                          />
+                          <div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">
+                                {log.dayName || 'Workout Session'}
+                              </span>
+                              {log.isRestDay && (
+                                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                  Rest Day
+                                </span>
+                              )}
+                            </div>
+                            <div className="text-[11px] text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
+                              {log.date} • {log.durationMin} min • {log.exercisesCompleted}/{log.totalExercises} exercises
+                              {log.totalVolumeKg ? ` • ${Math.round(log.totalVolumeKg).toLocaleString()} kg` : ''}
+                            </div>
+
+                            {/* Performance Reflection Notes */}
+                            {log.notes && editingLogId !== logIdentifier && (
+                              <div className="mt-1.5 p-2 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/50 dark:border-emerald-800/40 text-[11px] text-emerald-900 dark:text-emerald-200 flex items-start justify-between gap-2">
+                                <div className="italic flex-1 break-words">
+                                  "{log.notes}"
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setEditingLogId(logIdentifier);
+                                    setEditingLogNotes(log.notes || '');
+                                  }}
+                                  className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold hover:underline shrink-0 cursor-pointer"
+                                >
+                                  Edit
+                                </button>
+                              </div>
+                            )}
+
+                            {editingLogId === logIdentifier && (
+                              <div className="mt-2 space-y-1.5">
+                                <textarea
+                                  value={editingLogNotes}
+                                  onChange={(e) => setEditingLogNotes(e.target.value)}
+                                  placeholder="Update reflection..."
+                                  rows={2}
+                                  className="w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white"
+                                />
+                                <div className="flex gap-2 justify-end">
+                                  <button
+                                    type="button"
+                                    onClick={() => setEditingLogId(null)}
+                                    className="px-2 py-1 text-[11px] rounded bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (onUpdateWorkoutLogNotes) {
+                                        onUpdateWorkoutLogNotes(logIdentifier, editingLogNotes);
+                                      }
+                                      setEditingLogId(null);
+                                    }}
+                                    className="px-2.5 py-1 text-[11px] font-semibold rounded bg-[#0F6E5F] text-white"
+                                  >
+                                    Save Note
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {!log.notes && editingLogId !== logIdentifier && onUpdateWorkoutLogNotes && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setEditingLogId(logIdentifier);
+                                  setEditingLogNotes('');
+                                }}
+                                className="mt-1 text-[11px] text-[#0F6E5F] dark:text-[#2DD4BF] hover:underline cursor-pointer flex items-center gap-1"
+                              >
+                                + Add reflections / notes
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {onDeleteWorkoutLog && (
+                          <button
+                            type="button"
+                            onClick={() => onDeleteWorkoutLog(logIdentifier)}
+                            className="p-1.5 text-[#9CA3AF] hover:text-[#DC2626] rounded-md transition-colors cursor-pointer"
+                            title="Delete this session log"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Day Selector Tabs */}
           <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
@@ -1236,23 +1491,39 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
           </div>
 
           {/* Session Complete Bottom CTA */}
-          <div className="p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826] flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-6">
-            <div>
-              <div className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
-                {dayCompletedCount === totalDayExercises ? '🎉 All Prescribed Movements Completed!' : `${dayCompletedCount} of ${totalDayExercises} Movements Completed`}
+          <div className="p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826] space-y-4 mt-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <div className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  {dayCompletedCount === totalDayExercises ? '🎉 All Prescribed Movements Completed!' : `${dayCompletedCount} of ${totalDayExercises} Movements Completed`}
+                </div>
+                <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
+                  Lock in your training session to maintain your progressive overload log and advance your consistency streak.
+                </p>
               </div>
-              <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
-                Lock in your training session to maintain your progressive overload log and advance your consistency streak.
-              </p>
+
+              <button
+                onClick={handleLogActiveDayToStreak}
+                className="px-5 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-bold hover:bg-[#0D5B4F] transition-all flex items-center justify-center gap-2 shadow-sm shrink-0 cursor-pointer"
+              >
+                <Flame className="w-4 h-4 text-amber-300 fill-amber-300" />
+                <span>Lock In Session & Boost Streak</span>
+              </button>
             </div>
 
-            <button
-              onClick={handleLogActiveDayToStreak}
-              className="px-5 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-bold hover:bg-[#0D5B4F] transition-all flex items-center justify-center gap-2 shadow-sm shrink-0 cursor-pointer"
-            >
-              <Flame className="w-4 h-4 text-amber-300 fill-amber-300" />
-              <span>Lock In Session & Boost Streak</span>
-            </button>
+            {/* Optional Post-Workout Notes Reflection Field */}
+            <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#242826]">
+              <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
+                Post-Workout Performance Reflections & Notes (Optional)
+              </label>
+              <textarea
+                value={activePostWorkoutNotes}
+                onChange={(e) => setActivePostWorkoutNotes(e.target.value)}
+                placeholder="Jot down notes (e.g., Felt strong on squats, new PR on bench press, minor hamstring tightness, great pump)..."
+                rows={2}
+                className="w-full p-2.5 text-xs rounded-xl border border-[#E5E7EB] dark:border-[#242826] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:ring-2 focus:ring-[#0F6E5F] placeholder-gray-400 dark:placeholder-gray-600 resize-none"
+              />
+            </div>
           </div>
         </div>
       )}
@@ -1416,6 +1687,41 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
         report={auditReport}
         isRunningAudit={isAuditing}
         onTriggerAudit={handleRunFullAudit}
+      />
+
+      {/* Bulk Batch Delete Confirmation Modal */}
+      <ClearHistoryConfirmModal
+        isOpen={isBatchDeleteModalOpen}
+        onClose={() => setIsBatchDeleteModalOpen(false)}
+        onConfirm={handleConfirmBatchDelete}
+        historyType="workouts"
+        itemCount={selectedWorkoutIds.length}
+        isBatchDelete={true}
+        selectedItemTitles={workoutLogs
+          .filter((w) => selectedWorkoutIds.includes(w.id || `${w.date}_${w.dayId}`))
+          .map((w) => `${w.date}: ${w.dayName || 'Session'}`)}
+      />
+
+      {/* Confirmation Modal: Type DELETE to Confirm */}
+      <ClearHistoryConfirmModal
+        isOpen={isClearWorkoutModalOpen}
+        onClose={() => setIsClearWorkoutModalOpen(false)}
+        onConfirm={() => {
+          if (onClearAllWorkoutLogs) {
+            onClearAllWorkoutLogs();
+          }
+        }}
+        historyType="workouts"
+        itemCount={workoutLogs.length}
+      />
+
+      {/* Google Keep Integration Modal */}
+      <GoogleKeepSyncModal
+        isOpen={isKeepModalOpen}
+        onClose={() => setIsKeepModalOpen(false)}
+        userProfile={userProfile}
+        workoutPrograms={workoutPrograms}
+        initialCategory="workout"
       />
     </div>
   );

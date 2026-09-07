@@ -35,10 +35,15 @@ import {
 import { BodyMetric, UserProfile, MealLog, WorkoutCompletionLog, WorkoutProgram } from '../types';
 import { WeeklyProgressReport } from './WeeklyProgressReport';
 import { WorkoutActivityHeatmap } from './WorkoutActivityHeatmap';
+import { CalendarHeatmapView } from './CalendarHeatmapView';
 import { D3MuscleIntensityHeatmap } from './D3MuscleIntensityHeatmap';
 import { WeeklyLiftingVolumeChart } from './WeeklyLiftingVolumeChart';
 import { GoalTimelinePredictor } from './GoalTimelinePredictor';
+import { BodyCompositionTrendDashboard } from './BodyCompositionTrendDashboard';
+import { ThirtyDayWeightDeficitChart } from './ThirtyDayWeightDeficitChart';
 import { exportUserDataToCSV } from '../lib/csvExport';
+import { D3MacroDonutChart } from './D3MacroDonutChart';
+import { GranularCSVExportModal } from './GranularCSVExportModal';
 
 interface ProgressAnalyticsProps {
   bodyMetrics: BodyMetric[];
@@ -69,22 +74,15 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
   onOpenCheckIn,
   onToggleWorkoutLog,
 }) => {
-  const [activeSubTab, setActiveSubTab] = useState<'weekly' | 'predictor' | 'muscle_heatmap' | 'heatmap' | 'trends'>('weekly');
+  const [activeSubTab, setActiveSubTab] = useState<'weekly' | 'calendar_heatmap' | 'predictor' | 'muscle_heatmap' | 'heatmap' | 'trends'>('weekly');
   const [newWeight, setNewWeight] = useState<number>(userProfile.weightKg);
   const [newBodyFat, setNewBodyFat] = useState<number>(userProfile.bodyFatPct || 18);
   const [showAddMetricModal, setShowAddMetricModal] = useState<boolean>(false);
+  const [showExportModal, setShowExportModal] = useState<boolean>(false);
   const [exportSuccess, setExportSuccess] = useState<boolean>(false);
 
   const handleExportData = () => {
-    exportUserDataToCSV(
-      userProfile,
-      bodyMetrics,
-      [],
-      workoutLogs,
-      mealLogs
-    );
-    setExportSuccess(true);
-    setTimeout(() => setExportSuccess(false), 4000);
+    setShowExportModal(true);
   };
 
   // Format data for weight progression chart
@@ -437,6 +435,9 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
         </div>
       </div>
 
+      {/* D3-Based Macronutrient Donut Chart vs User Profile Targets */}
+      <D3MacroDonutChart userProfile={userProfile} mealLogs={mealLogs} />
+
       {/* Sub-view switcher: Weekly Progress Report vs Goal Timeline Predictor vs Muscle Volume Heatmap vs Consistency Matrix vs Weight Trends */}
       <div className="flex items-center gap-2 border-b border-[#E5E7EB] dark:border-[#242826] pb-2 overflow-x-auto">
         <button
@@ -461,6 +462,18 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
         >
           <Target className="w-4 h-4 text-amber-400" />
           <span>Goal Timeline Predictor</span>
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab('calendar_heatmap')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
+            activeSubTab === 'calendar_heatmap'
+              ? 'bg-[#0F6E5F] text-white shadow-xs'
+              : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
+          }`}
+        >
+          <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
+          <span>Calendar Heatmap</span>
         </button>
 
         <button
@@ -528,6 +541,12 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
             bodyMetrics={bodyMetrics}
             onOpenCheckIn={onOpenCheckIn}
           />
+          {/* 30-Day Weight Loss Trend Overlayed with Daily Calorie Deficit Progress */}
+          <ThirtyDayWeightDeficitChart
+            bodyMetrics={bodyMetrics}
+            userProfile={userProfile}
+            mealLogs={mealLogs}
+          />
           {/* 3-Month Weekly Total Lifting Volume Line Chart */}
           <WeeklyLiftingVolumeChart
             workoutLogs={workoutLogs}
@@ -541,6 +560,17 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
           />
           {/* Quick Heatmap preview in Weekly tab for effortless consistency glance */}
           <WorkoutActivityHeatmap
+            workoutLogs={workoutLogs}
+            userProfile={userProfile}
+            onToggleWorkoutLog={onToggleWorkoutLog}
+          />
+        </div>
+      )}
+
+      {/* Sub-Tab Content: Dedicated Calendar Heatmap View */}
+      {activeSubTab === 'calendar_heatmap' && (
+        <div className="space-y-8 animate-in fade-in duration-300">
+          <CalendarHeatmapView
             workoutLogs={workoutLogs}
             userProfile={userProfile}
             onToggleWorkoutLog={onToggleWorkoutLog}
@@ -573,6 +603,20 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
       {/* Sub-Tab Content: Long-Term Trends */}
       {activeSubTab === 'trends' && (
         <div className="space-y-8">
+          {/* 30-Day Weight Loss Trend Overlayed with Daily Calorie Deficit Progress */}
+          <ThirtyDayWeightDeficitChart
+            bodyMetrics={bodyMetrics}
+            userProfile={userProfile}
+            mealLogs={mealLogs}
+          />
+
+          {/* Recharts Multi-Range Body Composition Trend Analysis Dashboard */}
+          <BodyCompositionTrendDashboard
+            userProfile={userProfile}
+            bodyMetrics={bodyMetrics}
+            workoutLogs={workoutLogs}
+          />
+
           {/* Metric Cards Summary */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white dark:bg-[#161817] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs">
@@ -820,6 +864,16 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
           </div>
         </div>
       )}
+
+      {/* Granular CSV Export Modal */}
+      <GranularCSVExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+        userProfile={userProfile}
+        mealLogs={mealLogs}
+        workoutLogs={workoutLogs}
+        bodyMetrics={bodyMetrics}
+      />
     </div>
   );
 };

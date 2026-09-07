@@ -18,14 +18,18 @@ import {
   Download,
   Crown,
   ShieldCheck,
-  QrCode
+  QrCode,
+  Award,
+  CheckSquare,
+  BookOpen
 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { ThemeToggle } from './ThemeToggle';
 import { ThemeMode } from '../lib/theme';
 import { SyncStatusIndicator } from './SyncStatusIndicator';
-import { isHostAdmin, computeSubscriptionStatus } from '../lib/subscription';
+import { isHostAdmin, computeSubscriptionStatus, getPlanDisplayBadge } from '../lib/subscription';
 import { User } from 'firebase/auth';
+import { ArohLogo } from './ArohLogo';
 
 interface HeaderProps {
   activeTab: string;
@@ -36,6 +40,7 @@ interface HeaderProps {
   onOpenSubscriptionModal?: () => void;
   onOpenHostAdminModal?: () => void;
   onOpenPerformanceDashboard?: () => void;
+  onOpenKeepSync?: () => void;
   onExportData?: () => void;
   onForceSync?: () => void;
   caloriesConsumedToday: number;
@@ -59,6 +64,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSubscriptionModal,
   onOpenHostAdminModal,
   onOpenPerformanceDashboard,
+  onOpenKeepSync,
   onExportData,
   onForceSync,
   caloriesConsumedToday,
@@ -76,71 +82,61 @@ export const Header: React.FC<HeaderProps> = ({
   const proteinPercent = Math.min(100, Math.round((proteinConsumedToday / (userProfile.dailyProtein || 150)) * 100));
 
   const isHost = isHostAdmin(userProfile.email) || isHostAdmin(currentUser?.email);
-  const activeSub = computeSubscriptionStatus(userProfile.subscription);
+  const userEmail = userProfile.email || currentUser?.email || undefined;
+  const activeSub = computeSubscriptionStatus(userProfile.subscription, userEmail);
 
   const navItems = [
     { id: 'scan', label: 'Meal Scanner', icon: Camera },
     { id: 'nutrition', label: 'Meals & Food', icon: Utensils },
     { id: 'workouts', label: 'Workout Plans', icon: Dumbbell },
+    { id: 'library', label: 'Library', icon: BookOpen },
     { id: 'form', label: 'Posture & Form', icon: Activity },
     { id: 'projector', label: 'Body Preview', icon: Sparkles },
     { id: 'progress', label: 'My Progress', icon: TrendingUp },
+    { id: 'challenges', label: 'Community', icon: Award },
     { id: 'research', label: 'Fitness Guides', icon: Globe },
     { id: 'coach', label: 'Ask AI Coach', icon: Bot },
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-[#FAFAF8]/95 dark:bg-[#111312]/95 backdrop-blur-md border-b border-[#E5E7EB] dark:border-[#242826] transition-colors">
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#080B14]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
       {/* Top Banner / User Quick Metrics */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-3">
-          {/* Logo & Brand */}
-          <div className="flex items-center gap-3 shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-[#0F6E5F] flex items-center justify-center text-white shadow-sm">
-              <Sparkles className="w-5 h-5 text-[#E8912D]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-lg tracking-tight text-[#1A1D1B] dark:text-[#E8ECE9]">PeakForm</span>
-                <span className="text-[11px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:bg-[#0F6E5F]/20 dark:text-[#2DD4BF]">
-                  AI
-                </span>
-              </div>
-              <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] hidden sm:block">
-                Evidence-Based Fitness & Nutrition
-              </p>
-            </div>
+          {/* Logo & Brand with Uploaded Logo Asset */}
+          <div className="flex items-center gap-3 shrink-0 cursor-pointer" onClick={() => setActiveTab('workouts')}>
+            <ArohLogo size="md" />
           </div>
 
           {/* Daily Quick Summary Widget */}
-          <div className="hidden lg:flex items-center gap-6 bg-white dark:bg-[#1A1D1C] px-4 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] shadow-xs">
+          <div className="hidden lg:flex items-center gap-6 bg-slate-50 dark:bg-[#0E1424] px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
             <div className="text-left">
-              <div className="flex items-center gap-1.5 text-xs text-[#6B7280] dark:text-[#9EA8A2]">
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                 <span>Daily Calories</span>
-                <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                <span className="font-semibold text-slate-900 dark:text-white">
                   {caloriesConsumedToday} / {userProfile.dailyCalories} kcal
                 </span>
               </div>
-              <div className="w-28 bg-[#F3F4F6] dark:bg-[#2A2E2C] rounded-full h-2 mt-1 overflow-hidden">
+              <div className="w-28 bg-slate-200 dark:bg-slate-800 rounded-full h-2 mt-1 overflow-hidden">
                 <div
-                  className="bg-[#0F6E5F] h-2 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${caloriePercent}%` }}
                 />
               </div>
             </div>
 
-            <div className="h-7 w-[1px] bg-[#E5E7EB] dark:bg-[#2A2E2C]" />
+            <div className="h-7 w-[1px] bg-slate-200 dark:bg-slate-800" />
 
             <div className="text-left">
-              <div className="flex items-center gap-1.5 text-xs text-[#6B7280] dark:text-[#9EA8A2]">
+              <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                 <span>Protein</span>
-                <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                <span className="font-semibold text-slate-900 dark:text-white">
                   {proteinConsumedToday}g / {userProfile.dailyProtein}g
                 </span>
               </div>
-              <div className="w-24 bg-[#F3F4F6] dark:bg-[#2A2E2C] rounded-full h-2 mt-1 overflow-hidden">
+              <div className="w-24 bg-slate-200 dark:bg-slate-800 rounded-full h-2 mt-1 overflow-hidden">
                 <div
-                  className="bg-[#E8912D] h-2 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-purple-400 to-indigo-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${proteinPercent}%` }}
                 />
               </div>
@@ -168,33 +164,43 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={onOpenSubscriptionModal}
               className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl border transition-all shadow-2xs cursor-pointer ${
                 activeSub.status === 'active'
-                  ? 'bg-emerald-500/15 border-emerald-500/30 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-500/25'
-                  : 'bg-amber-500/15 border-amber-500/30 text-amber-900 dark:text-amber-300 hover:bg-amber-500/25'
+                  ? 'bg-cyan-500/15 border-cyan-400/40 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-500/25'
+                  : 'bg-purple-500/15 border-purple-500/30 text-purple-800 dark:text-purple-300 hover:bg-purple-500/25'
               }`}
-              title="View PeakForm AI Pro Subscription, QR Payment & Active Tier"
+              title="View AROH Pro Subscription, QR Payment & Active Tier"
             >
-              <Crown className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-              <span>
-                {activeSub.status === 'active' 
-                  ? `${activeSub.daysRemaining}d Pro` 
-                  : `${activeSub.daysRemaining}d Trial`}
-              </span>
+              <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+              <span>{getPlanDisplayBadge(activeSub, isHost)}</span>
             </button>
 
             {/* Streak Quick Badge */}
             <button
               onClick={() => setActiveTab('workouts')}
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-amber-500/15 to-orange-500/15 dark:from-amber-500/20 dark:to-orange-500/20 border border-amber-500/30 dark:border-amber-500/40 text-amber-900 dark:text-amber-300 hover:scale-105 transition-all shadow-2xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-cyan-500/15 to-purple-500/15 dark:from-cyan-500/20 dark:to-purple-500/20 border border-cyan-400/30 dark:border-cyan-400/40 text-cyan-800 dark:text-cyan-300 hover:scale-105 transition-all shadow-2xs cursor-pointer"
               title="View Training Consistency Streak & 28-Day Matrix"
             >
-              <Flame className="w-3.5 h-3.5 text-[#E8912D] fill-[#E8912D]" />
+              <Flame className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400" />
               <span>{currentStreak}d</span>
             </button>
+
+            {/* Google Keep Launcher */}
+            {onOpenKeepSync && (
+              <button
+                id="header-google-keep-btn"
+                type="button"
+                onClick={onOpenKeepSync}
+                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-400/30 hover:bg-purple-500/20 transition-all shadow-xs cursor-pointer"
+                title="Sync workout, macros & groceries to Google Keep"
+              >
+                <CheckSquare className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" />
+                <span className="hidden sm:inline">Keep</span>
+              </button>
+            )}
 
             {/* Profile Button */}
             <button
               onClick={onOpenOnboarding}
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-[#0F6E5F] text-white hover:bg-[#0D5B4F] transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 text-white hover:opacity-95 transition-all shadow-md shadow-cyan-500/20 cursor-pointer"
               title="Update profile stats, goal, injuries, or preferences"
             >
               <UserCheck className="w-3.5 h-3.5 text-white" />
@@ -203,23 +209,23 @@ export const Header: React.FC<HeaderProps> = ({
 
             {/* Google Sign-in / Cloud Sync status */}
             {currentUser ? (
-              <div className="flex items-center gap-1.5 pl-1 border-l border-[#E5E7EB] dark:border-[#242826]">
+              <div className="flex items-center gap-1.5 pl-1 border-l border-slate-200 dark:border-slate-800">
                 {currentUser.photoURL ? (
                   <img
                     src={currentUser.photoURL}
                     alt={currentUser.displayName || 'User Avatar'}
                     referrerPolicy="no-referrer"
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[#0F6E5F]/30 object-cover"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-cyan-400/40 object-cover"
                     title={`Signed in as ${currentUser.email || currentUser.displayName}`}
                   />
                 ) : (
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#0F6E5F] text-white font-bold text-xs flex items-center justify-center">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 text-white font-bold text-xs flex items-center justify-center">
                     {(currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()}
                   </div>
                 )}
                 <button
                   onClick={onSignOut}
-                  className="p-1.5 rounded-lg text-[#6B7280] dark:text-[#9EA8A2] hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                   title="Sign out of Firebase"
                 >
                   <LogOut className="w-3.5 h-3.5" />
@@ -228,7 +234,7 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <button
                 onClick={onSignIn}
-                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-[#1A1D1C] border border-[#0F6E5F]/40 text-[#0F6E5F] dark:text-[#5FD1B8] hover:bg-[#0F6E5F]/5 transition-all shadow-xs cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-[#0E1424] border border-cyan-400/40 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10 transition-all shadow-xs cursor-pointer"
                 title="Sign in with Google to sync workouts, meals & analyses across devices"
               >
                 <LogIn className="w-3.5 h-3.5" />
@@ -239,7 +245,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex space-x-1 overflow-x-auto pb-2 scrollbar-none border-t border-[#E5E7EB]/60 dark:border-[#242826] pt-2">
+        <div className="flex space-x-1 overflow-x-auto pb-2 scrollbar-none border-t border-slate-200/60 dark:border-slate-800/80 pt-2">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -247,13 +253,13 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#0F6E5F] text-white shadow-xs'
-                    : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-white dark:hover:bg-[#1A1D1C]'
+                    ? 'bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-md shadow-cyan-500/25'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#141C34]'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-[#6B7280] dark:text-[#9EA8A2]'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                 <span>{item.label}</span>
               </button>
             );

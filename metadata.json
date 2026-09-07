@@ -1,6 +1,7 @@
 {
-  "name": "PeakForm AI",
+  "name": "AROH",
   "description": "Evidence-based workout and nutrition coaching platform with interactive progress tracking and AI meal analysis.",
   "requestFramePermissions": ["camera", "microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
+

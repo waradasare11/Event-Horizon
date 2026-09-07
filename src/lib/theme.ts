@@ -11,7 +11,7 @@ export function getStoredTheme(): ThemeMode {
   } catch (e) {
     console.error('Failed reading theme preference from storage', e);
   }
-  return 'system';
+  return 'dark';
 }
 
 export function isSystemDark(): boolean {

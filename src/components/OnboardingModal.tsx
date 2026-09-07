@@ -63,8 +63,12 @@ import {
   getUPIQRCodeUrl,
   validateUTRNumber,
   verifyPaymentWithBackendServer,
-  createInitialTrialSubscription
+  createInitialTrialSubscription,
+  checkUserHostGrant,
+  createGrantedUserSubscription,
+  createHostLifetimeSubscription
 } from '../lib/subscription';
+import { HostGrantedSubscription } from '../types';
 import { fireCelebrationConfetti } from '../lib/confetti';
 import { GoalTimelinePredictionCard } from './GoalTimelinePredictionCard';
 
@@ -217,8 +221,19 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [isVerifyingPayment, setIsVerifyingPayment] = useState<boolean>(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
+  const [hostGrant, setHostGrant] = useState<HostGrantedSubscription | null>(null);
 
   const isUserHost = isHostAdmin(userProfile.email);
+
+  useEffect(() => {
+    if (userProfile.email) {
+      checkUserHostGrant(userProfile.email).then(({ hasGrant, grant }) => {
+        if (hasGrant && grant) {
+          setHostGrant(grant);
+        }
+      }).catch(console.warn);
+    }
+  }, [userProfile.email]);
 
   // Live Math Calculations Fallback
   const calculatedBMR = calculateBMR(sex, numWeight, numHeight, numAge);
@@ -587,7 +602,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       weeklyRateKg: macroResults.weeklyRateKg,
       goalTimelinePrediction: predictionResult || undefined,
       cameraCalibration: cameraCalibration,
-      subscription: chosenSubscription || userProfile.subscription || createInitialTrialSubscription(),
+      subscription: chosenSubscription || (
+        isUserHost
+          ? createHostLifetimeSubscription()
+          : hostGrant
+          ? createGrantedUserSubscription(hostGrant)
+          : userProfile.subscription || createInitialTrialSubscription()
+      ),
       isOnboarded: true,
     };
 
@@ -1660,6 +1681,33 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     className="py-3.5 px-8 rounded-2xl bg-amber-400 hover:bg-amber-300 text-gray-900 font-extrabold text-sm shadow-xl transition-all cursor-pointer"
                   >
                     Launch PeakForm AI as Host (Lifetime Access) →
+                  </button>
+                </div>
+              ) : hostGrant ? (
+                /* HOST VIP GRANT USER DETECTED */
+                <div className="p-8 rounded-3xl bg-gradient-to-br from-emerald-500/20 via-teal-500/15 to-emerald-950/20 border-2 border-emerald-500 text-center space-y-5 shadow-2xl">
+                  <div className="w-16 h-16 rounded-3xl bg-emerald-500 text-white flex items-center justify-center mx-auto shadow-lg">
+                    <Crown className="w-9 h-9" />
+                  </div>
+                  <div className="space-y-2">
+                    <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500 text-white shadow-sm">
+                      🌟 VIP Pro Pass Granted by Host
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
+                      Welcome, PeakForm VIP Member!
+                    </h3>
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 max-w-md mx-auto leading-relaxed">
+                      Host <strong>Warad Asare</strong> has granted your Gmail ID (<strong>{userProfile.email}</strong>) full 100% free VIP Pro Access ({hostGrant.planName || 'VIP Access'}).
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => handleApplyProfileAndFinish(createGrantedUserSubscription(hostGrant))}
+                    className="py-4 px-10 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2 mx-auto"
+                  >
+                    <Sparkles className="w-4 h-4 text-amber-300" />
+                    <span>Launch PeakForm Pro with VIP Pass →</span>
                   </button>
                 </div>
               ) : (

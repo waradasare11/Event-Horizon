@@ -15,7 +15,10 @@ import {
   Smartphone,
   Info,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Ticket,
+  Tag,
+  Gift
 } from 'lucide-react';
 import { 
   SUBSCRIPTION_PLANS, 
@@ -28,9 +31,13 @@ import {
   fetchPersonalizedPlans,
   isHostAdmin,
   createHostLifetimeSubscription,
-  createGrantedUserSubscription
+  createGrantedUserSubscription,
+  checkUserHostGrant,
+  redeemHostCouponCode,
+  validateHostCouponCode
 } from '../lib/subscription';
 import { SubscriptionPlanConfig, UserProfile, UserSubscription } from '../types';
+import { fireCelebrationConfetti } from '../lib/confetti';
 
 interface SubscriptionPaywallModalProps {
   isOpen: boolean;
@@ -56,13 +63,35 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
   const [copiedUPI, setCopiedUPI] = useState(false);
   const [copiedAmount, setCopiedAmount] = useState(false);
 
+  const [hasHostGrant, setHasHostGrant] = useState<boolean>(false);
+  const [grantDetails, setGrantDetails] = useState<any>(null);
+
+  // Coupon Code Redemption State
+  const [showCouponInput, setShowCouponInput] = useState<boolean>(false);
+  const [couponCodeInput, setCouponCodeInput] = useState<string>('');
+  const [isRedeemingCoupon, setIsRedeemingCoupon] = useState<boolean>(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
+
   React.useEffect(() => {
     if (isOpen) {
+      // 1. Fetch personalized pricing
       fetchPersonalizedPlans(userProfile.email).then((res) => {
         setPlansList(res.plans);
-        const preferred = res.plans.find((p) => p.id === '1_year') || res.plans.find((p) => p.priceINR > 0) || res.plans[0];
+        const freePlan = res.plans.find((p) => p.priceINR === 0);
+        const preferred = freePlan || res.plans.find((p) => p.id === '1_year') || res.plans[0];
         setSelectedPlan(preferred);
       });
+
+      // 2. Check direct host grant
+      if (userProfile.email) {
+        checkUserHostGrant(userProfile.email).then(({ hasGrant, grant }) => {
+          if (hasGrant) {
+            setHasHostGrant(true);
+            setGrantDetails(grant);
+          }
+        }).catch(console.warn);
+      }
     }
   }, [isOpen, userProfile.email]);
 
@@ -116,7 +145,46 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
     }
   };
 
-  const paidPlans = plansList.filter((p) => p.priceINR > 0);
+  // Handle Coupon Code Redemption
+  const handleRedeemCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCouponError(null);
+    setCouponSuccess(null);
+
+    const code = couponCodeInput.trim().toUpperCase();
+    if (!code) {
+      setCouponError('Please enter a coupon code.');
+      return;
+    }
+
+    const email = userProfile.email || '';
+    if (!email) {
+      setCouponError('Active user email is required to claim coupon.');
+      return;
+    }
+
+    setIsRedeemingCoupon(true);
+
+    try {
+      const res = await redeemHostCouponCode(code, email, userProfile.name || 'Peak Athlete');
+      if (!res.success || !res.subscription) {
+        setCouponError(res.error || 'Invalid or expired coupon code.');
+        setIsRedeemingCoupon(false);
+        return;
+      }
+
+      fireCelebrationConfetti();
+      setCouponSuccess(`🎉 Coupon code "${code}" verified & redeemed successfully for ${res.subscription.planName}!`);
+      setVerificationSuccess(true);
+      onSubscriptionUpdated(res.subscription);
+    } catch (err: any) {
+      setCouponError(err.message || 'Failed to redeem coupon.');
+    } finally {
+      setIsRedeemingCoupon(false);
+    }
+  };
+
+  const displayPlans = plansList && plansList.length > 0 ? plansList : SUBSCRIPTION_PLANS;
   const upiDeepLink = generateUPILink(selectedPlan, userProfile.email);
   const qrCodeUrl = getUPIQRCodeUrl(selectedPlan, userProfile.email);
 
@@ -200,12 +268,22 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
           <div className="p-6 sm:p-8 space-y-6 max-h-[75vh] overflow-y-auto">
             {/* 1. Plan Tier Selector */}
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">
-                1. Select Your Subscription Tier
-              </label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  1. Select Your Subscription Tier
+                </label>
+                {hasHostGrant && (
+                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>VIP Free Pass Available</span>
+                  </span>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                {paidPlans.map((plan) => {
+                {displayPlans.map((plan) => {
                   const isSelected = selectedPlan.id === plan.id;
+                  const isFree = plan.priceINR === 0;
                   return (
                     <div
                       key={plan.id}
@@ -215,24 +293,31 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                       }}
                       className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative flex flex-col justify-between ${
                         isSelected
-                          ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/5 dark:bg-[#2DD4BF]/10 shadow-sm'
+                          ? isFree 
+                            ? 'border-emerald-500 bg-emerald-500/10 shadow-sm'
+                            : 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/5 dark:bg-[#2DD4BF]/10 shadow-sm'
                           : 'border-gray-200 dark:border-[#242826] bg-white dark:bg-[#1A1D1C] hover:border-gray-300 dark:hover:border-gray-700'
                       }`}
                     >
-                      {plan.bestValue && (
+                      {isFree && (
+                        <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase shadow-xs">
+                          100% Free
+                        </span>
+                      )}
+                      {!isFree && plan.bestValue && (
                         <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-amber-500 text-white text-[10px] font-extrabold uppercase shadow-xs">
                           Best Value
                         </span>
                       )}
-                      {plan.popular && !plan.bestValue && (
+                      {!isFree && plan.popular && !plan.bestValue && (
                         <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-[#0F6E5F] text-white text-[10px] font-extrabold uppercase shadow-xs">
                           Most Popular
                         </span>
                       )}
 
                       <div>
-                        <div className="text-sm font-bold text-gray-900 dark:text-white">
-                          {plan.durationLabel}
+                        <div className="text-sm font-bold text-gray-900 dark:text-white flex items-center justify-between">
+                          <span>{plan.durationLabel}</span>
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                           {plan.name}
@@ -241,14 +326,16 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
 
                       <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-baseline justify-between">
                         <div>
-                          <span className="text-xl font-black text-gray-900 dark:text-white">
-                            ₹{plan.priceINR}
+                          <span className={`text-xl font-black ${isFree ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
+                            {isFree ? '₹0 FREE' : `₹${plan.priceINR}`}
                           </span>
-                          <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-1">
-                            total
-                          </span>
+                          {!isFree && (
+                            <span className="text-[11px] text-gray-500 dark:text-gray-400 ml-1">
+                              total
+                            </span>
+                          )}
                         </div>
-                        {plan.monthlyEquivalentINR && (
+                        {plan.monthlyEquivalentINR && !isFree && (
                           <span className="text-[11px] font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">
                             ~₹{Math.round(plan.monthlyEquivalentINR)}/mo
                           </span>
@@ -260,21 +347,26 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
               </div>
             </div>
 
-            {/* Free VIP Access Box if Price is ₹0 */}
-            {selectedPlan.priceINR === 0 && (
+            {/* Free VIP Access Box if Price is ₹0 or hasHostGrant */}
+            {(selectedPlan.priceINR === 0 || hasHostGrant) && (
               <div className="bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-emerald-500/15 p-6 rounded-2xl border-2 border-emerald-500/40 dark:border-emerald-500/20 text-center space-y-4 shadow-sm">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-md">
                   <Crown className="w-6 h-6 text-amber-300 fill-amber-300" />
                 </div>
                 <div className="space-y-1">
                   <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded-md">
-                    Host VIP Pass Active
+                    Host VIP Free Access Unlocked
                   </span>
                   <h4 className="text-lg font-black text-gray-900 dark:text-white">
-                    100% Free Lifetime Pro Access Granted
+                    {grantDetails?.isLifetime 
+                      ? '100% Free Lifetime Pro Access Granted' 
+                      : `100% Free VIP Access Granted (${grantDetails?.planName || selectedPlan.name})`}
                   </h4>
                   <p className="text-xs text-gray-600 dark:text-gray-300 max-w-md mx-auto">
-                    Host <strong>Warad Asare</strong> has granted your Gmail ID (<strong>{userProfile.email}</strong>) full VIP membership. No payment, UPI transfer, or UTR entry is required!
+                    Host <strong>Warad Asare</strong> has granted your Gmail ID (<strong>{userProfile.email}</strong>) full VIP membership.
+                    {grantDetails?.isLifetime 
+                      ? ' Lifetime access is 100% unlocked!' 
+                      : ` Valid for ${grantDetails?.durationDays || selectedPlan.durationDays || 90} days (Expires: ${grantDetails?.expiresAt ? new Date(grantDetails.expiresAt).toLocaleDateString() : 'Active'}).`} No payment required!
                   </p>
                 </div>
 
@@ -285,39 +377,113 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                     try {
                       const res = await verifyPaymentWithBackendServer(
                         userProfile,
-                        selectedPlan,
-                        'HOST_LIFETIME_GRANT'
+                        selectedPlan.priceINR === 0 ? selectedPlan : { ...selectedPlan, priceINR: 0 },
+                        grantDetails?.isLifetime ? 'HOST_LIFETIME_GRANT' : 'MANUAL_GRANT'
                       );
                       if (res.subscription) {
                         setVerificationSuccess(true);
                         onSubscriptionUpdated(res.subscription);
+                        return;
                       }
                     } catch (e) {
-                      const fallbackSub = isUserHost
-                        ? createHostLifetimeSubscription()
-                        : createGrantedUserSubscription({
-                            id: `grant_${Date.now()}`,
-                            email: userProfile.email || '',
-                            planId: selectedPlan.id as any,
-                            planName: selectedPlan.name,
-                            isLifetime: true,
-                            grantedAt: new Date().toISOString(),
-                            expiresAt: '2099-12-31T23:59:59.000Z',
-                            grantedBy: 'Warad Asare (Host VIP)',
-                          });
-                      onSubscriptionUpdated(fallbackSub);
-                    } finally {
-                      setIsVerifying(false);
+                      // Fallback: Use verified grant details
                     }
+
+                    const fallbackSub = isUserHost
+                      ? createHostLifetimeSubscription()
+                      : createGrantedUserSubscription(grantDetails || {
+                          id: `grant_${Date.now()}`,
+                          email: userProfile.email || '',
+                          planId: selectedPlan.id as any,
+                          planName: selectedPlan.name,
+                          isLifetime: false,
+                          durationDays: selectedPlan.durationDays || 90,
+                          grantedAt: new Date().toISOString(),
+                          expiresAt: new Date(Date.now() + (selectedPlan.durationDays || 90) * 86400000).toISOString(),
+                          grantedBy: 'Warad Asare (Host VIP)',
+                        });
+
+                    setVerificationSuccess(true);
+                    onSubscriptionUpdated(fallbackSub);
+                    setIsVerifying(false);
                   }}
                   disabled={isVerifying}
                   className="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>{isVerifying ? 'Activating VIP Membership...' : `Activate 100% Free ${selectedPlan.name} Now`}</span>
+                  <span>{isVerifying ? 'Activating VIP Membership...' : 'Activate 100% Free VIP Pro Access Now'}</span>
                 </button>
               </div>
             )}
+
+            {/* Promo / Coupon Code Redemption Accordion */}
+            <div className="pt-2">
+              <div className="rounded-2xl border border-dashed border-amber-500/40 bg-amber-500/5 dark:bg-amber-500/10 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Ticket className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    <span className="text-xs font-black uppercase tracking-wider text-gray-800 dark:text-gray-200">
+                      Have a Host VIP Coupon Voucher?
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowCouponInput(!showCouponInput)}
+                    className="text-xs font-extrabold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
+                  >
+                    {showCouponInput ? 'Hide Coupon Box' : 'Enter Code'}
+                  </button>
+                </div>
+
+                {showCouponInput && (
+                  <form onSubmit={handleRedeemCoupon} className="space-y-3 pt-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <div className="relative flex-1">
+                        <Tag className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          placeholder="e.g. PEAK-VIP2026"
+                          value={couponCodeInput}
+                          onChange={(e) => {
+                            setCouponCodeInput(e.target.value.toUpperCase());
+                            setCouponError(null);
+                          }}
+                          className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1A1D1C] text-xs font-mono font-bold text-gray-900 dark:text-white uppercase outline-hidden focus:ring-2 focus:ring-amber-500"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={isRedeemingCoupon || !couponCodeInput.trim()}
+                        className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      >
+                        {isRedeemingCoupon ? (
+                          <span>Verifying...</span>
+                        ) : (
+                          <>
+                            <Gift className="w-3.5 h-3.5" />
+                            <span>Redeem Free Access</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+
+                    {couponError && (
+                      <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        <span>{couponError}</span>
+                      </div>
+                    )}
+
+                    {couponSuccess && (
+                      <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
+                        <span>{couponSuccess}</span>
+                      </div>
+                    )}
+                  </form>
+                )}
+              </div>
+            </div>
 
             {/* 2. QR Code & UPI Transfer Details */}
             {selectedPlan.priceINR > 0 && (

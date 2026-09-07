@@ -113,6 +113,10 @@ export function getGlobalSyncState(): GlobalSyncState {
   };
 }
 
+export function getPendingQueueSnapshot(): SyncJob[] {
+  return [...pendingQueue];
+}
+
 function notifyListeners(): void {
   const state = getGlobalSyncState();
   listeners.forEach((listener) => {

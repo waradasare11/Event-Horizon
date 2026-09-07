@@ -60,39 +60,88 @@ export function getCurrentActiveEmail(): string {
 
 export function getStoredProfile(userEmail?: string): UserProfile {
   try {
-    const scopedKey = getUserScopedKey(STORAGE_KEYS.PROFILE, userEmail);
-    const raw = localStorage.getItem(scopedKey) || localStorage.getItem(STORAGE_KEYS.PROFILE);
+    const effectiveEmail = (userEmail || getCurrentActiveEmail() || '').trim().toLowerCase();
+    const sanitized = effectiveEmail.replace(/[^a-z0-9]/g, '_');
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.PROFILE, effectiveEmail);
+
+    let raw = localStorage.getItem(scopedKey);
+
+    // If scoped key didn't have it, check Drive persistent profile cache
+    if (!raw && sanitized) {
+      raw = localStorage.getItem(`peakform_drive_profile_${sanitized}`);
+    }
+
+    // If still not found, check complete Drive backup cache
+    if (!raw && sanitized) {
+      const driveBackup = localStorage.getItem(`peakform_drive_backup_${sanitized}`);
+      if (driveBackup) {
+        try {
+          const parsedBundle = JSON.parse(driveBackup);
+          if (parsedBundle?.userProfile) {
+            raw = JSON.stringify(parsedBundle.userProfile);
+          }
+        } catch (e) {}
+      }
+    }
+
+    // Fallback to base storage key
+    if (!raw) {
+      raw = localStorage.getItem(STORAGE_KEYS.PROFILE);
+    }
+
     if (raw) {
       const parsed = JSON.parse(raw);
-      // If profile has no valid email, ensure it strictly starts unauthenticated & not onboarded
+      // If profile has no valid email, ensure it starts unauthenticated
       if (!parsed.email || !parsed.email.includes('@')) {
+        if (effectiveEmail && effectiveEmail.includes('@')) {
+          return {
+            ...INITIAL_USER_PROFILE,
+            ...parsed,
+            email: effectiveEmail,
+            // If they had previously chosen goals, keep them onboarded
+            isOnboarded: Boolean(parsed.isOnboarded || (parsed.goal && parsed.dailyCalories > 0)),
+          };
+        }
         return {
           ...INITIAL_USER_PROFILE,
           ...parsed,
-          email: userEmail || '',
+          email: '',
           isOnboarded: false,
         };
       }
-      return parsed;
+
+      // Valid email exists on profile
+      return {
+        ...INITIAL_USER_PROFILE,
+        ...parsed,
+        email: effectiveEmail || parsed.email,
+        isOnboarded: Boolean(parsed.isOnboarded || (parsed.goal && parsed.dailyCalories > 0)),
+      };
     }
   } catch (e) {
     console.error('Failed reading user profile from storage', e);
   }
   return {
     ...INITIAL_USER_PROFILE,
-    email: userEmail || '',
+    email: userEmail || getCurrentActiveEmail() || '',
   };
 }
 
 export function saveStoredProfile(profile: UserProfile): void {
   try {
-    if (profile.email) {
-      setCurrentActiveEmail(profile.email);
+    const email = (profile.email || getCurrentActiveEmail() || '').trim().toLowerCase();
+    if (email) {
+      setCurrentActiveEmail(email);
     }
-    const scopedKey = getUserScopedKey(STORAGE_KEYS.PROFILE, profile.email);
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.PROFILE, email);
     const serialized = JSON.stringify(profile);
     localStorage.setItem(scopedKey, serialized);
     localStorage.setItem(STORAGE_KEYS.PROFILE, serialized);
+
+    if (email) {
+      const sanitized = email.replace(/[^a-z0-9]/g, '_');
+      localStorage.setItem(`peakform_drive_profile_${sanitized}`, serialized);
+    }
   } catch (e) {
     console.error('Failed saving user profile to storage', e);
   }
@@ -132,6 +181,26 @@ export function deleteMealLog(id: string): MealLog[] {
   const updated = current.filter((l) => l.id !== id);
   saveStoredMealLogs(updated);
   return updated;
+}
+
+export function deleteMealLogs(ids: string[]): MealLog[] {
+  const current = getStoredMealLogs();
+  const idSet = new Set(ids);
+  const updated = current.filter((l) => !idSet.has(l.id));
+  saveStoredMealLogs(updated);
+  return updated;
+}
+
+export function clearStoredMealLogs(userEmail?: string): void {
+  try {
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.MEAL_LOGS, userEmail);
+    localStorage.removeItem(scopedKey);
+    localStorage.removeItem(STORAGE_KEYS.MEAL_LOGS);
+    localStorage.setItem(scopedKey, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEYS.MEAL_LOGS, JSON.stringify([]));
+  } catch (e) {
+    console.error('Failed clearing meal logs from storage', e);
+  }
 }
 
 export function getStoredBodyMetrics(userEmail?: string): BodyMetric[] {
@@ -347,6 +416,33 @@ export function addWorkoutLog(log: WorkoutCompletionLog): WorkoutCompletionLog[]
   return updated;
 }
 
+export function deleteWorkoutLog(id: string, userEmail?: string): WorkoutCompletionLog[] {
+  const current = getStoredWorkoutLogs(userEmail);
+  const updated = current.filter((l) => l.id !== id);
+  saveStoredWorkoutLogs(updated, userEmail);
+  return updated;
+}
+
+export function deleteWorkoutLogs(ids: string[], userEmail?: string): WorkoutCompletionLog[] {
+  const current = getStoredWorkoutLogs(userEmail);
+  const idSet = new Set(ids);
+  const updated = current.filter((l) => !idSet.has(l.id));
+  saveStoredWorkoutLogs(updated, userEmail);
+  return updated;
+}
+
+export function clearStoredWorkoutLogs(userEmail?: string): void {
+  try {
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.WORKOUT_LOGS, userEmail);
+    localStorage.removeItem(scopedKey);
+    localStorage.removeItem(STORAGE_KEYS.WORKOUT_LOGS);
+    localStorage.setItem(scopedKey, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEYS.WORKOUT_LOGS, JSON.stringify([]));
+  } catch (e) {
+    console.error('Failed clearing workout logs from storage', e);
+  }
+}
+
 export function toggleWorkoutDayLog(
   date: string, 
   dayId: string, 
@@ -366,9 +462,11 @@ export function toggleWorkoutDayLog(
     rpeLogged?: number;
     volumeKg: number;
   }>,
-  totalVolumeKg?: number
+  totalVolumeKg?: number,
+  notes?: string,
+  userEmail?: string
 ): WorkoutCompletionLog[] {
-  const current = getStoredWorkoutLogs();
+  const current = getStoredWorkoutLogs(userEmail);
   const existingIndex = current.findIndex((l) => l.date === date && (l.dayId === dayId || (isRestDay && l.isRestDay)));
   
   let updated: WorkoutCompletionLog[];
@@ -387,14 +485,28 @@ export function toggleWorkoutDayLog(
       loggedExercises: loggedExercises || [],
       totalVolumeKg: totalVolumeKg || 0,
       isRestDay,
-      notes: isRestDay ? 'Active recovery and central nervous system replenishment' : `Full workout completed with average RPE ${rpeAverage?.toFixed(1) || '8.0'}/10`,
+      notes: notes || (isRestDay ? 'Active recovery and central nervous system replenishment' : `Full workout completed with average RPE ${rpeAverage?.toFixed(1) || '8.0'}/10`),
     };
     updated = [newLog, ...current];
   }
   
-  saveStoredWorkoutLogs(updated);
+  saveStoredWorkoutLogs(updated, userEmail);
   return updated;
 }
+
+export function updateWorkoutLogNotes(id: string, notes: string, userEmail?: string): WorkoutCompletionLog[] {
+  const current = getStoredWorkoutLogs(userEmail);
+  const updated = current.map((log) => {
+    const logIdentifier = log.id || `${log.date}_${log.dayId}`;
+    if (logIdentifier === id || log.id === id) {
+      return { ...log, notes };
+    }
+    return log;
+  });
+  saveStoredWorkoutLogs(updated, userEmail);
+  return updated;
+}
+
 
 const INITIAL_FORM_ANALYSIS: FormAnalysisResult = {
   id: 'fa_sample_squat',

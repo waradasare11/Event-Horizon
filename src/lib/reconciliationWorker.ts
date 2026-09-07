@@ -236,6 +236,18 @@ export async function runAutomatedDataReconciliation(): Promise<ReconciliationRe
   }
 }
 
+export function getLatestReconciliationReport(): ReconciliationReport | null {
+  if (typeof window === 'undefined' || typeof localStorage === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(RECONCILIATION_HISTORY_KEY);
+    if (raw) {
+      const list: ReconciliationReport[] = JSON.parse(raw);
+      if (list && list.length > 0) return list[0];
+    }
+  } catch {}
+  return null;
+}
+
 function saveReconciliationReport(report: ReconciliationReport): void {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
   try {

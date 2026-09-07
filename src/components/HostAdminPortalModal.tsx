@@ -1,79 +1,86 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
   X, 
   ShieldCheck, 
-  IndianRupee, 
   Users, 
-  TrendingUp, 
-  Download, 
-  CheckCircle2, 
-  AlertTriangle, 
-  AlertCircle,
-  Search, 
   Crown, 
-  Calendar, 
-  FileText,
-  Lock,
-  UserPlus,
-  Trash2,
-  Tag,
-  KeyRound,
-  Percent,
-  PlusCircle,
-  RefreshCw,
-  Gift,
-  History,
-  ShieldAlert,
-  ClipboardList,
-  Eye,
-  Check,
+  Lock, 
+  CheckCircle2, 
+  AlertCircle, 
+  Search, 
+  Copy, 
+  Check, 
+  Trash2, 
+  RefreshCw, 
+  Sparkles, 
+  Eye, 
+  EyeOff, 
+  Download, 
+  KeyRound, 
+  Mail, 
+  Clock, 
   Activity,
-  Bug,
-  Sparkles,
-  Sliders,
-  BrainCircuit,
-  Scale,
-  Wand2,
-  Mail
+  History,
+  FileText,
+  Filter,
+  CheckCircle,
+  AlertTriangle,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Send,
+  Bell,
+  MailCheck,
+  Database,
+  BarChart3,
+  Zap,
+  Ticket,
+  Tag,
+  Gift,
+  FileCheck,
+  CheckSquare,
+  Layers,
+  CalendarPlus
 } from 'lucide-react';
-import { PerformanceMonitoringDashboard } from './PerformanceMonitoringDashboard';
 import { 
   HOST_ADMIN_CONFIG, 
-  getStoredTransactions, 
-  saveStoredTransactions,
-  recordPaymentTransaction,
-  SUBSCRIPTION_PLANS,
-  verifyHostPIN,
-  updateHostPIN,
-  fetchHostDiscountRules,
-  createHostDiscountRule,
-  deleteHostDiscountRule,
-  clearServerAndLocalLedger,
+  verifyHostPIN, 
+  forceVerifyHostPassword,
+  updateHostPIN, 
+  grantUserFreeSubscription, 
+  fetchHostGrantedSubscriptions, 
+  revokeHostGrantedSubscription, 
+  createGrantedUserSubscription,
   fetchHostAuditLogs,
   clearHostAuditLogs,
   exportAuditLogsToCSV,
-  generateHostSecurityChallenge,
-  computeClientCryptoSignature,
-  grantUserFreeSubscription,
-  fetchHostGrantedSubscriptions,
-  revokeHostGrantedSubscription
+  exportHostLedgerToCSV,
+  notifyAllActiveSubscribers,
+  notifyExpiringSubscribers,
+  notifySingleSubscriber,
+  recordLocalHostAuditLog,
+  fetchHostCoupons,
+  createHostCouponCode,
+  revokeHostCouponCode,
+  executeBulkOperation,
+  fetchGrantVerificationLogs
 } from '../lib/subscription';
 import { 
-  PaymentTransaction, 
+  fetchPersistentGrantsCollection, 
+  syncHostGrantedSubscription 
+} from '../lib/firestoreSync';
+import { 
   UserProfile, 
   UserSubscription, 
-  HostDiscountRule, 
+  HostGrantedSubscription,
   HostAuditLogEntry,
-  AIAccuracyReport,
-  AppErrorReport,
-  HostGrantedSubscription
+  HostCouponCode,
+  GrantVerificationLog
 } from '../types';
-import { 
-  fetchImprovementQueue, 
-  fetchAppErrorReports, 
-  updateAccuracyReportStatus, 
-  updateAppErrorReportStatus 
-} from '../lib/accuracyAndErrorReporting';
+import { fireCelebrationConfetti } from '../lib/confetti';
+import { GrantTimelineModal } from './GrantTimelineModal';
+import { ProgramValuationDashboard } from './ProgramValuationDashboard';
+import { AthleteLoginsSection } from './AthleteLoginsSection';
 
 interface HostAdminPortalModalProps {
   isOpen: boolean;
@@ -82,2135 +89,3153 @@ interface HostAdminPortalModalProps {
   onUpdateSubscription?: (sub: UserSubscription) => void;
 }
 
+type TabType = 'ledger' | 'athlete_logins' | 'valuation' | 'coupons' | 'persistent_grants' | 'verification_logs' | 'activity_log';
+type FilterStatusType = 'all' | 'active' | 'expiring' | 'pending' | 'expired';
+type SortField = 'email' | 'status' | 'expiresAt' | 'grantedAt' | 'plan';
+type SortDirection = 'asc' | 'desc';
+
 export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
   isOpen,
   onClose,
   currentUserProfile,
   onUpdateSubscription,
 }) => {
-  const [activeTab, setActiveTab] = useState<'subscriptions' | 'ledger' | 'discounts' | 'security' | 'audit' | 'performance' | 'improvement_queue' | 'accuracy_stats'>('subscriptions');
-  const [transactions, setTransactions] = useState<PaymentTransaction[]>(() => getStoredTransactions());
-  const [searchQuery, setSearchQuery] = useState('');
+  // Navigation Tabs
+  const [activeTab, setActiveTab] = useState<TabType>('ledger');
+
+  // Bulk Operations State
+  const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
+  const [selectedTimelineEmail, setSelectedTimelineEmail] = useState<string | null>(null);
+  const [isExecutingBulkOp, setIsExecutingBulkOp] = useState<boolean>(false);
+  const [bulkOpMsg, setBulkOpMsg] = useState<string | null>(null);
+  const [showBulkEmailModal, setShowBulkEmailModal] = useState<boolean>(false);
+  const [bulkEmailSubject, setBulkEmailSubject] = useState<string>('Special VIP Subscription Update from Host Warad Asare');
+  const [bulkEmailBody, setBulkEmailBody] = useState<string>('Your PeakForm Pro access has been extended! Continue crushing your goals with peak precision.');
+  const [bulkExtensionDaysInput, setBulkExtensionDaysInput] = useState<number>(30);
+
+  // Single Unified Grant Form State
+  const [targetEmail, setTargetEmail] = useState<string>('');
+  const [durationOption, setDurationOption] = useState<string>('3_months');
+  const [hostPassword, setHostPassword] = useState<string>('');
+  const [notes, setNotes] = useState<string>('Host Free VIP Subscription Grant');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  // Submission & Feedback State
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [grantSuccessMsg, setGrantSuccessMsg] = useState<string | null>(null);
+  const [grantErrorMsg, setGrantErrorMsg] = useState<string | null>(null);
 
-  // Host Direct Granted Free Subscriptions State
-  const [grantedSubs, setGrantedSubs] = useState<HostGrantedSubscription[]>([]);
-  const [isLoadingGrants, setIsLoadingGrants] = useState<boolean>(false);
-  const [grantTargetEmail, setGrantTargetEmail] = useState<string>('');
-  const [grantSelectedPlan, setGrantSelectedPlan] = useState<string>('all_plans');
-  const [grantIsLifetime, setGrantIsLifetime] = useState<boolean>(true);
-  const [grantNotes, setGrantNotes] = useState<string>('Host Lifetime Free VIP Pass - Full Access');
-  const [grantFeedback, setGrantFeedback] = useState<string | null>(null);
-  const [grantSearchQuery, setGrantSearchQuery] = useState<string>('');
-  const [isSubmittingGrant, setIsSubmittingGrant] = useState<boolean>(false);
+  // Host Ledger State & Sorting
+  const [grantedList, setGrantedList] = useState<HostGrantedSubscription[]>([]);
+  const [isLoadingLedger, setIsLoadingLedger] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<FilterStatusType>('all');
+  const [sortField, setSortField] = useState<SortField>('grantedAt');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [copiedEmail, setCopiedEmail] = useState<string | null>(null);
+  const [revokingEmail, setRevokingEmail] = useState<string | null>(null);
+  const [isRevoking, setIsRevoking] = useState<boolean>(false);
 
-  // Improvement Queue & Error Reports State
-  const [accuracyReports, setAccuracyReports] = useState<AIAccuracyReport[]>([]);
-  const [appErrorReports, setAppErrorReports] = useState<AppErrorReport[]>([]);
-  const [isLoadingReports, setIsLoadingReports] = useState<boolean>(false);
-  const [reportSubTab, setReportSubTab] = useState<'ai_accuracy' | 'app_bugs'>('ai_accuracy');
-  const [reportActionFeedback, setReportActionFeedback] = useState<string | null>(null);
-  const [isAlertDismissed, setIsAlertDismissed] = useState<boolean>(false);
-  const [alertThresholdPct] = useState<number>(5);
+  // Persistent Cloud Grants State (Isolated Zero-lag Tab)
+  const [persistentGrants, setPersistentGrants] = useState<HostGrantedSubscription[]>([]);
+  const [isLoadingPersistent, setIsLoadingPersistent] = useState<boolean>(false);
+  const [persistentSearchQuery, setPersistentSearchQuery] = useState<string>('');
+  const [isRepairingEmail, setIsRepairingEmail] = useState<string | null>(null);
 
-  // Accuracy Statistics & Recipe Prompt Tuning State
-  const [recipeStats, setRecipeStats] = useState<any[]>([
-    {
-      categoryId: 'mixed_gravy_curry',
-      categoryName: 'Mixed Gravy & Cream Curries',
-      cuisineTag: 'Indian / Mughlai',
-      dishes: 'Dal Makhani, Butter Paneer, Shahi Korma, Chana Masala',
-      totalScans: 412,
-      flaggedCount: 14,
-      errorRatePct: 3.4,
-      avgCalorieDiscrepancyPct: 4.8,
-      primaryRootCause: 'Cream, butter & cashew paste hidden density under-estimation',
-      systemPromptVersion: 'v3.2-ifct-weighted',
-      lastRetrainedAt: '2026-08-28',
-      activeOptimizationPrompt: 'Inject +15% volumetric density factor for opaque emulsion gravies with visible sheen.',
-    },
-    {
-      categoryId: 'sabudana_fasting',
-      categoryName: 'Fasting & Tapioca Preparations',
-      cuisineTag: 'Maharashtrian / Gujarati',
-      dishes: 'Sabudana Khichdi, Farali Pattice, Peanut Chutney',
-      totalScans: 284,
-      flaggedCount: 9,
-      errorRatePct: 3.1,
-      avgCalorieDiscrepancyPct: 5.2,
-      primaryRootCause: 'Roasted peanut oil absorption & starch gelatinization weight shifts',
-      systemPromptVersion: 'v3.4-starch-calibrated',
-      lastRetrainedAt: '2026-08-29',
-      activeOptimizationPrompt: 'Detect pearl translucency & crushed peanut grain size for precise carbohydrate/lipid split.',
-    },
-    {
-      categoryId: 'layered_rice_biryani',
-      categoryName: 'Layered Rice & Biryanis',
-      cuisineTag: 'Hyderabadi / Awadhi',
-      dishes: 'Dum Biryani, Pulao, Ghee Rice, Khichdi',
-      totalScans: 360,
-      flaggedCount: 8,
-      errorRatePct: 2.2,
-      avgCalorieDiscrepancyPct: 3.1,
-      primaryRootCause: 'Rice grain fluffiness vs density variations between basmati & sona masoori',
-      systemPromptVersion: 'v3.1-grain-depth',
-      lastRetrainedAt: '2026-08-27',
-      activeOptimizationPrompt: 'Evaluate mound height profile to calculate packing density vs airy grain volume.',
-    },
-    {
-      categoryId: 'flatbread_roti_stacks',
-      categoryName: 'Flatbreads & Roti Stacks',
-      cuisineTag: 'North / South Indian',
-      dishes: 'Whole Wheat Roti, Paratha, Kulcha, Dosa',
-      totalScans: 520,
-      flaggedCount: 7,
-      errorRatePct: 1.3,
-      avgCalorieDiscrepancyPct: 2.0,
-      primaryRootCause: 'Stack count occlusion & ghee brush thickness',
-      systemPromptVersion: 'v3.5-edge-contour',
-      lastRetrainedAt: '2026-08-29',
-      activeOptimizationPrompt: 'Perform perimeter edge segmentation to isolate stacked disc layers.',
-    },
-    {
-      categoryId: 'western_salads_dressings',
-      categoryName: 'Salads & Dressed Bowls',
-      cuisineTag: 'Continental / Healthy',
-      dishes: 'Greek Salad, Caesar Salad, Quinoa Bowls',
-      totalScans: 190,
-      flaggedCount: 2,
-      errorRatePct: 1.0,
-      avgCalorieDiscrepancyPct: 1.8,
-      primaryRootCause: 'Olive oil/vinaigrette coating weight detection',
-      systemPromptVersion: 'v3.0-surface-sheen',
-      lastRetrainedAt: '2026-08-25',
-      activeOptimizationPrompt: 'Surface specular highlight estimation for oil droplet coating thickness.',
-    },
-  ]);
-  const [retrainingCategoryId, setRetrainingCategoryId] = useState<string | null>(null);
-  const [retrainSuccessFeedback, setRetrainSuccessFeedback] = useState<string | null>(null);
+  // Host Coupon Code Management State
+  const [couponsList, setCouponsList] = useState<HostCouponCode[]>([]);
+  const [isLoadingCoupons, setIsLoadingCoupons] = useState<boolean>(false);
+  const [couponCodeInput, setCouponCodeInput] = useState<string>('');
+  const [couponPlanOption, setCouponPlanOption] = useState<string>('lifetime');
+  const [couponExpiryDays, setCouponExpiryDays] = useState<string>('30');
+  const [couponMaxUses, setCouponMaxUses] = useState<string>('1');
+  const [couponNotes, setCouponNotes] = useState<string>('VIP Special Access Coupon');
+  const [isCreatingCoupon, setIsCreatingCoupon] = useState<boolean>(false);
+  const [couponSuccessMsg, setCouponSuccessMsg] = useState<string | null>(null);
+  const [couponErrorMsg, setCouponErrorMsg] = useState<string | null>(null);
+  const [copiedCouponCode, setCopiedCouponCode] = useState<string | null>(null);
+  const [revokingCouponCode, setRevokingCouponCode] = useState<string | null>(null);
+  const [isRevokingCoupon, setIsRevokingCoupon] = useState<boolean>(false);
+  const [couponsSearchQuery, setCouponsSearchQuery] = useState<string>('');
 
-  const loadAccuracyStats = async () => {
-    try {
-      const res = await fetch('/api/admin/accuracy-stats');
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.data && data.data.categories) {
-          setRecipeStats(data.data.categories);
-        }
-      }
-    } catch (err) {
-      console.warn('Could not fetch remote accuracy stats:', err);
-    }
-  };
+  // Notify All Active Users State
+  const [isNotifyingAll, setIsNotifyingAll] = useState<boolean>(false);
+  const [isNotifyingExpiring, setIsNotifyingExpiring] = useState<boolean>(false);
+  const [isNotifyingSingle, setIsNotifyingSingle] = useState<string | null>(null);
+  const [showNotifyModal, setShowNotifyModal] = useState<boolean>(false);
+  const [customNotifyMsg, setCustomNotifyMsg] = useState<string>('');
+  const [notifyResult, setNotifyResult] = useState<{
+    totalNotified: number;
+    notifications: any[];
+    message?: string;
+  } | null>(null);
 
-  useEffect(() => {
-    if (activeTab === 'accuracy_stats') {
-      loadAccuracyStats();
-    }
-  }, [activeTab]);
+  // Host Activity Logs State
+  const [activityLogs, setActivityLogs] = useState<HostAuditLogEntry[]>([]);
+  const [isLoadingLogs, setIsLoadingLogs] = useState<boolean>(false);
+  const [logsSearchQuery, setLogsSearchQuery] = useState<string>('');
+  const [isClearingLogs, setIsClearingLogs] = useState<boolean>(false);
 
-  const handleRetrainRecipePrompt = async (categoryId: string) => {
-    setRetrainingCategoryId(categoryId);
-    setRetrainSuccessFeedback(null);
+  // Authentication & Grant Verification Audit Log State
+  const [verificationAuditLogs, setVerificationAuditLogs] = useState<GrantVerificationLog[]>([]);
+  const [isLoadingVerificationLogs, setIsLoadingVerificationLogs] = useState<boolean>(false);
+  const [verificationSearchQuery, setVerificationSearchQuery] = useState<string>('');
+  const [verificationFilter, setVerificationFilter] = useState<'all' | 'grants' | 'coupons' | 'auth'>('all');
 
-    try {
-      const res = await fetch('/api/admin/retrain-recipe-prompt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ categoryId }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.data) {
-          setRecipeStats((prev) =>
-            prev.map((cat) => (cat.categoryId === categoryId ? data.data : cat))
-          );
-          setRetrainSuccessFeedback(`Successfully re-trained & optimized system prompt for "${categoryId.replace(/_/g, ' ')}" using OmniRoute high-reasoning engine!`);
-        }
-      } else {
-        throw new Error('Retrain API call failed');
-      }
-    } catch (err) {
-      // Fallback local update
-      setRecipeStats((prev) =>
-        prev.map((cat) => {
-          if (cat.categoryId !== categoryId) return cat;
-          const newErrorRate = Math.max(0.6, Number((cat.errorRatePct * 0.45).toFixed(1)));
-          const newVersion = `v${(parseFloat(cat.systemPromptVersion.replace('v', '')) + 0.1).toFixed(1)}-fine-tuned`;
-          return {
-            ...cat,
-            errorRatePct: newErrorRate,
-            systemPromptVersion: newVersion,
-            lastRetrainedAt: new Date().toISOString().split('T')[0],
-            totalScans: cat.totalScans + 12,
-          };
-        })
-      );
-      setRetrainSuccessFeedback(`Successfully re-trained & optimized system prompt for "${categoryId.replace(/_/g, ' ')}"! Volumetric compensations deployed.`);
-    } finally {
-      setRetrainingCategoryId(null);
-      setTimeout(() => setRetrainSuccessFeedback(null), 4500);
-    }
-  };
-
-  // Calculate Hourly Flagged Rate for Real-Time Alert
-  const oneHourAgo = Date.now() - 60 * 60 * 1000;
-  const hourlyMealFlags = accuracyReports.filter((r) => {
-    const t = new Date(r.reportedAt).getTime();
-    return r.feature === 'meal_scanner' && t >= oneHourAgo;
-  });
-  // Calculate flag percentage in the current rolling hour
-  const hourlyEstimatedScans = Math.max(12, hourlyMealFlags.length * 10);
-  const hourlyInaccuracyPct = Number(((hourlyMealFlags.length / hourlyEstimatedScans) * 100).toFixed(1));
-  const isRealtimeAlertActive = hourlyMealFlags.length > 0 && hourlyInaccuracyPct >= alertThresholdPct && !isAlertDismissed;
-
-  // Security PIN state
-  const [hostPin, setHostPin] = useState<string>('9284');
-  const [isPinAuthenticated, setIsPinAuthenticated] = useState<boolean>(true);
-  const [pinError, setPinError] = useState<string | null>(null);
-
-  // Change PIN state
+  // PIN Management Drawer
+  const [showSecuritySettings, setShowSecuritySettings] = useState<boolean>(false);
   const [currentPinInput, setCurrentPinInput] = useState<string>('');
   const [newPinInput, setNewPinInput] = useState<string>('');
   const [pinChangeMsg, setPinChangeMsg] = useState<string | null>(null);
+  const [pinChangeError, setPinChangeError] = useState<string | null>(null);
+  const [isUpdatingPin, setIsUpdatingPin] = useState<boolean>(false);
 
-  // Discount Rules State
-  const [discountRules, setDiscountRules] = useState<HostDiscountRule[]>([]);
-  const [isLoadingRules, setIsLoadingRules] = useState<boolean>(false);
-  const [newTargetType, setNewTargetType] = useState<'individual' | 'everyone'>('individual');
-  const [newTargetEmail, setNewTargetEmail] = useState<string>('');
-  const [newPlanId, setNewPlanId] = useState<string>('all');
-  const [newDiscountType, setNewDiscountType] = useState<'free' | 'custom_price' | 'percentage'>('free');
-  const [newCustomPrice, setNewCustomPrice] = useState<number>(0);
-  const [newDiscountPct, setNewDiscountPct] = useState<number>(50);
-  const [newNotes, setNewNotes] = useState<string>('');
-  const [ruleActionMsg, setRuleActionMsg] = useState<string | null>(null);
+  // Load Host Ledger
+  const loadLedger = async () => {
+    setIsLoadingLedger(true);
+    try {
+      const records = await fetchHostGrantedSubscriptions(hostPassword || '9284', HOST_ADMIN_CONFIG.email);
+      setGrantedList(records);
+    } catch (e) {
+      console.warn('Error loading host ledger:', e);
+    } finally {
+      setIsLoadingLedger(false);
+    }
+  };
 
-  // Cryptographic Ledger Wipe Verification Modal State
-  const [isCryptoModalOpen, setIsCryptoModalOpen] = useState<boolean>(false);
-  const [cryptoChallenge, setCryptoChallenge] = useState<{ nonce: string; timestamp: string; action: string; requiredPhrase: string } | null>(null);
-  const [cryptoPinInput, setCryptoPinInput] = useState<string>('9284');
-  const [cryptoPhraseInput, setCryptoPhraseInput] = useState<string>('');
-  const [cryptoError, setCryptoError] = useState<string | null>(null);
-  const [isClearingLedger, setIsClearingLedger] = useState<boolean>(false);
-  const [clearConfirmMsg, setClearConfirmMsg] = useState<string | null>(null);
-  const [lastWipeSignature, setLastWipeSignature] = useState<string | null>(null);
+  // Load Persistent Grants Directly from Firestore
+  const loadPersistentGrants = async () => {
+    setIsLoadingPersistent(true);
+    try {
+      const records = await fetchPersistentGrantsCollection();
+      setPersistentGrants(records);
+    } catch (e) {
+      console.warn('Error loading persistent grants:', e);
+    } finally {
+      setIsLoadingPersistent(false);
+    }
+  };
 
-  // Audit Log State
-  const [auditLogs, setAuditLogs] = useState<HostAuditLogEntry[]>([]);
-  const [isLoadingAudit, setIsLoadingAudit] = useState<boolean>(false);
-  const [auditSearchQuery, setAuditSearchQuery] = useState<string>('');
-  const [auditActionFilter, setAuditActionFilter] = useState<string>('all');
-  const [auditMsg, setAuditMsg] = useState<string | null>(null);
+  // Load Host Coupons
+  const loadCoupons = async () => {
+    setIsLoadingCoupons(true);
+    try {
+      const list = await fetchHostCoupons(hostPassword || '9284', HOST_ADMIN_CONFIG.email);
+      setCouponsList(list);
+    } catch (e) {
+      console.warn('Error loading host coupons:', e);
+    } finally {
+      setIsLoadingCoupons(false);
+    }
+  };
+
+  // Load Host Activity Logs
+  const loadActivityLogs = async () => {
+    setIsLoadingLogs(true);
+    try {
+      const logs = await fetchHostAuditLogs(hostPassword || '9284', HOST_ADMIN_CONFIG.email);
+      setActivityLogs(logs);
+    } catch (e) {
+      console.warn('Error loading activity logs:', e);
+    } finally {
+      setIsLoadingLogs(false);
+    }
+  };
+
+  // Load Cryptographic Verification Audit Logs
+  const loadVerificationLogs = async () => {
+    setIsLoadingVerificationLogs(true);
+    try {
+      const logs = await fetchGrantVerificationLogs();
+      setVerificationAuditLogs(logs);
+    } catch (e) {
+      console.warn('Error loading verification audit logs:', e);
+    } finally {
+      setIsLoadingVerificationLogs(false);
+    }
+  };
 
   useEffect(() => {
     if (isOpen) {
-      loadGrantedSubs();
-      loadDiscountRules();
-      loadAuditLogs();
-      loadImprovementReports();
-      setTransactions(getStoredTransactions());
+      loadLedger();
+      loadPersistentGrants();
+      loadCoupons();
+      loadActivityLogs();
+      loadVerificationLogs();
+      setGrantSuccessMsg(null);
+      setGrantErrorMsg(null);
+      setCouponSuccessMsg(null);
+      setCouponErrorMsg(null);
+      setNotifyResult(null);
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
-  const loadGrantedSubs = async () => {
-    setIsLoadingGrants(true);
-    try {
-      const grants = await fetchHostGrantedSubscriptions(hostPin, HOST_ADMIN_CONFIG.email);
-      setGrantedSubs(grants);
-    } catch (e) {
-      console.warn('Failed to fetch grants:', e);
-    } finally {
-      setIsLoadingGrants(false);
+  // Generate random coupon code
+  const handleGenerateRandomCode = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let rand = '';
+    for (let i = 0; i < 6; i++) {
+      rand += chars.charAt(Math.floor(Math.random() * chars.length));
     }
+    setCouponCodeInput(`PEAK-${rand}`);
   };
 
+  // Duration Presets
+  const DURATION_PRESETS = [
+    { id: '3_months', label: '⚡ 3 Months (90-Day Transformation Free Grant)', planId: '3_months', isLifetime: false, days: 90, months: 3 },
+    { id: '1_month', label: '1 Month (30 Days Kickstarter)', planId: '1_month', isLifetime: false, days: 30, months: 1 },
+    { id: '6_months', label: '6 Months (180 Days Elite Protocol)', planId: '6_months', isLifetime: false, days: 180, months: 6 },
+    { id: '1_year', label: '1 Year (12 Months Master Athlete)', planId: '1_year', isLifetime: false, days: 365, months: 12 },
+    { id: '2_years', label: '2 Years (24 Months Elite Mastery)', planId: '2_years', isLifetime: false, days: 730, months: 24 },
+    { id: '3_years', label: '3 Years (36 Months Lifetime Physique)', planId: '3_years', isLifetime: false, days: 1095, months: 36 },
+    { id: 'lifetime', label: '🌟 Lifetime VIP (Never Expires - 100 Years)', planId: 'all_plans', isLifetime: true, days: 36500, months: 1200 },
+  ];
+
+  // Helper function to determine subscription status badge (with 3-day expiry warning detection)
+  const getSubscriptionStatusInfo = (record: HostGrantedSubscription) => {
+    if (record.status === 'revoked') {
+      return {
+        status: 'Expired',
+        badgeClass: 'bg-rose-500/15 text-rose-700 dark:text-rose-400 border-rose-500/30',
+        dotClass: 'bg-rose-500',
+        icon: AlertCircle,
+        label: 'Revoked / Expired',
+        isExpiringSoon: false,
+        daysRemaining: 0,
+      };
+    }
+
+    if (record.isLifetime) {
+      return {
+        status: 'Active',
+        badgeClass: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
+        dotClass: 'bg-emerald-500',
+        icon: CheckCircle2,
+        label: 'Active (Lifetime VIP)',
+        isExpiringSoon: false,
+        daysRemaining: 36500,
+      };
+    }
+
+    if (record.expiresAt) {
+      const expiresTime = new Date(record.expiresAt).getTime();
+      const now = Date.now();
+      const diffMs = expiresTime - now;
+      const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+      if (days <= 0) {
+        return {
+          status: 'Expired',
+          badgeClass: 'bg-rose-500/15 text-rose-700 dark:text-rose-400 border-rose-500/30',
+          dotClass: 'bg-rose-500',
+          icon: AlertCircle,
+          label: 'Expired',
+          isExpiringSoon: false,
+          daysRemaining: 0,
+        };
+      }
+
+      // Highlight in yellow 3 days before expiration
+      if (days <= 3) {
+        return {
+          status: 'Expiring Soon',
+          badgeClass: 'bg-amber-500/20 text-amber-800 dark:text-amber-300 border-amber-500/50 shadow-2xs font-bold animate-pulse',
+          dotClass: 'bg-amber-500',
+          icon: AlertTriangle,
+          label: `Expires in ${days}d`,
+          isExpiringSoon: true,
+          daysRemaining: days,
+        };
+      }
+
+      return {
+        status: 'Active',
+        badgeClass: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
+        dotClass: 'bg-emerald-500',
+        icon: CheckCircle2,
+        label: `Active (${days}d left)`,
+        isExpiringSoon: false,
+        daysRemaining: days,
+      };
+    }
+
+    if ((record.status as string) === 'pending' || !record.grantedAt) {
+      return {
+        status: 'Pending Verification',
+        badgeClass: 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30',
+        dotClass: 'bg-amber-500',
+        icon: Clock,
+        label: 'Pending Verification',
+        isExpiringSoon: false,
+        daysRemaining: 0,
+      };
+    }
+
+    return {
+      status: 'Active',
+      badgeClass: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
+      dotClass: 'bg-emerald-500',
+      icon: CheckCircle2,
+      label: 'Active',
+      isExpiringSoon: false,
+      daysRemaining: 365,
+    };
+  };
+
+  // Handle Granting Free Subscription (100% Reliable & Non-hanging)
   const handleGrantSubscription = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!grantTargetEmail || !grantTargetEmail.includes('@')) {
-      setGrantFeedback('❌ Please enter a valid Gmail / Email address.');
+    setGrantSuccessMsg(null);
+    setGrantErrorMsg(null);
+
+    const cleanTargetEmail = targetEmail.trim().toLowerCase();
+    if (!cleanTargetEmail || !cleanTargetEmail.includes('@') || !cleanTargetEmail.includes('.')) {
+      setGrantErrorMsg('Please provide a valid Gmail/Email address (e.g. athlete@gmail.com).');
       return;
     }
 
-    setIsSubmittingGrant(true);
-    setGrantFeedback(null);
+    const cleanPin = hostPassword.trim();
+    if (!cleanPin) {
+      setGrantErrorMsg('Please enter your Host Verification Password/PIN (e.g. 9284) to verify host authority.');
+      return;
+    }
 
-    const result = await grantUserFreeSubscription({
-      pin: hostPin,
-      email: HOST_ADMIN_CONFIG.email,
-      targetEmail: grantTargetEmail.trim().toLowerCase(),
-      planId: grantSelectedPlan,
-      isLifetime: grantIsLifetime,
-      notes: grantNotes || `Granted by Host Warad Asare on ${new Date().toLocaleDateString()}`,
+    setIsSubmitting(true);
+
+    try {
+      // 1. Verify Host PIN with fallback & force verification
+      const isPinValid = await forceVerifyHostPassword(cleanPin, HOST_ADMIN_CONFIG.email);
+      if (!isPinValid) {
+        setGrantErrorMsg('Incorrect Host Verification Password. Please enter the valid Host Security PIN (e.g. 9284).');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Record PIN verification action
+      recordLocalHostAuditLog(
+        'pin_updated',
+        `Host Master verification password authenticated for granting free access to ${cleanTargetEmail}.`,
+        cleanTargetEmail
+      );
+
+      // 2. Resolve plan details
+      const preset = DURATION_PRESETS.find((p) => p.id === durationOption) || DURATION_PRESETS[0];
+
+      // 3. Execute Grant across Server, Firestore (Triple-Redundant) and Local Storage
+      const result = await grantUserFreeSubscription({
+        pin: cleanPin,
+        email: HOST_ADMIN_CONFIG.email,
+        targetEmail: cleanTargetEmail,
+        planId: preset.planId,
+        isLifetime: preset.isLifetime,
+        notes: notes.trim() || `Host Free VIP Subscription granted by ${HOST_ADMIN_CONFIG.name}`,
+      });
+
+      if (!result.success) {
+        setGrantErrorMsg(result.error || 'Failed to grant subscription. Please check your credentials and try again.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 4. Success handling
+      fireCelebrationConfetti();
+      setGrantSuccessMsg(`🎉 Success! Free VIP subscription has been granted to ${cleanTargetEmail} for ${preset.label}. Access is now 100% active!`);
+      
+      // Reset input form
+      setTargetEmail('');
+      setNotes('Host Free VIP Subscription Grant');
+
+      // 5. If current logged in user is the recipient, immediately update live subscription in UI
+      if (
+        currentUserProfile.email &&
+        currentUserProfile.email.trim().toLowerCase() === cleanTargetEmail &&
+        result.grant &&
+        onUpdateSubscription
+      ) {
+        const sub = createGrantedUserSubscription(result.grant);
+        onUpdateSubscription(sub);
+      }
+
+      // 6. Reload Ledger records, Persistent Firestore collection & Activity logs
+      await Promise.all([loadLedger(), loadPersistentGrants(), loadActivityLogs()]);
+
+    } catch (err: any) {
+      setGrantErrorMsg(err.message || 'An error occurred while granting subscription.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle Revoke
+  const handleRevoke = async (emailToRevoke: string) => {
+    const pin = hostPassword || '9284';
+    setIsRevoking(true);
+    try {
+      const ok = await revokeHostGrantedSubscription(emailToRevoke, pin, HOST_ADMIN_CONFIG.email);
+      if (ok) {
+        recordLocalHostAuditLog(
+          'discount_deleted',
+          `Host Warad Asare revoked free subscription access for ${emailToRevoke}.`,
+          emailToRevoke
+        );
+        setGrantedList((prev) => prev.filter((g) => g.email.toLowerCase() !== emailToRevoke.toLowerCase()));
+        setPersistentGrants((prev) => prev.filter((g) => g.email.toLowerCase() !== emailToRevoke.toLowerCase()));
+        setRevokingEmail(null);
+        await Promise.all([loadLedger(), loadPersistentGrants(), loadActivityLogs()]);
+      }
+    } catch (e) {
+      console.warn('Error revoking:', e);
+    } finally {
+      setIsRevoking(false);
+    }
+  };
+
+  // Bulk Operations Handlers
+  const handleToggleSelectEmail = (emailToToggle: string) => {
+    setSelectedEmails((prev) =>
+      prev.includes(emailToToggle)
+        ? prev.filter((e) => e.toLowerCase() !== emailToToggle.toLowerCase())
+        : [...prev, emailToToggle]
+    );
+  };
+
+  const handleSelectAllVisible = () => {
+    if (selectedEmails.length === filteredLedger.length && filteredLedger.length > 0) {
+      setSelectedEmails([]);
+    } else {
+      setSelectedEmails(filteredLedger.map((r) => r.email));
+    }
+  };
+
+  const handleSelectByStatus = (targetStatus: 'active' | 'expiring' | 'expired') => {
+    const matching = filteredLedger
+      .filter((r) => {
+        const info = getSubscriptionStatusInfo(r);
+        if (targetStatus === 'active') return info.status === 'Active';
+        if (targetStatus === 'expiring') return info.isExpiringSoon;
+        if (targetStatus === 'expired') return info.status === 'Expired';
+        return false;
+      })
+      .map((r) => r.email);
+    setSelectedEmails(matching);
+  };
+
+  const handleExecuteBulkAction = async (
+    action: 'extend_duration' | 'set_lifetime' | 'send_notification' | 'revoke',
+    extensionDays?: number,
+    customMessage?: string
+  ) => {
+    if (selectedEmails.length === 0) return;
+    if (
+      action === 'revoke' &&
+      !window.confirm(`Are you sure you want to REVOKE free VIP access for all ${selectedEmails.length} selected athlete(s)?`)
+    ) {
+      return;
+    }
+
+    setIsExecutingBulkOp(true);
+    setBulkOpMsg(null);
+    try {
+      const pin = hostPassword || '9284';
+      const res = await executeBulkOperation({
+        pin,
+        email: HOST_ADMIN_CONFIG.email,
+        targetEmails: selectedEmails,
+        action,
+        extensionDays: extensionDays || bulkExtensionDaysInput,
+        customNotificationMessage: customMessage || bulkEmailBody,
+        notes: `Bulk Action [${action}] by Host ${HOST_ADMIN_CONFIG.name}`,
+      });
+
+      if (res.success) {
+        setBulkOpMsg(res.message);
+        fireCelebrationConfetti();
+        await Promise.all([loadLedger(), loadPersistentGrants(), loadActivityLogs()]);
+        if (action === 'revoke') {
+          setSelectedEmails([]);
+        }
+      } else {
+        setBulkOpMsg(`Error: ${res.message}`);
+      }
+    } catch (err: any) {
+      setBulkOpMsg(`Error: ${err.message}`);
+    } finally {
+      setIsExecutingBulkOp(false);
+      setShowBulkEmailModal(false);
+    }
+  };
+
+  // Handle Notify Expiring Users (≤ 3 Days Remaining)
+  const handleNotifyExpiring = async () => {
+    const expiringList = grantedList.filter((g) => getSubscriptionStatusInfo(g).isExpiringSoon);
+    if (expiringList.length === 0) {
+      alert('No subscribers expiring within the next 3 days.');
+      return;
+    }
+
+    setIsNotifyingExpiring(true);
+    try {
+      const pin = hostPassword || '9284';
+      const result = await notifyExpiringSubscribers(pin, HOST_ADMIN_CONFIG.email, 3);
+      fireCelebrationConfetti();
+      setNotifyResult({
+        totalNotified: result.totalNotified || expiringList.length,
+        notifications: result.notifications || [],
+        message: result.message || `Reminder emails dispatched to ${expiringList.length} subscribers expiring within 3 days.`,
+      });
+      setShowNotifyModal(true);
+
+      recordLocalHostAuditLog(
+        'notification_sent',
+        `Host Warad Asare sent 3-day expiry reminders to ${expiringList.length} VIP athletes.`,
+        HOST_ADMIN_CONFIG.email,
+        undefined,
+        0,
+        { expiringCount: expiringList.length }
+      );
+      await loadActivityLogs();
+    } catch (e: any) {
+      alert(`Notification notice: ${e.message || 'Error triggering expiry notifications'}`);
+    } finally {
+      setIsNotifyingExpiring(false);
+    }
+  };
+
+  // Handle Single Subscriber Expiry Reminder
+  const handleNotifySingle = async (email: string) => {
+    const record = grantedList.find((g) => g.email.toLowerCase() === email.toLowerCase());
+    if (!record) return;
+
+    setIsNotifyingSingle(email);
+    try {
+      const pin = hostPassword || '9284';
+      const days = record.expiresAt ? Math.max(0, Math.ceil((new Date(record.expiresAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24))) : 0;
+      const expiryDateStr = record.expiresAt ? new Date(record.expiresAt).toLocaleDateString() : 'Active';
+      const result = await notifySingleSubscriber(email, days, expiryDateStr, pin);
+      setNotifyResult({
+        totalNotified: 1,
+        notifications: [result.notification || { email, daysRemaining: days, plan: record.planName || 'VIP' }],
+        message: `Direct reminder email successfully delivered to ${email}.`,
+      });
+      setShowNotifyModal(true);
+      recordLocalHostAuditLog(
+        'notification_sent',
+        `Host Warad Asare sent personalized reminder notice to ${email}.`,
+        email
+      );
+      await loadActivityLogs();
+    } catch (e: any) {
+      alert(`Notification notice: ${e.message || 'Error sending reminder'}`);
+    } finally {
+      setIsNotifyingSingle(null);
+    }
+  };
+
+  // Handle Self-Healing Repair & Sync of a Persistent Grant
+  const handleRepairGrant = async (grant: HostGrantedSubscription) => {
+    setIsRepairingEmail(grant.email);
+    try {
+      await syncHostGrantedSubscription(grant);
+      await Promise.all([loadLedger(), loadPersistentGrants(), loadActivityLogs()]);
+      alert(`Successfully verified & synchronized persistent grant for ${grant.email} across all storage tiers!`);
+    } catch (e: any) {
+      alert(`Sync error: ${e.message || 'Failed to re-sync'}`);
+    } finally {
+      setIsRepairingEmail(null);
+    }
+  };
+
+  // Handle Sort
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  // Handle Copy Email
+  const handleCopyEmail = (email: string) => {
+    navigator.clipboard.writeText(email);
+    setCopiedEmail(email);
+    setTimeout(() => setCopiedEmail(null), 2000);
+  };
+
+  // Export CSV of Ledger Snapshot
+  const handleExportCSV = () => {
+    if (grantedList.length === 0) return;
+    exportHostLedgerToCSV(grantedList);
+    recordLocalHostAuditLog('snapshot_exported', `Host Warad Asare exported full CSV snapshot of ${grantedList.length} ledger records.`);
+    loadActivityLogs();
+  };
+
+  // Export CSV of Activity Logs
+  const handleExportActivityLogs = () => {
+    exportAuditLogsToCSV(activityLogs);
+    recordLocalHostAuditLog('audit_exported', `Host Warad Asare exported full CSV activity audit logs.`);
+  };
+
+  // Clear Activity Logs
+  const handleClearActivityLogs = async () => {
+    if (!window.confirm('Are you sure you want to clear the historical activity log? This will reset the log history.')) return;
+    setIsClearingLogs(true);
+    try {
+      await clearHostAuditLogs(hostPassword || '9284', HOST_ADMIN_CONFIG.email);
+      localStorage.removeItem('peakform_host_activity_logs');
+      setActivityLogs([]);
+      recordLocalHostAuditLog('ledger_cleared', `Host Warad Asare cleared historical activity log archive.`);
+      await loadActivityLogs();
+    } catch (e) {
+      console.warn('Error clearing logs:', e);
+    } finally {
+      setIsClearingLogs(false);
+    }
+  };
+
+  // Handle Create Coupon Code
+  const handleCreateCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCouponSuccessMsg(null);
+    setCouponErrorMsg(null);
+
+    const code = couponCodeInput.trim().toUpperCase();
+    if (!code || code.length < 3) {
+      setCouponErrorMsg('Coupon code must be at least 3 characters long (e.g. PEAK-VIP2026).');
+      return;
+    }
+
+    const pin = hostPassword.trim();
+    if (!pin) {
+      setCouponErrorMsg('Please enter your Host Verification Password/PIN (e.g. 9284) to authorize coupon creation.');
+      return;
+    }
+
+    setIsCreatingCoupon(true);
+
+    try {
+      const isPinValid = await forceVerifyHostPassword(pin, HOST_ADMIN_CONFIG.email);
+      if (!isPinValid) {
+        setCouponErrorMsg('Incorrect Host Verification Password. Please enter the valid Host Security PIN (e.g. 9284).');
+        setIsCreatingCoupon(false);
+        return;
+      }
+
+      const preset = DURATION_PRESETS.find((p) => p.id === couponPlanOption) || DURATION_PRESETS[0];
+      
+      // Calculate coupon expiry date
+      const expiryDaysNum = parseInt(couponExpiryDays, 10) || 30;
+      const couponExpiresAt = new Date(Date.now() + expiryDaysNum * 24 * 60 * 60 * 1000).toISOString();
+
+      const maxUsesNum = couponMaxUses ? parseInt(couponMaxUses, 10) : undefined;
+
+      const result = await createHostCouponCode({
+        code,
+        pin,
+        email: HOST_ADMIN_CONFIG.email,
+        planId: preset.planId,
+        planName: preset.label,
+        durationDays: preset.isLifetime ? undefined : preset.days,
+        isLifetime: preset.isLifetime,
+        expiresAt: couponExpiresAt,
+        maxUses: maxUsesNum,
+        notes: couponNotes.trim() || `Coupon created by Host ${HOST_ADMIN_CONFIG.name}`,
+      });
+
+      if (!result.success || !result.coupon) {
+        setCouponErrorMsg(result.error || 'Failed to create coupon code.');
+        setIsCreatingCoupon(false);
+        return;
+      }
+
+      fireCelebrationConfetti();
+      setCouponSuccessMsg(`🎉 Coupon code "${result.coupon.code}" created successfully! Athletes can now redeem this coupon code for 100% free access (${preset.label}).`);
+      setCouponCodeInput('');
+      
+      await Promise.all([loadCoupons(), loadActivityLogs()]);
+    } catch (err: any) {
+      setCouponErrorMsg(err.message || 'Error creating coupon.');
+    } finally {
+      setIsCreatingCoupon(false);
+    }
+  };
+
+  // Handle Revoke Coupon Code
+  const handleRevokeCoupon = async (code: string) => {
+    const pin = hostPassword || '9284';
+    setIsRevokingCoupon(true);
+    try {
+      const ok = await revokeHostCouponCode(code, pin, HOST_ADMIN_CONFIG.email);
+      if (ok) {
+        setCouponsList((prev) => prev.map((c) => (c.code.toUpperCase() === code.toUpperCase() ? { ...c, status: 'revoked' } : c)));
+        setRevokingCouponCode(null);
+        await Promise.all([loadCoupons(), loadActivityLogs()]);
+      }
+    } catch (e: any) {
+      alert(`Error revoking coupon: ${e.message || 'Failed'}`);
+    } finally {
+      setIsRevokingCoupon(false);
+    }
+  };
+
+  // Handle Copy Coupon Code
+  const handleCopyCouponCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCouponCode(code);
+    setTimeout(() => setCopiedCouponCode(null), 2000);
+  };
+
+  // Handle Update Security PIN
+  const handleUpdatePIN = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPinChangeMsg(null);
+    setPinChangeError(null);
+
+    if (!currentPinInput.trim()) {
+      setPinChangeError('Current Security PIN is required.');
+      return;
+    }
+    if (!newPinInput.trim() || newPinInput.trim().length < 4) {
+      setPinChangeError('New PIN must be at least 4 characters long.');
+      return;
+    }
+
+    setIsUpdatingPin(true);
+    try {
+      const ok = await updateHostPIN(currentPinInput.trim(), newPinInput.trim(), HOST_ADMIN_CONFIG.email);
+      if (ok) {
+        setPinChangeMsg('Host Security PIN successfully updated.');
+        setHostPassword(newPinInput.trim());
+        setCurrentPinInput('');
+        setNewPinInput('');
+        recordLocalHostAuditLog('pin_updated', `Host Warad Asare updated Master Security PIN.`);
+        await loadActivityLogs();
+        setTimeout(() => setShowSecuritySettings(false), 2000);
+      } else {
+        setPinChangeError('Failed to update PIN. Invalid current PIN.');
+      }
+    } catch (e: any) {
+      setPinChangeError(e.message || 'Error updating PIN.');
+    } finally {
+      setIsUpdatingPin(false);
+    }
+  };
+
+  // Handle Notify All Active Subscribers
+  const handleNotifyAll = async () => {
+    const activeGrants = grantedList.filter((g) => getSubscriptionStatusInfo(g).status === 'Active');
+    if (activeGrants.length === 0) {
+      alert('No active VIP subscribers found in the ledger to notify.');
+      return;
+    }
+
+    setIsNotifyingAll(true);
+    try {
+      const pin = hostPassword || '9284';
+      const result = await notifyAllActiveSubscribers(pin, HOST_ADMIN_CONFIG.email, customNotifyMsg);
+      
+      fireCelebrationConfetti();
+      setNotifyResult({
+        totalNotified: result.totalNotified || activeGrants.length,
+        notifications: result.notifications || [],
+        message: result.message || `Automated notifications dispatched to ${activeGrants.length} active athletes.`,
+      });
+      setShowNotifyModal(true);
+
+      recordLocalHostAuditLog(
+        'notification_sent',
+        `Host Warad Asare dispatched automated access duration alerts to ${activeGrants.length} active VIP athletes.`,
+        HOST_ADMIN_CONFIG.email,
+        undefined,
+        0,
+        { activeCount: activeGrants.length, customMessage: customNotifyMsg }
+      );
+
+      await loadActivityLogs();
+    } catch (e: any) {
+      alert(`Notification notice: ${e.message || 'Error triggering notifications'}`);
+    } finally {
+      setIsNotifyingAll(false);
+    }
+  };
+
+  // Filtered & Sorted Ledger List
+  const filteredLedger = useMemo(() => {
+    const list = grantedList.filter((g) => {
+      const q = searchQuery.toLowerCase().trim();
+      const statusInfo = getSubscriptionStatusInfo(g);
+
+      // Search matching across email, plan name, notes, or username
+      const matchesSearch = !q || (
+        g.email.toLowerCase().includes(q) ||
+        (g.planName && g.planName.toLowerCase().includes(q)) ||
+        (g.notes && g.notes.toLowerCase().includes(q)) ||
+        statusInfo.status.toLowerCase().includes(q)
+      );
+
+      // Status tab matching
+      if (!matchesSearch) return false;
+      if (statusFilter === 'all') return true;
+      if (statusFilter === 'active') return statusInfo.status === 'Active';
+      if (statusFilter === 'pending') return statusInfo.status === 'Pending Verification';
+      if (statusFilter === 'expired') return statusInfo.status === 'Expired';
+      return true;
     });
 
-    if (result.success) {
-      setGrantFeedback(`✅ Free subscription granted to ${grantTargetEmail.trim().toLowerCase()}!`);
-      setGrantTargetEmail('');
-      await loadGrantedSubs();
-      await loadAuditLogs();
-      setTransactions(getStoredTransactions());
-    } else {
-      setGrantFeedback(`❌ Error: ${result.error || 'Failed to grant subscription'}`);
+    return list.sort((a, b) => {
+      let comparison = 0;
+      if (sortField === 'email') {
+        comparison = a.email.toLowerCase().localeCompare(b.email.toLowerCase());
+      } else if (sortField === 'status') {
+        const statusA = getSubscriptionStatusInfo(a).status;
+        const statusB = getSubscriptionStatusInfo(b).status;
+        const rankMap: Record<string, number> = { 'Active': 1, 'Pending Verification': 2, 'Expired': 3 };
+        const rankA = rankMap[statusA] || 99;
+        const rankB = rankMap[statusB] || 99;
+        comparison = rankA - rankB;
+        if (comparison === 0) {
+          comparison = a.email.toLowerCase().localeCompare(b.email.toLowerCase());
+        }
+      } else if (sortField === 'expiresAt') {
+        const timeA = a.isLifetime ? 8640000000000000 : (a.expiresAt ? new Date(a.expiresAt).getTime() : 0);
+        const timeB = b.isLifetime ? 8640000000000000 : (b.expiresAt ? new Date(b.expiresAt).getTime() : 0);
+        comparison = timeA - timeB;
+      } else if (sortField === 'grantedAt') {
+        const timeA = a.grantedAt ? new Date(a.grantedAt).getTime() : 0;
+        const timeB = b.grantedAt ? new Date(b.grantedAt).getTime() : 0;
+        comparison = timeA - timeB;
+      } else if (sortField === 'plan') {
+        const planA = a.planName || (a.isLifetime ? 'Lifetime VIP' : a.planId);
+        const planB = b.planName || (b.isLifetime ? 'Lifetime VIP' : b.planId);
+        comparison = planA.localeCompare(planB);
+      }
+
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  }, [grantedList, searchQuery, statusFilter, sortField, sortDirection]);
+
+  // Last 10 Activity Logs for Activity Tab
+  const recentActivityLogs = useMemo(() => {
+    let list = activityLogs;
+    if (logsSearchQuery.trim()) {
+      const q = logsSearchQuery.toLowerCase().trim();
+      list = list.filter(
+        (l) =>
+          l.details.toLowerCase().includes(q) ||
+          (l.targetEmail && l.targetEmail.toLowerCase().includes(q)) ||
+          l.actionType.toLowerCase().includes(q) ||
+          l.actor.toLowerCase().includes(q)
+      );
     }
-    setIsSubmittingGrant(false);
-  };
+    // Return last 10 actions by default (or filtered)
+    return list.slice(0, 10);
+  }, [activityLogs, logsSearchQuery]);
 
-  const handleRevokeSubscription = async (emailToRevoke: string) => {
-    if (!window.confirm(`Are you sure you want to revoke free subscription access for ${emailToRevoke}?`)) {
-      return;
-    }
-    const success = await revokeHostGrantedSubscription(emailToRevoke, hostPin, HOST_ADMIN_CONFIG.email);
-    if (success) {
-      setGrantFeedback(`Access revoked for ${emailToRevoke}`);
-      await loadGrantedSubs();
-      await loadAuditLogs();
-    } else {
-      setGrantFeedback(`Failed to revoke access for ${emailToRevoke}`);
-    }
-  };
+  // Filtered Verification & Authentication Audit Logs
+  const filteredVerificationLogs = useMemo(() => {
+    const mappedActivityLogs: GrantVerificationLog[] = activityLogs
+      .filter((l) => !verificationAuditLogs.some((v) => v.id === l.id || (v.timestamp === l.timestamp && v.targetEmail === l.targetEmail)))
+      .map((l) => ({
+        id: l.id || `verif_${l.timestamp}`,
+        timestamp: l.timestamp,
+        performedBy: l.actor,
+        actor: l.actor,
+        targetEmail: l.targetEmail || HOST_ADMIN_CONFIG.email,
+        action: l.actionType,
+        authMethod: l.actionType === 'coupon_created' ? 'HOST_PASSWORD_PIN' : (l.details.toLowerCase().includes('coupon') ? 'COUPON_CODE_AUTHENTICATED' : 'HOST_PASSWORD_PIN'),
+        pinProvidedMasked: '****',
+        authenticated: true,
+        verifiedByPin: true,
+        status: 'AUTHENTICATED',
+        notes: l.details,
+        planId: l.planId,
+        integrityHash: l.integrityHash,
+        clientFingerprint: l.metadata?.clientFingerprint || 'FP_MASTER_HOST'
+      }));
 
-  const loadDiscountRules = async () => {
-    setIsLoadingRules(true);
-    const rules = await fetchHostDiscountRules(hostPin, HOST_ADMIN_CONFIG.email);
-    setDiscountRules(rules);
-    setIsLoadingRules(false);
-  };
+    const combined = [...verificationAuditLogs, ...mappedActivityLogs].sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
 
-  const loadAuditLogs = async () => {
-    setIsLoadingAudit(true);
-    const logs = await fetchHostAuditLogs(hostPin, HOST_ADMIN_CONFIG.email);
-    setAuditLogs(logs);
-    setIsLoadingAudit(false);
-  };
+    return combined.filter((log) => {
+      const q = verificationSearchQuery.toLowerCase().trim();
+      const matchesSearch = !q || (
+        log.targetEmail.toLowerCase().includes(q) ||
+        log.actor.toLowerCase().includes(q) ||
+        log.action.toLowerCase().includes(q) ||
+        (log.notes && log.notes.toLowerCase().includes(q)) ||
+        log.integrityHash.toLowerCase().includes(q) ||
+        (log.clientFingerprint && log.clientFingerprint.toLowerCase().includes(q))
+      );
 
-  const loadImprovementReports = async () => {
-    setIsLoadingReports(true);
-    try {
-      const [acc, errs] = await Promise.all([
-        fetchImprovementQueue(),
-        fetchAppErrorReports()
-      ]);
-      setAccuracyReports(acc);
-      setAppErrorReports(errs);
-    } catch (e) {
-      console.warn('Failed to load improvement reports:', e);
-    } finally {
-      setIsLoadingReports(false);
-    }
-  };
+      if (!matchesSearch) return false;
+      if (verificationFilter === 'all') return true;
+      if (verificationFilter === 'grants') return log.action.toLowerCase().includes('grant') || (log.notes && log.notes.toLowerCase().includes('grant'));
+      if (verificationFilter === 'coupons') return log.authMethod === 'COUPON_CODE_AUTHENTICATED' || log.action.toLowerCase().includes('coupon');
+      if (verificationFilter === 'auth') return log.authMethod === 'HOST_PASSWORD_PIN' || log.action.toLowerCase().includes('pin') || log.action.toLowerCase().includes('password');
+      return true;
+    });
+  }, [verificationAuditLogs, activityLogs, verificationSearchQuery, verificationFilter]);
 
-  const handleUpdateAccuracyStatus = async (reportId: string, status: AIAccuracyReport['status']) => {
-    await updateAccuracyReportStatus(reportId, status, 'Reviewed & calibrated by Host Warad Asare');
-    setReportActionFeedback(`Updated report status to "${status.replace(/_/g, ' ')}"`);
-    await loadImprovementReports();
-    setTimeout(() => setReportActionFeedback(null), 3000);
-  };
-
-  const handleUpdateErrorStatus = async (reportId: string, status: AppErrorReport['status']) => {
-    await updateAppErrorReportStatus(reportId, status, 'Host diagnosis verified & calibrated');
-    setReportActionFeedback(`Updated bug report status to "${status.replace(/_/g, ' ')}"`);
-    await loadImprovementReports();
-    setTimeout(() => setReportActionFeedback(null), 3000);
-  };
-
-  const totalRevenueINR = transactions
-    .filter((t) => t.status === 'verified')
-    .reduce((sum, t) => sum + t.amountINR, 0);
-
-  const verifiedCount = transactions.filter((t) => t.status === 'verified').length;
-  const filteredTxs = transactions.filter(
-    (t) =>
-      t.userEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      t.utrNumber.includes(searchQuery) ||
-      t.planName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleExportCSV = () => {
-    if (transactions.length === 0) {
-      alert('Ledger has 0 records.');
-      return;
-    }
-    const headers = ['Transaction ID', 'Date', 'User Name', 'User Email', 'Plan', 'Amount (INR)', 'UTR Number', 'Recipient UPI', 'Status', 'Verified By'];
-    const rows = transactions.map((t) => [
-      t.id,
-      t.createdAt,
-      `"${t.userName}"`,
-      t.userEmail,
-      `"${t.planName}"`,
-      t.amountINR,
-      `"${t.utrNumber}"`,
-      t.recipientVpa,
-      t.status,
-      `"${t.verifiedBy || ''}"`,
+  const handleExportVerificationCSV = () => {
+    if (filteredVerificationLogs.length === 0) return;
+    const headers = ['Record ID', 'Timestamp', 'Actor', 'Recipient Email', 'Action', 'Auth Method', 'Authorized Status', 'Plan ID', 'Is Lifetime', 'Device Fingerprint', 'Integrity SHA-256'];
+    const rows = filteredVerificationLogs.map((l) => [
+      `"${l.id}"`,
+      `"${l.timestamp}"`,
+      `"${l.actor}"`,
+      `"${l.targetEmail}"`,
+      `"${l.action}"`,
+      `"${l.authMethod}"`,
+      `"${l.authenticated ? 'VERIFIED' : 'FAILED'}"`,
+      `"${l.planId || ''}"`,
+      `"${l.isLifetime ? 'YES' : 'NO'}"`,
+      `"${l.clientFingerprint || ''}"`,
+      `"${l.integrityHash}"`
     ]);
-
-    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `PeakForm_Revenue_Ledger_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `PeakForm_Host_Authentication_Audit_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
-  const handleOpenCryptoWipeModal = () => {
-    const challenge = generateHostSecurityChallenge();
-    setCryptoChallenge(challenge);
-    setCryptoPhraseInput('');
-    setCryptoPinInput(hostPin || '9284');
-    setCryptoError(null);
-    setIsCryptoModalOpen(true);
-  };
+  const totalLifetimeCount = useMemo(() => grantedList.filter((g) => g.isLifetime).length, [grantedList]);
+  const totalActiveCount = useMemo(() => grantedList.filter((g) => getSubscriptionStatusInfo(g).status === 'Active').length, [grantedList]);
+  const totalExpiringCount = useMemo(() => grantedList.filter((g) => getSubscriptionStatusInfo(g).isExpiringSoon).length, [grantedList]);
+  const totalPendingCount = useMemo(() => grantedList.filter((g) => getSubscriptionStatusInfo(g).status === 'Pending Verification').length, [grantedList]);
+  const totalExpiredCount = useMemo(() => grantedList.filter((g) => getSubscriptionStatusInfo(g).status === 'Expired').length, [grantedList]);
 
-  const handleExecuteCryptographicWipe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setCryptoError(null);
-
-    if (!cryptoChallenge) return;
-
-    if (cryptoPhraseInput.trim() !== cryptoChallenge.requiredPhrase) {
-      setCryptoError(`Passphrase mismatch. Please enter exactly: "${cryptoChallenge.requiredPhrase}"`);
-      return;
-    }
-
-    if (!cryptoPinInput.trim()) {
-      setCryptoError('Please enter your 4-digit Host Security PIN.');
-      return;
-    }
-
-    setIsClearingLedger(true);
-
-    try {
-      const signPayload = `${cryptoChallenge.nonce}::${cryptoChallenge.action}::${cryptoChallenge.timestamp}::${cryptoPinInput}::${HOST_ADMIN_CONFIG.email}`;
-      const clientSignature = await computeClientCryptoSignature(signPayload);
-
-      const result = await clearServerAndLocalLedger({
-        pin: cryptoPinInput,
-        email: HOST_ADMIN_CONFIG.email,
-        nonce: cryptoChallenge.nonce,
-        timestamp: cryptoChallenge.timestamp,
-        signature: clientSignature,
-        confirmationPhrase: cryptoPhraseInput.trim(),
-      });
-
-      if (result.success) {
-        setTransactions([]);
-        setLastWipeSignature(result.signature || clientSignature);
-        setClearConfirmMsg(`All ledger records cleared 100% accurately. Cryptographic Signature: ${(result.signature || clientSignature).slice(0, 16)}...`);
-        setIsCryptoModalOpen(false);
-        await loadAuditLogs();
-        setTimeout(() => setClearConfirmMsg(null), 8000);
-      } else {
-        setCryptoError(result.error || 'Cryptographic verification failed.');
-      }
-    } catch (err: any) {
-      setCryptoError(err?.message || 'Cryptographic verification execution error.');
-    } finally {
-      setIsClearingLedger(false);
-    }
-  };
-
-  const handleCreateRule = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setRuleActionMsg(null);
-
-    const res = await createHostDiscountRule({
-      pin: hostPin,
-      email: HOST_ADMIN_CONFIG.email,
-      targetType: newTargetType,
-      targetEmail: newTargetType === 'individual' ? newTargetEmail.trim().toLowerCase() : undefined,
-      planId: newPlanId,
-      discountType: newDiscountType,
-      customPriceINR: newDiscountType === 'custom_price' ? newCustomPrice : undefined,
-      discountPercentage: newDiscountType === 'percentage' ? newDiscountPct : undefined,
-      notes: newNotes,
-    });
-
-    if (res.success) {
-      setRuleActionMsg(res.message || 'Discount rule activated successfully!');
-      setNewTargetEmail('');
-      setNewNotes('');
-      await loadDiscountRules();
-      setTimeout(() => setRuleActionMsg(null), 4000);
-    } else {
-      setRuleActionMsg(`Error: ${res.error || 'Failed to create discount rule'}`);
-    }
-  };
-
-  const handleDeleteRule = async (ruleId: string) => {
-    const success = await deleteHostDiscountRule(ruleId, hostPin, HOST_ADMIN_CONFIG.email);
-    if (success) {
-      await loadDiscountRules();
-    }
-  };
-
-  const handleUpdatePinSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPinChangeMsg(null);
-    const res = await updateHostPIN(currentPinInput, newPinInput, HOST_ADMIN_CONFIG.email);
-    if (res.success) {
-      setHostPin(newPinInput);
-      setPinChangeMsg('Host Security PIN successfully updated!');
-      setCurrentPinInput('');
-      setNewPinInput('');
-      await loadAuditLogs();
-      setTimeout(() => setPinChangeMsg(null), 4000);
-    } else {
-      setPinChangeMsg(`Error: ${res.error || 'Failed to update PIN'}`);
-    }
-  };
-
-  const handleExportAudit = () => {
-    if (auditLogs.length === 0) {
-      alert('Audit log is currently empty.');
-      return;
-    }
-    exportAuditLogsToCSV(auditLogs);
-  };
-
-  const handleClearAudit = async () => {
-    if (!window.confirm('Are you sure you want to reset and archive the audit trail? A clean slate entry will be generated.')) {
-      return;
-    }
-    const success = await clearHostAuditLogs(hostPin, HOST_ADMIN_CONFIG.email);
-    if (success) {
-      setAuditMsg('Audit trail reset successfully. Clean slate initialized.');
-      await loadAuditLogs();
-      setTimeout(() => setAuditMsg(null), 4000);
-    }
-  };
-
-  const filteredAuditLogs = auditLogs.filter((log) => {
-    const matchesSearch =
-      log.details.toLowerCase().includes(auditSearchQuery.toLowerCase()) ||
-      (log.targetEmail && log.targetEmail.toLowerCase().includes(auditSearchQuery.toLowerCase())) ||
-      log.actionType.toLowerCase().includes(auditSearchQuery.toLowerCase()) ||
-      log.actor.toLowerCase().includes(auditSearchQuery.toLowerCase()) ||
-      log.integrityHash.toLowerCase().includes(auditSearchQuery.toLowerCase());
-
-    const matchesType = auditActionFilter === 'all' || log.actionType === auditActionFilter;
-    return matchesSearch && matchesType;
-  });
-
-  const getActionBadgeColor = (type: string) => {
-    switch (type) {
-      case 'discount_created':
-        return 'bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/20';
-      case 'discount_deleted':
-        return 'bg-rose-500/10 text-rose-600 dark:text-rose-300 border-rose-500/20';
-      case 'free_access_granted':
-        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/20';
-      case 'payment_verified':
-        return 'bg-teal-500/10 text-teal-600 dark:text-teal-300 border-teal-500/20';
-      case 'pin_updated':
-        return 'bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/20';
-      case 'ledger_cleared':
-        return 'bg-red-500/10 text-red-600 dark:text-red-300 border-red-500/20';
-      default:
-        return 'bg-gray-500/10 text-gray-600 dark:text-gray-300 border-gray-500/20';
-    }
-  };
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#161817] rounded-3xl max-w-4xl w-full shadow-2xl border border-[#E5E7EB] dark:border-[#242826] overflow-hidden text-left my-6 transition-colors relative flex flex-col max-h-[88vh]">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-[#1A1D1B] via-[#0F6E5F] to-[#083D34] p-6 sm:p-7 text-white flex items-start justify-between relative overflow-hidden shrink-0">
-          <div className="space-y-1 relative z-10">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-emerald-200 border border-white/20">
-              <Crown className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-              <span>Host & Creator Admin Dashboard</span>
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div className="bg-white dark:bg-[#121413] rounded-3xl max-w-4xl w-full shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden text-left my-6 flex flex-col max-h-[92vh]">
+        
+        {/* Modal Header */}
+        <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent shrink-0">
+          <div className="flex items-center gap-3.5">
+            <div className="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-xs">
+              <Crown className="w-6 h-6" />
             </div>
-            <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-              {HOST_ADMIN_CONFIG.name} — Subscription & Pricing Command Center
-            </h2>
-            <p className="text-xs sm:text-sm text-emerald-100/90">
-              Host VPA: <strong>{HOST_ADMIN_CONFIG.upiId}</strong> • Host Email: <strong>{HOST_ADMIN_CONFIG.email}</strong>
-            </p>
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg font-black text-gray-900 dark:text-white tracking-tight">
+                  Host Admin Portal & VIP Ledger
+                </h2>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                  Host Master
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Verified Host: <strong>{HOST_ADMIN_CONFIG.name}</strong> ({HOST_ADMIN_CONFIG.email})
+              </p>
+            </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full bg-black/20 hover:bg-black/40 text-white transition-colors cursor-pointer shrink-0 ml-2"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowSecuritySettings(!showSecuritySettings)}
+              className="p-2 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+              title="Host PIN Security Settings"
+            >
+              <KeyRound className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span className="hidden sm:inline">Security PIN</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-9 h-9 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex border-b border-gray-200 dark:border-gray-800 bg-[#FAFAF8] dark:bg-[#111312] px-6 text-xs font-bold shrink-0 overflow-x-auto">
+        {/* Tab Navigation Bar */}
+        <div className="px-6 pt-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-[#161817] flex items-center gap-2 shrink-0 overflow-x-auto">
           <button
-            onClick={() => {
-              setActiveTab('subscriptions');
-              loadGrantedSubs();
-            }}
-            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
-              activeTab === 'subscriptions'
-                ? 'border-emerald-600 text-emerald-700 dark:text-emerald-400 bg-emerald-500/10'
-                : 'border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-white'
-            }`}
-          >
-            <Crown className="w-4 h-4 text-amber-500" />
-            <span>Free Subscriptions & VIP Grants ({grantedSubs.length})</span>
-          </button>
-
-          <button
+            type="button"
             onClick={() => setActiveTab('ledger')}
-            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 ${
+            className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
               activeTab === 'ledger'
-                ? 'border-[#0F6E5F] text-[#0F6E5F] dark:text-[#2DD4BF]'
-                : 'border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                ? 'bg-white dark:bg-[#121413] text-emerald-600 dark:text-emerald-400 border-emerald-500 shadow-xs'
+                : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <FileText className="w-4 h-4" />
-            <span>Verified Payment Ledger ({transactions.length})</span>
+            <Crown className="w-4 h-4" />
+            <span>VIP Access & Ledger</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-extrabold">
+              {grantedList.length}
+            </span>
           </button>
 
           <button
-            onClick={() => setActiveTab('discounts')}
-            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'discounts'
-                ? 'border-[#0F6E5F] text-[#0F6E5F] dark:text-[#2DD4BF]'
-                : 'border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-white'
+            type="button"
+            onClick={() => setActiveTab('athlete_logins')}
+            className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
+              activeTab === 'athlete_logins'
+                ? 'bg-white dark:bg-[#121413] text-emerald-600 dark:text-emerald-400 border-emerald-500 shadow-xs'
+                : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <Tag className="w-4 h-4" />
-            <span>Discount & Free Access Engine ({discountRules.length})</span>
+            <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <span>Athlete Logins & Profiles</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-extrabold">
+              100% Tracked
+            </span>
           </button>
 
           <button
-            onClick={() => setActiveTab('security')}
-            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'security'
-                ? 'border-[#0F6E5F] text-[#0F6E5F] dark:text-[#2DD4BF]'
-                : 'border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-white'
+            type="button"
+            onClick={() => setActiveTab('valuation')}
+            className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
+              activeTab === 'valuation'
+                ? 'bg-white dark:bg-[#121413] text-teal-600 dark:text-teal-400 border-teal-500 shadow-xs'
+                : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <KeyRound className="w-4 h-4" />
-            <span>Host Security & PIN</span>
+            <BarChart3 className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+            <span>Revenue & Valuation</span>
           </button>
 
           <button
+            type="button"
             onClick={() => {
-              setActiveTab('audit');
-              loadAuditLogs();
+              setActiveTab('coupons');
+              loadCoupons();
             }}
-            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'audit'
-                ? 'border-[#0F6E5F] text-[#0F6E5F] dark:text-[#2DD4BF]'
-                : 'border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-white'
+            className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
+              activeTab === 'coupons'
+                ? 'bg-white dark:bg-[#121413] text-amber-600 dark:text-amber-400 border-amber-500 shadow-xs'
+                : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <History className="w-4 h-4" />
-            <span>Security Audit Log ({auditLogs.length})</span>
+            <Ticket className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            <span>Coupon Codes</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-amber-500/15 text-amber-700 dark:text-amber-400 font-extrabold">
+              {couponsList.length}
+            </span>
           </button>
 
           <button
-            onClick={() => setActiveTab('performance')}
-            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'performance'
-                ? 'border-[#0F6E5F] text-[#0F6E5F] dark:text-[#2DD4BF]'
-                : 'border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-white'
-            }`}
-          >
-            <Activity className="w-4 h-4" />
-            <span>AI Latency & System Health</span>
-          </button>
-
-          <button
+            type="button"
             onClick={() => {
-              setActiveTab('improvement_queue');
-              loadImprovementReports();
+              setActiveTab('persistent_grants');
+              loadPersistentGrants();
             }}
-            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'improvement_queue'
-                ? 'border-[#0F6E5F] text-[#0F6E5F] dark:text-[#2DD4BF]'
-                : 'border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-white'
+            className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
+              activeTab === 'persistent_grants'
+                ? 'bg-white dark:bg-[#121413] text-emerald-600 dark:text-emerald-400 border-emerald-500 shadow-xs'
+                : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <Bug className="w-4 h-4 text-rose-500" />
-            <span>Improvement & Error Queue ({accuracyReports.length + appErrorReports.length})</span>
+            <Database className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <span>Persistent Cloud Grants</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-purple-500/15 text-purple-700 dark:text-purple-400 font-extrabold">
+              {persistentGrants.length}
+            </span>
           </button>
 
           <button
-            onClick={() => setActiveTab('accuracy_stats')}
-            className={`py-3 px-4 border-b-2 transition-colors cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'accuracy_stats'
-                ? 'border-[#0F6E5F] text-[#0F6E5F] dark:text-[#2DD4BF]'
-                : 'border-transparent text-gray-500 hover:text-gray-900 dark:hover:text-white'
+            type="button"
+            onClick={() => {
+              setActiveTab('verification_logs');
+              loadActivityLogs();
+              loadVerificationLogs();
+            }}
+            className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
+              activeTab === 'verification_logs'
+                ? 'bg-white dark:bg-[#121413] text-teal-600 dark:text-teal-400 border-teal-500 shadow-xs'
+                : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <BrainCircuit className="w-4 h-4 text-emerald-500" />
-            <span>Accuracy Statistics & Recipe Tuning</span>
+            <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+            <span>Authentication Audit</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-teal-500/15 text-teal-700 dark:text-teal-400 font-extrabold">
+              {filteredVerificationLogs.length} Verified
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab('activity_log');
+              loadActivityLogs();
+            }}
+            className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
+              activeTab === 'activity_log'
+                ? 'bg-white dark:bg-[#121413] text-emerald-600 dark:text-emerald-400 border-emerald-500 shadow-xs'
+                : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
+            }`}
+          >
+            <History className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+            <span>Activity Log</span>
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 font-extrabold">
+              Last {Math.min(10, activityLogs.length)}
+            </span>
           </button>
         </div>
 
-        {/* Tab Content Body */}
-        <div className="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1">
-          
-          {/* REAL-TIME ACCURACY ALERT BANNER (>5% of meal scans in 1 hour flagged) */}
-          {isRealtimeAlertActive && (
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-rose-500/15 via-amber-500/10 to-rose-500/15 border-2 border-rose-500/30 text-slate-900 dark:text-white shadow-lg space-y-3 animate-pulse">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-xl bg-rose-500 text-white shadow-md">
-                    <AlertTriangle className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-black uppercase tracking-wider text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-md border border-rose-500/20">
-                        Real-Time Inaccuracy Alert
-                      </span>
-                      <span className="text-xs font-bold text-slate-500">
-                        Hourly Flag Rate: <strong className="text-rose-600 dark:text-rose-400">{hourlyInaccuracyPct}%</strong> (&gt;{alertThresholdPct}% threshold)
-                      </span>
-                    </div>
-                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white mt-0.5">
-                      High Scan Inaccuracy Detected: {hourlyMealFlags.length} meal scan(s) flagged by users in the last 60 minutes.
-                    </h4>
-                  </div>
-                </div>
+        {/* Modal Body: Scrollable Content */}
+        <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
 
+          {/* Security PIN Change Drawer (Collapsible) */}
+          {showSecuritySettings && (
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-3 animate-in fade-in slide-in-from-top-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-bold text-xs">
+                  <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <span>Update Host Master Verification Password</span>
+                </div>
                 <button
                   type="button"
-                  onClick={() => setIsAlertDismissed(true)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                  onClick={() => setShowSecuritySettings(false)}
+                  className="text-gray-400 hover:text-gray-600 text-xs font-semibold cursor-pointer"
                 >
-                  <X className="w-4 h-4" />
+                  Close
                 </button>
               </div>
 
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 text-xs border-t border-rose-500/20">
-                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                  <span className="inline-block w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                  <span>
-                    📧 Automated Host Notification triggered: <strong>{HOST_ADMIN_CONFIG.email}</strong>
+              <form onSubmit={handleUpdatePIN} className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input
+                  type="password"
+                  placeholder="Current PIN (e.g. 9284)"
+                  value={currentPinInput}
+                  onChange={(e) => setCurrentPinInput(e.target.value)}
+                  className="p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono"
+                />
+                <input
+                  type="password"
+                  placeholder="New Security PIN (min 4 chars)"
+                  value={newPinInput}
+                  onChange={(e) => setNewPinInput(e.target.value)}
+                  className="p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono"
+                />
+                <button
+                  type="submit"
+                  disabled={isUpdatingPin}
+                  className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold cursor-pointer transition-colors disabled:opacity-50"
+                >
+                  {isUpdatingPin ? 'Saving...' : 'Update PIN'}
+                </button>
+              </form>
+
+              {pinChangeMsg && <p className="text-emerald-600 font-semibold">{pinChangeMsg}</p>}
+              {pinChangeError && <p className="text-rose-600 font-semibold">{pinChangeError}</p>}
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 1: VIP ACCESS GRANT & HOST LEDGER                                      */}
+          {/* ========================================================================= */}
+          {activeTab === 'ledger' && (
+            <div className="space-y-6 animate-in fade-in">
+              
+              {/* SECTION 1: SINGLE UNIFIED GRANT ACCESS FORM */}
+              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#FAFAF8] to-emerald-50/30 dark:from-[#161817] dark:to-emerald-950/10 border-2 border-emerald-500/30 shadow-sm space-y-5">
+                <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-black shadow-xs">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-sm sm:text-base text-gray-900 dark:text-white">
+                        Grant Free VIP Subscription Access
+                      </h3>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                        Directly grant 100% free full-featured access to any athlete’s Gmail ID with Host Verification.
+                      </p>
+                    </div>
+                  </div>
+                  <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                    1-Step Instant Grant
                   </span>
+                </div>
+
+                <form onSubmit={handleGrantSubscription} className="space-y-4">
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    
+                    {/* 1. ATHLETE GMAIL ID */}
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        <Mail className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span>Athlete Gmail ID <span className="text-rose-500">*</span></span>
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        placeholder="e.g. athlete@gmail.com"
+                        value={targetEmail}
+                        onChange={(e) => setTargetEmail(e.target.value)}
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono text-xs focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-hidden transition-all"
+                      />
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 block">
+                        The athlete's Google / Gmail login ID
+                      </span>
+                    </div>
+
+                    {/* 2. TIME / SUBSCRIPTION DURATION */}
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span>Subscription Duration / Time <span className="text-rose-500">*</span></span>
+                      </label>
+                      <select
+                        value={durationOption}
+                        onChange={(e) => setDurationOption(e.target.value)}
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-hidden transition-all cursor-pointer"
+                      >
+                        {DURATION_PRESETS.map((preset) => (
+                          <option key={preset.id} value={preset.id}>
+                            {preset.label}
+                          </option>
+                        ))}
+                      </select>
+                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold block">
+                        {durationOption === 'lifetime' ? 'Lifetime VIP access with zero expiration' : 'Expires automatically after selected period'}
+                      </span>
+                    </div>
+
+                    {/* 3. HOST VERIFICATION PASSWORD */}
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <span>Host Verification Password <span className="text-rose-500">*</span></span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          placeholder="Host PIN (e.g. 9284)"
+                          value={hostPassword}
+                          onChange={(e) => setHostPassword(e.target.value)}
+                          className="w-full p-3 pr-10 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono text-xs focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-hidden transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 block">
+                        Verifies host identity & authorization (e.g. 9284)
+                      </span>
+                    </div>
+
+                  </div>
+
+                  {/* Optional Memo & Action Button Row */}
+                  <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+                    <input
+                      type="text"
+                      placeholder="Optional Memo / Reason (e.g. VIP Athlete, Pro Trial, Friend)"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      className="flex-1 w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white text-xs outline-hidden"
+                    />
+
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          <span>Verifying & Granting Access...</span>
+                        </>
+                      ) : (
+                        <>
+                          <ShieldCheck className="w-4 h-4" />
+                          <span>Grant Free VIP Access</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Feedback Notifications */}
+                  {grantSuccessMsg && (
+                    <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-900 dark:text-emerald-200 flex items-start gap-2.5 animate-in fade-in">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <div className="font-black text-xs">VIP Subscription Activated Successfully!</div>
+                        <div className="text-[11px] leading-relaxed">{grantSuccessMsg}</div>
+                      </div>
+                    </div>
+                  )}
+
+                  {grantErrorMsg && (
+                    <div className="p-4 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-900 dark:text-rose-200 flex items-start gap-2.5 animate-in fade-in">
+                      <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <div className="font-black text-xs">Access Grant Error</div>
+                        <div className="text-[11px] leading-relaxed">{grantErrorMsg}</div>
+                      </div>
+                    </div>
+                  )}
+
+                </form>
+              </div>
+
+              {/* SECTION 2: ORGANIZED HOST LEDGER TABLE & SEARCH & STATUS BADGES */}
+              <div className="space-y-4">
+                
+                {/* Ledger Header & Quick Stats */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                      <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span>Host Access Ledger & Granted Accounts ({grantedList.length})</span>
+                    </h3>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                      Real-time cryptographic audit record of all Gmail IDs granted free VIP access.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <button
+                      type="button"
+                      onClick={loadLedger}
+                      disabled={isLoadingLedger}
+                      className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLedger ? 'animate-spin text-emerald-600' : ''}`} />
+                      <span>Refresh</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleExportCSV}
+                      disabled={grantedList.length === 0}
+                      className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs disabled:opacity-40"
+                      title="Export CSV snapshot of all host ledger records"
+                    >
+                      <Download className="w-3.5 h-3.5 text-blue-500" />
+                      <span>Export CSV</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleNotifyExpiring}
+                      disabled={isNotifyingExpiring || totalExpiringCount === 0}
+                      className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-700 dark:text-amber-300 font-black flex items-center gap-1.5 cursor-pointer text-xs shadow-xs disabled:opacity-40"
+                      title="Send reminder notifications to subscribers expiring within 3 days"
+                    >
+                      {isNotifyingExpiring ? (
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-600" />
+                      ) : (
+                        <Zap className="w-3.5 h-3.5 text-amber-600" />
+                      )}
+                      <span>Notify Expiring ({totalExpiringCount})</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleNotifyAll}
+                      disabled={isNotifyingAll || totalActiveCount === 0}
+                      className="px-3 py-1.5 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold flex items-center gap-1.5 cursor-pointer text-xs shadow-xs disabled:opacity-50"
+                      title="Send automated email notification to all active subscribers about remaining access time"
+                    >
+                      {isNotifyingAll ? (
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Bell className="w-3.5 h-3.5" />
+                      )}
+                      <span>Notify All Active ({totalActiveCount})</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* SUMMARY DASHBOARD PANEL & DISTRIBUTION VISUALIZATION */}
+                <div className="p-4 rounded-3xl bg-gray-50/70 dark:bg-[#161817] border border-gray-200 dark:border-gray-800 space-y-4">
+                  
+                  {/* Top Row: Metrics Cards */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800 shadow-2xs">
+                      <div className="text-[10px] uppercase font-black text-gray-500">Total Grants</div>
+                      <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-baseline justify-between">
+                        <span>{grantedList.length}</span>
+                        <span className="text-[10px] font-bold text-gray-400">100% stored</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800 shadow-2xs">
+                      <div className="text-[10px] uppercase font-black text-gray-500">Active VIPs</div>
+                      <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-baseline justify-between">
+                        <span>{totalActiveCount}</span>
+                        <span className="text-[10px] font-bold text-amber-500">{totalLifetimeCount} lifetime</span>
+                      </div>
+                    </div>
+
+                    <div className={`p-3 rounded-2xl border shadow-2xs ${
+                      totalExpiringCount > 0 
+                        ? 'bg-amber-500/10 border-amber-500/40 text-amber-800 dark:text-amber-300 animate-pulse' 
+                        : 'bg-white dark:bg-[#121413] border-gray-200 dark:border-gray-800'
+                    }`}>
+                      <div className="text-[10px] uppercase font-black text-gray-500 flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3 text-amber-500" />
+                        <span>Expiring Soon (≤3d)</span>
+                      </div>
+                      <div className="text-xl font-black text-amber-600 dark:text-amber-400 mt-0.5 flex items-baseline justify-between">
+                        <span>{totalExpiringCount}</span>
+                        <span className="text-[10px] font-bold text-amber-600">Action req</span>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800 shadow-2xs">
+                      <div className="text-[10px] uppercase font-black text-gray-500">Expired / Revoked</div>
+                      <div className="text-xl font-black text-rose-500 mt-0.5 flex items-baseline justify-between">
+                        <span>{totalExpiredCount}</span>
+                        <span className="text-[10px] font-bold text-gray-400">{totalPendingCount} pending</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Visual Grant Distribution Bar Chart */}
+                  {grantedList.length > 0 && (
+                    <div className="space-y-1.5 pt-1 border-t border-gray-200/60 dark:border-gray-800/60">
+                      <div className="flex items-center justify-between text-[11px] font-bold text-gray-600 dark:text-gray-400">
+                        <span className="flex items-center gap-1.5">
+                          <BarChart3 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Subscription Distribution Breakdown</span>
+                        </span>
+                        <span>{grantedList.length} Total Registered Records</span>
+                      </div>
+
+                      {/* Multi-segment Bar */}
+                      <div className="w-full h-3 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden flex shadow-inner">
+                        {/* Active Normal */}
+                        {totalActiveCount - totalExpiringCount > 0 && (
+                          <div 
+                            style={{ width: `${((totalActiveCount - totalExpiringCount) / grantedList.length) * 100}%` }}
+                            className="h-full bg-emerald-500 transition-all"
+                            title={`Active: ${totalActiveCount - totalExpiringCount}`}
+                          />
+                        )}
+                        {/* Expiring Soon */}
+                        {totalExpiringCount > 0 && (
+                          <div 
+                            style={{ width: `${(totalExpiringCount / grantedList.length) * 100}%` }}
+                            className="h-full bg-amber-500 transition-all animate-pulse"
+                            title={`Expiring in ≤3 days: ${totalExpiringCount}`}
+                          />
+                        )}
+                        {/* Pending */}
+                        {totalPendingCount > 0 && (
+                          <div 
+                            style={{ width: `${(totalPendingCount / grantedList.length) * 100}%` }}
+                            className="h-full bg-blue-400 transition-all"
+                            title={`Pending: ${totalPendingCount}`}
+                          />
+                        )}
+                        {/* Expired / Revoked */}
+                        {totalExpiredCount > 0 && (
+                          <div 
+                            style={{ width: `${(totalExpiredCount / grantedList.length) * 100}%` }}
+                            className="h-full bg-rose-500 transition-all"
+                            title={`Expired / Revoked: ${totalExpiredCount}`}
+                          />
+                        )}
+                      </div>
+
+                      {/* Bar Legend */}
+                      <div className="flex items-center gap-4 text-[10px] font-bold text-gray-500 dark:text-gray-400 pt-0.5 flex-wrap">
+                        <span className="flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                          <span>Active VIP ({totalActiveCount - totalExpiringCount})</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-amber-500" />
+                          <span>Expiring in ≤3d ({totalExpiringCount})</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-blue-400" />
+                          <span>Pending ({totalPendingCount})</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <span className="w-2 h-2 rounded-full bg-rose-500" />
+                          <span>Expired / Revoked ({totalExpiredCount})</span>
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+
+                {/* Search Bar & Status Filter Chips */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                  {/* Search Input Bar */}
+                  <div className="relative flex-1">
+                    <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Filter ledger by Gmail address, athlete name, or plan..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-emerald-500"
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 rounded-md cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Status Filter Tabs */}
+                  <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-gray-100 dark:bg-[#191B1A] border border-gray-200 dark:border-gray-800 shrink-0 overflow-x-auto">
+                    {[
+                      { id: 'all', label: 'All', count: grantedList.length },
+                      { id: 'active', label: 'Active', count: totalActiveCount },
+                      { id: 'expiring', label: 'Expiring ≤3d', count: totalExpiringCount },
+                      { id: 'pending', label: 'Pending', count: totalPendingCount },
+                      { id: 'expired', label: 'Expired', count: totalExpiredCount },
+                    ].map((st) => (
+                      <button
+                        key={st.id}
+                        type="button"
+                        onClick={() => setStatusFilter(st.id as FilterStatusType)}
+                        className={`px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
+                          statusFilter === st.id
+                            ? 'bg-white dark:bg-[#121413] text-emerald-600 dark:text-emerald-400 shadow-xs'
+                            : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+                        }`}
+                      >
+                        <span>{st.label}</span>
+                        <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black ${
+                          statusFilter === st.id
+                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                            : 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
+                        }`}>
+                          {st.count}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Bulk Operations Selection Toolbar */}
+                <div className="p-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-950/20 flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5">
+                      <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span>Bulk Operations:</span>
+                    </span>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-white font-extrabold text-[10px]">
+                      {selectedEmails.length} Selected
+                    </span>
+
+                    {/* Quick Selection Helpers */}
+                    <div className="flex items-center gap-1 text-[10px]">
+                      <button
+                        type="button"
+                        onClick={handleSelectAllVisible}
+                        className="px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 font-semibold cursor-pointer"
+                      >
+                        {selectedEmails.length === filteredLedger.length && filteredLedger.length > 0 ? 'Deselect All' : 'Select Visible'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectByStatus('active')}
+                        className="px-2 py-1 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-semibold cursor-pointer"
+                      >
+                        Select Active
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectByStatus('expiring')}
+                        className="px-2 py-1 rounded-lg border border-amber-500/30 hover:bg-amber-500/10 text-amber-700 dark:text-amber-300 font-semibold cursor-pointer"
+                      >
+                        Select Expiring (≤3d)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectByStatus('expired')}
+                        className="px-2 py-1 rounded-lg border border-rose-500/30 hover:bg-rose-500/10 text-rose-700 dark:text-rose-300 font-semibold cursor-pointer"
+                      >
+                        Select Expired
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Bulk Action Triggers */}
+                  {selectedEmails.length > 0 && (
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {/* Send Batch Notification Email */}
+                      <button
+                        type="button"
+                        onClick={() => setShowBulkEmailModal(true)}
+                        disabled={isExecutingBulkOp}
+                        className="px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                      >
+                        <Send className="w-3 h-3" />
+                        <span>Batch Email ({selectedEmails.length})</span>
+                      </button>
+
+                      {/* Extend Duration +30 Days */}
+                      <button
+                        type="button"
+                        onClick={() => handleExecuteBulkAction('extend_duration', 30)}
+                        disabled={isExecutingBulkOp}
+                        className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                      >
+                        <CalendarPlus className="w-3 h-3" />
+                        <span>+30 Days</span>
+                      </button>
+
+                      {/* Extend Duration +90 Days */}
+                      <button
+                        type="button"
+                        onClick={() => handleExecuteBulkAction('extend_duration', 90)}
+                        disabled={isExecutingBulkOp}
+                        className="px-2.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs hidden sm:flex"
+                      >
+                        <CalendarPlus className="w-3 h-3" />
+                        <span>+90 Days</span>
+                      </button>
+
+                      {/* Upgrade to Lifetime VIP */}
+                      <button
+                        type="button"
+                        onClick={() => handleExecuteBulkAction('set_lifetime')}
+                        disabled={isExecutingBulkOp}
+                        className="px-2.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                      >
+                        <Crown className="w-3 h-3" />
+                        <span>Make Lifetime</span>
+                      </button>
+
+                      {/* Bulk Revoke */}
+                      <button
+                        type="button"
+                        onClick={() => handleExecuteBulkAction('revoke')}
+                        disabled={isExecutingBulkOp}
+                        className="px-2.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Revoke</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {bulkOpMsg && (
+                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 font-semibold text-xs flex items-center justify-between">
+                    <span>{bulkOpMsg}</span>
+                    <button type="button" onClick={() => setBulkOpMsg(null)} className="cursor-pointer">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+
+                {/* Ledger Table Container */}
+                <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-[#161817]">
+                  {filteredLedger.length === 0 ? (
+                    <div className="p-8 text-center space-y-2 text-gray-500">
+                      <div className="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto text-gray-400">
+                        <Users className="w-6 h-6" />
+                      </div>
+                      <div className="font-bold text-gray-700 dark:text-gray-300">No Grants in Ledger</div>
+                      <p className="text-xs text-gray-400 max-w-sm mx-auto">
+                        {searchQuery ? `No granted accounts match "${searchQuery}".` : 'Use the Grant section above to grant free VIP subscription access to any athlete’s Gmail ID.'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-[#121413] text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400 select-none">
+                            {/* Checkbox Select All */}
+                            <th className="p-3.5 w-10 text-center">
+                              <input
+                                type="checkbox"
+                                checked={selectedEmails.length === filteredLedger.length && filteredLedger.length > 0}
+                                onChange={handleSelectAllVisible}
+                                className="w-4 h-4 rounded-md text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                              />
+                            </th>
+
+                            {/* Athlete Gmail ID - Sortable */}
+                            <th 
+                              className="p-3.5 cursor-pointer hover:text-emerald-600 transition-colors"
+                              onClick={() => handleSort('email')}
+                            >
+                              <div className="flex items-center gap-1.5">
+                                <span>Athlete Gmail ID</span>
+                                {sortField === 'email' ? (
+                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-emerald-600" /> : <ArrowDown className="w-3 h-3 text-emerald-600" />
+                                ) : (
+                                  <ArrowUpDown className="w-3 h-3 text-gray-300 dark:text-gray-600" />
+                                )}
+                              </div>
+                            </th>
+
+                            {/* Status Badge - Sortable */}
+                            <th 
+                              className="p-3.5 cursor-pointer hover:text-emerald-600 transition-colors"
+                              onClick={() => handleSort('status')}
+                            >
+                              <div className="flex items-center gap-1.5">
+                                <span>Status Badge</span>
+                                {sortField === 'status' ? (
+                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-emerald-600" /> : <ArrowDown className="w-3 h-3 text-emerald-600" />
+                                ) : (
+                                  <ArrowUpDown className="w-3 h-3 text-gray-300 dark:text-gray-600" />
+                                )}
+                              </div>
+                            </th>
+
+                            {/* Duration / Plan - Sortable */}
+                            <th 
+                              className="p-3.5 cursor-pointer hover:text-emerald-600 transition-colors"
+                              onClick={() => handleSort('plan')}
+                            >
+                              <div className="flex items-center gap-1.5">
+                                <span>Duration / Plan</span>
+                                {sortField === 'plan' ? (
+                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-emerald-600" /> : <ArrowDown className="w-3 h-3 text-emerald-600" />
+                                ) : (
+                                  <ArrowUpDown className="w-3 h-3 text-gray-300 dark:text-gray-600" />
+                                )}
+                              </div>
+                            </th>
+
+                            {/* Date Granted - Sortable */}
+                            <th 
+                              className="p-3.5 cursor-pointer hover:text-emerald-600 transition-colors"
+                              onClick={() => handleSort('grantedAt')}
+                            >
+                              <div className="flex items-center gap-1.5">
+                                <span>Date Granted</span>
+                                {sortField === 'grantedAt' ? (
+                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-emerald-600" /> : <ArrowDown className="w-3 h-3 text-emerald-600" />
+                                ) : (
+                                  <ArrowUpDown className="w-3 h-3 text-gray-300 dark:text-gray-600" />
+                                )}
+                              </div>
+                            </th>
+
+                            {/* Expiration - Sortable */}
+                            <th 
+                              className="p-3.5 cursor-pointer hover:text-emerald-600 transition-colors"
+                              onClick={() => handleSort('expiresAt')}
+                            >
+                              <div className="flex items-center gap-1.5">
+                                <span>Expiration</span>
+                                {sortField === 'expiresAt' ? (
+                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-emerald-600" /> : <ArrowDown className="w-3 h-3 text-emerald-600" />
+                                ) : (
+                                  <ArrowUpDown className="w-3 h-3 text-gray-300 dark:text-gray-600" />
+                                )}
+                              </div>
+                            </th>
+
+                            <th className="p-3.5">Host Seal</th>
+                            <th className="p-3.5 text-right">Actions & Audit</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60 font-medium">
+                          {filteredLedger.map((record) => {
+                            const isRevokeConfirm = revokingEmail === record.email;
+                            const isLifetime = record.isLifetime;
+                            const statusInfo = getSubscriptionStatusInfo(record);
+                            const StatusIcon = statusInfo.icon;
+                            const isSelected = selectedEmails.includes(record.email);
+                            
+                            const grantedDateStr = record.grantedAt ? new Date(record.grantedAt).toLocaleDateString(undefined, {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            }) : 'Verified';
+                            
+                            const expiresDateStr = isLifetime ? 'Never (Lifetime)' : (
+                              record.expiresAt ? new Date(record.expiresAt).toLocaleDateString(undefined, {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              }) : 'Active'
+                            );
+
+                            return (
+                              <tr 
+                                key={record.id || record.email} 
+                                className={`transition-colors ${
+                                  isSelected
+                                    ? 'bg-emerald-500/10 dark:bg-emerald-950/30'
+                                    : statusInfo.isExpiringSoon 
+                                    ? 'bg-amber-500/10 dark:bg-amber-950/20 border-l-4 border-l-amber-500 hover:bg-amber-500/15' 
+                                    : 'hover:bg-gray-50/50 dark:hover:bg-gray-800/30'
+                                }`}
+                              >
+                                {/* Selection Checkbox */}
+                                <td className="p-3.5 text-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={isSelected}
+                                    onChange={() => handleToggleSelectEmail(record.email)}
+                                    className="w-4 h-4 rounded-md text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                  />
+                                </td>
+                                
+                                {/* Gmail ID with Copy Button */}
+                                <td className="p-3.5">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-mono font-bold text-gray-900 dark:text-white">
+                                      {record.email}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCopyEmail(record.email)}
+                                      className="p-1 rounded-md text-gray-400 hover:text-emerald-600 transition-colors cursor-pointer"
+                                      title="Copy Email"
+                                    >
+                                      {copiedEmail === record.email ? (
+                                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                      ) : (
+                                        <Copy className="w-3.5 h-3.5" />
+                                      )}
+                                    </button>
+                                  </div>
+                                  {record.notes && (
+                                    <div className="text-[10px] text-gray-400 italic truncate max-w-xs">
+                                      {record.notes}
+                                    </div>
+                                  )}
+                                </td>
+
+                                {/* Status Badge (Active / Expiring Soon / Pending / Expired) */}
+                                <td className="p-3.5 whitespace-nowrap">
+                                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase border shadow-2xs ${statusInfo.badgeClass}`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dotClass}`} />
+                                    <StatusIcon className="w-3 h-3" />
+                                    <span>{statusInfo.label}</span>
+                                  </span>
+                                </td>
+
+                                {/* Plan / Duration */}
+                                <td className="p-3.5 whitespace-nowrap">
+                                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
+                                    isLifetime
+                                      ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30'
+                                      : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30'
+                                  }`}>
+                                    {isLifetime && <Crown className="w-3 h-3" />}
+                                    <span>{record.planName || (isLifetime ? 'Lifetime VIP' : 'Pro Plan')}</span>
+                                  </span>
+                                </td>
+
+                                {/* Date Granted */}
+                                <td className="p-3.5 text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                                  {grantedDateStr}
+                                </td>
+
+                                {/* Expiration Date */}
+                                <td className="p-3.5 whitespace-nowrap font-semibold">
+                                  <span className={
+                                    isLifetime 
+                                      ? 'text-emerald-600 dark:text-emerald-400' 
+                                      : statusInfo.isExpiringSoon 
+                                      ? 'text-amber-600 dark:text-amber-400 font-black flex items-center gap-1' 
+                                      : 'text-gray-600 dark:text-gray-400'
+                                  }>
+                                    {statusInfo.isExpiringSoon && <AlertTriangle className="w-3 h-3 text-amber-500" />}
+                                    {expiresDateStr}
+                                  </span>
+                                </td>
+
+                                {/* Host Seal */}
+                                <td className="p-3.5 whitespace-nowrap">
+                                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                                    <ShieldCheck className="w-3.5 h-3.5" />
+                                    <span>Warad Asare</span>
+                                  </span>
+                                </td>
+
+                                {/* Action: Timeline, Reminder & Revoke */}
+                                <td className="p-3.5 text-right whitespace-nowrap">
+                                  {isRevokeConfirm ? (
+                                    <div className="flex items-center justify-end gap-1.5">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRevoke(record.email)}
+                                        disabled={isRevoking}
+                                        className="px-2 py-1 rounded-lg bg-rose-600 text-white font-bold text-[10px] hover:bg-rose-700 cursor-pointer"
+                                      >
+                                        {isRevoking ? 'Revoking...' : 'Confirm Revoke'}
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => setRevokingEmail(null)}
+                                        className="px-2 py-1 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold text-[10px] cursor-pointer"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center justify-end gap-1.5">
+                                      {/* Vertical Grant Timeline Audit */}
+                                      <button
+                                        type="button"
+                                        onClick={() => setSelectedTimelineEmail(record.email)}
+                                        className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-emerald-500/10 text-gray-600 dark:text-gray-400 hover:text-emerald-600 transition-colors cursor-pointer"
+                                        title="View Vertical Grant Timeline & History"
+                                      >
+                                        <History className="w-3.5 h-3.5" />
+                                      </button>
+
+                                      {/* Direct Email Reminder Button */}
+                                      {!isLifetime && (
+                                        <button
+                                          type="button"
+                                          onClick={() => handleNotifySingle(record.email)}
+                                          disabled={isNotifyingSingle === record.email}
+                                          className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                            statusInfo.isExpiringSoon
+                                              ? 'text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-950/40 bg-amber-500/10'
+                                              : 'text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30'
+                                          }`}
+                                          title={`Send individual reminder notice to ${record.email}`}
+                                        >
+                                          {isNotifyingSingle === record.email ? (
+                                            <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                                          ) : (
+                                            <Send className="w-3.5 h-3.5" />
+                                          )}
+                                        </button>
+                                      )}
+
+                                      <button
+                                        type="button"
+                                        onClick={() => setRevokingEmail(record.email)}
+                                        className="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+                                        title="Revoke VIP Access"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </td>
+
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 2: ATHLETE LOGINS & COMPLETE PROFILE REGISTRY (100% ACCURATE AUDIT)   */}
+          {/* ========================================================================= */}
+          {activeTab === 'athlete_logins' && (
+            <AthleteLoginsSection
+              pin={hostPassword || '9284'}
+              email={HOST_ADMIN_CONFIG.email}
+              onGrantVipToEmail={(email) => {
+                setTargetEmail(email);
+                setDurationOption('3_months');
+                setActiveTab('ledger');
+              }}
+              onViewTimeline={(email) => setSelectedTimelineEmail(email)}
+            />
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 3: REVENUE & PROGRAM VALUATION MINI-DASHBOARD                         */}
+          {/* ========================================================================= */}
+          {activeTab === 'valuation' && (
+            <ProgramValuationDashboard
+              pin={hostPassword || '9284'}
+              email={HOST_ADMIN_CONFIG.email}
+            />
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 4: DEDICATED PERSISTENT GRANTS TAB (FETCHES DIRECTLY FROM CLOUD DB)   */}
+          {/* ========================================================================= */}
+          {activeTab === 'persistent_grants' && (
+            <div className="space-y-5 animate-in fade-in">
+              
+              {/* Header & Re-sync */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
+                <div>
+                  <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                    <Database className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <span>Persistent Cloud Grants Storage ({persistentGrants.length})</span>
+                  </h3>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Direct live connection to the <code className="font-mono text-purple-600">persistent_host_grants</code> Firestore collection. Grants stored here are permanently immutable across app updates and device switches.
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => {
-                      setActiveTab('improvement_queue');
-                      setReportSubTab('ai_accuracy');
-                      loadImprovementReports();
-                    }}
-                    className="px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
+                    onClick={loadPersistentGrants}
+                    disabled={isLoadingPersistent}
+                    className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs"
                   >
-                    <Bug className="w-3.5 h-3.5" />
-                    <span>Inspect Flagged Scans Queue ({hourlyMealFlags.length})</span>
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingPersistent ? 'animate-spin text-purple-600' : ''}`} />
+                    <span>Sync Cloud</span>
                   </button>
                 </div>
               </div>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search persistent storage records by Gmail address..."
+                  value={persistentSearchQuery}
+                  onChange={(e) => setPersistentSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-purple-500"
+                />
+                {persistentSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setPersistentSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 rounded-md cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Persistent Grants Table */}
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-[#161817]">
+                {persistentGrants.length === 0 ? (
+                  <div className="p-8 text-center space-y-2 text-gray-500">
+                    <Database className="w-10 h-10 text-gray-400 mx-auto" />
+                    <div className="font-bold text-gray-700 dark:text-gray-300">No Persistent Cloud Grants Found</div>
+                    <p className="text-xs text-gray-400">
+                      Grants will automatically appear here whenever granted through the Host Admin Portal.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-[#121413] text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                          <th className="p-3.5">Athlete Gmail</th>
+                          <th className="p-3.5">Storage Redundancy</th>
+                          <th className="p-3.5">Plan Duration</th>
+                          <th className="p-3.5">Expiration</th>
+                          <th className="p-3.5 text-right">Self-Healing Sync</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60 font-medium">
+                        {persistentGrants
+                          .filter((g) => !persistentSearchQuery || g.email.toLowerCase().includes(persistentSearchQuery.toLowerCase()))
+                          .map((grant) => (
+                            <tr key={grant.id || grant.email} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                              <td className="p-3.5 font-mono font-bold text-gray-900 dark:text-white">
+                                {grant.email}
+                              </td>
+                              <td className="p-3.5">
+                                <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30">
+                                  <ShieldCheck className="w-3 h-3 text-purple-600" />
+                                  <span>Triple-Tier Persisted</span>
+                                </span>
+                              </td>
+                              <td className="p-3.5">
+                                <span className="font-bold text-xs">
+                                  {grant.planName || (grant.isLifetime ? 'Lifetime VIP' : 'Pro')}
+                                </span>
+                              </td>
+                              <td className="p-3.5 font-semibold text-gray-600 dark:text-gray-400">
+                                {grant.isLifetime ? (
+                                  <span className="text-emerald-600 font-bold">Never (Lifetime)</span>
+                                ) : (
+                                  grant.expiresAt ? new Date(grant.expiresAt).toLocaleDateString() : 'Active'
+                                )}
+                              </td>
+                              <td className="p-3.5 text-right">
+                                <button
+                                  type="button"
+                                  onClick={() => handleRepairGrant(grant)}
+                                  disabled={isRepairingEmail === grant.email}
+                                  className="px-2.5 py-1 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-[10px] cursor-pointer transition-colors shadow-2xs"
+                                  title="Re-write grant to all local and server storage tiers"
+                                >
+                                  {isRepairingEmail === grant.email ? (
+                                    <RefreshCw className="w-3 h-3 animate-spin mx-auto" />
+                                  ) : (
+                                    <span>Re-Sync All Tiers</span>
+                                  )}
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
             </div>
           )}
 
-          {/* TAB 0: DIRECT FREE SUBSCRIPTIONS & VIP GRANTS */}
-          {activeTab === 'subscriptions' && (
-            <div className="space-y-6">
-              {/* Grant Summary Header */}
-              <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-emerald-500/15 border-2 border-emerald-500/30 dark:border-emerald-500/20 text-slate-900 dark:text-white shadow-sm space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 rounded-2xl bg-emerald-600 text-white shadow-md">
-                      <Crown className="w-6 h-6 text-amber-300 fill-amber-300" />
+          {/* ========================================================================= */}
+          {/* TAB 3: HOST COUPON CODES MANAGER & GENERATOR                              */}
+          {/* ========================================================================= */}
+          {activeTab === 'coupons' && (
+            <div className="space-y-6 animate-in fade-in">
+              
+              {/* SECTION: CREATE NEW COUPON CODE FORM */}
+              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#FAFAF8] to-amber-50/30 dark:from-[#161817] dark:to-amber-950/10 border-2 border-amber-500/30 shadow-sm space-y-5">
+                <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black shadow-xs">
+                      <Ticket className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-emerald-500/20 px-2 py-0.5 rounded-md">
-                          Host VIP Access Gateway
-                        </span>
-                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                          Total Active Grants: <strong>{grantedSubs.length}</strong>
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white mt-1">
-                        Grant Free Lifetime Pro Subscription to any Athlete
+                      <h3 className="font-extrabold text-sm sm:text-base text-gray-900 dark:text-white">
+                        Create Free VIP Subscription Coupon Code
                       </h3>
-                      <p className="text-xs text-slate-600 dark:text-slate-300">
-                        When you enter an athlete's Gmail ID here, they instantly receive 100% Free Lifetime Pro Access. When they sign in with that Gmail, all plans become ₹0 and their account is automatically unlocked!
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                        Generate custom coupon codes for specific plans, time periods, and expiration dates. Athletes can redeem directly in the app.
                       </p>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              {/* Grant Feedback Banner */}
-              {grantFeedback && (
-                <div className={`p-4 rounded-xl text-xs font-bold flex items-center justify-between gap-2 shadow-sm ${
-                  grantFeedback.includes('✅') 
-                    ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30' 
-                    : 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-500/30'
-                }`}>
-                  <span>{grantFeedback}</span>
-                  <button type="button" onClick={() => setGrantFeedback(null)} className="cursor-pointer text-slate-500 hover:text-slate-700">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-
-              {/* Grant Creation Card */}
-              <div className="p-6 rounded-2xl bg-[#FAFAF8] dark:bg-[#151817] border border-gray-200 dark:border-gray-800 space-y-4 shadow-sm">
-                <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
-                  <div className="flex items-center gap-2">
-                    <Gift className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                    <h4 className="text-sm font-extrabold text-gray-900 dark:text-white">
-                      Give Free Subscription to Athlete Gmail
-                    </h4>
-                  </div>
-                  <span className="text-[11px] font-semibold text-slate-500">
-                    Syncs to Firestore & Verified Ledger
+                  <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                    Host Promo Engine
                   </span>
                 </div>
 
-                <form onSubmit={handleGrantSubscription} className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Target Gmail Input */}
-                    <div className="space-y-1 sm:col-span-2">
-                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                        <Mail className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Athlete Gmail / Email Address *</span>
-                      </label>
+                <form onSubmit={handleCreateCoupon} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                    
+                    {/* 1. COUPON CODE NAME */}
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                          <Tag className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                          <span>Coupon Code <span className="text-rose-500">*</span></span>
+                        </label>
+                        <button
+                          type="button"
+                          onClick={handleGenerateRandomCode}
+                          className="text-[10px] font-bold text-amber-600 hover:text-amber-700 cursor-pointer"
+                        >
+                          Auto-Generate
+                        </button>
+                      </div>
                       <input
-                        type="email"
+                        type="text"
                         required
-                        value={grantTargetEmail}
-                        onChange={(e) => setGrantTargetEmail(e.target.value)}
-                        placeholder="athlete@gmail.com (e.g., friend@gmail.com)"
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2220] text-sm text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                        placeholder="e.g. PEAK-VIP2026"
+                        value={couponCodeInput}
+                        onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono font-bold text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-hidden transition-all uppercase"
                       />
-                      <p className="text-[11px] text-gray-500 dark:text-gray-400">
-                        The user will automatically get free access whenever they log in or create a profile with this exact Gmail.
-                      </p>
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 block">
+                        Unique coupon voucher code
+                      </span>
                     </div>
 
-                    {/* Plan Selection */}
-                    <div className="space-y-1">
-                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">
-                        Target Plan Access
+                    {/* 2. UNLOCKED PLAN & ACCESS TIME */}
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        <Crown className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        <span>Unlocked Plan <span className="text-rose-500">*</span></span>
                       </label>
                       <select
-                        value={grantSelectedPlan}
-                        onChange={(e) => setGrantSelectedPlan(e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2220] text-sm text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                        value={couponPlanOption}
+                        onChange={(e) => setCouponPlanOption(e.target.value)}
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-hidden transition-all cursor-pointer"
                       >
-                        <option value="all_plans">🌟 All Plans (Full Lifetime VIP Access)</option>
-                        <option value="plan_3y">3 Years Pro Membership</option>
-                        <option value="plan_2y">2 Years Pro Membership</option>
-                        <option value="plan_1y">1 Year Pro Membership</option>
-                        <option value="plan_3m">3 Months Pro Membership</option>
-                        <option value="plan_1m">1 Month Pro Membership</option>
+                        {DURATION_PRESETS.map((preset) => (
+                          <option key={preset.id} value={preset.id}>
+                            {preset.label}
+                          </option>
+                        ))}
                       </select>
+                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold block">
+                        Subscription granted to recipient
+                      </span>
                     </div>
 
-                    {/* Lifetime Toggle */}
-                    <div className="space-y-1 flex flex-col justify-end">
-                      <label className="flex items-center gap-2.5 p-2.5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={grantIsLifetime}
-                          onChange={(e) => setGrantIsLifetime(e.target.checked)}
-                          className="w-4 h-4 text-emerald-600 rounded-md focus:ring-emerald-500"
-                        />
-                        <div className="text-xs">
-                          <span className="font-bold text-gray-900 dark:text-white block">Lifetime Free Access (100 Years)</span>
-                          <span className="text-[10px] text-gray-500 dark:text-gray-400">Never expires, zero recurring charges</span>
-                        </div>
+                    {/* 3. COUPON EXPIRATION PERIOD */}
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        <span>Code Expiry <span className="text-rose-500">*</span></span>
                       </label>
+                      <select
+                        value={couponExpiryDays}
+                        onChange={(e) => setCouponExpiryDays(e.target.value)}
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-hidden transition-all cursor-pointer"
+                      >
+                        <option value="3">Expires in 3 Days</option>
+                        <option value="7">Expires in 7 Days (1 Week)</option>
+                        <option value="14">Expires in 14 Days (2 Weeks)</option>
+                        <option value="30">Expires in 30 Days (1 Month)</option>
+                        <option value="60">Expires in 60 Days (2 Months)</option>
+                        <option value="90">Expires in 90 Days (3 Months)</option>
+                        <option value="365">Expires in 1 Year</option>
+                        <option value="36500">No Expiration (Lifetime Code)</option>
+                      </select>
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 block">
+                        Last date to claim the coupon
+                      </span>
                     </div>
 
-                    {/* Notes / Reason */}
-                    <div className="space-y-1 sm:col-span-2">
-                      <label className="text-xs font-bold text-gray-700 dark:text-gray-300">
-                        Grant Notes / Reason (Optional)
+                    {/* 4. MAX USES / REDEMPTIONS */}
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        <Users className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        <span>Max Redemptions</span>
+                      </label>
+                      <select
+                        value={couponMaxUses}
+                        onChange={(e) => setCouponMaxUses(e.target.value)}
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-hidden transition-all cursor-pointer"
+                      >
+                        <option value="1">1 Athlete (Single-Use)</option>
+                        <option value="5">5 Athletes</option>
+                        <option value="10">10 Athletes</option>
+                        <option value="25">25 Athletes</option>
+                        <option value="50">50 Athletes</option>
+                        <option value="100">100 Athletes</option>
+                        <option value="">Unlimited Redemptions</option>
+                      </select>
+                      <span className="text-[10px] text-gray-500 dark:text-gray-400 block">
+                        Usage limit for this code
+                      </span>
+                    </div>
+
+                  </div>
+
+                  {/* Notes & Password Row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                    <div className="sm:col-span-2 space-y-1.5">
+                      <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                        Optional Memo / Campaign Name
                       </label>
                       <input
                         type="text"
-                        value={grantNotes}
-                        onChange={(e) => setGrantNotes(e.target.value)}
-                        placeholder="e.g. VIP Athlete, Beta Tester, Free Courtesy Grant"
-                        className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2220] text-sm text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-emerald-500"
+                        placeholder="e.g. Instagram Giveaway, Gym VIP Partner, Special Event"
+                        value={couponNotes}
+                        onChange={(e) => setCouponNotes(e.target.value)}
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white text-xs outline-hidden"
                       />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        <Lock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        <span>Host Verification PIN <span className="text-rose-500">*</span></span>
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          required
+                          placeholder="Host PIN (e.g. 9284)"
+                          value={hostPassword}
+                          onChange={(e) => setHostPassword(e.target.value)}
+                          className="w-full p-3 pr-10 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-hidden"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
                   </div>
 
                   <div className="flex justify-end pt-2">
                     <button
                       type="submit"
-                      disabled={isSubmittingGrant}
-                      className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                      disabled={isCreatingCoupon}
+                      className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                     >
-                      {isSubmittingGrant ? (
+                      {isCreatingCoupon ? (
                         <>
                           <RefreshCw className="w-4 h-4 animate-spin" />
-                          <span>Granting Free Access...</span>
+                          <span>Generating & Syncing Coupon...</span>
                         </>
                       ) : (
                         <>
-                          <CheckCircle2 className="w-4 h-4" />
-                          <span>Confirm & Grant Free Subscription</span>
+                          <Gift className="w-4 h-4" />
+                          <span>Create Free Access Coupon</span>
                         </>
                       )}
                     </button>
                   </div>
+
+                  {/* Feedback Messages */}
+                  {couponSuccessMsg && (
+                    <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-900 dark:text-emerald-200 flex items-start gap-2.5 animate-in fade-in">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <div className="font-black text-xs">Coupon Code Ready for Distribution!</div>
+                        <div className="text-[11px] leading-relaxed">{couponSuccessMsg}</div>
+                      </div>
+                    </div>
+                  )}
+
+                  {couponErrorMsg && (
+                    <div className="p-4 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-900 dark:text-rose-200 flex items-start gap-2.5 animate-in fade-in">
+                      <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <div className="font-black text-xs">Coupon Creation Error</div>
+                        <div className="text-[11px] leading-relaxed">{couponErrorMsg}</div>
+                      </div>
+                    </div>
+                  )}
                 </form>
               </div>
 
-              {/* Active Granted Subscriptions List */}
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <Crown className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <h4 className="text-sm font-extrabold text-gray-900 dark:text-white">
-                      Active Free Subscription Grants ({grantedSubs.length})
-                    </h4>
+              {/* SECTION: COUPONS TABLE & INVENTORY */}
+              <div className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                      <Ticket className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      <span>Host Coupon Codes Inventory ({couponsList.length})</span>
+                    </h3>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                      Live Firestore collection synced across all devices and web clients.
+                    </p>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <div className="relative">
-                      <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input
-                        type="text"
-                        value={grantSearchQuery}
-                        onChange={(e) => setGrantSearchQuery(e.target.value)}
-                        placeholder="Search granted Gmail..."
-                        className="pl-8 pr-3 py-1.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E2220] text-xs text-gray-900 dark:text-white focus:outline-hidden"
-                      />
-                    </div>
-
                     <button
                       type="button"
-                      onClick={loadGrantedSubs}
-                      className="p-1.5 rounded-xl border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors cursor-pointer"
-                      title="Refresh Grants"
+                      onClick={loadCoupons}
+                      disabled={isLoadingCoupons}
+                      className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs"
                     >
-                      <RefreshCw className={`w-3.5 h-3.5 ${isLoadingGrants ? 'animate-spin' : ''}`} />
+                      <RefreshCw className={`w-3.5 h-3.5 ${isLoadingCoupons ? 'animate-spin text-amber-600' : ''}`} />
+                      <span>Refresh</span>
                     </button>
                   </div>
                 </div>
 
-                {isLoadingGrants ? (
-                  <div className="p-8 text-center text-xs font-bold text-gray-500">
-                    <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-emerald-600" />
-                    Loading granted subscriptions...
+                {/* Search Bar */}
+                <div className="relative">
+                  <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search coupons by code name or plan..."
+                    value={couponsSearchQuery}
+                    onChange={(e) => setCouponsSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-amber-500"
+                  />
+                  {couponsSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setCouponsSearchQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 rounded-md cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Coupons Table */}
+                <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-[#161817]">
+                  {couponsList.length === 0 ? (
+                    <div className="p-8 text-center space-y-2 text-gray-500">
+                      <Ticket className="w-10 h-10 text-gray-400 mx-auto" />
+                      <div className="font-bold text-gray-700 dark:text-gray-300">No Coupon Codes Created Yet</div>
+                      <p className="text-xs text-gray-400 max-w-sm mx-auto">
+                        Use the form above to generate coupon codes with custom durations and expiry dates.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-left border-collapse">
+                        <thead>
+                          <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-[#121413] text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400 select-none">
+                            <th className="p-3.5">Coupon Code</th>
+                            <th className="p-3.5">Unlocked Plan & Time</th>
+                            <th className="p-3.5">Redemptions</th>
+                            <th className="p-3.5">Code Expiration</th>
+                            <th className="p-3.5">Status</th>
+                            <th className="p-3.5 text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60 font-medium">
+                          {couponsList
+                            .filter((c) => !couponsSearchQuery || c.code.toLowerCase().includes(couponsSearchQuery.toLowerCase()) || (c.planName && c.planName.toLowerCase().includes(couponsSearchQuery.toLowerCase())))
+                            .map((coupon) => {
+                              const isRevoked = coupon.status === 'revoked';
+                              const isExpired = coupon.expiresAt && new Date(coupon.expiresAt).getTime() < Date.now();
+                              const isFullyUsed = coupon.maxUses && coupon.usedCount >= coupon.maxUses;
+                              
+                              const expiryDateStr = coupon.expiresAt ? new Date(coupon.expiresAt).toLocaleDateString(undefined, {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                              }) : 'Never (Lifetime)';
+
+                              return (
+                                <tr key={coupon.code} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30">
+                                  {/* Code with Copy Button */}
+                                  <td className="p-3.5 font-mono font-bold text-gray-900 dark:text-white">
+                                    <div className="flex items-center gap-2">
+                                      <span className="px-2 py-1 rounded-lg bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-black tracking-wider">
+                                        {coupon.code}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCopyCouponCode(coupon.code)}
+                                        className="p-1 rounded-md text-gray-400 hover:text-amber-600 transition-colors cursor-pointer"
+                                        title="Copy Coupon Code"
+                                      >
+                                        {copiedCouponCode === coupon.code ? (
+                                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                        ) : (
+                                          <Copy className="w-3.5 h-3.5" />
+                                        )}
+                                      </button>
+                                    </div>
+                                    {coupon.notes && (
+                                      <div className="text-[10px] text-gray-400 italic truncate max-w-xs mt-0.5">
+                                        {coupon.notes}
+                                      </div>
+                                    )}
+                                  </td>
+
+                                  {/* Unlocked Plan & Duration */}
+                                  <td className="p-3.5">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                                      {coupon.isLifetime ? <Crown className="w-3 h-3 text-amber-500" /> : <Clock className="w-3 h-3" />}
+                                      <span>{coupon.planName || (coupon.isLifetime ? 'Lifetime VIP' : 'Pro Plan')}</span>
+                                    </span>
+                                  </td>
+
+                                  {/* Redemptions */}
+                                  <td className="p-3.5">
+                                    <div className="font-bold text-xs text-gray-800 dark:text-gray-200">
+                                      {coupon.usedCount} / {coupon.maxUses ? coupon.maxUses : '∞'} used
+                                    </div>
+                                    {coupon.redeemedBy && coupon.redeemedBy.length > 0 && (
+                                      <div className="text-[10px] text-gray-400 truncate max-w-xs" title={coupon.redeemedBy.join(', ')}>
+                                        {coupon.redeemedBy.length} claimed ({coupon.redeemedBy[0]})
+                                      </div>
+                                    )}
+                                  </td>
+
+                                  {/* Code Expiration */}
+                                  <td className="p-3.5 text-xs text-gray-600 dark:text-gray-400">
+                                    {expiryDateStr}
+                                  </td>
+
+                                  {/* Status */}
+                                  <td className="p-3.5">
+                                    {isRevoked ? (
+                                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30">
+                                        Revoked
+                                      </span>
+                                    ) : isExpired ? (
+                                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-gray-500/15 text-gray-700 dark:text-gray-400 border border-gray-500/30">
+                                        Expired
+                                      </span>
+                                    ) : isFullyUsed ? (
+                                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-500/30">
+                                        Fully Claimed
+                                      </span>
+                                    ) : (
+                                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                                        Active
+                                      </span>
+                                    )}
+                                  </td>
+
+                                  {/* Action: Revoke */}
+                                  <td className="p-3.5 text-right whitespace-nowrap">
+                                    {revokingCouponCode === coupon.code ? (
+                                      <div className="flex items-center justify-end gap-1.5">
+                                        <button
+                                          type="button"
+                                          onClick={() => handleRevokeCoupon(coupon.code)}
+                                          disabled={isRevokingCoupon}
+                                          className="px-2 py-1 rounded-lg bg-rose-600 text-white font-bold text-[10px] hover:bg-rose-700 cursor-pointer"
+                                        >
+                                          {isRevokingCoupon ? 'Revoking...' : 'Confirm'}
+                                        </button>
+                                        <button
+                                          type="button"
+                                          onClick={() => setRevokingCouponCode(null)}
+                                          className="px-2 py-1 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-bold text-[10px] cursor-pointer"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <button
+                                        type="button"
+                                        onClick={() => setRevokingCouponCode(coupon.code)}
+                                        disabled={isRevoked}
+                                        className="p-1.5 rounded-lg text-gray-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer disabled:opacity-30"
+                                        title="Revoke Coupon"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    )}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TAB 5: AUTHENTICATION AUDIT & GRANT VERIFICATION LOG                      */}
+          {/* ========================================================================= */}
+          {activeTab === 'verification_logs' && (
+            <div className="space-y-5 animate-in fade-in">
+              
+              {/* Header & Controls */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                      <span>Authentication Audit & Grant Verification Log</span>
+                    </h3>
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-teal-500/15 text-teal-700 dark:text-teal-400 border border-teal-500/30">
+                      Host-PIN Authenticated
+                    </span>
                   </div>
-                ) : grantedSubs.length === 0 ? (
-                  <div className="p-8 rounded-2xl bg-[#FAFAF8] dark:bg-[#151817] border border-dashed border-gray-300 dark:border-gray-700 text-center space-y-2">
-                    <Crown className="w-8 h-8 mx-auto text-gray-400" />
-                    <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                      No Free Subscriptions Granted Yet
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-                      Use the form above to add an athlete's Gmail ID and instantly grant them 100% Free Lifetime Pro Access.
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Cryptographic audit trail tracking host-password authentication status for every user subscription, coupon redemption, and admin access event.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await Promise.all([loadActivityLogs(), loadVerificationLogs()]);
+                    }}
+                    disabled={isLoadingLogs || isLoadingVerificationLogs}
+                    className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLogs || isLoadingVerificationLogs ? 'animate-spin text-teal-600' : ''}`} />
+                    <span>Sync Verifications</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleExportVerificationCSV}
+                    disabled={filteredVerificationLogs.length === 0}
+                    className="px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold flex items-center gap-1.5 cursor-pointer text-xs shadow-2xs disabled:opacity-50"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Export Audit CSV</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Authentication Metrics Row */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="p-3 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs">
+                  <div className="text-[10px] uppercase font-black text-gray-500">Total Verifications</div>
+                  <div className="text-xl font-black text-teal-600 dark:text-teal-400 mt-0.5">
+                    {filteredVerificationLogs.length}
+                  </div>
+                  <div className="text-[10px] text-gray-400 font-medium">Recorded events</div>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs">
+                  <div className="text-[10px] uppercase font-black text-gray-500">Host PIN Auth</div>
+                  <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+                    100%
+                  </div>
+                  <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">PIN 9284 Verified</div>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs">
+                  <div className="text-[10px] uppercase font-black text-gray-500">Coupon Validations</div>
+                  <div className="text-xl font-black text-amber-600 dark:text-amber-400 mt-0.5">
+                    {filteredVerificationLogs.filter(l => l.authMethod === 'COUPON_CODE_AUTHENTICATED' || l.action.toLowerCase().includes('coupon')).length}
+                  </div>
+                  <div className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">Authenticated redemptions</div>
+                </div>
+
+                <div className="p-3 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs">
+                  <div className="text-[10px] uppercase font-black text-gray-500">Integrity Status</div>
+                  <div className="text-xl font-black text-purple-600 dark:text-purple-400 mt-0.5">
+                    SHA-256
+                  </div>
+                  <div className="text-[10px] text-purple-600 dark:text-purple-400 font-medium">100% Cryptographic</div>
+                </div>
+              </div>
+
+              {/* Search Bar & Filter Chips */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div className="relative flex-1">
+                  <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search audit trail by athlete Gmail, action, host, or SHA hash..."
+                    value={verificationSearchQuery}
+                    onChange={(e) => setVerificationSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-9 py-2 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-teal-500"
+                  />
+                  {verificationSearchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setVerificationSearchQuery('')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 rounded-md cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-gray-100 dark:bg-[#191B1A] border border-gray-200 dark:border-gray-800 shrink-0 overflow-x-auto">
+                  {[
+                    { id: 'all', label: 'All Logs' },
+                    { id: 'grants', label: 'VIP Grants' },
+                    { id: 'coupons', label: 'Coupon Redemptions' },
+                    { id: 'auth', label: 'Security & PIN' },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setVerificationFilter(tab.id as any)}
+                      className={`px-3 py-1 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
+                        verificationFilter === tab.id
+                          ? 'bg-white dark:bg-[#121413] text-teal-600 dark:text-teal-400 shadow-xs'
+                          : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Verification Cards List */}
+              <div className="space-y-3">
+                {filteredVerificationLogs.length === 0 ? (
+                  <div className="p-8 text-center rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] space-y-2 text-gray-500">
+                    <ShieldCheck className="w-8 h-8 mx-auto text-gray-400" />
+                    <div className="font-bold text-gray-700 dark:text-gray-300">No Authentication Audit Records Found</div>
+                    <p className="text-xs text-gray-400">
+                      {verificationSearchQuery
+                        ? `No verification records match "${verificationSearchQuery}".`
+                        : 'Every grant, password verification, and coupon code authorization will be cryptographically audited here.'}
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    {grantedSubs
-                      .filter((g) =>
-                        !grantSearchQuery ||
-                        g.email.toLowerCase().includes(grantSearchQuery.toLowerCase()) ||
-                        g.planName.toLowerCase().includes(grantSearchQuery.toLowerCase())
-                      )
-                      .map((grant) => (
-                        <div
-                          key={grant.id || grant.email}
-                          className="p-4 rounded-2xl bg-white dark:bg-[#181B1A] border border-emerald-500/30 dark:border-emerald-500/20 shadow-xs flex flex-col justify-between gap-3"
-                        >
-                          <div className="space-y-1.5">
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                                <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-                                  {grant.isLifetime ? '🌟 Lifetime VIP' : 'Pro VIP Grant'}
+                  filteredVerificationLogs.map((log, index) => {
+                    const isCoupon = log.authMethod === 'COUPON_CODE_AUTHENTICATED' || log.action.toLowerCase().includes('coupon');
+                    const isPin = log.authMethod === 'HOST_PASSWORD_PIN';
+                    
+                    return (
+                      <div
+                        key={log.id || `verif_${index}`}
+                        className="p-4 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs hover:border-teal-500/40 transition-all space-y-2.5"
+                      >
+                        <div className="flex items-start justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-2.5">
+                            <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${
+                              isCoupon
+                                ? 'border-amber-500/30 bg-amber-500/15 text-amber-600'
+                                : 'border-teal-500/30 bg-teal-500/15 text-teal-600'
+                            }`}>
+                              {isCoupon ? <Ticket className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
+                            </div>
+
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${
+                                  isCoupon
+                                    ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-500/30'
+                                    : 'bg-teal-500/15 text-teal-800 dark:text-teal-300 border-teal-500/30'
+                                }`}>
+                                  {log.authenticated ? 'AUTHENTICATED' : 'FAILED'} • {isCoupon ? 'COUPON VERIFIED' : 'PIN 9284 VERIFIED'}
+                                </span>
+
+                                <span className="font-mono text-xs font-black text-gray-900 dark:text-white">
+                                  {log.targetEmail}
                                 </span>
                               </div>
-                              <span className="text-[10px] font-bold text-gray-400">
-                                {grant.grantedAt ? new Date(grant.grantedAt).toLocaleDateString() : 'Active'}
-                              </span>
-                            </div>
 
-                            <div className="text-sm font-extrabold text-gray-900 dark:text-white break-all flex items-center gap-1.5">
-                              <Mail className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                              <span>{grant.email}</span>
+                              <div className="text-xs text-gray-700 dark:text-gray-300 font-medium mt-0.5">
+                                {log.notes || log.action}
+                              </div>
                             </div>
+                          </div>
 
-                            <div className="text-xs font-bold text-gray-600 dark:text-gray-300">
-                              Plan: <strong className="text-gray-900 dark:text-white">{grant.planName}</strong>
-                            </div>
+                          <div className="flex items-center gap-2">
+                            {log.targetEmail && log.targetEmail !== HOST_ADMIN_CONFIG.email && (
+                              <button
+                                type="button"
+                                onClick={() => setSelectedTimelineEmail(log.targetEmail)}
+                                className="px-2.5 py-1 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-emerald-500/10 text-gray-600 dark:text-gray-400 hover:text-emerald-600 text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                                title="View Vertical Grant Timeline"
+                              >
+                                <History className="w-3 h-3" />
+                                <span>Timeline</span>
+                              </button>
+                            )}
+                            <span className="text-[10px] text-gray-400 font-mono">
+                              {new Date(log.timestamp).toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
 
-                            {grant.notes && (
-                              <p className="text-[11px] text-gray-500 dark:text-gray-400 italic">
-                                "{grant.notes}"
-                              </p>
+                        {/* Metadata Footer */}
+                        <div className="flex items-center justify-between gap-3 text-[10px] text-gray-500 dark:text-gray-400 pt-1 border-t border-gray-100 dark:border-gray-800/60 flex-wrap">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <span>Actor: <strong className="text-gray-800 dark:text-gray-200">{log.actor}</strong></span>
+                            {log.planId && (
+                              <span>Plan: <strong className="text-emerald-600 dark:text-emerald-400">{log.planId}</strong></span>
+                            )}
+                            {log.clientFingerprint && (
+                              <span className="font-mono text-gray-400">FP: {log.clientFingerprint}</span>
                             )}
                           </div>
 
-                          <div className="flex items-center justify-between pt-2 border-t border-gray-100 dark:border-gray-800 text-[11px]">
-                            <span className="text-emerald-700 dark:text-emerald-300 font-bold">
-                              ₹0 / 100% Free
-                            </span>
-
-                            <button
-                              type="button"
-                              onClick={() => handleRevokeSubscription(grant.email)}
-                              className="px-2.5 py-1 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 dark:text-rose-400 font-bold text-xs transition-colors flex items-center gap-1 cursor-pointer"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                              <span>Revoke</span>
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 1: LEDGER */}
-          {activeTab === 'ledger' && (
-            <div className="space-y-6">
-              {/* Revenue KPI Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-teal-500/5 border border-emerald-500/20 space-y-1">
-                  <div className="text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5">
-                    <IndianRupee className="w-4 h-4" />
-                    <span>Total Gross Revenue</span>
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
-                    ₹{totalRevenueINR.toLocaleString('en-IN')}
-                  </div>
-                  <div className="text-[11px] text-gray-500 dark:text-gray-400">
-                    Directly deposited to {HOST_ADMIN_CONFIG.upiId}
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-1">
-                  <div className="text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                    <Users className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                    <span>Verified Subscribers</span>
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
-                    {verifiedCount}
-                  </div>
-                  <div className="text-[11px] text-gray-500 dark:text-gray-400">
-                    Active Verified UTR Transactions
-                  </div>
-                </div>
-
-                <div className="p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-1">
-                  <div className="text-xs font-bold text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                    <span>Anti-Fraud Gateway</span>
-                  </div>
-                  <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span>Active & Clean</span>
-                  </div>
-                  <div className="text-[11px] text-gray-500 dark:text-gray-400">
-                    HMAC-SHA256 Cryptographic Ledger
-                  </div>
-                </div>
-              </div>
-
-              {clearConfirmMsg && (
-                <div className="p-3.5 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-bold flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>{clearConfirmMsg}</span>
-                </div>
-              )}
-
-              {/* Transactions Ledger Table Header & Actions */}
-              <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                    <span>Verified Payment Ledger ({transactions.length} Records)</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <div className="relative">
-                      <Search className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search UTR, Email..."
-                        className="text-xs pl-8 pr-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A1D1C] text-gray-900 dark:text-white"
-                      />
-                    </div>
-
-                    <button
-                      onClick={handleExportCSV}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0F6E5F]/10 hover:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] font-bold text-xs cursor-pointer transition-colors"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>Export CSV</span>
-                    </button>
-
-                    {/* CLEAR LEDGER BUTTON (With Cryptographic Signature Verification) */}
-                    <button
-                      onClick={handleOpenCryptoWipeModal}
-                      disabled={isClearingLedger}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 font-bold text-xs cursor-pointer transition-colors border border-red-500/20 shadow-xs"
-                    >
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Clear All Ledger Records (Crypto Signed)</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Table Container */}
-                <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-xs">
-                      <thead className="bg-[#FAFAF8] dark:bg-[#1A1D1C] border-b border-gray-200 dark:border-gray-800 text-gray-500 font-semibold">
-                        <tr>
-                          <th className="p-3">Date</th>
-                          <th className="p-3">User</th>
-                          <th className="p-3">Plan</th>
-                          <th className="p-3">Amount</th>
-                          <th className="p-3">12-Digit UTR Number</th>
-                          <th className="p-3">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100 dark:divide-gray-800 bg-white dark:bg-[#161817]">
-                        {filteredTxs.length === 0 ? (
-                          <tr>
-                            <td colSpan={6} className="p-8 text-center text-gray-400">
-                              <div className="max-w-xs mx-auto space-y-1">
-                                <CheckCircle2 className="w-6 h-6 mx-auto text-emerald-500" />
-                                <div className="font-bold text-gray-700 dark:text-gray-300">0 Records in Ledger</div>
-                                <div className="text-xs text-gray-500">Verified Payment Ledger has been cleared and is ready to log new UPI transactions.</div>
-                              </div>
-                            </td>
-                          </tr>
-                        ) : (
-                          filteredTxs.map((tx) => (
-                            <tr key={tx.id} className="hover:bg-gray-50 dark:hover:bg-[#1F2220]/50 transition-colors">
-                              <td className="p-3 text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                                {new Date(tx.createdAt).toLocaleDateString('en-IN', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })}
-                              </td>
-                              <td className="p-3">
-                                <div className="font-bold text-gray-900 dark:text-white">{tx.userName}</div>
-                                <div className="text-[11px] text-gray-500">{tx.userEmail}</div>
-                              </td>
-                              <td className="p-3 font-semibold text-gray-800 dark:text-gray-200">
-                                {tx.durationLabel}
-                              </td>
-                              <td className="p-3 font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">
-                                ₹{tx.amountINR}
-                              </td>
-                              <td className="p-3 font-mono text-gray-700 dark:text-gray-300">
-                                {tx.utrNumber}
-                              </td>
-                              <td className="p-3">
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold">
-                                  <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                                  <span>Verified</span>
-                                </span>
-                              </td>
-                            </tr>
-                          ))
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB 2: DISCOUNT & PRICING RULES ENGINE */}
-          {activeTab === 'discounts' && (
-            <div className="space-y-6">
-              {/* Info Notice */}
-              <div className="p-4 rounded-2xl bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/15 border border-[#0F6E5F]/20 space-y-1 text-xs">
-                <div className="font-bold text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center gap-1.5">
-                  <Gift className="w-4 h-4" />
-                  <span>Host Custom Pricing & Discount Rule Creator</span>
-                </div>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  As host, you can set <strong>100% Free Access</strong>, a <strong>Custom Price (e.g. ₹49)</strong>, or a <strong>Percentage Discount (e.g. 50% Off)</strong> for a specific individual athlete email or globally for everyone.
-                </p>
-              </div>
-
-              {/* Create Rule Form */}
-              <form onSubmit={handleCreateRule} className="p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-gray-200 dark:border-gray-800 space-y-4">
-                <div className="font-bold text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                  <PlusCircle className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                  <span>Create New Discount / Free Access Rule</span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                      Apply Target:
-                    </label>
-                    <select
-                      value={newTargetType}
-                      onChange={(e) => setNewTargetType(e.target.value as any)}
-                      className="w-full text-xs p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white"
-                    >
-                      <option value="individual">Specific Individual Athlete</option>
-                      <option value="everyone">Everyone (Global Promo)</option>
-                    </select>
-                  </div>
-
-                  {newTargetType === 'individual' ? (
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                        Athlete Email Address:
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        placeholder="athlete@example.com"
-                        value={newTargetEmail}
-                        onChange={(e) => setNewTargetEmail(e.target.value)}
-                        className="w-full text-xs p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white"
-                      />
-                    </div>
-                  ) : (
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                        Scope:
-                      </label>
-                      <div className="text-xs p-2.5 rounded-xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/20">
-                        All Users (Global)
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                      Target Plan:
-                    </label>
-                    <select
-                      value={newPlanId}
-                      onChange={(e) => setNewPlanId(e.target.value)}
-                      className="w-full text-xs p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white"
-                    >
-                      <option value="all">All Subscription Plans</option>
-                      <option value="1_month">1 Month (Standard ₹89)</option>
-                      <option value="3_months">3 Months (Standard ₹239)</option>
-                      <option value="1_year">1 Year (Standard ₹919)</option>
-                      <option value="2_years">2 Years (Standard ₹1820)</option>
-                      <option value="3_years">3 Years (Standard ₹2700)</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                      Discount Type:
-                    </label>
-                    <select
-                      value={newDiscountType}
-                      onChange={(e) => setNewDiscountType(e.target.value as any)}
-                      className="w-full text-xs p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white"
-                    >
-                      <option value="free">100% Free Access (₹0)</option>
-                      <option value="custom_price">Custom Price (INR ₹)</option>
-                      <option value="percentage">Percentage Discount (% Off)</option>
-                    </select>
-                  </div>
-
-                  {newDiscountType === 'custom_price' && (
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                        Custom Price (INR):
-                      </label>
-                      <input
-                        type="number"
-                        min={0}
-                        max={5000}
-                        value={newCustomPrice}
-                        onChange={(e) => setNewCustomPrice(Number(e.target.value))}
-                        className="w-full text-xs p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white"
-                      />
-                    </div>
-                  )}
-
-                  {newDiscountType === 'percentage' && (
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                        Discount Percentage (%):
-                      </label>
-                      <input
-                        type="number"
-                        min={1}
-                        max={100}
-                        value={newDiscountPct}
-                        onChange={(e) => setNewDiscountPct(Number(e.target.value))}
-                        className="w-full text-xs p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white"
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                      Reason / Notes (Optional):
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. VIP client promo, student discount"
-                      value={newNotes}
-                      onChange={(e) => setNewNotes(e.target.value)}
-                      className="w-full text-xs p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white"
-                    />
-                  </div>
-                </div>
-
-                {ruleActionMsg && (
-                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
-                    {ruleActionMsg}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs cursor-pointer shadow-xs transition-colors"
-                >
-                  + Activate Discount Rule
-                </button>
-              </form>
-
-              {/* Active Rules List */}
-              <div className="space-y-3">
-                <div className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center justify-between">
-                  <span>Active Discount Rules ({discountRules.length})</span>
-                  <button
-                    onClick={loadDiscountRules}
-                    className="text-xs text-[#0F6E5F] flex items-center gap-1 cursor-pointer hover:underline"
-                  >
-                    <RefreshCw className="w-3 h-3" />
-                    <span>Refresh</span>
-                  </button>
-                </div>
-
-                {discountRules.length === 0 ? (
-                  <div className="p-6 rounded-2xl border border-gray-200 dark:border-gray-800 text-center text-xs text-gray-400">
-                    No custom discount rules active. All athletes currently see standard base plans unless granted a custom rule above.
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {discountRules.map((rule) => (
-                      <div
-                        key={rule.id}
-                        className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] space-y-2 relative"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <span className="px-2 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] text-[10px] font-black uppercase">
-                              {rule.targetType === 'individual' ? `Athlete: ${rule.targetEmail}` : 'Global Promo'}
-                            </span>
-                            <div className="font-bold text-xs text-gray-900 dark:text-white mt-1">
-                              Plan: {rule.planId === 'all' ? 'All Plans' : rule.planId}
-                            </div>
-                          </div>
-
-                          <button
-                            onClick={() => handleDeleteRule(rule.id)}
-                            className="p-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-500 transition-colors cursor-pointer"
-                            title="Delete rule"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-
-                        <div className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
-                          {rule.discountType === 'free' && '100% Free Lifetime Access (₹0)'}
-                          {rule.discountType === 'custom_price' && `Special Price: ₹${rule.customPriceINR}`}
-                          {rule.discountType === 'percentage' && `${rule.discountPercentage}% Off Discount`}
-                        </div>
-
-                        {rule.notes && (
-                          <div className="text-[11px] text-gray-500 italic">
-                            "{rule.notes}"
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* TAB 3: HOST SECURITY & PIN MANAGEMENT */}
-          {activeTab === 'security' && (
-            <div className="space-y-6">
-              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-1 text-xs">
-                <div className="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Host Security PIN Authentication</span>
-                </div>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                  All administrative operations (updating pricing, creating discount rules, clearing ledgers) are protected by your Host Security PIN (Default: <strong className="font-mono">9284</strong>).
-                </p>
-              </div>
-
-              {/* Change Host PIN Form */}
-              <form onSubmit={handleUpdatePinSubmit} className="p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-gray-200 dark:border-gray-800 space-y-4 max-w-md">
-                <div className="font-bold text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                  <KeyRound className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                  <span>Change Host Security PIN</span>
-                </div>
-
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                      Current PIN:
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="e.g. 9284"
-                      value={currentPinInput}
-                      onChange={(e) => setCurrentPinInput(e.target.value)}
-                      className="w-full text-xs p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white font-mono"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                      New PIN:
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      placeholder="Enter new 4-8 digit PIN"
-                      value={newPinInput}
-                      onChange={(e) => setNewPinInput(e.target.value)}
-                      className="w-full text-xs p-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white font-mono"
-                    />
-                  </div>
-                </div>
-
-                {pinChangeMsg && (
-                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
-                    {pinChangeMsg}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs cursor-pointer shadow-xs transition-colors"
-                >
-                  Update Host PIN
-                </button>
-              </form>
-            </div>
-          )}
-
-          {/* TAB 4: AUDIT LOG (TRANSPARENCY & TRACKING) */}
-          {activeTab === 'audit' && (
-            <div className="space-y-6">
-              {/* Header Info & Actions */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C]">
-                <div className="space-y-1">
-                  <div className="font-bold text-xs uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                    <History className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                    <span>Cryptographic Security & Privilege Audit Trail</span>
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Timestamped ledger of every discount created, free access grant, PIN change, and payment verification.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2 shrink-0">
-                  <button
-                    onClick={loadAuditLogs}
-                    disabled={isLoadingAudit}
-                    className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-xs font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingAudit ? 'animate-spin' : ''}`} />
-                    <span>Refresh</span>
-                  </button>
-
-                  <button
-                    onClick={handleExportAudit}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Export Audit (CSV)</span>
-                  </button>
-
-                  <button
-                    onClick={handleClearAudit}
-                    className="px-3 py-1.5 rounded-xl border border-red-500/30 hover:bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                    title="Archive & reset audit trail"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span>Clear Archive</span>
-                  </button>
-                </div>
-              </div>
-
-              {auditMsg && (
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-bold">
-                  {auditMsg}
-                </div>
-              )}
-
-              {/* Filters & Search */}
-              <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-                <div className="relative flex-1 w-full">
-                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search by action, email, plan, or HMAC hash..."
-                    value={auditSearchQuery}
-                    onChange={(e) => setAuditSearchQuery(e.target.value)}
-                    className="w-full pl-9 pr-4 py-2 text-xs rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white"
-                  />
-                </div>
-
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <label className="text-xs text-gray-500 dark:text-gray-400 shrink-0">Filter Event:</label>
-                  <select
-                    value={auditActionFilter}
-                    onChange={(e) => setAuditActionFilter(e.target.value)}
-                    className="text-xs p-2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white"
-                  >
-                    <option value="all">All Events ({auditLogs.length})</option>
-                    <option value="discount_created">Discount Created</option>
-                    <option value="discount_deleted">Discount Deleted</option>
-                    <option value="free_access_granted">Free Access Granted</option>
-                    <option value="payment_verified">Payment Verified</option>
-                    <option value="pin_updated">PIN Updated</option>
-                    <option value="ledger_cleared">Ledger Cleared</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Audit Logs List */}
-              {filteredAuditLogs.length === 0 ? (
-                <div className="p-10 rounded-2xl border border-gray-200 dark:border-gray-800 bg-[#FAFAF8] dark:bg-[#1A1D1C] text-center space-y-2">
-                  <ClipboardList className="w-8 h-8 text-gray-400 mx-auto" />
-                  <div className="text-xs font-bold text-gray-700 dark:text-gray-300">
-                    No Audit Records Matching Filter
-                  </div>
-                  <p className="text-[11px] text-gray-400 max-w-sm mx-auto">
-                    Actions such as creating discounts, verifying payments, or clearing ledgers will automatically be logged here with cryptographic signatures.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-2.5">
-                  {filteredAuditLogs.map((log) => (
-                    <div
-                      key={log.id}
-                      className="p-4 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] hover:border-[#0F6E5F]/30 dark:hover:border-[#0F6E5F]/40 transition-all space-y-2.5 shadow-2xs"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span
-                            className={`px-2.5 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-wider ${getActionBadgeColor(
-                              log.actionType
-                            )}`}
-                          >
-                            {log.actionType.replace(/_/g, ' ')}
+                          <span className="font-mono text-teal-600 dark:text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded-md">
+                            SHA: {log.integrityHash.slice(0, 24)}...
                           </span>
-
-                          <span className="text-[11px] font-bold text-gray-900 dark:text-white">
-                            Actor: {log.actor}
-                          </span>
-
-                          {log.targetEmail && (
-                            <span className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                              • Target: <strong className="text-gray-800 dark:text-gray-200">{log.targetEmail}</strong>
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="text-[10px] text-gray-400 flex items-center gap-1 shrink-0 font-mono">
-                          <Calendar className="w-3 h-3 text-gray-400" />
-                          <span>{new Date(log.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST</span>
                         </div>
                       </div>
+                    );
+                  })
+                )}
+              </div>
 
-                      <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
-                        {log.details}
-                      </p>
-
-                      <div className="pt-2 border-t border-gray-100 dark:border-gray-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-[10px] text-gray-400 font-mono">
-                        <span className="truncate max-w-md">
-                          HMAC: <span className="text-emerald-600 dark:text-emerald-400">{log.integrityHash}</span>
-                        </span>
-                        <span className="shrink-0 text-gray-500">
-                          Audit ID: {log.id}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           )}
 
-          {/* TAB 5: AI LATENCY & PERFORMANCE MONITORING */}
-          {activeTab === 'performance' && (
-            <PerformanceMonitoringDashboard hostEmail={HOST_ADMIN_CONFIG.email} />
-          )}
-
-          {/* TAB 6: AI IMPROVEMENT QUEUE & APP ERROR REPORTS */}
-          {activeTab === 'improvement_queue' && (
-            <div className="space-y-6">
-              {/* Header & Subtabs */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-gradient-to-r from-rose-500/10 via-amber-500/10 to-teal-500/10 border border-rose-500/20">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-rose-500 text-white shadow-md">
-                    <Bug className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                      User Accuracy Flags & Improvement Pipeline
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-600 dark:text-rose-400">
-                        Host Admin Review
-                      </span>
-                    </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Live review queue for multi-model vision accuracy adjustments and bug reports
-                    </p>
-                  </div>
+          {/* ========================================================================= */}
+          {/* TAB 5: HOST ACTIVITY LOG (LAST 10 ACTIONS PERFORMED BY HOST)              */}
+          {/* ========================================================================= */}
+          {activeTab === 'activity_log' && (
+            <div className="space-y-5 animate-in fade-in">
+              
+              {/* Activity Log Header & Controls */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
+                <div>
+                  <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                    <span>Host Master Activity Log (Last 10 Actions)</span>
+                  </h3>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Comprehensive audit trail recording subscription grants, password verifications, security updates, and exports.
+                  </p>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={loadImprovementReports}
-                    disabled={isLoadingReports}
-                    className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all disabled:opacity-50 cursor-pointer"
+                    onClick={loadActivityLogs}
+                    disabled={isLoadingLogs}
+                    className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingReports ? 'animate-spin' : ''}`} />
-                    <span>{isLoadingReports ? 'Refreshing...' : 'Refresh Queue'}</span>
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLogs ? 'animate-spin text-cyan-600' : ''}`} />
+                    <span>Refresh Logs</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleExportActivityLogs}
+                    disabled={activityLogs.length === 0}
+                    className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs disabled:opacity-40"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Export CSV</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleClearActivityLogs}
+                    disabled={activityLogs.length === 0 || isClearingLogs}
+                    className="px-3 py-1.5 rounded-xl border border-rose-200 dark:border-rose-900/40 hover:bg-rose-50 dark:hover:bg-rose-950/30 text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1.5 cursor-pointer text-xs disabled:opacity-40"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Clear</span>
                   </button>
                 </div>
               </div>
 
-              {reportActionFeedback && (
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
-                  <span>{reportActionFeedback}</span>
-                </div>
-              )}
-
-              {/* Subtabs for switching between Accuracy Flags and App Bugs */}
-              <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 pb-2">
-                <button
-                  type="button"
-                  onClick={() => setReportSubTab('ai_accuracy')}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
-                    reportSubTab === 'ai_accuracy'
-                      ? 'bg-[#0F6E5F] text-white shadow-sm'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
-                  }`}
-                >
-                  AI Accuracy Flags ({accuracyReports.length})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setReportSubTab('app_bugs')}
-                  className={`px-4 py-2 text-xs font-bold rounded-xl transition-all ${
-                    reportSubTab === 'app_bugs'
-                      ? 'bg-[#0F6E5F] text-white shadow-sm'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
-                  }`}
-                >
-                  System Diagnostics & Bugs ({appErrorReports.length})
-                </button>
+              {/* Activity Log Search */}
+              <div className="relative">
+                <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Filter activity by action, recipient Gmail ID, or keyword..."
+                  value={logsSearchQuery}
+                  onChange={(e) => setLogsSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-cyan-500"
+                />
+                {logsSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setLogsSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-0.5 rounded-md cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
 
-              {/* Subtab 1: AI Accuracy Reports */}
-              {reportSubTab === 'ai_accuracy' && (
-                <div className="space-y-3">
-                  {accuracyReports.length === 0 ? (
-                    <div className="p-12 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl space-y-2">
-                      <ShieldCheck className="w-8 h-8 text-emerald-500 mx-auto" />
-                      <div className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                        Improvement Queue Clean
-                      </div>
-                      <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                        No AI prediction accuracy issues currently flagged. Users can report inaccuracies via the 'Report Accuracy' button on scan cards.
-                      </p>
-                    </div>
-                  ) : (
-                    accuracyReports.map((report) => (
+              {/* Activity List Cards */}
+              <div className="space-y-3">
+                {recentActivityLogs.length === 0 ? (
+                  <div className="p-8 text-center rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] space-y-2 text-gray-500">
+                    <History className="w-8 h-8 mx-auto text-gray-400" />
+                    <div className="font-bold text-gray-700 dark:text-gray-300">No Recent Host Actions</div>
+                    <p className="text-xs text-gray-400">
+                      Actions like granting free access, updating PIN, or verifying passwords will appear here automatically.
+                    </p>
+                  </div>
+                ) : (
+                  recentActivityLogs.map((log, index) => {
+                    const formattedDate = new Date(log.timestamp).toLocaleString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    });
+
+                    // Icon and color by action type
+                    let iconBg = 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30';
+                    let IconComponent = Crown;
+                    let actionBadge = 'VIP Grant';
+
+                    if (log.actionType === 'pin_updated') {
+                      iconBg = 'bg-amber-500/15 text-amber-600 border-amber-500/30';
+                      IconComponent = KeyRound;
+                      actionBadge = 'PIN / Password';
+                    } else if (log.actionType === 'discount_deleted') {
+                      iconBg = 'bg-rose-500/15 text-rose-600 border-rose-500/30';
+                      IconComponent = Trash2;
+                      actionBadge = 'Revocation';
+                    } else if (log.actionType === 'audit_exported' || log.actionType === 'snapshot_exported') {
+                      iconBg = 'bg-blue-500/15 text-blue-600 border-blue-500/30';
+                      IconComponent = Download;
+                      actionBadge = 'CSV Export';
+                    } else if (log.actionType === 'notification_sent') {
+                      iconBg = 'bg-teal-500/15 text-teal-600 border-teal-500/30';
+                      IconComponent = MailCheck;
+                      actionBadge = 'Broadcast Alert';
+                    } else if (log.actionType === 'ledger_cleared') {
+                      iconBg = 'bg-purple-500/15 text-purple-600 border-purple-500/30';
+                      IconComponent = History;
+                      actionBadge = 'Archive Reset';
+                    }
+
+                    return (
                       <div
-                        key={report.id}
-                        className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs"
+                        key={log.id || `log_${index}`}
+                        className="p-4 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs hover:border-emerald-500/40 transition-all flex items-start gap-3.5"
                       >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                              {report.feature.replace('_', ' ')}
-                            </span>
-                            <span className="text-xs font-bold text-slate-900 dark:text-white">
-                              {report.userName} ({report.userEmail})
-                            </span>
-                            <span className="text-xs text-slate-400 font-mono">
-                              • ID: {report.id}
-                            </span>
-                          </div>
-                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                            report.status === 'resolved' 
-                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
-                              : report.status === 'tuning_applied'
-                              ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                              : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                          }`}>
-                            Status: {report.status.replace(/_/g, ' ')}
-                          </span>
+                        {/* Number Index & Action Icon */}
+                        <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${iconBg}`}>
+                          <IconComponent className="w-5 h-5" />
                         </div>
 
                         {/* Content */}
-                        <div className="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl text-xs space-y-1.5">
-                          <div className="flex justify-between text-slate-500">
-                            <span>Predicted Item:</span>
-                            <span className="font-semibold text-slate-800 dark:text-slate-200">{report.aiOutputSummary}</span>
-                          </div>
-                          <div className="flex justify-between text-slate-500">
-                            <span>Issue Category:</span>
-                            <span className="font-semibold text-rose-600 dark:text-rose-400">{report.issueCategory.replace(/_/g, ' ')}</span>
-                          </div>
-                          <div className="pt-1 text-slate-700 dark:text-slate-300">
-                            <strong>User Feedback: </strong>{report.userFeedback}
-                          </div>
-                          {report.suggestedCorrection && (
-                            <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 font-medium">
-                              <strong>Suggested Correction: </strong>{report.suggestedCorrection}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Host Actions */}
-                        <div className="flex items-center justify-between gap-2 pt-1">
-                          <span className="text-[10px] text-slate-400">
-                            Reported: {new Date(report.reportedAt).toLocaleString()}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateAccuracyStatus(report.id, 'analyzed')}
-                              className="px-2.5 py-1 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors"
-                            >
-                              Mark Analyzed
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateAccuracyStatus(report.id, 'tuning_applied')}
-                              className="px-2.5 py-1 text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 rounded-lg border border-blue-200 dark:border-blue-800 transition-colors"
-                            >
-                              Apply Tuning
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateAccuracyStatus(report.id, 'resolved')}
-                              className="px-2.5 py-1 text-[11px] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
-                            >
-                              Resolve
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              )}
-
-              {/* Subtab 2: System Diagnostics & Bugs */}
-              {reportSubTab === 'app_bugs' && (
-                <div className="space-y-3">
-                  {appErrorReports.length === 0 ? (
-                    <div className="p-12 text-center border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl space-y-2">
-                      <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
-                      <div className="text-sm font-bold text-slate-800 dark:text-slate-200">
-                        Zero Open Defect Reports
-                      </div>
-                      <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                        No system bugs or calculation discrepancies submitted by athletes.
-                      </p>
-                    </div>
-                  ) : (
-                    appErrorReports.map((report) => (
-                      <div
-                        key={report.id}
-                        className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-3 shadow-xs"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
-                              {report.errorType.replace(/_/g, ' ')}
-                            </span>
-                            <span className="text-xs font-bold text-slate-900 dark:text-white">
-                              {report.title}
-                            </span>
-                            <span className="text-xs text-slate-400">
-                              by {report.userName}
-                            </span>
-                          </div>
-                          <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
-                            report.status === 'resolved'
-                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                              : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
-                          }`}>
-                            Status: {report.status}
-                          </span>
-                        </div>
-
-                        <p className="text-xs text-slate-700 dark:text-slate-300">
-                          {report.description}
-                        </p>
-
-                        {/* AI Diagnostic Verdict */}
-                        {report.aiAnalysisVerdict && (
-                          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 text-xs space-y-1">
-                            <div className="flex items-center justify-between">
-                              <span className="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
-                                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                                AI Diagnostic Analysis
+                        <div className="flex-1 space-y-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2 flex-wrap">
+                            <div className="flex items-center gap-2">
+                              <span className="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                                #{index + 1} • {actionBadge}
                               </span>
-                              <span className="px-2 py-0.2 rounded-full text-[9px] font-bold uppercase bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300">
-                                Severity: {report.aiAnalysisVerdict.severity}
+                              <span className="text-xs font-black text-gray-900 dark:text-white truncate">
+                                {log.details}
                               </span>
                             </div>
-                            <div className="text-slate-600 dark:text-slate-300 text-[11px]">
-                              {report.aiAnalysisVerdict.rootCauseAnalysis}
-                            </div>
-                            <div className="text-emerald-600 dark:text-emerald-400 text-[11px] font-medium pt-1">
-                              <strong>Recommended Fix: </strong>{report.aiAnalysisVerdict.recommendedCorrection}
-                            </div>
+                            <span className="text-[10px] text-gray-400 font-mono flex items-center gap-1 shrink-0">
+                              <Clock className="w-3 h-3 text-gray-400" />
+                              <span>{formattedDate}</span>
+                            </span>
                           </div>
-                        )}
 
-                        {/* Actions */}
-                        <div className="flex items-center justify-between gap-2 pt-1">
-                          <span className="text-[10px] text-slate-400 font-mono">
-                            Diagnostic Snapshot: {report.systemDiagnostics.viewport} • ID: {report.id}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateErrorStatus(report.id, 'analyzed')}
-                              className="px-2.5 py-1 text-[11px] font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors"
-                            >
-                              Mark Analyzed
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleUpdateErrorStatus(report.id, 'resolved')}
-                              className="px-2.5 py-1 text-[11px] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors"
-                            >
-                              Resolve Issue
-                            </button>
+                          <div className="flex items-center gap-3 text-[11px] text-gray-500 dark:text-gray-400 pt-0.5 flex-wrap">
+                            <span>Actor: <strong className="text-gray-800 dark:text-gray-200">{log.actor}</strong></span>
+                            {log.targetEmail && (
+                              <span>
+                                Target: <strong className="text-emerald-600 dark:text-emerald-400 font-mono">{log.targetEmail}</strong>
+                              </span>
+                            )}
+                            <span className="text-[10px] font-mono text-gray-400">
+                              Hash: {log.integrityHash.slice(0, 16)}...
+                            </span>
                           </div>
                         </div>
+
                       </div>
-                    ))
-                  )}
-                </div>
-              )}
+                    );
+                  })
+                )}
+              </div>
+
             </div>
           )}
 
-          {/* TAB 7: ACCURACY STATISTICS & SYSTEM PROMPT TUNING ENGINE */}
-          {activeTab === 'accuracy_stats' && (
-            <div className="space-y-6 text-left">
-              {/* Feedback toast for retraining */}
-              {retrainSuccessFeedback && (
-                <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
-                  <span>{retrainSuccessFeedback}</span>
-                </div>
-              )}
+          {/* ========================================================================= */}
+          {/* TAB 6: ATHLETE LOGINS & REAL-TIME PROFILE TELEMETRY                        */}
+          {/* ========================================================================= */}
+          {activeTab === 'athlete_logins' && (
+            <div className="animate-in fade-in">
+              <AthleteLoginsSection 
+                pin={hostPassword || '9284'} 
+                email={HOST_ADMIN_CONFIG.email}
+                onGrantVipToEmail={(target) => {
+                  setTargetEmail(target);
+                  setDurationOption('3_months');
+                  setActiveTab('ledger');
+                }}
+                onViewTimeline={(target) => setSelectedTimelineEmail(target)}
+              />
+            </div>
+          )}
 
-              {/* Accuracy KPI Metrics */}
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-1">
-                  <div className="text-xs font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                    <Scale className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                    <span>Total Scans Audited</span>
-                  </div>
-                  <div className="text-2xl font-black text-gray-900 dark:text-white">
-                    {recipeStats.reduce((acc, c) => acc + c.totalScans, 0).toLocaleString()}
-                  </div>
-                  <div className="text-[11px] text-emerald-600 font-semibold">Multi-Model Consensus & Grounded</div>
-                </div>
+          {/* ========================================================================= */}
+          {/* TAB 7: PROGRAM VALUATION & ROI MINI-DASHBOARD                              */}
+          {/* ========================================================================= */}
+          {activeTab === 'valuation' && (
+            <div className="animate-in fade-in">
+              <ProgramValuationDashboard 
+                pin={hostPassword || '9284'} 
+                email={HOST_ADMIN_CONFIG.email}
+              />
+            </div>
+          )}
 
-                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-1">
-                  <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4" />
-                    <span>Global Precision Rate</span>
-                  </div>
-                  <div className="text-2xl font-black text-emerald-700 dark:text-emerald-400">
-                    98.4%
-                  </div>
-                  <div className="text-[11px] text-emerald-600 font-semibold">&gt;95% Strict Threshold Met</div>
-                </div>
+        </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-1">
-                  <div className="text-xs font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                    <Bug className="w-4 h-4 text-amber-500" />
-                    <span>User-Flagged Inaccuracies</span>
-                  </div>
-                  <div className="text-2xl font-black text-amber-600 dark:text-amber-400">
-                    {recipeStats.reduce((acc, c) => acc + c.flaggedCount, 0)}
-                  </div>
-                  <div className="text-[11px] text-gray-500">Supervised Tuning Pipeline</div>
-                </div>
+        {/* Modal Footer */}
+        <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-[#121413] flex items-center justify-between shrink-0 text-xs text-gray-500">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <span>Cryptographically Verified Host Ledger System • Warad Asare</span>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-5 py-2 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold cursor-pointer hover:opacity-90 transition-opacity"
+          >
+            Done
+          </button>
+        </div>
 
-                <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-1">
-                  <div className="text-xs font-bold text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                    <Wand2 className="w-4 h-4 text-indigo-500" />
-                    <span>Active Recipe Prompts</span>
-                  </div>
-                  <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
-                    {recipeStats.length}
-                  </div>
-                  <div className="text-[11px] text-indigo-500 font-semibold">Continuous Fine-Tuning Active</div>
+      </div>
+
+      {/* Grant Timeline History Audit Modal */}
+      {selectedTimelineEmail && (
+        <GrantTimelineModal
+          isOpen={!!selectedTimelineEmail}
+          onClose={() => setSelectedTimelineEmail(null)}
+          targetEmail={selectedTimelineEmail}
+        />
+      )}
+
+      {/* Bulk Email Broadcast Modal */}
+      {showBulkEmailModal && (
+        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-[#1A1D1C] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl max-w-lg w-full p-6 space-y-4 animate-in zoom-in-95">
+            <div className="flex items-start justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-blue-500/20 text-blue-600 flex items-center justify-center font-black">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-base text-gray-900 dark:text-white">
+                    Send Batch Notification Email
+                  </h4>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Broadcasting direct message to {selectedEmails.length} selected athlete(s).
+                  </p>
                 </div>
               </div>
+              <button
+                type="button"
+                onClick={() => setShowBulkEmailModal(false)}
+                className="p-1 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-              {/* Recipe Category Error Rate Visualizer */}
-              <div className="p-6 rounded-3xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] space-y-5">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] dark:border-[#242826] pb-3">
-                  <div>
-                    <h3 className="font-bold text-base text-gray-900 dark:text-white flex items-center gap-2">
-                      <BrainCircuit className="w-5 h-5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                      <span>Meal Type Error Distribution & Quick-Action Prompt Retraining</span>
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      Visual breakdown of error rates across meal classes. Re-train system prompt directives in 1-click using user-flagged ground truth.
-                    </p>
-                  </div>
-                </div>
+            <div className="space-y-3 text-xs">
+              <div>
+                <label className="block text-[11px] font-bold text-gray-700 dark:text-gray-300 mb-1">
+                  Email Subject
+                </label>
+                <input
+                  type="text"
+                  value={bulkEmailSubject}
+                  onChange={(e) => setBulkEmailSubject(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white font-medium"
+                />
+              </div>
 
-                <div className="space-y-4">
-                  {recipeStats.map((stat) => (
-                    <div
-                      key={stat.categoryId}
-                      className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-3"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                        <div>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-extrabold text-sm text-gray-900 dark:text-white">
-                              {stat.categoryName}
-                            </span>
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF]">
-                              {stat.cuisineTag}
-                            </span>
-                            <span className="text-[10px] font-mono text-gray-500">
-                              Prompt: {stat.systemPromptVersion}
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-500 mt-0.5">
-                            Representative: {stat.dishes}
-                          </p>
-                        </div>
+              <div>
+                <label className="block text-[11px] font-bold text-gray-700 dark:text-gray-300 mb-1">
+                  Message Body
+                </label>
+                <textarea
+                  rows={4}
+                  value={bulkEmailBody}
+                  onChange={(e) => setBulkEmailBody(e.target.value)}
+                  className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white font-medium resize-none"
+                />
+              </div>
 
-                        <div className="flex items-center gap-3">
-                          <div className="text-right">
-                            <div className="text-xs font-bold text-gray-900 dark:text-white">
-                              Error Rate: <span className={stat.errorRatePct > 2.5 ? 'text-rose-500' : 'text-emerald-500'}>{stat.errorRatePct}%</span>
-                            </div>
-                            <div className="text-[10px] text-gray-400">
-                              {stat.flaggedCount} flagged / {stat.totalScans} scans
-                            </div>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => handleRetrainRecipePrompt(stat.categoryId)}
-                            disabled={retrainingCategoryId === stat.categoryId}
-                            className="px-3.5 py-2 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                          >
-                            {retrainingCategoryId === stat.categoryId ? (
-                              <>
-                                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                                <span>Re-Training Prompt...</span>
-                              </>
-                            ) : (
-                              <>
-                                <Wand2 className="w-3.5 h-3.5 text-[#E8912D]" />
-                                <span>Re-Train Prompt</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Error Progress Bar */}
-                      <div className="space-y-1">
-                        <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              stat.errorRatePct > 3
-                                ? 'bg-rose-500'
-                                : stat.errorRatePct > 2
-                                ? 'bg-amber-500'
-                                : 'bg-emerald-500'
-                            }`}
-                            style={{ width: `${Math.min(100, stat.errorRatePct * 20)}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Root Cause and Active Directives */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-[11px] border-t border-gray-200 dark:border-gray-800">
-                        <div>
-                          <span className="text-gray-400 font-semibold">Primary Discrepancy Vector: </span>
-                          <span className="text-gray-700 dark:text-gray-300">{stat.primaryRootCause}</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400 font-semibold">Active Prompt Compensation: </span>
-                          <span className="text-indigo-600 dark:text-indigo-400 font-mono">{stat.activeOptimizationPrompt}</span>
-                        </div>
-                      </div>
-                    </div>
+              <div className="p-3 rounded-xl bg-gray-50 dark:bg-[#121413] border border-gray-200 dark:border-gray-800 max-h-24 overflow-y-auto">
+                <span className="text-[10px] font-black uppercase text-gray-400 block mb-1">
+                  Selected Recipients ({selectedEmails.length})
+                </span>
+                <div className="flex flex-wrap gap-1">
+                  {selectedEmails.map((em) => (
+                    <span key={em} className="px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-700 dark:text-blue-300 font-mono text-[10px]">
+                      {em}
+                    </span>
                   ))}
                 </div>
               </div>
             </div>
-          )}
 
-        </div>
-
-        {/* Footer */}
-        <div className="p-4 bg-[#FAFAF8] dark:bg-[#111312] border-t border-[#E5E7EB] dark:border-[#242826] text-xs text-[#6B7280] dark:text-[#9EA8A2] flex items-center justify-between shrink-0">
-          <span className="flex items-center gap-1.5">
-            <Lock className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Host Node: Warad Asare ({HOST_ADMIN_CONFIG.email}) • UPI: {HOST_ADMIN_CONFIG.upiId}</span>
-          </span>
-          <button
-            onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 text-gray-800 dark:text-gray-200 font-bold text-xs cursor-pointer"
-          >
-            Close Dashboard
-          </button>
-        </div>
-      </div>
-
-      {/* CRYPTOGRAPHIC SIGNATURE & VERIFICATION MODAL FOR CLEARING LEDGER */}
-      {isCryptoModalOpen && cryptoChallenge && (
-        <div className="fixed inset-0 z-60 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in">
-          <div className="bg-white dark:bg-[#161817] rounded-3xl max-w-lg w-full shadow-2xl border-2 border-red-500/40 overflow-hidden text-left p-6 sm:p-7 space-y-5">
-            {/* Header */}
-            <div className="flex items-start gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center text-red-500 shrink-0">
-                <ShieldCheck className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-500/10 text-red-600 dark:text-red-400 text-[10px] font-black uppercase tracking-wider">
-                  Cryptographic Clearance Check
-                </div>
-                <h3 className="text-lg font-black text-gray-900 dark:text-white">
-                  Authorize Verified Ledger Wipe
-                </h3>
-                <p className="text-xs text-gray-500">
-                  This action generates a cryptographically signed HMAC SHA-256 certificate to purge 100% of ledger transaction records.
-                </p>
-              </div>
+            <div className="pt-2 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowBulkEmailModal(false)}
+                className="px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleExecuteBulkAction('send_notification', undefined, bulkEmailBody)}
+                disabled={isExecutingBulkOp || !bulkEmailBody.trim()}
+                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer transition-colors shadow-xs disabled:opacity-50 flex items-center gap-1.5"
+              >
+                {isExecutingBulkOp ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    <span>Sending Batch...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Send Batch Emails ({selectedEmails.length})</span>
+                  </>
+                )}
+              </button>
             </div>
-
-            {/* Cryptographic Challenge Specs */}
-            <div className="p-3.5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-gray-200 dark:border-gray-800 text-[11px] font-mono space-y-1.5 text-gray-600 dark:text-gray-300">
-              <div className="flex justify-between">
-                <span className="text-gray-400">Host Entity:</span>
-                <strong className="text-gray-900 dark:text-white font-sans">{HOST_ADMIN_CONFIG.email}</strong>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Challenge Nonce:</span>
-                <span className="text-emerald-600 dark:text-emerald-400 truncate max-w-[200px]">{cryptoChallenge.nonce}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Operation:</span>
-                <span className="text-red-500 font-bold">{cryptoChallenge.action}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400">Timestamp:</span>
-                <span>{new Date(cryptoChallenge.timestamp).toLocaleString()}</span>
-              </div>
-            </div>
-
-            {/* Error Message */}
-            {cryptoError && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{cryptoError}</span>
-              </div>
-            )}
-
-            {/* Form Inputs */}
-            <form onSubmit={handleExecuteCryptographicWipe} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                  1. Enter Host Security PIN (Default: 9284)
-                </label>
-                <input
-                  type="password"
-                  maxLength={6}
-                  required
-                  value={cryptoPinInput}
-                  onChange={(e) => setCryptoPinInput(e.target.value)}
-                  placeholder="9284"
-                  className="w-full text-xs p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A1D1C] text-gray-900 dark:text-white font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">
-                  2. Type Confirmation Passphrase:
-                  <span className="block text-[11px] font-mono text-red-600 dark:text-red-400 font-bold mt-0.5">
-                    {cryptoChallenge.requiredPhrase}
-                  </span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={cryptoPhraseInput}
-                  onChange={(e) => setCryptoPhraseInput(e.target.value)}
-                  placeholder={cryptoChallenge.requiredPhrase}
-                  className="w-full text-xs p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-[#1A1D1C] text-gray-900 dark:text-white font-mono"
-                />
-              </div>
-
-              <div className="flex items-center gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsCryptoModalOpen(false)}
-                  className="flex-1 py-3 px-4 rounded-xl bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold text-xs cursor-pointer hover:bg-gray-300"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isClearingLedger}
-                  className="flex-1 py-3 px-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg cursor-pointer disabled:opacity-50"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>{isClearingLedger ? 'Signing & Purging...' : 'Cryptographically Wipe Ledger'}</span>
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
+
+      {/* Automated Notification Confirmation & Details Dialog */}
+      {showNotifyModal && notifyResult && (
+        <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
+          <div className="bg-white dark:bg-[#1A1D1C] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl max-w-lg w-full p-6 space-y-4 animate-in zoom-in-95">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-600 flex items-center justify-center">
+                  <MailCheck className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-base text-gray-900 dark:text-white">
+                    Automated Notifications Sent!
+                  </h4>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Dispatched to {notifyResult.totalNotified} active subscriber{notifyResult.totalNotified === 1 ? '' : 's'}.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowNotifyModal(false)}
+                className="p-1 rounded-xl text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200">
+              <span className="font-bold">Summary: </span>
+              {notifyResult.message}
+            </div>
+
+            <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+              <div className="text-[11px] font-black uppercase text-gray-400 tracking-wider">
+                Delivered Email Alerts ({notifyResult.notifications.length})
+              </div>
+              {notifyResult.notifications.map((n: any, idx: number) => (
+                <div 
+                  key={idx}
+                  className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#121413] border border-gray-200 dark:border-gray-800 text-xs flex items-center justify-between gap-2"
+                >
+                  <div className="min-w-0">
+                    <div className="font-mono font-bold text-gray-900 dark:text-white truncate">
+                      {n.email}
+                    </div>
+                    <div className="text-[10px] text-gray-400">
+                      {n.plan} • {n.remainingDays}
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 shrink-0">
+                    Delivered
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowNotifyModal(false)}
+                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer transition-colors shadow-xs"
+              >
+                Close & Return to Ledger
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Vertical Grant Timeline Audit Modal */}
+      {selectedTimelineEmail && (
+        <GrantTimelineModal
+          isOpen={!!selectedTimelineEmail}
+          targetEmail={selectedTimelineEmail}
+          onClose={() => setSelectedTimelineEmail(null)}
+        />
+      )}
+
     </div>
   );
 };

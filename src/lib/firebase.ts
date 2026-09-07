@@ -6,13 +6,13 @@ import firebaseConfig from '../../firebase-applet-config.json';
 // Initialize Firebase App
 const app = initializeApp(firebaseConfig);
 
-// CRITICAL: Must pass firebaseConfig.firestoreDatabaseId as third parameter to initializeFirestore
+// CRITICAL: Initialize Firestore with auto-detect long polling
 export const db = initializeFirestore(
   app,
   {
     experimentalAutoDetectLongPolling: true,
   },
-  firebaseConfig.firestoreDatabaseId
+  (firebaseConfig as any).firestoreDatabaseId || '(default)'
 );
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();

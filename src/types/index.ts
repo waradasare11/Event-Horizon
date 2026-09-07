@@ -23,6 +23,44 @@ export interface WorkoutNotificationSettings {
   lastNotifiedDate?: string;
 }
 
+export interface IntermittentFastingSettings {
+  enabled: boolean;
+  protocol: '16:8' | '18:6' | '20:4' | '14:10' | 'custom';
+  fastingDurationHours?: number; // e.g. 16
+  targetFastingHours: number; // e.g. 16
+  eatingDurationHours?: number; // e.g. 8
+  eatingWindowHours?: number; // e.g. 8
+  fastStartHour?: number; // 24-hr format, e.g. 20 (8:00 PM)
+  fastEndHour?: number; // 24-hr format, e.g. 12 (12:00 PM)
+  eatingWindowStart: string; // e.g. "12:00"
+  eatingWindowEnd: string; // e.g. "20:00"
+  allowOverride?: boolean;
+  waterRemindersEnabled?: boolean;
+}
+
+export interface FavoriteMealPreset {
+  id: string;
+  name: string;
+  calories: number;
+  proteinG: number;
+  carbsG: number;
+  fatG: number;
+  fiberG?: number;
+  icon?: string;
+  category?: 'Breakfast' | 'Lunch' | 'Dinner' | 'Snack' | 'Protein' | 'Shake';
+}
+
+export interface WeightLossDeficitSettings {
+  enabled: boolean;
+  deficitTier: 'mild' | 'moderate' | 'aggressive' | 'custom';
+  deficitPct: number; // e.g. 10, 15, 20, 25
+  deficitKcal: number; // e.g. 250, 400, 500, 600
+  maintenanceTdee: number;
+  deficitDailyCalories: number;
+  proteinMultiplierGPerKg: number; // e.g. 2.0 or 2.2 g/kg
+  safeFloorWarning?: boolean;
+}
+
 export interface UserProfile {
   id: string;
   name: string;
@@ -38,6 +76,8 @@ export interface UserProfile {
   equipmentType?: EquipmentType;
   hasPullUpBar?: boolean;
   notificationSettings?: WorkoutNotificationSettings;
+  intermittentFasting?: IntermittentFastingSettings;
+  favoriteMeals?: FavoriteMealPreset[];
   experienceLevel: ExperienceLevel;
   trainingDaysPerWeek: number;
   selectedDays: string[]; // e.g. ['Mon', 'Wed', 'Fri']
@@ -80,14 +120,17 @@ export interface UserProfile {
   dailyFat: number;
   hydrationLiters: number;
   weeklyRateKg: number;
+  weightLossDeficitSettings?: WeightLossDeficitSettings;
   
+  lastProfileUpdateDate?: string;
+  lastQuarterlyReviewDate?: string;
   isOnboarded: boolean;
   email?: string;
   authProvider?: string;
   subscription?: UserSubscription;
 }
 
-export type SubscriptionPlanId = 'trial_7d' | '1_month' | '3_months' | '1_year' | '2_years' | '3_years';
+export type SubscriptionPlanId = 'trial_7d' | '1_month' | '3_months' | '6_months' | '1_year' | '2_years' | '3_years' | 'lifetime';
 export type SubscriptionStatus = 'trial' | 'active' | 'expired' | 'pending_verification';
 
 export interface SubscriptionPlanConfig {
@@ -111,6 +154,8 @@ export interface UserSubscription {
   trialEndDate: string; // ISO String
   subscriptionStartDate?: string;
   subscriptionEndDate?: string;
+  expiresAt?: string;
+  isLifetime?: boolean;
   amountPaidINR?: number;
   utrNumber?: string;
   paymentMethod?: 'UPI_QR' | 'UPI_DIRECT' | 'PROMO_TRIAL' | 'HOST_LIFETIME_VIP' | 'MANUAL_GRANT';
@@ -118,6 +163,9 @@ export interface UserSubscription {
   daysRemaining: number;
   lastPaymentVerifiedAt?: string;
   verifiedBy?: string;
+  notes?: string;
+  couponCodeUsed?: string;
+  grantId?: string;
 }
 
 export interface PaymentTransaction {
@@ -359,6 +407,8 @@ export interface WorkoutCompletionLog {
   isRestDay?: boolean;
   notes?: string;
 }
+
+export type WorkoutLog = WorkoutCompletionLog;
 
 export interface WorkoutStreakStats {
   currentStreak: number;
@@ -697,7 +747,12 @@ export type HostAuditActionType =
   | 'payment_verified'
   | 'pin_updated'
   | 'ledger_cleared'
-  | 'audit_exported';
+  | 'audit_exported'
+  | 'notification_sent'
+  | 'snapshot_exported'
+  | 'coupon_created'
+  | 'coupon_redeemed'
+  | 'coupon_revoked';
 
 export interface HostAuditLogEntry {
   id: string;
@@ -848,12 +903,183 @@ export interface HostGrantedSubscription {
   grantedBy: string;
   grantedByName: string;
   grantedAt: string;
+  updatedAt?: string;
   status: 'active' | 'revoked';
   isLifetime: boolean;
   durationMonths: number;
   durationDays: number;
   notes?: string;
   expiresAt?: string;
+  couponCodeUsed?: string;
+}
+
+export interface HostCouponCode {
+  id: string;
+  code: string; // Uppercase unique code e.g. "SUMMERVIP100"
+  planId: string; // 'all_plans' | '1_month' | '3_months' | '1_year' | '2_years' | '3_years'
+  planName: string;
+  durationDays: number;
+  durationMonths: number;
+  isLifetime: boolean;
+  maxRedemptions?: number; // 0 or undefined for unlimited
+  maxUses?: number;
+  timesRedeemed?: number;
+  usedCount?: number;
+  redeemedByEmails?: string[];
+  redeemedBy?: string[];
+  expiresAt: string; // ISO date string of coupon expiration
+  createdAt: string;
+  createdBy: string;
+  status: 'active' | 'expired' | 'depleted' | 'revoked';
+  notes?: string;
+  integrityHash?: string;
+}
+
+export interface ChallengeLeaderboardEntry {
+  id: string;
+  athleteName: string;
+  avatarUrl?: string;
+  emailMasked: string;
+  rank: number;
+  totalScore: number; // Volume in kg or streak in days or score
+  unit: string;
+  badge?: string;
+  lastActive: string;
+  isCurrentUser?: boolean;
+  cheersCount?: number;
+}
+
+export interface CommunityChallenge {
+  id: string;
+  title: string;
+  category: 'volume' | 'streak' | 'nutrition' | 'powerlifting';
+  description: string;
+  targetMetric: string;
+  currentCommunityTotal: number;
+  goalCommunityTotal: number;
+  unit: string;
+  participantCount: number;
+  startDate: string;
+  endDate: string;
+  rewardBadge: string;
+  userContribution?: number;
+  leaderboard: ChallengeLeaderboardEntry[];
+}
+
+export interface AthleteLoginRecord {
+  id: string;
+  userId: string;
+  email: string;
+  name: string;
+  loginTimestamp: string; // ISO String
+  lastActiveTimestamp?: string;
+  sessionDurationMinutes?: number;
+  device: string; // e.g. "Apple iPhone / iOS 17", "Windows 11 / Chrome"
+  deviceFingerprint?: string; // Hardware/Browser deterministic fingerprint
+  browser?: string;
+  os?: string;
+  screenResolution?: string;
+  timezone?: string;
+  ipMasked?: string;
+  sessionCount?: number;
+
+  // Complete Snapshot of Profile Details (100% accurate)
+  age?: number;
+  sex?: 'male' | 'female' | string;
+  weightKg?: number;
+  heightCm?: number;
+  bmi?: number;
+  targetWeightKg?: number;
+  targetDate?: string;
+  bodyFatPct?: number;
+  goal?: string;
+  dietType?: string;
+  experienceLevel?: string;
+  trainingDaysPerWeek?: number;
+  sessionDurationMin?: number;
+  preferredTime?: string;
+  musclePriority?: string;
+  bmr?: number;
+  tdee?: number;
+  dailyCalories?: number;
+  dailyProtein?: number;
+  dailyCarbs?: number;
+  dailyFat?: number;
+  hydrationLiters?: number;
+  weeklyRateKg?: number;
+  workoutStreakDays?: number;
+  totalWorkoutsLogged?: number;
+  mealLogsCount?: number;
+  isOnboarded?: boolean;
+  isStrictVegetarian?: boolean;
+  subscriptionPlan?: string;
+  isLifetimeVIP?: boolean;
+  subscriptionStatus?: string;
+  daysRemaining?: number;
+  expiresAt?: string;
+  notes?: string;
+}
+
+export interface GrantVerificationLog {
+  id: string;
+  action: string;
+  targetEmail: string;
+  planId?: string;
+  planName?: string;
+  durationMonths?: number;
+  durationDays?: number;
+  isLifetime?: boolean;
+  expiresAt?: string;
+  performedBy: string;
+  verifiedByPin: boolean;
+  authMethod: 'HOST_PASSWORD_AUTHENTICATED' | 'COUPON_REDEEMED' | 'SYSTEM_INITIALIZED' | string;
+  deviceFingerprint?: string;
+  timestamp: string;
+  status: 'AUTHENTICATED' | 'FAILED' | 'REVOKED' | string;
+  notes?: string;
+  checksum?: string;
+  actor?: string;
+  pinProvidedMasked?: string;
+  pinProvided?: string;
+  authenticated?: boolean;
+  integrityHash?: string;
+  clientFingerprint?: string;
+}
+
+export interface GrantTimelineEvent {
+  id: string;
+  timestamp: string;
+  eventType: 'initial_grant' | 'plan_modified' | 'extension_added' | 'coupon_redeemed' | 'notification_dispatched' | 'repaired_synced' | 'status_changed';
+  title: string;
+  description: string;
+  actor: string;
+  previousExpiry?: string;
+  newExpiry?: string;
+  planName?: string;
+  durationLabel?: string;
+  badge?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface BulkOperationRequest {
+  pin: string;
+  email: string;
+  targetEmails: string[];
+  action: 'extend_duration' | 'set_lifetime' | 'send_notification' | 'revoke';
+  extensionDays?: number;
+  customNotificationMessage?: string;
+  notes?: string;
+}
+
+export interface BulkOperationResult {
+  success: boolean;
+  action: string;
+  totalTargeted: number;
+  totalUpdated: number;
+  totalNotified?: number;
+  affectedEmails: string[];
+  message: string;
+  updatedGrants?: HostGrantedSubscription[];
 }
 
 

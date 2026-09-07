@@ -19,9 +19,11 @@ import {
   ArrowRightLeft,
   Leaf,
   Lock,
-  ShieldCheck
+  ShieldCheck,
+  Moon,
+  Unlock
 } from 'lucide-react';
-import { UserProfile, MealLog, AIAdjustedMealPlan, AIMealPlanItem } from '../types';
+import { UserProfile, MealLog, AIAdjustedMealPlan, AIMealPlanItem, IntermittentFastingSettings } from '../types';
 import { CustomRecipeGenerator } from './CustomRecipeGenerator';
 import { MicroNutrientTracker } from './MicroNutrientTracker';
 import { SmartShoppingListView } from './SmartShoppingListView';
@@ -30,6 +32,7 @@ import { PerGramNutritionBuilder } from './PerGramNutritionBuilder';
 import { MacroDonutChart } from './MacroDonutChart';
 import { NutritionMacroProgressRing } from './NutritionMacroProgressRing';
 import { SmartNutritionAlertBanner } from './SmartNutritionAlertBanner';
+import { IntermittentFastingCard } from './IntermittentFastingCard';
 import { RECIPES_DATABASE } from '../data/recipes';
 
 interface NutritionPlannerProps {
@@ -55,6 +58,67 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [swapToast, setSwapToast] = useState<string | null>(null);
 
+  // Intermittent Fasting state
+  const [fastingSettings, setFastingSettings] = useState<IntermittentFastingSettings>(() => {
+    const saved = localStorage.getItem('peakform_intermittent_fasting_settings');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return userProfile.intermittentFasting || {
+      enabled: false,
+      protocol: '16:8',
+      fastingStartHour: 20,
+      fastingEndHour: 12,
+      eatingWindowHours: 8,
+      targetFastingHours: 16,
+      eatingWindowStart: '12:00',
+      eatingWindowEnd: '20:00',
+    };
+  });
+  const [isOverrideDimming, setIsOverrideDimming] = useState<boolean>(false);
+
+  // Weight Loss Mode State (applies automatic 20% deficit to maintenance TDEE)
+  const [isWeightLossMode, setIsWeightLossMode] = useState<boolean>(() => {
+    const saved = localStorage.getItem('peakform_weight_loss_mode');
+    if (saved !== null) {
+      return saved === 'true';
+    }
+    return userProfile.goal === 'lose_fat';
+  });
+
+  const toggleWeightLossMode = () => {
+    setIsWeightLossMode((prev) => {
+      const next = !prev;
+      localStorage.setItem('peakform_weight_loss_mode', String(next));
+      return next;
+    });
+  };
+
+  const handleUpdateFastingSettings = (newSettings: IntermittentFastingSettings) => {
+    setFastingSettings(newSettings);
+    localStorage.setItem('peakform_intermittent_fasting_settings', JSON.stringify(newSettings));
+  };
+
+  // Determine if current time falls within fasting hours
+  const isCurrentlyInFastingWindow = React.useMemo(() => {
+    if (!fastingSettings.enabled) return false;
+    const now = new Date();
+    const currentMin = now.getHours() * 60 + now.getMinutes();
+    const [startH, startM] = (fastingSettings.eatingWindowStart || '12:00').split(':').map(Number);
+    const [endH, endM] = (fastingSettings.eatingWindowEnd || '20:00').split(':').map(Number);
+    const eatStart = startH * 60 + startM;
+    const eatEnd = endH * 60 + endM;
+
+    if (eatStart <= eatEnd) {
+      return !(currentMin >= eatStart && currentMin < eatEnd);
+    } else {
+      return !(currentMin >= eatStart || currentMin < eatEnd);
+    }
+  }, [fastingSettings]);
+
+  const shouldDimMealInputs = isCurrentlyInFastingWindow && !isOverrideDimming;
 
   // Daily totals consumed today
   const totalCaloriesToday = mealLogs.reduce((sum, m) => sum + m.calories, 0);
@@ -62,10 +126,25 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
   const totalCarbsToday = mealLogs.reduce((sum, m) => sum + m.carbsG, 0);
   const totalFatToday = mealLogs.reduce((sum, m) => sum + m.fatG, 0);
 
-  const remainingCalories = Math.max(0, userProfile.dailyCalories - totalCaloriesToday);
+  // Calorie & Deficit Math
+  const maintenanceCalories = userProfile.tdee || Math.round((userProfile.bmr || 1600) * 1.45);
+  const standardDailyCalories = userProfile.dailyCalories || maintenanceCalories;
+  
+  // When Weight Loss Mode is ON, apply strict 20% deficit to maintenance TDEE
+  const weightLossTargetCalories = Math.round(maintenanceCalories * 0.80);
+  const effectiveDailyCalories = isWeightLossMode ? weightLossTargetCalories : standardDailyCalories;
+  const targetDeficitAmount = maintenanceCalories - effectiveDailyCalories;
+  const currentActualDeficit = maintenanceCalories - totalCaloriesToday;
+
+  const remainingCalories = Math.max(0, effectiveDailyCalories - totalCaloriesToday);
   const remainingProtein = Math.max(0, userProfile.dailyProtein - totalProteinToday);
   const remainingCarbs = Math.max(0, (userProfile.dailyCarbs || 200) - totalCarbsToday);
   const remainingFat = Math.max(0, (userProfile.dailyFat || 60) - totalFatToday);
+
+  // Weekly Fat Loss projection (7,700 kcal per kg of body fat)
+  const projectedWeeklyKgLoss = targetDeficitAmount > 0 
+    ? ((targetDeficitAmount * 7) / 7700).toFixed(2)
+    : '0.00';
 
   const handleGenerateAIMealPlan = async () => {
     try {
@@ -280,6 +359,33 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
         </div>
       )}
 
+      {/* Intermittent Fasting Schedule & Window Controls */}
+      <IntermittentFastingCard
+        settings={fastingSettings}
+        onUpdateSettings={handleUpdateFastingSettings}
+        isOverrideDimming={isOverrideDimming}
+        onToggleOverrideDimming={() => setIsOverrideDimming(!isOverrideDimming)}
+      />
+
+      {/* Fasting Active Visual Dimming Notice */}
+      {shouldDimMealInputs && (
+        <div className="p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in fade-in">
+          <div className="flex items-center gap-2.5 text-amber-900 dark:text-amber-200 font-bold">
+            <Moon className="w-5 h-5 text-amber-500 shrink-0" />
+            <span>
+              <strong>Fasting Window Active ({fastingSettings.protocol}):</strong> Next eating window begins at {fastingSettings.eatingWindowStart}. Meal log inputs are dimmed to encourage fasting compliance.
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsOverrideDimming(true)}
+            className="px-3.5 py-1.5 rounded-xl bg-amber-500 text-white font-black hover:bg-amber-600 transition-all cursor-pointer shrink-0 shadow-2xs self-start sm:self-auto"
+          >
+            Log Anyway / Break Fast
+          </button>
+        </div>
+      )}
+
 
       {/* Swap Success Toast */}
       {swapToast && (
@@ -311,6 +417,93 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
         </div>
       )}
 
+      {/* Weight Loss Mode & Caloric Deficit Target Controller */}
+      <div className="bg-gradient-to-r from-[#FAFAF8] to-emerald-50/50 dark:from-[#161817] dark:to-emerald-950/20 p-6 rounded-2xl border border-emerald-200/80 dark:border-emerald-800/40 shadow-xs transition-all">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <div className={`p-2.5 rounded-xl ${isWeightLossMode ? 'bg-[#0F6E5F] text-white shadow-xs' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}`}>
+              <Scale className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  Weight Loss Mode (20% Caloric Deficit)
+                </h3>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide ${
+                  isWeightLossMode 
+                    ? 'bg-[#0F6E5F]/15 text-[#0F6E5F] dark:text-emerald-300 border border-[#0F6E5F]/30' 
+                    : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                }`}>
+                  {isWeightLossMode ? '20% Deficit Active' : 'Maintenance / Standard'}
+                </span>
+              </div>
+              <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
+                {isWeightLossMode
+                  ? `Automatically applies a strict 20% deficit (-${targetDeficitAmount} kcal) against your daily maintenance needs (${maintenanceCalories} kcal).`
+                  : `Currently targeting standard daily calories (${standardDailyCalories} kcal). Activate to initiate accelerated fat loss.`}
+              </p>
+            </div>
+          </div>
+
+          {/* Toggle Button */}
+          <button
+            type="button"
+            onClick={toggleWeightLossMode}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 shadow-xs ${
+              isWeightLossMode
+                ? 'bg-[#0F6E5F] text-white hover:bg-[#0c594c]'
+                : 'bg-white dark:bg-[#202422] border border-[#D1D5DB] dark:border-[#383E3B] text-[#374151] dark:text-[#D1D5DB] hover:border-[#0F6E5F]'
+            }`}
+          >
+            <Flame className={`w-4 h-4 ${isWeightLossMode ? 'text-amber-300 animate-pulse' : 'text-gray-400'}`} />
+            <span>{isWeightLossMode ? 'Deactivate Deficit' : 'Activate 20% Deficit'}</span>
+          </button>
+        </div>
+
+        {/* Visual Deficit Progress Bar */}
+        {isWeightLossMode && (
+          <div className="mt-5 pt-4 border-t border-emerald-200/60 dark:border-emerald-900/40 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-1.5">
+              <span className="font-semibold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+                <Flame className="w-3.5 h-3.5 text-amber-500" />
+                Deficit Progress Today: <strong>{currentActualDeficit >= 0 ? `${currentActualDeficit} kcal deficit achieved` : `${Math.abs(currentActualDeficit)} kcal surplus`}</strong>
+              </span>
+              <span className="text-[#6B7280] dark:text-[#9EA8A2]">
+                Target Intake: <strong className="text-[#1A1D1B] dark:text-[#E8ECE9]">{effectiveDailyCalories} kcal</strong> (Maintenance: {maintenanceCalories} kcal • -20%)
+              </span>
+            </div>
+
+            {/* Progress Track */}
+            <div className="w-full bg-emerald-100/60 dark:bg-emerald-950/60 rounded-full h-3.5 p-0.5 overflow-hidden border border-emerald-300/40 dark:border-emerald-800/40 relative">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  currentActualDeficit >= targetDeficitAmount
+                    ? 'bg-gradient-to-r from-emerald-500 to-[#0F6E5F]'
+                    : currentActualDeficit > 0
+                    ? 'bg-gradient-to-r from-amber-500 to-emerald-500'
+                    : 'bg-rose-500'
+                }`}
+                style={{
+                  width: `${Math.min(100, Math.max(5, (Math.max(0, currentActualDeficit) / Math.max(1, targetDeficitAmount)) * 100))}%`
+                }}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-[#6B7280] dark:text-[#9EA8A2] pt-1">
+              <div className="bg-white/80 dark:bg-[#1B1E1D]/80 p-2 rounded-lg border border-emerald-100 dark:border-emerald-900/30">
+                <span className="text-gray-500">Target Deficit:</span> <strong className="text-[#0F6E5F] dark:text-emerald-400">-{targetDeficitAmount} kcal/day (20%)</strong>
+              </div>
+              <div className="bg-white/80 dark:bg-[#1B1E1D]/80 p-2 rounded-lg border border-emerald-100 dark:border-emerald-900/30">
+                <span className="text-gray-500">Projected Rate:</span> <strong className="text-amber-600 dark:text-amber-400">-{projectedWeeklyKgLoss} kg/week</strong>
+              </div>
+              <div className="bg-white/80 dark:bg-[#1B1E1D]/80 p-2 rounded-lg border border-emerald-100 dark:border-emerald-900/30">
+                <span className="text-gray-500">Zone Status:</span> <strong className="text-emerald-700 dark:text-emerald-300">{currentActualDeficit >= targetDeficitAmount ? '🎯 Ideal Deficit Zone' : `${Math.max(0, effectiveDailyCalories - totalCaloriesToday)} kcal remaining`}</strong>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Real-Time Macro Visual Progress Rings */}
       <NutritionMacroProgressRing
         userProfile={userProfile}
@@ -333,7 +526,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
               <span>Daily Calories</span>
             </div>
             <span className="text-xs font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">
-              {userProfile.dailyCalories} kcal target
+              {effectiveDailyCalories} kcal target {isWeightLossMode && '(-20%)'}
             </span>
           </div>
           <div className="text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-2">
@@ -342,7 +535,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
           <div className="w-full bg-[#F3F4F6] dark:bg-[#242826] rounded-full h-2 mt-3 overflow-hidden">
             <div
               className="bg-[#0F6E5F] h-2 rounded-full transition-all duration-500"
-              style={{ width: `${Math.min(100, (totalCaloriesToday / userProfile.dailyCalories) * 100)}%` }}
+              style={{ width: `${Math.min(100, (totalCaloriesToday / effectiveDailyCalories) * 100)}%` }}
             />
           </div>
           <div className="flex justify-between text-[11px] text-[#6B7280] dark:text-[#9EA8A2] mt-1.5">
@@ -437,13 +630,17 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
         onSaveToMealLog={onSaveToMealLog}
       />
 
-      {/* SUBVIEW 0: GRAM-PRECISION INGREDIENT CALCULATOR (IFCT & USDA) */}
-      {plannerSubView === 'per_gram_builder' && (
-        <PerGramNutritionBuilder
-          userProfile={userProfile}
-          onSaveToMealLog={onSaveToMealLog}
-        />
-      )}
+      {/* Subviews Container with Intermittent Fasting Dimming */}
+      <div className={`space-y-8 transition-all duration-300 relative ${
+        shouldDimMealInputs ? 'opacity-55 saturate-75 filter' : ''
+      }`}>
+        {/* SUBVIEW 0: GRAM-PRECISION INGREDIENT CALCULATOR (IFCT & USDA) */}
+        {plannerSubView === 'per_gram_builder' && (
+          <PerGramNutritionBuilder
+            userProfile={userProfile}
+            onSaveToMealLog={onSaveToMealLog}
+          />
+        )}
 
       {/* SUBVIEW 1: SMART SHOPPING LIST */}
       {plannerSubView === 'smart_grocery' && (
@@ -662,6 +859,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 };
