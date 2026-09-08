@@ -126,11 +126,11 @@ export function checkAndTrigger6PMWorkoutReminder(params: {
   // Fire Web Notification!
   try {
     const athleteName = params.userProfile.name || 'Athlete';
-    const notification = new Notification('🏋️ PeakForm AI: 6:00 PM Workout Reminder', {
+    const notification = new Notification('🏋️ AROH: 6:00 PM Workout Reminder', {
       body: `Hey ${athleteName}, it's past 6:00 PM and today's workout hasn't been logged yet! Don't break your streak—get your session in now.`,
       icon: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=128&auto=format&fit=crop&q=80',
       badge: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=128&auto=format&fit=crop&q=80',
-      tag: 'peakform-6pm-workout-reminder',
+      tag: 'aroh-6pm-workout-reminder',
       requireInteraction: false,
     });
 

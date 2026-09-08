@@ -145,7 +145,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `PeakForm_Athlete_Logins_And_Profiles_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `AROH_Athlete_Logins_And_Profiles_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -318,7 +318,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
             <Users className="w-10 h-10 text-gray-400 mx-auto" />
             <div className="font-bold text-gray-700 dark:text-gray-300">No Login Telemetry Records Found</div>
             <p className="text-xs text-gray-400">
-              {searchQuery ? `No athlete records match "${searchQuery}".` : 'Logins will automatically populate here whenever athletes open or authenticate into PeakForm AI.'}
+              {searchQuery ? `No athlete records match "${searchQuery}".` : 'Logins will automatically populate here whenever athletes open or authenticate into AROH AI.'}
             </p>
           </div>
         ) : (

@@ -17,7 +17,7 @@ export const HOST_ADMIN_CONFIG = {
   name: 'Warad Asare',
   upiId: '9284160309@fam',
   email: 'waradasare11@gmail.com',
-  appName: 'PeakForm AI Pro',
+  appName: 'AROH AI Pro',
   merchantCode: '5411',
   defaultPin: '9284',
 };
@@ -391,13 +391,13 @@ export function computeSubscriptionStatus(sub?: UserSubscription, userEmail?: st
 
 /**
  * Generate a real, strictly formatted UPI Deep Link URI
- * Format: upi://pay?pa=9284160309@fam&pn=Warad%20Asare&am=89&cu=INR&tn=PeakForm%20AI%20Pro
+ * Format: upi://pay?pa=9284160309@fam&pn=Warad%20Asare&am=89&cu=INR&tn=AROH%20AI%20Pro
  */
 export function generateUPILink(plan: SubscriptionPlanConfig, userEmail?: string): string {
   const vpa = HOST_ADMIN_CONFIG.upiId;
   const payeeName = encodeURIComponent(HOST_ADMIN_CONFIG.name);
   const amount = plan.priceINR.toFixed(2);
-  const note = encodeURIComponent(`PeakForm AI ${plan.durationLabel} - ${userEmail || 'Member'}`);
+  const note = encodeURIComponent(`AROH AI ${plan.durationLabel} - ${userEmail || 'Member'}`);
   return `upi://pay?pa=${vpa}&pn=${payeeName}&am=${amount}&cu=INR&tn=${note}`;
 }
 
@@ -1624,8 +1624,8 @@ export function recordPaymentTransaction(
   const tx: PaymentTransaction = {
     id: `tx_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
     userId: user.id,
-    userEmail: user.email || 'athlete@peakform.ai',
-    userName: user.name || 'PeakForm Athlete',
+    userEmail: user.email || 'athlete@aroh.fit',
+    userName: user.name || 'AROH Athlete',
     planId: plan.id,
     planName: plan.name,
     durationLabel: plan.durationLabel,
@@ -1674,8 +1674,8 @@ export async function verifyPaymentWithBackendServer(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         userId: user.id,
-        userEmail: user.email || 'athlete@peakform.ai',
-        userName: user.name || 'PeakForm Athlete',
+        userEmail: user.email || 'athlete@aroh.fit',
+        userName: user.name || 'AROH Athlete',
         planId: plan.id,
         amountINR: plan.priceINR,
         utrNumber,
@@ -1895,7 +1895,7 @@ export function exportHostLedgerToCSV(grants: HostGrantedSubscription[]): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `PeakForm_Host_Subscription_Ledger_${new Date().toISOString().split('T')[0]}.csv`);
+  link.setAttribute('download', `AROH_Host_Subscription_Ledger_${new Date().toISOString().split('T')[0]}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -1946,7 +1946,7 @@ export async function notifyAllActiveSubscribers(
         remainingTimeLabel,
         daysRemaining,
         sentAt: new Date().toISOString(),
-        subject: '🎉 PeakForm AI VIP Subscription Status - Active Access Update',
+        subject: '🎉 AROH AI VIP Subscription Status - Active Access Update',
         status: 'dispatched',
       };
     });
@@ -1992,8 +1992,8 @@ export async function notifyExpiringSubscribers(
       daysRemaining,
       expiryDateStr,
       sentAt: new Date().toISOString(),
-      subject: `⚠️ Reminder: Your PeakForm VIP Subscription expires in ${daysRemaining} day${daysRemaining === 1 ? '' : 's'} (${expiryDateStr})`,
-      message: customMessage || `Your PeakForm Pro access is set to expire in ${daysRemaining} day(s) on ${expiryDateStr}. Contact host ${HOST_ADMIN_CONFIG.name} (${HOST_ADMIN_CONFIG.email}) or renew in-app.`,
+      subject: `⚠️ Reminder: Your AROH VIP Subscription expires in ${daysRemaining} day${daysRemaining === 1 ? '' : 's'} (${expiryDateStr})`,
+      message: customMessage || `Your AROH Pro access is set to expire in ${daysRemaining} day(s) on ${expiryDateStr}. Contact host ${HOST_ADMIN_CONFIG.name} (${HOST_ADMIN_CONFIG.email}) or renew in-app.`,
       status: 'dispatched',
     };
   });
@@ -2029,7 +2029,7 @@ export async function notifySingleSubscriber(
     daysRemaining,
     expiryDateStr,
     sentAt: new Date().toISOString(),
-    subject: `⚠️ PeakForm Pro Renewal Reminder (${daysRemaining} Day${daysRemaining === 1 ? '' : 's'} Remaining)`,
+    subject: `⚠️ AROH Pro Renewal Reminder (${daysRemaining} Day${daysRemaining === 1 ? '' : 's'} Remaining)`,
     message: `Hello Athlete, your VIP subscription will expire in ${daysRemaining} days on ${expiryDateStr}.`,
     status: 'dispatched',
   };

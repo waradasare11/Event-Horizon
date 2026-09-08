@@ -1,7 +1,7 @@
 /**
  * Universal AIRouter Middleware Service
  * 
- * Centralized abstraction layer for all external AI operations across PeakForm AI.
+ * Centralized abstraction layer for all external AI operations across AROH.
  * Routes requests through OmniRoute High-Reasoning AI with automatic fallback,
  * model failover, and adaptive confidence threshold enforcement (>= 95%).
  * 

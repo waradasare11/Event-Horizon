@@ -31,15 +31,36 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
   userProfile,
   onSaveProfile,
 }) => {
-  const [weightKg, setWeightKg] = useState<number>(userProfile.weightKg || 70);
-  const [targetWeightKg, setTargetWeightKg] = useState<number>(userProfile.targetWeightKg || 68);
-  const [goal, setGoal] = useState<GoalType>(userProfile.goal || 'recomp');
-  const [dietType, setDietType] = useState<DietType>(userProfile.dietType || 'flexible');
-  const [trainingDaysPerWeek, setTrainingDaysPerWeek] = useState<number>(userProfile.trainingDaysPerWeek || 4);
-  const [bodyFatPct, setBodyFatPct] = useState<number>(userProfile.bodyFatPct || 18);
-  const [equipmentType, setEquipmentType] = useState<EquipmentType>(userProfile.equipmentType || 'full_gym');
-  const [dailyStepTarget, setDailyStepTarget] = useState<number>(userProfile.dailyStepTarget || 8000);
+  // Use string inputs to avoid persistent default 0s when users delete or edit
+  const [weightInput, setWeightInput] = useState<string>('');
+  const [targetWeightInput, setTargetWeightInput] = useState<string>('');
+  const [goal, setGoal] = useState<GoalType>('recomp');
+  const [dietType, setDietType] = useState<DietType>('flexible');
+  const [trainingDaysPerWeek, setTrainingDaysPerWeek] = useState<number>(4);
+  const [bodyFatInput, setBodyFatInput] = useState<string>('');
+  const [equipmentType, setEquipmentType] = useState<EquipmentType>('full_gym');
+  const [stepInput, setStepInput] = useState<string>('');
   const [notice, setNotice] = useState<string | null>(null);
+
+  // Synchronize with userProfile whenever modal opens or profile changes
+  React.useEffect(() => {
+    if (isOpen && userProfile) {
+      const initialWeight = userProfile.weightKg && userProfile.weightKg > 0 ? String(userProfile.weightKg) : '70';
+      const initialTargetWeight = userProfile.targetWeightKg && userProfile.targetWeightKg > 0 ? String(userProfile.targetWeightKg) : (userProfile.weightKg && userProfile.weightKg > 0 ? String(userProfile.weightKg - 3) : '67');
+      const initialBodyFat = userProfile.bodyFatPct && userProfile.bodyFatPct > 0 ? String(userProfile.bodyFatPct) : '18';
+      const initialSteps = userProfile.dailyStepTarget && userProfile.dailyStepTarget > 0 ? String(userProfile.dailyStepTarget) : '8000';
+
+      setWeightInput(initialWeight);
+      setTargetWeightInput(initialTargetWeight);
+      setGoal(userProfile.goal || 'recomp');
+      setDietType(userProfile.dietType || 'flexible');
+      setTrainingDaysPerWeek(userProfile.trainingDaysPerWeek || 4);
+      setBodyFatInput(initialBodyFat);
+      setEquipmentType(userProfile.equipmentType || 'full_gym');
+      setStepInput(initialSteps);
+      setNotice(null);
+    }
+  }, [isOpen, userProfile]);
 
   if (!isOpen) return null;
 
@@ -57,26 +78,31 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
   };
 
   const handleSaveUpdated = () => {
-    // Recalculate BMR, TDEE, Calories, and Macros based on any calibrated values
+    const parsedWeight = parseFloat(weightInput) || userProfile.weightKg || 70;
+    const parsedTargetWeight = parseFloat(targetWeightInput) || userProfile.targetWeightKg || parsedWeight;
+    const parsedBodyFat = parseFloat(bodyFatInput) || userProfile.bodyFatPct || 18;
+    const parsedSteps = parseInt(stepInput, 10) || userProfile.dailyStepTarget || 8000;
+
+    // Recalculate BMR, TDEE, Calories, and Macros based on calibrated values
     const age = userProfile.age || 25;
     const sex = userProfile.sex || 'male';
     const heightCm = userProfile.heightCm || 175;
 
-    const bmr = calculateBMR(sex, weightKg, heightCm, age);
+    const bmr = calculateBMR(sex, parsedWeight, heightCm, age);
     const tdee = calculateTDEE(bmr, trainingDaysPerWeek);
-    const macros = calculateMacros(tdee, goal, sex, weightKg, dietType);
+    const macros = calculateMacros(tdee, goal, sex, parsedWeight, dietType);
     const dailyCalories = macros.dailyCalories;
 
     const updated: UserProfile = {
       ...userProfile,
-      weightKg,
-      targetWeightKg,
+      weightKg: parsedWeight,
+      targetWeightKg: parsedTargetWeight,
       goal,
       dietType,
       trainingDaysPerWeek,
-      bodyFatPct,
+      bodyFatPct: parsedBodyFat,
       equipmentType,
-      dailyStepTarget,
+      dailyStepTarget: parsedSteps,
       bmr,
       tdee,
       dailyCalories,
@@ -151,8 +177,9 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
                 <input
                   type="number"
                   step="0.1"
-                  value={weightKg}
-                  onChange={(e) => setWeightKg(parseFloat(e.target.value) || 0)}
+                  placeholder="e.g. 75"
+                  value={weightInput}
+                  onChange={(e) => setWeightInput(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E211F] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0F6E5F]"
                 />
                 <span className="absolute right-3.5 top-2.5 text-xs text-gray-400">kg</span>
@@ -167,8 +194,9 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
                 <input
                   type="number"
                   step="0.1"
-                  value={targetWeightKg}
-                  onChange={(e) => setTargetWeightKg(parseFloat(e.target.value) || 0)}
+                  placeholder="e.g. 70"
+                  value={targetWeightInput}
+                  onChange={(e) => setTargetWeightInput(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E211F] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0F6E5F]"
                 />
                 <span className="absolute right-3.5 top-2.5 text-xs text-gray-400">kg</span>
@@ -215,8 +243,9 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
                 <input
                   type="number"
                   step="0.5"
-                  value={bodyFatPct}
-                  onChange={(e) => setBodyFatPct(parseFloat(e.target.value) || 18)}
+                  placeholder="e.g. 18"
+                  value={bodyFatInput}
+                  onChange={(e) => setBodyFatInput(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E211F] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0F6E5F]"
                 />
                 <span className="absolute right-3.5 top-2.5 text-xs text-gray-400">%</span>
@@ -231,8 +260,9 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
                 <input
                   type="number"
                   step="500"
-                  value={dailyStepTarget}
-                  onChange={(e) => setDailyStepTarget(parseInt(e.target.value) || 8000)}
+                  placeholder="e.g. 8000"
+                  value={stepInput}
+                  onChange={(e) => setStepInput(e.target.value)}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E211F] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0F6E5F]"
                 />
                 <span className="absolute right-3.5 top-2.5 text-xs text-gray-400">steps</span>

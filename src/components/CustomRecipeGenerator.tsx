@@ -138,7 +138,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
     const updated = addStoredCustomRecipe({ ...generatedRecipe, isBookmarked: true });
     setSavedRecipes(updated);
     setGeneratedRecipe({ ...generatedRecipe, isBookmarked: true });
-    setSuccessToast('Recipe saved to your personal PeakForm Recipe Book!');
+    setSuccessToast('Recipe saved to your personal AROH Recipe Book!');
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
@@ -178,7 +178,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
         carbsG: Number((recipeToLog.carbsG / recipeToLog.ingredients.length).toFixed(1)),
         fatG: Number((recipeToLog.fatG / recipeToLog.ingredients.length).toFixed(1)),
       })),
-      userNotes: `Cooked from PeakForm AI Custom Recipe: ${recipeToLog.headlineTag}`,
+      userNotes: `Cooked from AROH AI Custom Recipe: ${recipeToLog.headlineTag}`,
     };
 
     onSaveToMealLog(newLog);

@@ -270,29 +270,29 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
           fatG: approxFat,
         },
       ],
-      userNotes: `Added via PeakForm Micro-Nutrient Optimizer for ${item.amount}${item.unit} ${microId}.`,
+      userNotes: `Added via AROH Micro-Nutrient Optimizer for ${item.amount}${item.unit} ${microId}.`,
     };
 
     onSaveToMealLog(boosterLog);
   };
 
   return (
-    <div className="bg-white p-5 sm:p-7 rounded-3xl border border-[#E5E7EB] shadow-xs space-y-6 text-left">
+    <div className="bg-white dark:bg-[#111622] p-5 sm:p-7 rounded-3xl border border-[#E5E7EB] dark:border-[#232B3E] shadow-xs space-y-6 text-left">
       {/* Header with Title and Evidence Standards */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E7EB] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E7EB] dark:border-[#232B3E] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F]">
+            <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 dark:bg-cyan-500/15 text-[#0F6E5F] dark:text-cyan-400 border border-transparent dark:border-cyan-500/20">
               Micronutrient & Electrolyte Tracking
             </span>
-            <span className="text-xs text-[#6B7280]">
+            <span className="text-xs text-[#6B7280] dark:text-slate-400">
               ISSN & Dietary Guidelines for Americans
             </span>
           </div>
-          <h2 className="text-lg sm:text-xl font-bold text-[#1A1D1B] mt-1">
+          <h2 className="text-lg sm:text-xl font-bold text-[#1A1D1B] dark:text-white mt-1">
             Essential Micro-Nutrient Dashboard & Threshold Warnings
           </h2>
-          <p className="text-xs text-[#6B7280] mt-0.5">
+          <p className="text-xs text-[#6B7280] dark:text-slate-400 mt-0.5">
             Monitors your daily Fiber, Sodium, Calcium, and Potassium to safeguard metabolic health, neuromuscular power, and bone density.
           </p>
         </div>
@@ -300,45 +300,45 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
         <button
           type="button"
           onClick={() => setShowScienceGuide(!showScienceGuide)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAFAF8] border border-[#E5E7EB] text-xs font-semibold text-[#4B5563] hover:text-[#1A1D1B] hover:border-[#0F6E5F] transition-all self-start sm:self-auto"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#182032] border border-[#E5E7EB] dark:border-[#232B3E] text-xs font-semibold text-[#4B5563] dark:text-slate-300 hover:text-[#1A1D1B] dark:hover:text-white hover:border-[#0F6E5F] dark:hover:border-cyan-500/50 transition-all self-start sm:self-auto"
         >
-          <Info className="w-3.5 h-3.5 text-[#0F6E5F]" />
+          <Info className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-cyan-400" />
           <span>{showScienceGuide ? 'Hide Science Notes' : 'Why These Micros Matter'}</span>
         </button>
       </div>
 
       {/* SCIENTIFIC EDUCATION ACCORDION */}
       {showScienceGuide && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-[#FAFAF8] border border-[#E5E7EB] text-xs leading-relaxed text-[#374151] space-y-3 animate-in fade-in duration-200">
-          <div className="flex items-center gap-2 font-bold text-[#0F6E5F]">
+        <div className="p-4 sm:p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#161D2B] border border-[#E5E7EB] dark:border-[#232B3E] text-xs leading-relaxed text-[#374151] dark:text-slate-300 space-y-3 animate-in fade-in duration-200">
+          <div className="flex items-center gap-2 font-bold text-[#0F6E5F] dark:text-cyan-400">
             <Sparkles className="w-4 h-4 text-[#E8912D]" />
             <span>The Sports Science of Micronutrient Sufficiency</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-            <div className="p-3 bg-white rounded-xl border border-[#E5E7EB]">
-              <div className="font-bold text-[#16A34A] flex items-center gap-1.5 mb-1">
+            <div className="p-3 bg-white dark:bg-[#111622] rounded-xl border border-[#E5E7EB] dark:border-[#232B3E]">
+              <div className="font-bold text-[#16A34A] dark:text-emerald-400 flex items-center gap-1.5 mb-1">
                 <Wheat className="w-4 h-4" />
                 <span>Fiber (14g / 1,000 kcal)</span>
               </div>
-              <p className="text-[11px] text-[#6B7280]">
+              <p className="text-[11px] text-[#6B7280] dark:text-slate-400">
                 Critical in caloric deficits to slow gastric transit, blunt ghrelin (hunger hormone), and promote colonic bacterial diversity.
               </p>
             </div>
-            <div className="p-3 bg-white rounded-xl border border-[#E5E7EB]">
-              <div className="font-bold text-[#E8912D] flex items-center gap-1.5 mb-1">
+            <div className="p-3 bg-white dark:bg-[#111622] rounded-xl border border-[#E5E7EB] dark:border-[#232B3E]">
+              <div className="font-bold text-[#E8912D] dark:text-amber-400 flex items-center gap-1.5 mb-1">
                 <Zap className="w-4 h-4" />
                 <span>Sodium (1,500–2,300mg)</span>
               </div>
-              <p className="text-[11px] text-[#6B7280]">
+              <p className="text-[11px] text-[#6B7280] dark:text-slate-400">
                 Athletes lose 800–1,500mg sodium per hour of heavy sweating. Sub-1,500mg intake causes rapid muscular fatigue and drops in blood pressure.
               </p>
             </div>
-            <div className="p-3 bg-white rounded-xl border border-[#E5E7EB]">
-              <div className="font-bold text-[#3B82F6] flex items-center gap-1.5 mb-1">
+            <div className="p-3 bg-white dark:bg-[#111622] rounded-xl border border-[#E5E7EB] dark:border-[#232B3E]">
+              <div className="font-bold text-[#3B82F6] dark:text-blue-400 flex items-center gap-1.5 mb-1">
                 <Bone className="w-4 h-4" />
                 <span>Calcium (1,000mg)</span>
               </div>
-              <p className="text-[11px] text-[#6B7280]">
+              <p className="text-[11px] text-[#6B7280] dark:text-slate-400">
                 Calcium ions regulate muscle tension development. Without sufficient dietary calcium, bones undergo resorption to maintain blood homeostasis.
               </p>
             </div>
@@ -352,22 +352,22 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
           {activeWarnings.map((warning) => (
             <div
               key={warning.id}
-              className="p-4 rounded-2xl bg-amber-50/80 border border-amber-200 text-left flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in slide-in-from-top-2"
+              className="p-4 rounded-2xl bg-amber-50/90 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-left flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-in slide-in-from-top-2"
             >
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
-                  <ShieldAlert className="w-4 h-4 text-amber-600" />
+                <div className="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0 mt-0.5">
+                  <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-extrabold text-amber-900">
+                    <span className="text-xs font-extrabold text-amber-900 dark:text-amber-200">
                       ⚠️ Suboptimal {warning.name} Alert
                     </span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200/60 text-amber-900">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200/60 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200">
                       {warning.consumed}{warning.unit} / {warning.recommendedTarget}{warning.unit} Target
                     </span>
                   </div>
-                  <p className="text-xs text-amber-800 mt-1">
+                  <p className="text-xs text-amber-800 dark:text-amber-300 mt-1">
                     {warning.deficiencyRisk}
                   </p>
                 </div>
@@ -377,7 +377,7 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
               <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
                 <button
                   onClick={() => setExpandedCard(expandedCard === warning.id ? null : warning.id)}
-                  className="px-3 py-1.5 rounded-xl bg-amber-600 text-white text-xs font-bold hover:bg-amber-700 transition-all flex items-center gap-1 shadow-2xs"
+                  className="px-3 py-1.5 rounded-xl bg-amber-600 dark:bg-amber-700 text-white text-xs font-bold hover:bg-amber-700 dark:hover:bg-amber-600 transition-all flex items-center gap-1 shadow-2xs"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-amber-200" />
                   <span>Fix with Whole Foods</span>
@@ -387,13 +387,13 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
           ))}
 
           {highSodiumWarning && (
-            <div className="p-4 rounded-2xl bg-orange-50/80 border border-orange-200 text-left flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-2xl bg-orange-50/90 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800/60 text-left flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-orange-600 dark:text-orange-400 shrink-0 mt-0.5" />
               <div>
-                <div className="text-xs font-extrabold text-orange-900">
+                <div className="text-xs font-extrabold text-orange-900 dark:text-orange-200">
                   ⚡ Elevated Sodium Alert ({totalSodiumConsumed} mg)
                 </div>
-                <p className="text-xs text-orange-800 mt-0.5">
+                <p className="text-xs text-orange-800 dark:text-orange-300 mt-0.5">
                   Your sodium intake is above 3,400mg today. Unless doing ultra-endurance training in hot weather, balance your fluid homeostasis by drinking extra water and eating potassium-rich foods (e.g. avocado, spinach, potatoes).
                 </p>
               </div>
@@ -404,15 +404,15 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
 
       {/* ALL MICRONUTRIENTS MET BANNER (IF ZERO WARNINGS AND LOGS EXIST) */}
       {mealLogs.length > 0 && activeWarnings.length === 0 && !highSodiumWarning && (
-        <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-700 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+        <div className="p-4 rounded-2xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div>
-            <div className="text-xs font-bold text-emerald-900">
+            <div className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
               Optimal Micronutrient & Electrolyte Sufficiency Achieved! 🎉
             </div>
-            <p className="text-[11px] text-emerald-700 mt-0.5">
+            <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
               Your Fiber, Sodium, Calcium, and Potassium levels all meet or exceed scientifically recommended athletic thresholds today.
             </p>
           </div>
@@ -432,8 +432,8 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
               key={micro.id}
               className={`p-4 sm:p-5 rounded-2xl border transition-all flex flex-col justify-between ${
                 isDeficient
-                  ? 'bg-amber-50/30 border-amber-300 ring-1 ring-amber-300/50'
-                  : 'bg-[#FAFAF8] border-[#E5E7EB] hover:border-[#0F6E5F]'
+                  ? 'bg-amber-50/30 dark:bg-amber-950/20 border-amber-300 dark:border-amber-700/50 ring-1 ring-amber-300/50 dark:ring-amber-500/30'
+                  : 'bg-[#FAFAF8] dark:bg-[#151C2C] border-[#E5E7EB] dark:border-[#232B3E] hover:border-[#0F6E5F] dark:hover:border-cyan-500/50'
               }`}
             >
               <div>
@@ -444,8 +444,8 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
                       <Icon className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-[#1A1D1B]">{micro.name}</div>
-                      <div className="text-[10px] text-[#6B7280]">
+                      <div className="text-xs font-bold text-[#1A1D1B] dark:text-white">{micro.name}</div>
+                      <div className="text-[10px] text-[#6B7280] dark:text-slate-400">
                         Min Threshold: {micro.minThreshold} {micro.unit}
                       </div>
                     </div>
@@ -455,16 +455,16 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
                 {/* Amount Display */}
                 <div className="mt-3">
                   <div className="flex items-baseline justify-between">
-                    <span className="text-2xl font-extrabold text-[#1A1D1B]">
-                      {micro.consumed} <span className="text-xs font-medium text-[#6B7280]">{micro.unit}</span>
+                    <span className="text-2xl font-extrabold text-[#1A1D1B] dark:text-white">
+                      {micro.consumed} <span className="text-xs font-medium text-[#6B7280] dark:text-slate-400">{micro.unit}</span>
                     </span>
-                    <span className="text-xs font-bold text-[#6B7280]">
+                    <span className="text-xs font-bold text-[#6B7280] dark:text-slate-400">
                       / {micro.recommendedTarget} {micro.unit}
                     </span>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full bg-[#E5E7EB] rounded-full h-2 mt-2 overflow-hidden">
+                  <div className="w-full bg-[#E5E7EB] dark:bg-slate-800 rounded-full h-2 mt-2 overflow-hidden">
                     <div
                       className={`h-2 rounded-full transition-all duration-500 ${
                         isDeficient ? 'bg-amber-500' : micro.progressColor
@@ -475,10 +475,10 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
 
                   {/* Status Indicator */}
                   <div className="flex items-center justify-between text-[11px] mt-2">
-                    <span className={`font-semibold ${isDeficient ? 'text-amber-700' : 'text-[#0F6E5F]'}`}>
+                    <span className={`font-semibold ${isDeficient ? 'text-amber-700 dark:text-amber-400' : 'text-[#0F6E5F] dark:text-cyan-400'}`}>
                       {isDeficient ? '⚠️ Below Threshold' : pct >= 100 ? '✅ Target Satisfied' : `${pct}% of Target`}
                     </span>
-                    <span className="text-[#6B7280]">
+                    <span className="text-[#6B7280] dark:text-slate-400">
                       {micro.consumed >= micro.recommendedTarget ? 'Optimal' : `${(micro.recommendedTarget - micro.consumed).toFixed(0)}${micro.unit} needed`}
                     </span>
                   </div>
@@ -486,11 +486,11 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
               </div>
 
               {/* Expandable Food Sources Toggle */}
-              <div className="mt-4 pt-3 border-t border-[#E5E7EB]">
+              <div className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#232B3E]">
                 <button
                   type="button"
                   onClick={() => setExpandedCard(isExpanded ? null : micro.id)}
-                  className="w-full flex items-center justify-between text-[11px] font-bold text-[#0F6E5F] hover:underline"
+                  className="w-full flex items-center justify-between text-[11px] font-bold text-[#0F6E5F] dark:text-cyan-400 hover:underline"
                 >
                   <span>Top Food Boosters</span>
                   {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -503,11 +503,11 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
                       return (
                         <div
                           key={idx}
-                          className="p-2 rounded-xl bg-white border border-[#E5E7EB] flex items-center justify-between gap-1 text-[11px]"
+                          className="p-2 rounded-xl bg-white dark:bg-[#182032] border border-[#E5E7EB] dark:border-[#232B3E] flex items-center justify-between gap-1 text-[11px]"
                         >
                           <div className="overflow-hidden">
-                            <div className="font-semibold text-[#1A1D1B] truncate">{item.food}</div>
-                            <div className="text-[10px] text-[#6B7280]">
+                            <div className="font-semibold text-[#1A1D1B] dark:text-white truncate">{item.food}</div>
+                            <div className="text-[10px] text-[#6B7280] dark:text-slate-400">
                               {item.portion} • +{item.amount}{item.unit}
                             </div>
                           </div>
@@ -516,8 +516,8 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
                             disabled={isAdded}
                             className={`px-2 py-1 rounded-lg font-bold text-[10px] flex items-center gap-0.5 transition-all shrink-0 ${
                               isAdded
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : 'bg-[#0F6E5F] text-white hover:bg-[#0D5B4F]'
+                                ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                                : 'bg-[#0F6E5F] dark:bg-cyan-600 text-white hover:bg-[#0D5B4F] dark:hover:bg-cyan-500'
                             }`}
                             title={`Log ${item.food} to today's meal log`}
                           >

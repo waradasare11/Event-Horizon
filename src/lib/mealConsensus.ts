@@ -1,5 +1,5 @@
 /**
- * PeakForm AI - Multi-Model Consensus & Weighted-Confidence Nutritional Engine
+ * AROH - Multi-Model Consensus & Weighted-Confidence Nutritional Engine
  * 
  * Provides:
  * 1. Multi-model consensus resolution across vision models (Gemini 3.7 Flash, Gemini 3.1, Gemini 2.5 Flash).

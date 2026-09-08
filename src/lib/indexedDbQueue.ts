@@ -21,7 +21,7 @@ export interface SyncJob {
   retryCount: number;
 }
 
-const DB_NAME = 'PeakFormOfflineDB';
+const DB_NAME = 'ArohOfflineDB';
 const DB_VERSION = 1;
 
 const STORES = {

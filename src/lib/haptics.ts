@@ -1,5 +1,5 @@
 /**
- * PeakForm AI Mobile Haptic Feedback Utility
+ * AROH Mobile Haptic Feedback Utility
  * Leverages the Navigator Vibration API on supported mobile browsers & webviews
  * Provides tactile confirmation for set completion, workout finishes, and quick actions.
  */

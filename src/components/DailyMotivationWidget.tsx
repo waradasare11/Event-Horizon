@@ -386,7 +386,7 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
         if (perm === 'granted') {
           setRemindWorkout(true);
           try {
-            new Notification('🔔 PeakForm Workout Reminder Activated', {
+            new Notification('🔔 AROH Workout Reminder Activated', {
               body: `We will remind you to train daily at ${workoutReminderTime}. Stay relentless!`,
               icon: '/favicon.ico',
             });
@@ -406,7 +406,7 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
     setReminderTestStatus('Triggering test reminder...');
     if ('Notification' in window && Notification.permission === 'granted') {
       try {
-        new Notification('💪 PeakForm AI: Time to Crush Your Workout!', {
+        new Notification('💪 AROH: Time to Crush Your Workout!', {
           body: `Hey ${userName}, it's ${workoutReminderTime}! Your training session is ready. Let's make today count!`,
           icon: '/favicon.ico',
         });
@@ -415,7 +415,7 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
         setReminderTestStatus('Notification fired.');
       }
     } else {
-      alert(`[PeakForm Reminder Preview]: Time to train! Daily workout scheduled for ${workoutReminderTime}.`);
+      alert(`[AROH Reminder Preview]: Time to train! Daily workout scheduled for ${workoutReminderTime}.`);
       setReminderTestStatus('Alert preview displayed.');
     }
     setTimeout(() => setReminderTestStatus(null), 3000);

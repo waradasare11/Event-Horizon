@@ -59,7 +59,7 @@ export const WorkoutNotificationBanner: React.FC<WorkoutNotificationBannerProps>
       onUpdateNotificationSettings(updated);
       // Trigger a celebratory welcoming notification
       sendWorkoutNotification(
-        '🔥 PeakForm Workout Notifications Active!',
+        '🔥 AROH Workout Notifications Active!',
         `You are set up to receive reminders for scheduled sessions like ${todayWorkoutDay?.dayName || 'your next workout'}.`,
         { sound: currentSettings.soundEnabled }
       );
@@ -69,7 +69,7 @@ export const WorkoutNotificationBanner: React.FC<WorkoutNotificationBannerProps>
   const handleSendTestNotification = () => {
     setTestSent(true);
     sendWorkoutNotification(
-      '🏋️ PeakForm: Time for Your Scheduled Workout!',
+      '🏋️ AROH: Time for Your Scheduled Workout!',
       `Today's Focus: ${todayWorkoutDay?.dayName || 'Scientific Hypertrophy Session'} (${todayWorkoutDay?.focus || 'Push Strength'}). Lace up!`,
       { sound: currentSettings.soundEnabled }
     );

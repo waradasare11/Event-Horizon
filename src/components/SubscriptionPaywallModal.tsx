@@ -196,7 +196,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
           <div className="space-y-1 relative z-10">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-emerald-200 border border-white/20">
               <Crown className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-              <span>Official PeakForm AI Pro Subscription</span>
+              <span>Official AROH Pro Subscription</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
               Unlock Unlimited Master Coaching
@@ -260,7 +260,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
               onClick={onClose}
               className="px-8 py-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-sm shadow-md transition-all cursor-pointer"
             >
-              Continue to PeakForm AI Pro
+              Continue to AROH Pro
             </button>
           </div>
         ) : (

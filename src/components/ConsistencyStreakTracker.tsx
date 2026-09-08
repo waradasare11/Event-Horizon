@@ -466,7 +466,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
             <strong>Why Rest Days Do Not Break Streaks:</strong> Skeletal muscle hypertrophy occurs during periods of rest through satellite cell donation and ribosomal biogenesis. Overtraining without scheduled CNS deloads causes elevated resting cortisol, catabolic muscle breakdown, and psychological burnout.
           </p>
           <p className="text-[11px] text-[#6B7280] dark:text-[#9EA8A2]">
-            PeakForm's <em>Consistency Streak</em> rewards both high-intensity progressive overload sessions and structured active recovery days to ensure healthy, lifelong adherence.
+            AROH's <em>Consistency Streak</em> rewards both high-intensity progressive overload sessions and structured active recovery days to ensure healthy, lifelong adherence.
           </p>
         </div>
       )}

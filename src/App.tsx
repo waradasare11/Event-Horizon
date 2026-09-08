@@ -83,6 +83,7 @@ import { WorkoutPushNotificationManager } from './components/WorkoutPushNotifica
 import { backupUserProfileToGoogleDrive, backupAllDataToGoogleDrive, fetchUserDataFromGoogleDrive } from './lib/googleWorkspace';
 import { GranularCSVExportModal } from './components/GranularCSVExportModal';
 import { ExerciseLibraryView } from './components/ExerciseLibraryView';
+import { BiWeeklyProfileReminderBanner } from './components/BiWeeklyProfileReminderBanner';
 import { SyncToast } from './components/SyncToast';
 import { ArohLogo } from './components/ArohLogo';
 import { calculateDailyMacrosSum, calculateWorkoutStreak } from './lib/calc/dailyStats';
@@ -926,6 +927,19 @@ export default function App() {
             onSignIn={handleSignIn}
             onSignOut={handleSignOut}
             onSelectTab={setActiveTab}
+          />
+
+          {/* Bi-Weekly Profile Update & Recalibration Reminder Banner */}
+          <BiWeeklyProfileReminderBanner
+            userProfile={userProfile}
+            onOpenCalibration={() => setIsQuarterlyCalibrationOpen(true)}
+            onConfirmCurrentSettings={() => {
+              const updated: UserProfile = {
+                ...userProfile,
+                lastProfileUpdateDate: new Date().toISOString(),
+              };
+              handleSaveProfile(updated);
+            }}
           />
 
           {/* Daily Motivation, Radial Progress, Water Tracker, 7-Day Sparkline & Quick Add */}

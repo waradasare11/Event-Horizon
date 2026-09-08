@@ -1,7 +1,7 @@
 /**
  * Google Workspace Integration Service
  * Integrates Google Drive, Google Calendar, and Google Tasks
- * Supports automatic "PeakForm AI" folder creation, CSV backup export,
+ * Supports automatic "AROH AI" folder creation, CSV backup export,
  * workout calendar event synchronization, and daily fitness task creation.
  */
 
@@ -17,7 +17,8 @@ export interface GoogleWorkspaceAuthState {
 }
 
 const STORAGE_KEY_AUTH = 'peakform_google_workspace_auth';
-const PEAKFORM_FOLDER_NAME = 'PeakForm AI';
+const PEAKFORM_FOLDER_NAME = 'AROH AI';
+export const AROH_FOLDER_NAME = 'AROH AI';
 
 // Scopes required for Drive, Calendar, and Tasks
 export const GOOGLE_WORKSPACE_SCOPES = [
@@ -114,12 +115,12 @@ export async function connectGoogleWorkspace(emailHint?: string): Promise<{ succ
               userEmail: emailHint || null,
             });
 
-            // Automatically ensure 'PeakForm AI' folder exists in user's root Drive
+            // Automatically ensure 'AROH AI' folder exists in user's root Drive
             try {
-              const folderId = await getOrCreatePeakFormFolder(token);
+              const folderId = await getOrCreateArohFolder(token);
               saveGoogleWorkspaceAuth({ driveFolderId: folderId });
             } catch (folderErr) {
-              console.warn('PeakForm folder setup note:', folderErr);
+              console.warn('AROH folder setup note:', folderErr);
             }
 
             resolve({ success: true, accessToken: token });
@@ -129,14 +130,14 @@ export async function connectGoogleWorkspace(emailHint?: string): Promise<{ succ
         tokenClient.requestAccessToken({ prompt: 'consent' });
       } else {
         // Simulated authorized token state for sandboxed container preview
-        const mockToken = `oauth_token_${Date.now()}_peakform_ready`;
+        const mockToken = `oauth_token_${Date.now()}_aroh_ready`;
         saveGoogleWorkspaceAuth({
           isConnected: true,
           accessToken: mockToken,
           expiresAt: Date.now() + 3600 * 1000,
           userEmail: emailHint || 'Athlete',
           lastBackupTimestamp: new Date().toISOString(),
-          driveFolderId: 'folder_peakform_ai_root',
+          driveFolderId: 'folder_aroh_ai_root',
         });
         resolve({ success: true, accessToken: mockToken });
       }
@@ -148,16 +149,16 @@ export async function connectGoogleWorkspace(emailHint?: string): Promise<{ succ
 }
 
 /**
- * Finds or creates the dedicated 'PeakForm AI' folder in the user's root Google Drive directory
+ * Finds or creates the dedicated 'AROH AI' folder in the user's root Google Drive directory
  */
-export async function getOrCreatePeakFormFolder(accessToken: string): Promise<string> {
+export async function getOrCreateArohFolder(accessToken: string): Promise<string> {
   if (!accessToken || accessToken.startsWith('oauth_token_')) {
-    return 'folder_peakform_ai_root';
+    return 'folder_aroh_ai_root';
   }
 
-  // 1. Search for existing folder named 'PeakForm AI'
+  // 1. Search for existing folder named 'AROH AI'
   const searchUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(
-    `name = '${PEAKFORM_FOLDER_NAME}' and mimeType = 'application/vnd.google-apps.folder' and trashed = false and 'root' in parents`
+    `(name = 'AROH AI' or name = '${PEAKFORM_FOLDER_NAME}') and mimeType = 'application/vnd.google-apps.folder' and trashed = false and 'root' in parents`
   )}&fields=files(id, name)`;
 
   const searchRes = await fetch(searchUrl, {
@@ -171,7 +172,7 @@ export async function getOrCreatePeakFormFolder(accessToken: string): Promise<st
     }
   }
 
-  // 2. Create the 'PeakForm AI' folder in root directory
+  // 2. Create the 'AROH AI' folder in root directory
   const createRes = await fetch('https://www.googleapis.com/drive/v3/files', {
     method: 'POST',
     headers: {
@@ -179,9 +180,9 @@ export async function getOrCreatePeakFormFolder(accessToken: string): Promise<st
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      name: PEAKFORM_FOLDER_NAME,
+      name: 'AROH AI',
       mimeType: 'application/vnd.google-apps.folder',
-      description: 'PeakForm AI Automated Fitness & Nutrition Backups',
+      description: 'AROH AI Automated Fitness & Nutrition Backups',
       parents: ['root'],
     }),
   });
@@ -195,7 +196,7 @@ export async function getOrCreatePeakFormFolder(accessToken: string): Promise<st
 }
 
 /**
- * Uploads or updates a file (CSV or JSON) to the user's 'PeakForm AI' Google Drive folder
+ * Uploads or updates a file (CSV or JSON) to the user's 'AROH AI' Google Drive folder
  */
 export async function uploadFileToDrive(params: {
   accessToken: string;
@@ -389,41 +390,42 @@ export async function backupAllDataToGoogleDrive(params: {
   if (params.userProfile?.email) {
     const sanitized = params.userProfile.email.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
     try {
+      localStorage.setItem(`aroh_drive_backup_${sanitized}`, completeBundleJson);
       localStorage.setItem(`peakform_drive_backup_${sanitized}`, completeBundleJson);
     } catch (e) {}
   }
 
-  // Upload files to Google Drive 'PeakForm AI' folder
+  // Upload files to Google Drive 'AROH AI' folder
   await Promise.all([
     uploadFileToDrive({
       accessToken: token,
       folderId,
-      fileName: `PeakForm_Nutrition_Logs_${dateStr}.csv`,
+      fileName: `AROH_Nutrition_Logs_${dateStr}.csv`,
       fileContent: mealCsv,
     }),
     uploadFileToDrive({
       accessToken: token,
       folderId,
-      fileName: `PeakForm_Workout_Logs_${dateStr}.csv`,
+      fileName: `AROH_Workout_Logs_${dateStr}.csv`,
       fileContent: workoutCsv,
     }),
     uploadFileToDrive({
       accessToken: token,
       folderId,
-      fileName: `PeakForm_BodyMetrics_${dateStr}.csv`,
+      fileName: `AROH_BodyMetrics_${dateStr}.csv`,
       fileContent: metricsCsv,
     }),
     uploadFileToDrive({
       accessToken: token,
       folderId,
-      fileName: `PeakForm_UserProfile.json`,
+      fileName: `AROH_UserProfile.json`,
       fileContent: profileJson,
       mimeType: 'application/json',
     }),
     uploadFileToDrive({
       accessToken: token,
       folderId,
-      fileName: `PeakForm_Complete_Backup.json`,
+      fileName: `AROH_Complete_Backup.json`,
       fileContent: completeBundleJson,
       mimeType: 'application/json',
     }),
@@ -437,7 +439,7 @@ export async function backupAllDataToGoogleDrive(params: {
 
   return {
     success: true,
-    message: `Successfully backed up profile, nutrition, workouts, and body metrics into your Google Drive 'PeakForm AI' folder!`,
+    message: `Successfully backed up profile, nutrition, workouts, and body metrics into your Google Drive 'AROH AI' folder!`,
     timestamp,
   };
 }
@@ -450,6 +452,7 @@ export async function backupUserProfileToGoogleDrive(profile: any): Promise<{ su
     if (profile?.email) {
       const sanitized = profile.email.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
       try {
+        localStorage.setItem(`aroh_drive_profile_${sanitized}`, JSON.stringify(profile));
         localStorage.setItem(`peakform_drive_profile_${sanitized}`, JSON.stringify(profile));
       } catch (e) {}
     }
@@ -459,7 +462,7 @@ export async function backupUserProfileToGoogleDrive(profile: any): Promise<{ su
     const result = await uploadFileToDrive({
       accessToken: auth.accessToken,
       folderId,
-      fileName: 'PeakForm_UserProfile.json',
+      fileName: 'AROH_UserProfile.json',
       fileContent: JSON.stringify(profile, null, 2),
       mimeType: 'application/json',
     });
@@ -491,9 +494,9 @@ export async function fetchUserDataFromGoogleDrive(emailHint?: string): Promise<
     try {
       const folderId = auth.driveFolderId || (await getOrCreatePeakFormFolder(auth.accessToken));
 
-      // Search for PeakForm_Complete_Backup.json
+      // Search for AROH_Complete_Backup.json or PeakForm_Complete_Backup.json
       const backupSearchUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(
-        `name = 'PeakForm_Complete_Backup.json' and trashed = false and '${folderId}' in parents`
+        `(name = 'AROH_Complete_Backup.json' or name = 'PeakForm_Complete_Backup.json') and trashed = false and '${folderId}' in parents`
       )}&fields=files(id, name, modifiedTime)`;
 
       const backupRes = await fetch(backupSearchUrl, {
@@ -519,9 +522,9 @@ export async function fetchUserDataFromGoogleDrive(emailHint?: string): Promise<
         }
       }
 
-      // Search for PeakForm_UserProfile.json
+      // Search for AROH_UserProfile.json or PeakForm_UserProfile.json
       const profileSearchUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(
-        `name = 'PeakForm_UserProfile.json' and trashed = false and '${folderId}' in parents`
+        `(name = 'AROH_UserProfile.json' or name = 'PeakForm_UserProfile.json') and trashed = false and '${folderId}' in parents`
       )}&fields=files(id, name, modifiedTime)`;
 
       const profRes = await fetch(profileSearchUrl, {
@@ -552,7 +555,9 @@ export async function fetchUserDataFromGoogleDrive(emailHint?: string): Promise<
   if (sanitized && typeof window !== 'undefined') {
     try {
       const cachedBundle =
+        localStorage.getItem(`aroh_drive_backup_${sanitized}`) ||
         localStorage.getItem(`peakform_drive_backup_${sanitized}`) ||
+        localStorage.getItem('aroh_drive_file_AROH_Complete_Backup.json') ||
         localStorage.getItem('peakform_drive_file_PeakForm_Complete_Backup.json');
 
       if (cachedBundle) {
@@ -570,7 +575,9 @@ export async function fetchUserDataFromGoogleDrive(emailHint?: string): Promise<
       }
 
       const cachedProfile =
+        localStorage.getItem(`aroh_drive_profile_${sanitized}`) ||
         localStorage.getItem(`peakform_drive_profile_${sanitized}`) ||
+        localStorage.getItem('aroh_drive_file_AROH_UserProfile.json') ||
         localStorage.getItem('peakform_drive_file_PeakForm_UserProfile.json');
 
       if (cachedProfile) {
@@ -610,21 +617,21 @@ export async function backupHostLedgerToGoogleDrive(ledgerData: {
       uploadFileToDrive({
         accessToken: auth.accessToken,
         folderId,
-        fileName: `PeakForm_Host_Ledger_Transactions_${dateStr}.json`,
+        fileName: `AROH_Host_Ledger_Transactions_${dateStr}.json`,
         fileContent: JSON.stringify(ledgerData.transactions || [], null, 2),
         mimeType: 'application/json',
       }),
       uploadFileToDrive({
         accessToken: auth.accessToken,
         folderId,
-        fileName: `PeakForm_Host_Discounts_Grants_${dateStr}.json`,
+        fileName: `AROH_Host_Discounts_Grants_${dateStr}.json`,
         fileContent: JSON.stringify(ledgerData.grants || [], null, 2),
         mimeType: 'application/json',
       }),
       uploadFileToDrive({
         accessToken: auth.accessToken,
         folderId,
-        fileName: `PeakForm_Host_Master_Ledger_Latest.json`,
+        fileName: `AROH_Host_Master_Ledger_Latest.json`,
         fileContent: JSON.stringify({
           updatedAt: new Date().toISOString(),
           hostEmail: ledgerData.hostEmail,
@@ -663,7 +670,7 @@ export async function createGoogleCalendarWorkoutEvent(params: {
   const endDate = new Date(startDate.getTime() + durationMinutes * 60 * 1000);
 
   const eventPayload = {
-    summary: `🏋️ PeakForm AI: ${title}`,
+    summary: `🏋️ AROH: ${title}`,
     description,
     start: { dateTime: startDate.toISOString() },
     end: { dateTime: endDate.toISOString() },
@@ -718,8 +725,8 @@ export async function syncDailyTasksToGoogleTasks(params: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title: `🎯 PeakForm: ${t.title}`,
-          notes: t.notes || 'Daily PeakForm AI Habit Target',
+          title: `🎯 AROH: ${t.title}`,
+          notes: t.notes || 'Daily AROH Habit Target',
           due: t.due ? new Date(t.due).toISOString() : new Date().toISOString(),
         }),
       });

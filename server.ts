@@ -15,6 +15,30 @@ const PORT = 3000;
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
+// Rate limiting protection for API endpoints (Anti-DDoS & brute force defense)
+const requestLimits = new Map<string, { count: number; resetAt: number }>();
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/")) {
+    const isSensitive = req.path.startsWith("/api/host") || req.path.startsWith("/api/subscription");
+    const limit = isSensitive ? 60 : 180;
+    const windowMs = 60_000;
+    const clientIp = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown-client";
+    const key = `${clientIp}:${isSensitive ? "sensitive" : "api"}`;
+    const now = Date.now();
+    const entry = requestLimits.get(key);
+    if (!entry || entry.resetAt <= now) {
+      requestLimits.set(key, { count: 1, resetAt: now + windowMs });
+      return next();
+    }
+    entry.count += 1;
+    if (entry.count > limit) {
+      res.setHeader("Retry-After", String(Math.ceil((entry.resetAt - now) / 1000)));
+      return res.status(429).json({ error: "Too many requests. Please try again shortly." });
+    }
+  }
+  next();
+});
+
 // Lazy-initialized Gemini client with telemetry header
 let aiClient: GoogleGenAI | null = null;
 function getAI(): GoogleGenAI {
@@ -2897,7 +2921,7 @@ app.post("/api/ai/coach-chat", async (req, res) => {
   try {
     const { messages, userProfile, useSearchGrounding = true, enableThinking = false } = req.body;
 
-    const systemInstruction = `You are the PeakForm Science Coach, an elite sports science AI assistant inspired by exercise physiologists, sports nutritionists, and evidence-based researchers (Jeremy Ethier / BuiltWithScience, Dr. Brad Schoenfeld, Dr. Eric Helms, ISSN, and ACSM).
+    const systemInstruction = `You are the AROH Science Coach, an elite sports science AI assistant inspired by exercise physiologists, sports nutritionists, and evidence-based researchers (Jeremy Ethier / BuiltWithScience, Dr. Brad Schoenfeld, Dr. Eric Helms, ISSN, and ACSM).
 
 You provide concise, crystal-clear, scientifically backed guidance across all domains of:
 - Health, Nutrition, and Energy Balance (Mifflin-St Jeor, TDEE, NEAT)
@@ -4552,10 +4576,10 @@ function computeTransactionHMAC(payload: string): string {
 function verifyHostPin(inputPin?: string | null): boolean {
   if (!inputPin) return false;
   const cleanInput = String(inputPin).trim().toLowerCase();
-  const currentPinClean = String(hostSecurityPin).trim().toLowerCase();
+  const currentPinClean = String(hostSecurityPin || "9284").trim().toLowerCase();
   
   // Accept current configured PIN or any of the verified Host Master passcodes
-  const validPasscodes = new Set([
+  const validPasscodes = [
     currentPinClean,
     "9284",
     "warad",
@@ -4565,9 +4589,17 @@ function verifyHostPin(inputPin?: string | null): boolean {
     "admin",
     "host",
     "9284160309"
-  ]);
+  ];
 
-  return validPasscodes.has(cleanInput);
+  for (const code of validPasscodes) {
+    if (cleanInput.length === code.length) {
+      if (crypto.timingSafeEqual(Buffer.from(cleanInput), Buffer.from(code))) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 // Compute effective price for a user on a given plan
@@ -4747,7 +4779,7 @@ app.post("/api/subscription/verify-payment", async (req, res) => {
         id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
         userId,
         userEmail: cleanEmail,
-        userName: userName || (isHost ? "Host Admin" : "PeakForm Athlete"),
+        userName: userName || (isHost ? "Host Admin" : "AROH Athlete"),
         planId: matchedBasePlan.id,
         planName: matchedBasePlan.durationLabel,
         durationMonths: matchedBasePlan.durationMonths,
@@ -4845,7 +4877,7 @@ app.post("/api/subscription/verify-payment", async (req, res) => {
       id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       userId,
       userEmail: cleanEmail,
-      userName: userName || "PeakForm Athlete",
+      userName: userName || "AROH Athlete",
       planId: matchedBasePlan.id,
       planName: matchedBasePlan.durationLabel,
       durationMonths: matchedBasePlan.durationMonths,
@@ -5283,7 +5315,7 @@ app.post("/api/host/notify-active-subscribers", (req, res) => {
       remainingTimeLabel,
       daysRemaining,
       sentAt: new Date().toISOString(),
-      subject: "🎉 PeakForm AI VIP Subscription Status - Active Access Update",
+      subject: "🎉 AROH VIP Subscription Status - Active Access Update",
       status: "dispatched",
     };
   });
@@ -6126,10 +6158,10 @@ app.post("/api/host/bulk-operations", (req, res) => {
       const grant = hostGrantedSubscriptions.find((g) => g.email.toLowerCase() === tgtEmail);
       return {
         recipientEmail: tgtEmail,
-        planName: grant?.planName || "PeakForm VIP Pro",
+        planName: grant?.planName || "AROH VIP Pro",
         sentAt: now.toISOString(),
-        customMessage: customNotificationMessage || "Your PeakForm AI VIP subscription access is active and verified.",
-        subject: "⚡ PeakForm AI VIP Access Update from Host",
+        customMessage: customNotificationMessage || "Your AROH VIP subscription access is active and verified.",
+        subject: "⚡ AROH VIP Access Update from Host",
         status: "dispatched",
       };
     });
@@ -6652,7 +6684,7 @@ async function startServer() {
     }
 
     const server = app.listen(PORT, "0.0.0.0", () => {
-      console.log(`PeakForm AI Server running on port ${PORT}`);
+      console.log(`AROH Server running on port ${PORT}`);
     });
 
     server.on("error", (err: any) => {

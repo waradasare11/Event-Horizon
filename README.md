@@ -1,6 +1,6 @@
-# PeakForm AI — Evidence-Based Workout & Nutrition Coaching Platform
+# AROH — Evidence-Based Workout & Nutrition Coaching Platform
 
-PeakForm AI is a science-guided fitness and nutrition coaching SaaS inspired by exercise physiology principles (like BuiltWithScience). It combines real-time AI computer vision for instant meal photo scanning, a deterministic Mifflin-St Jeor metabolic calculation engine, EMG-backed resistance training programs, and interactive body composition analytics.
+AROH is a science-guided fitness and nutrition coaching SaaS inspired by exercise physiology principles (like BuiltWithScience). It combines real-time AI computer vision for instant meal photo scanning, a deterministic Mifflin-St Jeor metabolic calculation engine, EMG-backed resistance training programs, and interactive body composition analytics.
 
 ---
 

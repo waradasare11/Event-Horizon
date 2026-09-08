@@ -110,7 +110,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
   const [bulkOpMsg, setBulkOpMsg] = useState<string | null>(null);
   const [showBulkEmailModal, setShowBulkEmailModal] = useState<boolean>(false);
   const [bulkEmailSubject, setBulkEmailSubject] = useState<string>('Special VIP Subscription Update from Host Warad Asare');
-  const [bulkEmailBody, setBulkEmailBody] = useState<string>('Your PeakForm Pro access has been extended! Continue crushing your goals with peak precision.');
+  const [bulkEmailBody, setBulkEmailBody] = useState<string>('Your AROH Pro access has been extended! Continue crushing your goals with peak precision.');
   const [bulkExtensionDaysInput, setBulkExtensionDaysInput] = useState<number>(30);
 
   // Single Unified Grant Form State
@@ -997,7 +997,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `PeakForm_Host_Authentication_Audit_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `AROH_Host_Authentication_Audit_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

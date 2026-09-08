@@ -1,5 +1,5 @@
-// PeakForm AI - Service Worker for Background Workout Push & Scheduled Notifications
-const CACHE_NAME = 'peakform-v1';
+// AROH - Service Worker for Background Workout Push & Scheduled Notifications
+const CACHE_NAME = 'aroh-v1';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -16,7 +16,7 @@ self.addEventListener('push', (event) => {
     body: 'Your evidence-based training session is ready. Tap to start.',
     icon: '/favicon.ico',
     badge: '/favicon.ico',
-    tag: 'peakform-workout-reminder',
+    tag: 'aroh-workout-reminder',
     data: { url: '/?tab=workouts' },
   };
 

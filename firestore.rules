@@ -152,28 +152,34 @@ service cloud.firestore {
 
     // Global Host Accuracy Correction Queue (supports PascalCase and camelCase)
     match /AccuracyCorrectionQueue/{correctionId} {
-      allow read, write: if isSignedIn() && isValidId(correctionId);
+      allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
+      allow read: if isSignedIn();
     }
     match /accuracyCorrectionQueue/{correctionId} {
-      allow read, write: if isSignedIn() && isValidId(correctionId);
+      allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
+      allow read: if isSignedIn();
     }
 
     // Global Host Correction Queue (supports PascalCase and camelCase)
     match /CorrectionQueue/{correctionId} {
-      allow read, write: if isSignedIn() && isValidId(correctionId);
+      allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
+      allow read: if isSignedIn();
     }
     match /correctionQueue/{correctionId} {
-      allow read, write: if isSignedIn() && isValidId(correctionId);
+      allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
+      allow read: if isSignedIn();
     }
 
     // Global Host Improvement Queue
     match /improvementQueue/{reportId} {
-      allow read, write: if isSignedIn() && isValidId(reportId);
+      allow create: if isSignedIn() && isValidId(reportId) && incoming().userId == request.auth.uid;
+      allow read: if isSignedIn();
     }
 
     // Global Host App Error Reports
     match /appErrorReports/{reportId} {
-      allow read, write: if isSignedIn() && isValidId(reportId);
+      allow create: if isSignedIn() && isValidId(reportId) && incoming().userId == request.auth.uid;
+      allow read: if isSignedIn();
     }
 
     // Host Granted Subscriptions & Ledger Collections (Accessible for grant checks & host management)

@@ -52,7 +52,7 @@ export const SmartNutritionAlertBanner: React.FC<SmartNutritionAlertBannerProps>
     if (perm === 'granted') {
       await sendWorkoutNotification(
         '🔔 Smart Nutrition Alerts Enabled',
-        `PeakForm AI will monitor your daily calories vs protein balance for your ${userProfile.goal} goal.`,
+        `AROH AI will monitor your daily calories vs protein balance for your ${userProfile.goal} goal.`,
         { sound: true }
       );
       setTestSent(true);

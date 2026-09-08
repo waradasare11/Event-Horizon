@@ -1,5 +1,5 @@
 /**
- * PeakForm AI - Accuracy & App Error Reporting Engine
+ * AROH - Accuracy & App Error Reporting Engine
  * 
  * Provides:
  * 1. 'Report Accuracy' mechanism for Meal Scans and Biomechanics Analyses.

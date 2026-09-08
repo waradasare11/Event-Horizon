@@ -1,5 +1,5 @@
 /**
- * PeakForm AI - ReportAccuracy Logging Service
+ * AROH - ReportAccuracy Logging Service
  * 
  * Saves user feedback, manual adjustments, and portion corrections from
  * MealCameraScanner directly into the Firestore collection `AccuracyCorrectionQueue`.

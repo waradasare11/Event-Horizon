@@ -24,10 +24,10 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
   try {
     const registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
     swRegistration = registration;
-    console.log('[PeakForm SW] Service Worker registered successfully with scope:', registration.scope);
+    console.log('[AROH SW] Service Worker registered successfully with scope:', registration.scope);
     return registration;
   } catch (err) {
-    console.warn('[PeakForm SW] Service Worker registration failed or unsupported in current environment:', err);
+    console.warn('[AROH SW] Service Worker registration failed or unsupported in current environment:', err);
     return null;
   }
 }
@@ -118,14 +118,14 @@ export async function sendWorkoutNotification(
         body,
         icon: options?.icon || '/favicon.ico',
         badge: '/favicon.ico',
-        tag: options?.tag || 'peakform-workout-reminder',
+        tag: options?.tag || 'aroh-workout-reminder',
         renotify: true,
         data: options?.data || { url: '/?tab=workouts' },
       } as any);
       return true;
     }
   } catch (swErr) {
-    console.warn('[PeakForm SW] Fallback to standard Notification API:', swErr);
+    console.warn('[AROH SW] Fallback to standard Notification API:', swErr);
   }
 
   // 2. Fallback to standard window Notification instance

@@ -46,7 +46,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
       const user = await signInWithGoogle();
       if (user) {
         fireCelebrationConfetti();
-        onSuccessAuth(user.email || 'athlete@peakform.ai', user.displayName || 'PeakForm Athlete');
+        onSuccessAuth(user.email || 'athlete@aroh.fit', user.displayName || 'AROH Athlete');
       }
     } catch (err: any) {
       console.warn('Google popup error, falling back to direct sign-in:', err);
@@ -60,7 +60,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
   const handleDirectLogin = (e: React.FormEvent) => {
     e.preventDefault();
     const cleanEmail = emailInput.trim();
-    const cleanName = nameInput.trim() || 'PeakForm Athlete';
+    const cleanName = nameInput.trim() || 'AROH Athlete';
 
     if (!cleanEmail || !cleanEmail.includes('@')) {
       setAuthError('Please provide a valid email address to initialize your account and 7-day trial.');
@@ -73,7 +73,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
 
   const handleQuickDemoAccess = () => {
     fireCelebrationConfetti();
-    onSuccessAuth('athlete.demo@peakform.ai', 'Champion Athlete');
+    onSuccessAuth('athlete.demo@aroh.fit', 'Champion Athlete');
   };
 
   return (
@@ -89,7 +89,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Welcome to PeakForm AI
+            Welcome to AROH
           </h2>
           <p className="text-xs sm:text-sm text-emerald-100/90 mt-1 leading-relaxed max-w-xl">
             Sign in to start your <strong>1-Week Free Trial</strong>. Complete your profile to calculate your personalized <strong>Goal Timeline Prediction</strong>, meal plans, and workout progression.
@@ -280,7 +280,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
             <Lock className="w-3.5 h-3.5 text-emerald-500" />
             <span>Encrypted Session • Host: Warad Asare (waradasare11@gmail.com)</span>
           </span>
-          <span className="font-semibold text-[#0F6E5F] dark:text-[#2DD4BF]">PeakForm AI v2.4</span>
+          <span className="font-semibold text-[#0F6E5F] dark:text-[#2DD4BF]">AROH v2.4</span>
         </div>
       </div>
     </div>

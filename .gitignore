@@ -6,3 +6,5 @@ coverage/
 *.log
 .env*
 !.env.example
+.peakform_host_data.json
+.peakform_athlete_logins.json

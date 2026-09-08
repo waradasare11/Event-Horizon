@@ -35,8 +35,8 @@ export interface GlobalSyncState {
   isIndexedDBActive: boolean;
 }
 
-const QUEUE_STORAGE_KEY = 'peakform_pending_sync_queue';
-const LAST_SYNCED_STORAGE_KEY = 'peakform_last_synced_timestamp';
+const QUEUE_STORAGE_KEY = 'aroh_pending_sync_queue';
+const LAST_SYNCED_STORAGE_KEY = 'aroh_last_synced_timestamp';
 
 // In-memory queue & listeners
 let pendingQueue: SyncJob[] = loadQueueFromStorage();
@@ -71,7 +71,7 @@ if (typeof window !== 'undefined') {
 
 function loadQueueFromStorage(): SyncJob[] {
   try {
-    const raw = localStorage.getItem(QUEUE_STORAGE_KEY);
+    const raw = localStorage.getItem(QUEUE_STORAGE_KEY) || localStorage.getItem('peakform_pending_sync_queue');
     if (raw) return JSON.parse(raw);
   } catch (e) {
     console.error('Failed to load sync queue from localStorage', e);
@@ -81,7 +81,9 @@ function loadQueueFromStorage(): SyncJob[] {
 
 function saveQueueToStorage(queue: SyncJob[]): void {
   try {
-    localStorage.setItem(QUEUE_STORAGE_KEY, JSON.stringify(queue));
+    const serialized = JSON.stringify(queue);
+    localStorage.setItem(QUEUE_STORAGE_KEY, serialized);
+    localStorage.setItem('peakform_pending_sync_queue', serialized);
   } catch (e) {
     console.error('Failed to save sync queue to localStorage', e);
   }
@@ -89,7 +91,7 @@ function saveQueueToStorage(queue: SyncJob[]): void {
 
 function loadLastSyncTimestamp(): string | null {
   try {
-    return localStorage.getItem(LAST_SYNCED_STORAGE_KEY);
+    return localStorage.getItem(LAST_SYNCED_STORAGE_KEY) || localStorage.getItem('peakform_last_synced_timestamp');
   } catch {
     return null;
   }
@@ -99,7 +101,46 @@ function saveLastSyncTimestamp(iso: string): void {
   lastSyncTimestamp = iso;
   try {
     localStorage.setItem(LAST_SYNCED_STORAGE_KEY, iso);
+    localStorage.setItem('peakform_last_synced_timestamp', iso);
   } catch {}
+}
+
+/**
+ * Prioritizes a specific job in the queue to be processed first immediately
+ */
+export function prioritizeSyncJob(id: string): void {
+  const index = pendingQueue.findIndex((j) => j.id === id);
+  if (index > 0) {
+    const [job] = pendingQueue.splice(index, 1);
+    // Reset retry count and set fresh timestamp
+    job.retryCount = 0;
+    job.timestamp = new Date().toISOString();
+    pendingQueue.unshift(job);
+    saveQueueToStorage(pendingQueue);
+    idbSaveSyncJob(job);
+    notifyListeners();
+  }
+  processPendingSyncQueue();
+}
+
+/**
+ * Manually dismisses/clears a specific job from the sync queue
+ */
+export function clearSyncJob(id: string): void {
+  pendingQueue = pendingQueue.filter((j) => j.id !== id);
+  saveQueueToStorage(pendingQueue);
+  idbDeleteSyncJob(id);
+  notifyListeners();
+}
+
+/**
+ * Manually clears all pending items from the sync queue
+ */
+export function clearAllSyncJobs(): void {
+  pendingQueue = [];
+  saveQueueToStorage([]);
+  idbClearAllSyncJobs();
+  notifyListeners();
 }
 
 export function getGlobalSyncState(): GlobalSyncState {

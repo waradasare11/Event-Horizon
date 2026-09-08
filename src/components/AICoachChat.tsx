@@ -41,7 +41,7 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
     {
       id: 'msg-init',
       role: 'assistant',
-      content: `Hello ${userProfile.name || 'there'}! I am your PeakForm Science Coach, powered by sports science literature, exercise physiology, and real-time Google Search grounding (inspired by BuiltWithScience and ISSN guidelines). 
+      content: `Hello ${userProfile.name || 'there'}! I am your AROH Science Coach, powered by sports science literature, exercise physiology, and real-time Google Search grounding (inspired by BuiltWithScience and ISSN guidelines). 
 
 I have your personalized profile loaded:
 • **Goal:** ${userProfile.goal === 'lose_fat' ? 'Fat Loss & Muscle Preservation' : userProfile.goal === 'build_muscle' ? 'Hypertrophy & Lean Bulk' : 'Body Recomposition'}

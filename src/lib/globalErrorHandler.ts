@@ -1,5 +1,5 @@
 /**
- * Global Error Handler Service for PeakForm AI
+ * Global Error Handler Service for AROH
  * 
  * Captures all unhandled Promise rejections and uncaught runtime errors across the entire app.
  * Stores detailed error diagnostics into Firestore under the 'ClientErrorLogs' collection,

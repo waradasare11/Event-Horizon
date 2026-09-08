@@ -33,7 +33,7 @@ const INITIAL_COMMUNITY_CHALLENGES: CommunityChallenge[] = [
     id: 'volume-10m',
     title: '10,000,000 kg Collective Volume Quest',
     category: 'volume',
-    description: 'Every bench press, squat, deadlift, and curl logged by PeakForm athletes counts toward our shared 10M kg goal.',
+    description: 'Every bench press, squat, deadlift, and curl logged by AROH athletes counts toward our shared 10M kg goal.',
     targetMetric: 'Total Weight Lifted',
     currentCommunityTotal: 7428590,
     goalCommunityTotal: 10000000,
@@ -317,7 +317,7 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-emerald-200 mb-3 border border-white/10">
               <Users className="w-3.5 h-3.5" />
-              PeakForm Global Athlete Network
+              AROH Global Athlete Network
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
               Community Challenges & Live Leaderboard

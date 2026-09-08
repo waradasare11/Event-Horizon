@@ -1,5 +1,5 @@
 /**
- * PeakForm AI - Automated Data Reconciliation Worker
+ * AROH - Automated Data Reconciliation Worker
  * 
  * Runs on application initialization to cross-check local IndexedDB state
  * against Firestore snapshots, detect metric & log discrepancies,

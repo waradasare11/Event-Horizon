@@ -27,7 +27,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('PeakForm Global Error Boundary Caught:', error, errorInfo);
+    console.error('AROH Global Error Boundary Caught:', error, errorInfo);
     this.setState({ error, errorInfo });
   }
 

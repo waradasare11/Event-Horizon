@@ -50,7 +50,7 @@ export const CloudSyncWidget: React.FC<CloudSyncWidgetProps> = ({
       const result = await connectGoogleWorkspace(userProfile.email);
       if (result.success) {
         setAuthState(getStoredGoogleWorkspaceAuth());
-        setBackupMessage('Connected to Google Drive, Calendar & Tasks. "PeakForm AI" folder ready.');
+        setBackupMessage('Connected to Google Drive, Calendar & Tasks. "AROH AI" folder ready.');
         setTimeout(() => setBackupMessage(null), 4000);
       } else {
         setErrorMessage(result.error || 'Failed to connect Google Workspace');
@@ -74,7 +74,7 @@ export const CloudSyncWidget: React.FC<CloudSyncWidgetProps> = ({
 
       if (res.success) {
         setAuthState(getStoredGoogleWorkspaceAuth());
-        setBackupMessage(`Backup saved to "PeakForm AI" folder in Google Drive at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
+        setBackupMessage(`Backup saved to "AROH AI" folder in Google Drive at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
       }
     } catch (err: any) {
       setErrorMessage(err.message || 'Backup failed. Please verify Google Drive permissions.');
@@ -115,7 +115,7 @@ export const CloudSyncWidget: React.FC<CloudSyncWidgetProps> = ({
             </div>
             <p className="text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex items-center gap-1.5 mt-0.5">
               <FolderSync className="w-3 h-3 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-              <span>Drive Folder: <strong>PeakForm AI</strong></span>
+              <span>Drive Folder: <strong>AROH AI</strong></span>
               <span>•</span>
               <span>Last Backup: <strong>{formattedLastBackup}</strong></span>
             </p>
@@ -147,7 +147,7 @@ export const CloudSyncWidget: React.FC<CloudSyncWidgetProps> = ({
           onClick={handleBackupNow}
           disabled={isBackingUp}
           className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white shadow-xs transition-all active:scale-95 cursor-pointer disabled:opacity-50 min-h-[38px]"
-          title="Export all workouts, nutrition logs, and body metrics directly to your PeakForm AI Google Drive folder"
+          title="Export all workouts, nutrition logs, and body metrics directly to your AROH AI Google Drive folder"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isBackingUp ? 'animate-spin' : ''}`} />
           <span>{isBackingUp ? 'Backing Up...' : 'Backup Now'}</span>

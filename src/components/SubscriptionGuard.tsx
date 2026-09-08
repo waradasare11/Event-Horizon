@@ -84,7 +84,7 @@ export const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
         const sub = isHost ? createHostLifetimeSubscription() : createGrantedUserSubscription(grant || { email });
         onUpdateSubscription(sub);
         onSaveProfile({ ...userProfile, subscription: sub });
-        setGrantCheckNotice('🎉 VIP Free Subscription Verified! Unlocking PeakForm Pro...');
+        setGrantCheckNotice('🎉 VIP Free Subscription Verified! Unlocking AROH Pro...');
       } else {
         setGrantCheckNotice('No VIP grant found for this Gmail yet. Ask the Host to add your Gmail ID.');
       }
@@ -153,7 +153,7 @@ export const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
               1-Week Free Trial Expired
             </span>
             <h3 className="text-2xl font-black text-gray-900 dark:text-white">
-              Renew Your PeakForm Pro Access
+              Renew Your AROH Pro Access
             </h3>
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
               Your 7-day free trial has concluded. Upgrade to any plan starting at only <strong>₹89/mo</strong> via our verified host QR code (Warad Asare).
