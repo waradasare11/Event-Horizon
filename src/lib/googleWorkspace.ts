@@ -196,6 +196,11 @@ export async function getOrCreateArohFolder(accessToken: string): Promise<string
 }
 
 /**
+ * Backward compatibility alias
+ */
+export const getOrCreatePeakFormFolder = getOrCreateArohFolder;
+
+/**
  * Uploads or updates a file (CSV or JSON) to the user's 'AROH AI' Google Drive folder
  */
 export async function uploadFileToDrive(params: {
