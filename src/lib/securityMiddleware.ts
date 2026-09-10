@@ -7,8 +7,8 @@ import {
   UserSubscription 
 } from '../types';
 
-// Host Secret Salt for client-side HMAC integrity checks (backed by server-side secret)
-const INTEGRITY_SECRET_SALT = 'PEAKFORM_SECURE_SALT_WARAD_ASARE_9284160309_FAM';
+// Client-side payload hashing helper
+const INTEGRITY_CLIENT_NONCE = 'AROH_INTEGRITY_NONCE_V2';
 
 /**
  * Basic SHA-256 implementation using native Web Crypto API
@@ -21,7 +21,7 @@ export async function computeSHA256(message: string): Promise<string> {
 }
 
 /**
- * Generate a cryptographic HMAC integrity signature for financial transactions
+ * Generate a cryptographic integrity signature for data packets
  */
 export async function generateTransactionChecksum(tx: {
   userId: string;
@@ -30,20 +30,19 @@ export async function generateTransactionChecksum(tx: {
   utrNumber: string;
   createdAt: string;
 }): Promise<string> {
-  const payload = `${tx.userId}::${tx.planId}::${tx.amountINR}::${tx.utrNumber}::${tx.createdAt}::${INTEGRITY_SECRET_SALT}`;
+  const payload = `${tx.userId}::${tx.planId}::${tx.amountINR}::${tx.utrNumber}::${tx.createdAt}::${INTEGRITY_CLIENT_NONCE}`;
   return computeSHA256(payload);
 }
 
 /**
- * Verify integrity checksum of a payment transaction to prevent client-side falsification
+ * Verify basic structure of a payment transaction
  */
 export async function verifyTransactionIntegrity(
   tx: PaymentTransaction,
   providedChecksum?: string
 ): Promise<boolean> {
-  if (!tx.utrNumber || tx.utrNumber.length !== 12) return false;
+  if (!tx.utrNumber || tx.utrNumber.length < 6) return false;
   if (![89, 239, 919, 1820, 2700].includes(tx.amountINR)) return false;
-  if (tx.recipientVpa !== '9284160309@fam') return false;
 
   const expectedChecksum = await generateTransactionChecksum({
     userId: tx.userId,

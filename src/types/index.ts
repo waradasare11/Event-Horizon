@@ -128,6 +128,14 @@ export interface UserProfile {
   email?: string;
   authProvider?: string;
   subscription?: UserSubscription;
+
+  // Age Gate & Legal Compliance (DPDP Act, 2023)
+  isUnder18?: boolean;
+  parentGuardianConsent?: boolean;
+  parentGuardianName?: string;
+  agreedToMedicalDisclaimer?: boolean;
+  agreedToTermsAndPrivacy?: boolean;
+  dataDeletionRequestedAt?: string;
 }
 
 export type SubscriptionPlanId = 'trial_7d' | '1_month' | '3_months' | '6_months' | '1_year' | '2_years' | '3_years' | 'lifetime';
@@ -178,8 +186,8 @@ export interface PaymentTransaction {
   durationLabel: string;
   amountINR: number;
   utrNumber: string; // 12-digit UPI reference number
-  recipientVpa: string; // e.g. '9284160309@fam'
-  recipientName: string; // e.g. 'Warad Asare'
+  recipientVpa?: string;
+  recipientName?: string;
   status: 'pending' | 'verified' | 'rejected';
   createdAt: string;
   verifiedAt?: string;

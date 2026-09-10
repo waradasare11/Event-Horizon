@@ -743,3 +743,61 @@ export async function syncDailyTasksToGoogleTasks(params: {
     return { success: true, count: params.tasks.length };
   }
 }
+
+/**
+ * Permanently delete all AROH backup files and folders from Google Drive
+ * (Right to Erasure under DPDP Act, 2023)
+ */
+export async function deleteAllGoogleDriveBackups(): Promise<{ success: boolean; deletedCount: number }> {
+  let deletedCount = 0;
+
+  // Clear local drive caches
+  if (typeof window !== 'undefined') {
+    try {
+      const driveKeys = Object.keys(localStorage).filter(
+        (k) => k.startsWith('peakform_drive_') || k.startsWith('aroh_drive_')
+      );
+      driveKeys.forEach((k) => localStorage.removeItem(k));
+    } catch (e) {
+      console.warn('Notice clearing local drive cache:', e);
+    }
+  }
+
+  const auth = getStoredGoogleWorkspaceAuth();
+  if (!auth.accessToken) {
+    return { success: true, deletedCount: 0 };
+  }
+
+  try {
+    const searchUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(
+      "(name contains 'AROH' or name contains 'PeakForm') and trashed = false"
+    )}&fields=files(id, name)`;
+
+    const res = await fetch(searchUrl, {
+      headers: { Authorization: `Bearer ${auth.accessToken}` },
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.files && Array.isArray(data.files)) {
+        for (const file of data.files) {
+          try {
+            await fetch(`https://www.googleapis.com/drive/v3/files/${file.id}`, {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${auth.accessToken}` },
+            });
+            deletedCount++;
+          } catch (delErr) {
+            console.warn(`Could not delete Drive file ${file.id}:`, delErr);
+          }
+        }
+      }
+    }
+
+    return { success: true, deletedCount };
+  } catch (err) {
+    console.warn('Notice deleting Google Drive backups:', err);
+    return { success: true, deletedCount };
+  }
+}
+

@@ -99,6 +99,9 @@ import { auditWorkoutPrograms, WorkoutProgramAuditReport } from './data/Exercise
 import { runAutomatedDataReconciliation } from './lib/reconciliationWorker';
 import { setCurrentActiveEmail, getCurrentActiveEmail, updateWorkoutLogNotes } from './lib/storage';
 import { Activity } from 'lucide-react';
+import { LegalPagesModal, LegalTabType } from './components/LegalPagesModal';
+import { Footer } from './components/Footer';
+import { CookieBanner } from './components/CookieBanner';
 
 export default function App() {
   const { isOnline, pendingCount, triggerSync } = useSyncStatus();
@@ -132,6 +135,56 @@ export default function App() {
   const [isPerformanceDashboardOpen, setIsPerformanceDashboardOpen] = useState<boolean>(false);
   const [isKeepSyncOpen, setIsKeepSyncOpen] = useState<boolean>(false);
   const [precisionStatus, setPrecisionStatus] = useState<'active' | 'standby'>('active');
+
+  // Real Legal Pages & Compliance State (DPDP Act 2023)
+  const [isLegalModalOpen, setIsLegalModalOpen] = useState<boolean>(false);
+  const [legalModalTab, setLegalModalTab] = useState<LegalTabType>('privacy');
+
+  const handleOpenLegal = (tab: LegalTabType = 'privacy') => {
+    setLegalModalTab(tab);
+    setIsLegalModalOpen(true);
+  };
+
+  const handleCompleteDataErasure = () => {
+    setUserProfile(getStoredProfile(''));
+    setMealLogs([]);
+    setWorkoutLogs([]);
+    setBodyMetrics([]);
+    setFormAnalyses([]);
+    setAiMealPlan(null);
+    setIsLegalModalOpen(false);
+    setActiveTab('scan');
+  };
+
+  // Direct path & hash support for legal routes: /privacy, /terms, /disclaimer, /refund, etc.
+  useEffect(() => {
+    const handleUrlHashOrPath = () => {
+      const hash = window.location.hash.toLowerCase().replace('#', '');
+      const path = window.location.pathname.toLowerCase();
+
+      if (path === '/privacy' || hash === 'privacy') {
+        handleOpenLegal('privacy');
+      } else if (path === '/terms' || hash === 'terms') {
+        handleOpenLegal('terms');
+      } else if (path === '/disclaimer' || hash === 'disclaimer') {
+        handleOpenLegal('disclaimer');
+      } else if (path === '/refund' || hash === 'refund') {
+        handleOpenLegal('refund');
+      } else if (path === '/delete-data' || hash === 'delete-data' || hash === 'delete') {
+        handleOpenLegal('delete-data');
+      } else if (path === '/cookies' || hash === 'cookies') {
+        handleOpenLegal('cookies');
+      }
+    };
+
+    handleUrlHashOrPath();
+    window.addEventListener('popstate', handleUrlHashOrPath);
+    window.addEventListener('hashchange', handleUrlHashOrPath);
+    return () => {
+      window.removeEventListener('popstate', handleUrlHashOrPath);
+      window.removeEventListener('hashchange', handleUrlHashOrPath);
+    };
+  }, []);
 
   // Cloud-to-Local Sync Toast Notification State
   const [syncToastState, setSyncToastState] = useState<{
@@ -1051,73 +1104,17 @@ export default function App() {
           )}
         </main>
 
-        {/* Footer */}
-        <footer className="border-t border-slate-200 dark:border-slate-800/80 bg-white dark:bg-[#080B14] py-4 mt-auto transition-colors">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
-            <div className="flex items-center gap-3 flex-wrap">
-              <ArohLogo size="sm" />
-              <span className="hidden md:inline">• Evidence-Based Workout &amp; Nutrition Coaching</span>
-              <GlobalSyncStatus />
-            </div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <button
-                id="report-issue-footer-btn"
-                type="button"
-                onClick={() => setIsReportAppErrorOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 font-semibold text-[11px] transition-all cursor-pointer"
-                title="Report a bug, calculation discrepancy, or suggest an enhancement"
-              >
-                <span>Report Issue / Feedback</span>
-              </button>
-
-              {/* Host-only Debug, Latency & Audit Tools */}
-              {(isHostAdmin(userProfile.email) || isHostAdmin(currentUser?.email) || userProfile.email === 'waradasare11@gmail.com') && (
-                <>
-                  <button
-                    onClick={handleTriggerAudit}
-                    disabled={isAuditing}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 font-semibold text-[11px] transition-all cursor-pointer disabled:opacity-50"
-                    title="Run one-time audit of all workout programs against ExerciseRegistry and refresh all YouTube links"
-                  >
-                    <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-                    <span>{isAuditing ? 'Auditing Registry...' : 'Audit YouTube Links & Registry'}</span>
-                  </button>
-
-                  {/* Precision System Status Badge (Host Only) */}
-                  <button
-                    id="precision-system-status-badge"
-                    type="button"
-                    onClick={() => setPrecisionStatus((prev) => prev === 'active' ? 'standby' : 'active')}
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all cursor-pointer shadow-2xs ${
-                      precisionStatus === 'active'
-                        ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
-                        : 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
-                    }`}
-                    title={`Multi-Model Consensus is currently ${precisionStatus.toUpperCase()}. Click to toggle status.`}
-                  >
-                    <span className={`w-2 h-2 rounded-full ${
-                      precisionStatus === 'active' ? 'bg-emerald-500 animate-pulse shadow-xs' : 'bg-amber-500'
-                    }`} />
-                    <span>Consensus: {precisionStatus === 'active' ? 'Active' : 'Standby'}</span>
-                  </button>
-
-                  <button
-                    id="open-performance-dashboard-footer-btn"
-                    type="button"
-                    onClick={() => setIsPerformanceDashboardOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 dark:text-teal-300 border border-teal-500/30 font-semibold text-[11px] transition-all cursor-pointer"
-                    title="Open Real-time Service Latency & Telemetry Dashboard (Host Only)"
-                  >
-                    <Activity className="w-3 h-3 text-teal-600 dark:text-teal-400" />
-                    <span>Host Latency Sparklines</span>
-                  </button>
-                </>
-              )}
-
-              <span>Host: Warad Asare (9284160309@fam) • Gemini 3.7 Flash</span>
-            </div>
-          </div>
-        </footer>
+        {/* Real Legal & Global Footer */}
+        <Footer
+          onOpenLegal={handleOpenLegal}
+          onOpenReportError={() => setIsReportAppErrorOpen(true)}
+          isHostAdminUser={isHostAdmin()}
+          onTriggerAudit={handleTriggerAudit}
+          isAuditing={isAuditing}
+          precisionStatus={precisionStatus}
+          onTogglePrecisionStatus={() => setPrecisionStatus((prev) => prev === 'active' ? 'standby' : 'active')}
+          onOpenPerformanceDashboard={() => setIsPerformanceDashboardOpen(true)}
+        />
 
         {/* Modals */}
         <OnboardingModal
@@ -1223,6 +1220,18 @@ export default function App() {
           timestamp={syncToastState.timestamp}
           source={syncToastState.source}
         />
+
+        {/* Real Legal Pages & Compliance Modal (DPDP Act, 2023) */}
+        <LegalPagesModal
+          isOpen={isLegalModalOpen}
+          onClose={() => setIsLegalModalOpen(false)}
+          initialTab={legalModalTab}
+          userProfile={userProfile}
+          onCompleteDataErasure={handleCompleteDataErasure}
+        />
+
+        {/* Cookie & Local Storage Consent Banner */}
+        <CookieBanner onOpenLegal={handleOpenLegal} />
       </div>
     </SubscriptionGuard>
   );

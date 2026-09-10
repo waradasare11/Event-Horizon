@@ -1082,3 +1082,45 @@ export async function fetchAthleteLoginsFromFirestore(): Promise<any[]> {
   return [];
 }
 
+/**
+ * Permanently wipe all Firestore documents and subcollections for the active user
+ * (DPDP Act, 2023 - Right to Erasure / Data Deletion)
+ */
+export async function wipeUserFirestoreData(): Promise<boolean> {
+  const user = auth.currentUser;
+  if (!user) return false;
+
+  const subcollections = [
+    'mealLogs',
+    'workoutLogs',
+    'bodyMetrics',
+    'customRecipes',
+    'formAnalyses',
+    'shoppingList'
+  ];
+
+  try {
+    for (const sub of subcollections) {
+      try {
+        const subRef = collection(db, 'users', user.uid, sub);
+        const snapshot = await getDocs(subRef);
+        if (!snapshot.empty) {
+          const batch = writeBatch(db);
+          snapshot.docs.forEach((docSnap) => batch.delete(docSnap.ref));
+          await batch.commit();
+        }
+      } catch (subErr) {
+        console.warn(`Notice wiping subcollection ${sub}:`, subErr);
+      }
+    }
+
+    // Delete the root user profile document
+    await deleteDoc(doc(db, 'users', user.uid));
+    return true;
+  } catch (err) {
+    console.error('Error wiping user data from Firestore:', err);
+    return false;
+  }
+}
+
+

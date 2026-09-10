@@ -15,9 +15,9 @@ import {
 
 export const HOST_ADMIN_CONFIG = {
   name: 'Warad Asare',
-  upiId: '9284160309@fam',
   email: 'waradasare11@gmail.com',
-  appName: 'AROH AI Pro',
+  upiId: '9284160309@fam',
+  appName: 'AROH Pro',
   merchantCode: '5411',
   defaultPin: '9284',
 };
@@ -171,7 +171,7 @@ export function createHostLifetimeSubscription(): UserSubscription {
     isTrialActive: false,
     daysRemaining: 36500,
     isLifetime: true,
-    verifiedBy: 'Warad Asare (Host)',
+    verifiedBy: 'Host Admin',
     lastPaymentVerifiedAt: new Date().toISOString(),
   };
 }
@@ -391,7 +391,7 @@ export function computeSubscriptionStatus(sub?: UserSubscription, userEmail?: st
 
 /**
  * Generate a real, strictly formatted UPI Deep Link URI
- * Format: upi://pay?pa=9284160309@fam&pn=Warad%20Asare&am=89&cu=INR&tn=AROH%20AI%20Pro
+ * Format: upi://pay?pa={vpa}&pn={payeeName}&am={amount}&cu=INR&tn={note}
  */
 export function generateUPILink(plan: SubscriptionPlanConfig, userEmail?: string): string {
   const vpa = HOST_ADMIN_CONFIG.upiId;
@@ -528,35 +528,29 @@ export async function predictGoalTimelineAPI(profile: Partial<UserProfile>): Pro
   }
 }
 
-export async function verifyHostPIN(pin: string, email: string): Promise<boolean> {
-  const cleanPin = String(pin || '').trim().toLowerCase();
-  const validMasterPasscodes = new Set([
-    '9284',
-    'warad',
-    'waradasare',
-    'waradasare11',
-    'peakform',
-    'admin',
-    'host',
-    '9284160309'
-  ]);
-  
-  if (validMasterPasscodes.has(cleanPin)) return true;
+export async function verifyHostPIN(pin: string, email?: string): Promise<boolean> {
+  const cleanPin = String(pin || '').trim();
+  if (!cleanPin) return false;
 
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 2000);
+    const timeout = setTimeout(() => controller.abort(), 4000);
     const res = await fetch('/api/host/verify-pin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pin, email }),
+      body: JSON.stringify({ pin: cleanPin, email: email || '' }),
       signal: controller.signal,
     });
     clearTimeout(timeout);
+    if (!res.ok) return false;
     const data = await res.json();
-    return !!data.success;
+    const isValid = Boolean(data && data.success);
+    if (isValid) {
+      setHostAdminSession(true);
+    }
+    return isValid;
   } catch (e) {
-    return validMasterPasscodes.has(cleanPin);
+    return false;
   }
 }
 
@@ -888,8 +882,8 @@ export async function fetchHostGrantedSubscriptions(pin?: string, email?: string
 
   // 2. Fetch from backend server
   try {
-    const hostEmail = email || HOST_ADMIN_CONFIG.email;
-    const hostPin = pin || '9284';
+    const hostEmail = email || '';
+    const hostPin = pin || '';
     const res = await fetch(`/api/host/granted-subscriptions?email=${encodeURIComponent(hostEmail)}`, {
       headers: {
         'x-host-pin': hostPin,
@@ -972,8 +966,8 @@ export async function revokeHostGrantedSubscription(email: string, pin: string, 
     await fetch(`/api/host/revoke-granted-subscription/${encodeURIComponent(cleanEmail)}`, {
       method: 'DELETE',
       headers: {
-        'x-host-pin': pin || '9284',
-        'x-host-email': hostEmail || HOST_ADMIN_CONFIG.email,
+        'x-host-pin': pin || '',
+        'x-host-email': hostEmail || '',
       },
     });
     return true;
@@ -984,24 +978,17 @@ export async function revokeHostGrantedSubscription(email: string, pin: string, 
 
 /**
  * Force verify host verification password callback.
- * Validates master PIN '9284' or dynamically stored host PIN locally and remotely.
+ * Validates host PIN securely via server-side verification only.
  */
 export async function forceVerifyHostPassword(password: string, hostEmail?: string): Promise<boolean> {
   const cleanPass = String(password || '').trim();
   if (!cleanPass) return false;
-  // Always accept Master Host PIN '9284'
-  if (cleanPass === '9284') return true;
-
-  return verifyHostPIN(cleanPass, hostEmail || HOST_ADMIN_CONFIG.email);
+  return verifyHostPIN(cleanPass, hostEmail);
 }
 
 /**
  * Check if a user's Gmail has a free subscription grant.
- * Deeply audited multi-tier lookup:
- * 1. Checks immutable local grant store ('peakform_user_grant_<email>', 'peakform_host_ledger', 'peakform_host_grants_cache')
- * 2. Checks backend server endpoint
- * 3. Checks Firestore persistent collections ('persistent_host_grants', 'hostGrantedSubscriptions', 'host_ledger')
- * 4. Ensures grant is immediately self-healed, cached locally, and subscription state updated.
+ * Server-authoritative lookup via backend API endpoint.
  */
 export async function checkUserHostGrant(email: string): Promise<{ hasGrant: boolean; isHost?: boolean; grant?: HostGrantedSubscription }> {
   const cleanEmail = String(email || '').trim().toLowerCase();
@@ -1013,9 +1000,9 @@ export async function checkUserHostGrant(email: string): Promise<{ hasGrant: boo
       email: cleanEmail,
       sanitizedEmail: cleanEmail.replace(/[^a-zA-Z0-9_]/g, '_'),
       planId: 'all_plans',
-      planName: 'Host Lifetime Master Access',
+      planName: 'Host Master Access',
       grantedBy: cleanEmail,
-      grantedByName: 'Warad Asare (Host)',
+      grantedByName: 'Host Admin',
       grantedAt: '2024-01-01T00:00:00.000Z',
       status: 'active',
       isLifetime: true,
@@ -1320,7 +1307,7 @@ export async function revokeHostCouponCode(
 ): Promise<boolean> {
   const couponId = couponIdOrCode;
   const code = emailArg ? codeOrPin || couponIdOrCode : couponIdOrCode;
-  const pin = emailArg ? pinOrEmail || '9284' : (codeOrPin || '9284');
+  const pin = emailArg ? pinOrEmail || HOST_ADMIN_CONFIG.defaultPin : (codeOrPin || HOST_ADMIN_CONFIG.defaultPin);
   const email = emailArg || pinOrEmail || HOST_ADMIN_CONFIG.email;
 
   try {
@@ -1636,8 +1623,8 @@ export function recordPaymentTransaction(
     status: 'verified', // Auto-verified with 12-digit anti-fraud cryptographic checksum
     createdAt: now.toISOString(),
     verifiedAt: now.toISOString(),
-    verifiedBy: 'Warad Asare (Host Automated QR Verification Gateway)',
-    notes: `Verified ₹${plan.priceINR} payment via FamApp UPI to Warad Asare (9284160309@fam).`,
+    verifiedBy: `${HOST_ADMIN_CONFIG.name} (Host Automated QR Verification Gateway)`,
+    notes: `Verified ₹${plan.priceINR} payment via UPI to ${HOST_ADMIN_CONFIG.name} (${HOST_ADMIN_CONFIG.upiId}).`,
   };
 
   const updatedSubscription: UserSubscription = {
@@ -1709,9 +1696,58 @@ export async function verifyPaymentWithBackendServer(
   }
 }
 
-export function isHostAdmin(userEmail?: string | null): boolean {
-  if (!userEmail) return false;
-  return userEmail.trim().toLowerCase() === HOST_ADMIN_CONFIG.email.toLowerCase();
+export function isHostAdmin(_userEmail?: string | null): boolean {
+  if (typeof window === 'undefined') return false;
+  return sessionStorage.getItem('aroh_host_authenticated') === 'true';
+}
+
+export function setHostAdminSession(authenticated: boolean): void {
+  if (typeof window === 'undefined') return;
+  if (authenticated) {
+    sessionStorage.setItem('aroh_host_authenticated', 'true');
+  } else {
+    sessionStorage.removeItem('aroh_host_authenticated');
+  }
+}
+
+export interface RazorpayConfig {
+  isLive: boolean;
+  keyId: string | null;
+}
+
+export async function getRazorpayConfig(): Promise<RazorpayConfig> {
+  try {
+    const res = await fetch('/api/payment/razorpay/config');
+    if (!res.ok) return { isLive: false, keyId: null };
+    return await res.json();
+  } catch (e) {
+    return { isLive: false, keyId: null };
+  }
+}
+
+export async function createRazorpayOrder(planId: string, userEmail: string, userName: string): Promise<any> {
+  const res = await fetch('/api/payment/razorpay/create-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ planId, userEmail, userName }),
+  });
+  return await res.json();
+}
+
+export async function verifyRazorpayPayment(data: {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+  planId: string;
+  userEmail: string;
+  userName: string;
+}): Promise<any> {
+  const res = await fetch('/api/payment/razorpay/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  return await res.json();
 }
 
 export async function fetchHostAuditLogs(pin?: string, email?: string): Promise<HostAuditLogEntry[]> {
@@ -1737,10 +1773,10 @@ export async function fetchHostAuditLogs(pin?: string, email?: string): Promise<
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 2500);
 
-    const res = await fetch(`/api/host/audit-logs?email=${encodeURIComponent(email || HOST_ADMIN_CONFIG.email)}`, {
+    const res = await fetch(`/api/host/audit-logs?email=${encodeURIComponent(email || '')}`, {
       headers: {
-        'x-host-pin': pin || '9284',
-        'x-host-email': email || HOST_ADMIN_CONFIG.email,
+        'x-host-pin': pin || '',
+        'x-host-email': email || '',
       },
       signal: controller.signal,
     });
@@ -1754,32 +1790,6 @@ export async function fetchHostAuditLogs(pin?: string, email?: string): Promise<
     }
   } catch (e) {
     console.warn('Backend audit logs fetch note (local logs preserved):', e);
-  }
-
-  // Default seed entries if none exist yet
-  if (map.size === 0) {
-    const seedLogs: HostAuditLogEntry[] = [
-      {
-        id: 'seed_log_1',
-        timestamp: new Date().toISOString(),
-        actionType: 'pin_updated',
-        actor: 'Warad Asare (Host Master)',
-        targetEmail: HOST_ADMIN_CONFIG.email,
-        details: 'Host Admin security credentials initialized with master verification authority.',
-        integrityHash: 'verified_hmac_root',
-      },
-      {
-        id: 'seed_log_2',
-        timestamp: new Date(Date.now() - 3600000).toISOString(),
-        actionType: 'free_access_granted',
-        actor: 'Warad Asare (Host Master)',
-        targetEmail: 'yashmandale394@gmail.com',
-        planId: 'all_plans',
-        details: 'Host Warad Asare granted 100% Free Lifetime VIP Access to yashmandale394@gmail.com.',
-        integrityHash: 'verified_hmac_grant_seed',
-      }
-    ];
-    seedLogs.forEach((l) => map.set(l.id, l));
   }
 
   const sorted = Array.from(map.values()).sort(

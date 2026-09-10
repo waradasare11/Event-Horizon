@@ -110,6 +110,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     return d.toISOString().split('T')[0];
   });
 
+  // Age Gate & Legal Compliance (DPDP Act, 2023)
+  const isAgeUnder18 = Number(age) > 0 && Number(age) < 18;
+  const [parentGuardianConsent, setParentGuardianConsent] = useState(Boolean(userProfile.parentGuardianConsent));
+  const [parentGuardianName, setParentGuardianName] = useState(userProfile.parentGuardianName || '');
+  const [agreedToMedicalDisclaimer, setAgreedToMedicalDisclaimer] = useState(userProfile.agreedToMedicalDisclaimer ?? true);
+
+
   // Step 2: Lifestyle, NEAT, Circadian & Recovery (AI Driven Targets)
   const [dailySleepDurationHours, setDailySleepDurationHours] = useState<number>(userProfile.dailySleepDurationHours || 7.5);
   const [sleepQuality, setSleepQuality] = useState<'restful' | 'average' | 'fragmented'>('restful');
@@ -612,8 +619,14 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       weightKg: numWeight,
       targetWeightKg: numTargetWeight,
       targetDate: finalDate,
-      bodyFatPct: numBodyFat,
-      targetBodyFatPct: numTargetBodyFat,
+      // In compliance with DPDP Act, 2023, do not store extra biometric profiling for children
+      bodyFatPct: numAge < 18 ? undefined : numBodyFat,
+      targetBodyFatPct: numAge < 18 ? undefined : numTargetBodyFat,
+      isUnder18: numAge < 18,
+      parentGuardianConsent: numAge < 18 ? parentGuardianConsent : undefined,
+      parentGuardianName: numAge < 18 ? parentGuardianName.trim() : undefined,
+      agreedToMedicalDisclaimer: true,
+      agreedToTermsAndPrivacy: true,
       goal,
       dietType,
       experienceLevel,
@@ -872,8 +885,52 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     max={50}
                     step="any"
                   />
+                  {isAgeUnder18 && (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 mt-1 block">
+                      Protected under DPDP Act (Not tracked for youth athletes)
+                    </span>
+                  )}
                 </div>
               </div>
+
+              {/* Age Gate & Guardian Consent (DPDP Act, 2023) */}
+              {isAgeUnder18 && (
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3 animate-in fade-in">
+                  <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-bold text-xs sm:text-sm">
+                    <ShieldAlert className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <span>Parent / Legal Guardian Consent (DPDP Act, 2023)</span>
+                  </div>
+                  <p className="text-xs text-amber-900/80 dark:text-amber-200/80 leading-relaxed">
+                    You have entered an age under 18 ({age} years). In compliance with India's <strong>Digital Personal Data Protection Act, 2023</strong>, minors require verifiable consent from a parent or legal guardian. We strictly minimize data collection and do not store secondary health markers or invasive body fat profiling for minors.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <label className="block text-[11px] font-bold text-amber-950 dark:text-amber-100 mb-1">
+                        Parent or Legal Guardian Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={parentGuardianName}
+                        onChange={(e) => setParentGuardianName(e.target.value)}
+                        placeholder="e.g. Rajesh Asare"
+                        className="w-full text-xs p-2.5 rounded-xl border border-amber-300 dark:border-amber-800/60 bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-amber-500"
+                      />
+                    </div>
+                    <div className="flex items-start gap-2 sm:pt-6">
+                      <input
+                        type="checkbox"
+                        id="parent-guardian-consent-check"
+                        checked={parentGuardianConsent}
+                        onChange={(e) => setParentGuardianConsent(e.target.checked)}
+                        className="w-4 h-4 mt-0.5 rounded text-[#0F6E5F] focus:ring-[#0F6E5F] accent-[#0F6E5F] cursor-pointer shrink-0"
+                      />
+                      <label htmlFor="parent-guardian-consent-check" className="text-xs font-semibold text-amber-950 dark:text-amber-100 cursor-pointer">
+                        I confirm that my parent/guardian has reviewed and consented to my use of AROH.
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* TIMELINE HORIZON & TARGET DATE QUESTION */}
               <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-3">
@@ -958,6 +1015,29 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                     AROH models your biological timeline to render realistic photorealistic visual time-lapses of how your deltoids, waist, and abdominals evolve at 4, 8, 12, and 16 weeks.
                   </p>
+                </div>
+              </div>
+
+              {/* Mandatory Medical Disclaimer (Onboarding) */}
+              <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-3">
+                <div className="flex items-center gap-2 text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                  <span>Mandatory Medical &amp; Health Disclaimer</span>
+                </div>
+                <p className="text-xs text-[#4B5563] dark:text-[#9EA8A2] leading-relaxed border-l-2 border-amber-500 pl-3 italic">
+                  “AROH is a fitness tracking and education tool, not a doctor, dietitian, or physiotherapist. Meal calorie estimates can be wrong. Workout and form tips are general guidance. If you are under 18, have an injury, or a medical condition, get a parent/guardian and a qualified professional involved before you train or change how you eat.”
+                </p>
+                <div className="flex items-start gap-2 pt-1">
+                  <input
+                    type="checkbox"
+                    id="onboarding-medical-consent-check"
+                    checked={agreedToMedicalDisclaimer}
+                    onChange={(e) => setAgreedToMedicalDisclaimer(e.target.checked)}
+                    className="w-4 h-4 mt-0.5 rounded text-[#0F6E5F] focus:ring-[#0F6E5F] accent-[#0F6E5F] cursor-pointer shrink-0"
+                  />
+                  <label htmlFor="onboarding-medical-consent-check" className="text-xs text-[#1A1D1B] dark:text-[#E8ECE9] cursor-pointer font-medium">
+                    I acknowledge and agree to this Medical Disclaimer, and accept the Terms of Service and Privacy Policy under the DPDP Act, 2023.
+                  </label>
                 </div>
               </div>
             </div>
@@ -1960,6 +2040,14 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               onClick={() => {
                 if (!name.trim()) {
                   alert('Please enter your full name to personalize your prediction roadmap.');
+                  return;
+                }
+                if (isAgeUnder18 && !parentGuardianConsent) {
+                  alert('Under the Digital Personal Data Protection Act, 2023 (DPDP Act), youth athletes under 18 require consent from a parent or legal guardian. Please have your parent or guardian check the consent box.');
+                  return;
+                }
+                if (!agreedToMedicalDisclaimer) {
+                  alert('Please acknowledge and agree to the Medical Disclaimer and Terms to proceed.');
                   return;
                 }
                 setStep(2);

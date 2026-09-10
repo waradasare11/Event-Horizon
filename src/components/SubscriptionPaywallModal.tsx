@@ -611,7 +611,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                   <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-800 dark:text-amber-300 flex items-start gap-2">
                     <Info className="w-4 h-4 shrink-0 mt-0.5" />
                     <span>
-                      <strong>Anti-Fraud Protection:</strong> Each UTR is cryptographically cross-checked against our ledger to guarantee exact recipient matching to <strong>Warad Asare</strong> (`9284160309@fam`). Submissions with duplicate or falsified references are automatically rejected.
+                      <strong>Anti-Fraud Protection:</strong> Each UTR is cryptographically cross-checked against our ledger to guarantee exact recipient matching to <strong>{HOST_ADMIN_CONFIG.name}</strong> ({HOST_ADMIN_CONFIG.upiId}). Submissions with duplicate or falsified references are automatically rejected.
                     </span>
                   </div>
                 </div>

@@ -11,6 +11,11 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
+// Immediate health check route for container & reverse proxy readiness probes
+app.get("/api/health", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
 // Middleware for parsing JSON with a generous limit for base64 image data
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
@@ -18,6 +23,9 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 // Rate limiting protection for API endpoints (Anti-DDoS & brute force defense)
 const requestLimits = new Map<string, { count: number; resetAt: number }>();
 app.use((req, res, next) => {
+  if (req.path === "/api/health") {
+    return next();
+  }
   if (req.path.startsWith("/api/")) {
     const isSensitive = req.path.startsWith("/api/host") || req.path.startsWith("/api/subscription");
     const limit = isSensitive ? 60 : 180;
@@ -1073,11 +1081,6 @@ function generateHighAccuracyFallbackAnalysis(userProfile?: any, customNotes?: s
 }
 
 const generateFallbackMealAnalysis = generateHighAccuracyFallbackAnalysis;
-
-// Health Check API
-app.get("/api/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
-});
 
 // 1. AI Meal Analysis from Photo (Multi-Angle Vision & High-Reasoning Consensus)
 app.post("/api/ai/analyze-meal", async (req, res) => {
@@ -4128,13 +4131,10 @@ Return ONLY a valid JSON object matching this schema:
 });
 
 // 14. Subscription Plans, Host Master PIN Security & Tamper-Proof Financial Gateway
-const HOST_SECRET_KEY = process.env.HOST_SECRET_KEY || "WARAD_ASARE_PEAKFORM_9284160309_FAM_SECRET";
-const HOST_VPA = "9284160309@fam";
-const HOST_NAME = "Warad Asare";
-const HOST_EMAIL = "waradasare11@gmail.com";
-
-// Configurable Host Security PIN (Default: 9284)
-let hostSecurityPin = process.env.HOST_SECURITY_PIN || "9284";
+const HOST_SECRET_KEY = process.env.HOST_SECRET_KEY || crypto.randomBytes(32).toString("hex");
+const HOST_VPA = process.env.HOST_UPI_VPA || "9284160309@fam";
+const HOST_NAME = process.env.HOST_NAME || "Warad Asare";
+const HOST_EMAIL = (process.env.HOST_EMAIL || "waradasare11@gmail.com").trim().toLowerCase();
 
 const BASE_OFFICIAL_PLANS = [
   {
@@ -4471,79 +4471,8 @@ let hostGrantedSubscriptions: HostGrantedSubscriptionRecord[] = initialHostData.
 let hostDiscountRules: HostDiscountRule[] = initialHostData.rules || [];
 let athleteLoginSessions: AthleteLoginRecord[] = loadPersistedAthleteLogins().length > 0
   ? loadPersistedAthleteLogins()
-  : (initialHostData.logins || [
-      {
-        id: "login_initial_host",
-        userId: "user_waradasare11",
-        email: "waradasare11@gmail.com",
-        name: "Warad Asare",
-        loginTimestamp: new Date().toISOString(),
-        lastActiveTimestamp: new Date().toISOString(),
-        sessionDurationMinutes: 45,
-        device: "Apple iPhone 15 Pro / iOS 17.5",
-        browser: "Mobile Safari 17.5",
-        os: "iOS 17.5",
-        screenResolution: "393x852",
-        timezone: "Asia/Kolkata",
-        ipMasked: "103.21.***.***",
-        sessionCount: 12,
-        age: 24,
-        sex: "male",
-        weightKg: 74.5,
-        heightCm: 178,
-        bmi: 23.5,
-        targetWeightKg: 78,
-        goal: "build_muscle",
-        dietType: "strict_vegetarian",
-        experienceLevel: "advanced",
-        dailyCalories: 2850,
-        dailyProtein: 165,
-        hydrationLiters: 3.5,
-        workoutStreakDays: 14,
-        totalWorkoutsLogged: 48,
-        isStrictVegetarian: true,
-        subscriptionPlan: "Host Lifetime Master VIP",
-        isLifetimeVIP: true,
-        subscriptionStatus: "active",
-        notes: "Host Creator & Master Athlete Account"
-      }
-    ]);
-let hostCouponCodes: HostCouponCodeRecord[] = initialHostData.coupons || [
-  {
-    id: "coupon_master_initial",
-    code: "WARADVIPFREE",
-    planId: "all_plans",
-    planName: "All Pro Plans (Full Lifetime VIP)",
-    durationDays: 36500,
-    durationMonths: 1200,
-    isLifetime: true,
-    maxRedemptions: 0,
-    timesRedeemed: 0,
-    redeemedByEmails: [],
-    expiresAt: "2030-12-31T23:59:59.000Z",
-    createdAt: new Date().toISOString(),
-    createdBy: "Warad Asare (Host Master)",
-    status: "active",
-    notes: "Host Official Universal VIP Free Lifetime Pass",
-  },
-  {
-    id: "coupon_1y_initial",
-    code: "PEAKFORM100",
-    planId: "1_year",
-    planName: "1 Year (12 Months Pro)",
-    durationDays: 365,
-    durationMonths: 12,
-    isLifetime: false,
-    maxRedemptions: 100,
-    timesRedeemed: 0,
-    redeemedByEmails: [],
-    expiresAt: "2028-12-31T23:59:59.000Z",
-    createdAt: new Date().toISOString(),
-    createdBy: "Warad Asare (Host Master)",
-    status: "active",
-    notes: "Host 1-Year Free Pro Access Coupon",
-  }
-];
+  : (initialHostData.logins || []);
+let hostCouponCodes: HostCouponCodeRecord[] = initialHostData.coupons || [];
 if (initialHostData.ledger && initialHostData.ledger.length > 0) {
   serverLedger = initialHostData.ledger;
 }
@@ -4573,33 +4502,81 @@ function computeTransactionHMAC(payload: string): string {
   return crypto.createHmac("sha256", HOST_SECRET_KEY).update(payload).digest("hex");
 }
 
-function verifyHostPin(inputPin?: string | null): boolean {
-  if (!inputPin) return false;
-  const cleanInput = String(inputPin).trim().toLowerCase();
-  const currentPinClean = String(hostSecurityPin || "9284").trim().toLowerCase();
-  
-  // Accept current configured PIN or any of the verified Host Master passcodes
-  const validPasscodes = [
-    currentPinClean,
-    "9284",
-    "warad",
-    "waradasare",
-    "waradasare11",
-    "peakform",
-    "admin",
-    "host",
-    "9284160309"
-  ];
+const PIN_SALT = process.env.HOST_PIN_SALT || "aroh_salt_v2";
 
-  for (const code of validPasscodes) {
-    if (cleanInput.length === code.length) {
-      if (crypto.timingSafeEqual(Buffer.from(cleanInput), Buffer.from(code))) {
-        return true;
-      }
-    }
+function hashPin(pin: string): string {
+  return crypto.createHmac("sha256", HOST_SECRET_KEY).update(`${pin}::${PIN_SALT}`).digest("hex");
+}
+
+let runtimeHashedPin: string | null = hashPin((process.env.HOST_SECURITY_PIN || "9284").trim());
+
+// In-memory rate limiting and lockout tracking for Host Security PIN
+// Enforces max 5 attempts per 15 minutes, with lockout upon 5 failed attempts
+interface PinAttemptTracker {
+  failures: number;
+  lockedUntil: number;
+  firstAttemptAt: number;
+}
+const pinAttemptMap = new Map<string, PinAttemptTracker>();
+
+function checkPinRateLimit(key: string): { allowed: boolean; remainingAttempts: number; retryAfterSeconds?: number } {
+  const now = Date.now();
+  const windowMs = 15 * 60 * 1000; // 15 minutes
+  const maxFailures = 5;
+
+  let record = pinAttemptMap.get(key);
+  if (!record || (now - record.firstAttemptAt > windowMs && now > record.lockedUntil)) {
+    record = { failures: 0, lockedUntil: 0, firstAttemptAt: now };
+    pinAttemptMap.set(key, record);
   }
 
-  return false;
+  if (record.lockedUntil > now) {
+    const retryAfter = Math.ceil((record.lockedUntil - now) / 1000);
+    return { allowed: false, remainingAttempts: 0, retryAfterSeconds: retryAfter };
+  }
+
+  return { allowed: true, remainingAttempts: Math.max(0, maxFailures - record.failures) };
+}
+
+function recordPinFailure(key: string): { locked: boolean; lockoutSeconds?: number } {
+  const now = Date.now();
+  const windowMs = 15 * 60 * 1000;
+  const maxFailures = 5;
+
+  let record = pinAttemptMap.get(key);
+  if (!record || (now - record.firstAttemptAt > windowMs && now > record.lockedUntil)) {
+    record = { failures: 1, lockedUntil: 0, firstAttemptAt: now };
+  } else {
+    record.failures += 1;
+  }
+
+  if (record.failures >= maxFailures) {
+    record.lockedUntil = now + windowMs;
+    pinAttemptMap.set(key, record);
+    return { locked: true, lockoutSeconds: 15 * 60 };
+  }
+
+  pinAttemptMap.set(key, record);
+  return { locked: false };
+}
+
+function recordPinSuccess(key: string): void {
+  pinAttemptMap.delete(key);
+}
+
+function verifyHostPin(inputPin?: string | null): boolean {
+  if (!inputPin) return false;
+  const targetHash = runtimeHashedPin || (process.env.HOST_SECURITY_PIN ? hashPin(process.env.HOST_SECURITY_PIN.trim()) : null);
+  if (!targetHash) {
+    console.warn("[Security Alert] HOST_SECURITY_PIN is not configured in server environment.");
+    return false;
+  }
+
+  const cleanInput = String(inputPin).trim();
+  const inputHash = hashPin(cleanInput);
+
+  if (inputHash.length !== targetHash.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(inputHash), Buffer.from(targetHash));
 }
 
 // Compute effective price for a user on a given plan
@@ -4824,99 +4801,11 @@ app.post("/api/subscription/verify-payment", async (req, res) => {
       });
     }
 
-    // Paid Plan Validation
-    if (!utrNumber) {
-      return res.status(400).json({
-        success: false,
-        error: "Missing 12-digit UPI Reference (UTR) number for paid activation.",
-      });
-    }
-
-    const isStandard12Digit = /^[0-9]{12}$/.test(cleanUtr);
-    if (!isStandard12Digit) {
-      return res.status(400).json({
-        success: false,
-        error: "Invalid UTR / UPI Reference Number. UPI Transaction IDs must be exactly 12 numeric digits (e.g. 423589012345) from your payment app.",
-      });
-    }
-
-    // Verify payment amount matches authorized discounted or regular price
-    if (Number(amountINR) !== pricing.priceINR) {
-      return res.status(400).json({
-        success: false,
-        error: `Amount mismatch: Expected ₹${pricing.priceINR} for ${matchedBasePlan.durationLabel}, but received ₹${amountINR}. Please pay the exact amount.`,
-      });
-    }
-
-    // Verify correct recipient
-    const targetVpa = (recipientVpa || "").toLowerCase().trim();
-    if (targetVpa && targetVpa !== HOST_VPA.toLowerCase()) {
-      return res.status(400).json({
-        success: false,
-        error: `Incorrect payee VPA. Payment must be made directly to Host: ${HOST_VPA} (${HOST_NAME}).`,
-      });
-    }
-
-    // Anti-replay check: ensure UTR hasn't already been used by another transaction
-    const existingTx = serverLedger.find((tx) => tx.utrNumber === cleanUtr && tx.status === "verified");
-    if (existingTx && existingTx.userId !== userId) {
-      return res.status(400).json({
-        success: false,
-        error: "This UPI Reference (UTR) has already been claimed and verified for another athlete profile. Duplicate submissions are rejected by anti-scam security.",
-      });
-    }
-
-    const now = new Date();
-    const expiryDate = new Date(now);
-    expiryDate.setDate(expiryDate.getDate() + matchedBasePlan.durationDays);
-
-    const payloadToSign = `${userId}::${planId}::${pricing.priceINR}::${cleanUtr}::${now.toISOString()}`;
-    const checksum = computeTransactionHMAC(payloadToSign);
-
-    const record: VerifiedTransactionLedger = {
-      id: `tx_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      userId,
-      userEmail: cleanEmail,
-      userName: userName || "AROH Athlete",
-      planId: matchedBasePlan.id,
-      planName: matchedBasePlan.durationLabel,
-      durationMonths: matchedBasePlan.durationMonths,
-      durationDays: matchedBasePlan.durationDays,
-      amountINR: pricing.priceINR,
-      utrNumber: cleanUtr,
-      recipientVpa: HOST_VPA,
-      status: "verified",
-      verifiedAt: now.toISOString(),
-      checksum,
-    };
-
-    serverLedger.push(record);
-
-    recordAuditLog(
-      "payment_verified",
-      `Verified payment of ₹${pricing.priceINR} (UTR: ${cleanUtr}) for ${cleanEmail} (${matchedBasePlan.durationLabel}).`,
-      cleanEmail,
-      matchedBasePlan.id,
-      pricing.priceINR,
-      { utrNumber: cleanUtr, durationMonths: matchedBasePlan.durationMonths }
-    );
-
-    return res.json({
-      success: true,
-      message: "Payment successfully verified against Host UPI Ledger!",
-      transaction: record,
-      subscription: {
-        status: "active",
-        planId: matchedBasePlan.id,
-        planName: matchedBasePlan.durationLabel,
-        amountINR: pricing.priceINR,
-        utrNumber: cleanUtr,
-        paymentDate: now.toISOString(),
-        subscriptionEndDate: expiryDate.toISOString(),
-        durationMonths: matchedBasePlan.durationMonths,
-        isVerified: true,
-        checksum,
-      },
+    // Paid Plan Security: Direct manual UTR submission is disabled.
+    // Payments are securely processed through Razorpay with cryptographic webhook/signature verification.
+    return res.status(400).json({
+      success: false,
+      error: "Direct UTR entry is disabled for financial security. Please use the secure online payment checkout (Razorpay). Until live gateway activation, paid plans are Coming Soon! You can enjoy the 1-Week Free Trial.",
     });
   } catch (error: any) {
     console.error("Error verifying payment transaction:", error);
@@ -4928,19 +4817,258 @@ app.post("/api/subscription/verify-payment", async (req, res) => {
   }
 });
 
+// 14.2.1 Razorpay Payment Gateway Integration
+app.get("/api/payment/razorpay/config", (req, res) => {
+  const keyId = process.env.RAZORPAY_KEY_ID || "";
+  const keySecret = process.env.RAZORPAY_KEY_SECRET || "";
+  const isLive = Boolean(keyId && keySecret && keyId.trim().length > 4 && keySecret.trim().length > 4);
+
+  return res.json({
+    isLive,
+    keyId: isLive ? keyId : null,
+    currency: "INR",
+  });
+});
+
+app.post("/api/payment/razorpay/create-order", async (req, res) => {
+  try {
+    const { planId, userId, userEmail, userName } = req.body;
+    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!keyId || !keySecret) {
+      return res.status(503).json({
+        success: false,
+        error: "Razorpay payment gateway is currently in setup. Paid plans are Coming Soon! Please enjoy your 1-Week Free Trial.",
+      });
+    }
+
+    const matchedPlan = resolveBasePlan(planId);
+    if (!matchedPlan || matchedPlan.priceINR <= 0) {
+      return res.status(400).json({ success: false, error: "Invalid plan or free plan cannot be purchased via gateway." });
+    }
+
+    const cleanEmail = String(userEmail || "").trim().toLowerCase();
+    const pricing = calculateEffectivePlanPrice(matchedPlan, cleanEmail);
+    if (pricing.isFree) {
+      return res.status(400).json({ success: false, error: "This plan is already free for your account." });
+    }
+
+    const amountPaise = pricing.priceINR * 100;
+    const receipt = `rcpt_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+
+    const authHeader = "Basic " + Buffer.from(`${keyId}:${keySecret}`).toString("base64");
+    const response = await fetch("https://api.razorpay.com/v1/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: authHeader,
+      },
+      body: JSON.stringify({
+        amount: amountPaise,
+        currency: "INR",
+        receipt,
+        notes: {
+          planId: matchedPlan.id,
+          userId: userId || "",
+          userEmail: cleanEmail,
+          userName: userName || "AROH Athlete",
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error("[Razorpay] Order creation failed:", errBody);
+      return res.status(502).json({ success: false, error: "Failed to create payment order with Razorpay." });
+    }
+
+    const orderData = (await response.json()) as any;
+    return res.json({
+      success: true,
+      orderId: orderData.id,
+      amount: orderData.amount,
+      currency: orderData.currency,
+      keyId,
+      planName: matchedPlan.durationLabel,
+    });
+  } catch (error: any) {
+    console.error("[Razorpay] Create order exception:", error);
+    return res.status(500).json({ success: false, error: "Internal server error initializing payment order." });
+  }
+});
+
+app.post("/api/payment/razorpay/verify", async (req, res) => {
+  try {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, planId, userId, userEmail, userName } = req.body;
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+
+    if (!keySecret) {
+      return res.status(503).json({ success: false, error: "Payment gateway credentials not configured on server." });
+    }
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({ success: false, error: "Missing required Razorpay payment verification fields." });
+    }
+
+    // Cryptographic signature verification: HMAC-SHA256(order_id + "|" + payment_id, secret)
+    const payload = `${razorpay_order_id}|${razorpay_payment_id}`;
+    const expectedSignature = crypto.createHmac("sha256", keySecret).update(payload).digest("hex");
+
+    if (razorpay_signature.length !== expectedSignature.length || !crypto.timingSafeEqual(Buffer.from(razorpay_signature), Buffer.from(expectedSignature))) {
+      console.warn(`[Razorpay] Invalid payment signature for order ${razorpay_order_id}`);
+      return res.status(400).json({ success: false, error: "Payment verification failed: cryptographic signature mismatch." });
+    }
+
+    const matchedPlan = resolveBasePlan(planId);
+    if (!matchedPlan) {
+      return res.status(400).json({ success: false, error: "Invalid subscription plan specified." });
+    }
+
+    const cleanEmail = String(userEmail || "").trim().toLowerCase();
+    const pricing = calculateEffectivePlanPrice(matchedPlan, cleanEmail);
+
+    const now = new Date();
+    const expiryDate = new Date(now);
+    expiryDate.setDate(expiryDate.getDate() + matchedPlan.durationDays);
+
+    const checksum = computeTransactionHMAC(`${userId}::${planId}::${pricing.priceINR}::${razorpay_payment_id}::${now.toISOString()}`);
+
+    const record: VerifiedTransactionLedger = {
+      id: `tx_rzp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      userId: userId || `user_${cleanEmail}`,
+      userEmail: cleanEmail,
+      userName: userName || "AROH Athlete",
+      planId: matchedPlan.id,
+      planName: matchedPlan.durationLabel,
+      durationMonths: matchedPlan.durationMonths,
+      durationDays: matchedPlan.durationDays,
+      amountINR: pricing.priceINR,
+      utrNumber: razorpay_payment_id,
+      recipientVpa: "RAZORPAY_GATEWAY",
+      status: "verified",
+      verifiedAt: now.toISOString(),
+      checksum,
+    };
+
+    serverLedger.push(record);
+    savePersistedHostData();
+
+    recordAuditLog(
+      "payment_verified",
+      `Verified Razorpay payment of ₹${pricing.priceINR} (Payment ID: ${razorpay_payment_id}) for ${cleanEmail} (${matchedPlan.durationLabel}).`,
+      cleanEmail,
+      matchedPlan.id,
+      pricing.priceINR,
+      { paymentId: razorpay_payment_id, orderId: razorpay_order_id, durationMonths: matchedPlan.durationMonths }
+    );
+
+    return res.json({
+      success: true,
+      message: "Payment successfully verified and subscription activated!",
+      transaction: record,
+      subscription: {
+        status: "active",
+        planId: matchedPlan.id,
+        planName: matchedPlan.durationLabel,
+        amountINR: pricing.priceINR,
+        utrNumber: razorpay_payment_id,
+        paymentDate: now.toISOString(),
+        subscriptionEndDate: expiryDate.toISOString(),
+        durationMonths: matchedPlan.durationMonths,
+        isVerified: true,
+        checksum,
+      },
+    });
+  } catch (error: any) {
+    console.error("[Razorpay] Verification error:", error);
+    return res.status(500).json({ success: false, error: "Internal payment verification error." });
+  }
+});
+
+app.post("/api/payment/razorpay/webhook", (req, res) => {
+  const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    return res.status(200).send("OK");
+  }
+
+  const signature = req.headers["x-razorpay-signature"] as string;
+  if (!signature) {
+    return res.status(400).send("Missing signature header");
+  }
+
+  try {
+    const rawBody = JSON.stringify(req.body);
+    const expectedSignature = crypto.createHmac("sha256", webhookSecret).update(rawBody).digest("hex");
+    if (signature.length !== expectedSignature.length || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
+      return res.status(400).send("Invalid webhook signature");
+    }
+
+    const event = req.body.event;
+    console.log(`[Razorpay Webhook] Verified event: ${event}`);
+
+    if (event === "payment.captured" || event === "order.paid") {
+      const payment = req.body.payload?.payment?.entity;
+      if (payment) {
+        recordAuditLog(
+          "payment_verified",
+          `Razorpay Webhook captured payment ₹${(payment.amount || 0) / 100} for ${payment.email || "athlete"} (ID: ${payment.id}).`,
+          payment.email || "webhook",
+          payment.notes?.planId || "pro_plan",
+          (payment.amount || 0) / 100,
+          { paymentId: payment.id, method: payment.method }
+        );
+      }
+    }
+
+    return res.status(200).json({ status: "ok" });
+  } catch (err) {
+    console.error("[Razorpay Webhook] Processing error:", err);
+    return res.status(500).send("Webhook error");
+  }
+});
+
 // 14.3 Host Admin Security PIN Authentication & Updates
 app.post("/api/host/verify-pin", (req, res) => {
   const { pin, email } = req.body;
-  const cleanEmail = String(email || "").trim().toLowerCase();
+  const clientIp = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown-client";
+  const rateLimitKey = `${clientIp}:${String(email || "host").toLowerCase().trim()}`;
 
-  if (cleanEmail !== HOST_EMAIL.toLowerCase()) {
+  const rateCheck = checkPinRateLimit(rateLimitKey);
+  if (!rateCheck.allowed) {
+    return res.status(429).json({
+      success: false,
+      error: `Too many failed PIN attempts. Account locked for security. Please try again in ${Math.ceil((rateCheck.retryAfterSeconds || 60) / 60)} minutes.`,
+      retryAfterSeconds: rateCheck.retryAfterSeconds,
+      locked: true,
+    });
+  }
+
+  const cleanEmail = String(email || "").trim().toLowerCase();
+  if (HOST_EMAIL && cleanEmail && cleanEmail !== HOST_EMAIL) {
+    recordPinFailure(rateLimitKey);
     return res.status(403).json({ success: false, error: "Unauthorized. Host email required." });
   }
 
   if (!verifyHostPin(pin)) {
-    return res.status(401).json({ success: false, error: "Invalid Host Security PIN." });
+    const failureResult = recordPinFailure(rateLimitKey);
+    if (failureResult.locked) {
+      return res.status(429).json({
+        success: false,
+        error: "Maximum failed PIN attempts reached (5/5). Account locked for 15 minutes.",
+        locked: true,
+        retryAfterSeconds: failureResult.lockoutSeconds,
+      });
+    }
+    const attemptsLeft = checkPinRateLimit(rateLimitKey).remainingAttempts;
+    return res.status(401).json({
+      success: false,
+      error: `Invalid Host Security PIN. ${attemptsLeft} attempt(s) remaining before 15-minute lockout.`,
+      remainingAttempts: attemptsLeft,
+    });
   }
 
+  recordPinSuccess(rateLimitKey);
   return res.json({ success: true, message: "Host Security PIN verified successfully." });
 });
 
@@ -4948,7 +5076,7 @@ app.post("/api/host/update-pin", (req, res) => {
   const { currentPin, newPin, email } = req.body;
   const cleanEmail = String(email || "").trim().toLowerCase();
 
-  if (cleanEmail !== HOST_EMAIL.toLowerCase()) {
+  if (HOST_EMAIL && cleanEmail !== HOST_EMAIL) {
     return res.status(403).json({ success: false, error: "Unauthorized. Host email required." });
   }
 
@@ -4960,8 +5088,8 @@ app.post("/api/host/update-pin", (req, res) => {
     return res.status(400).json({ success: false, error: "New Security PIN must be at least 4 characters." });
   }
 
-  hostSecurityPin = String(newPin).trim();
-  recordAuditLog("pin_updated", "Host Admin successfully updated the Security PIN.", HOST_EMAIL);
+  runtimeHashedPin = hashPin(String(newPin).trim());
+  recordAuditLog("pin_updated", "Host Admin successfully updated the Security PIN in active runtime session.", HOST_EMAIL || "host-admin");
 
   return res.json({ success: true, message: "Host Security PIN updated successfully." });
 });
@@ -6025,7 +6153,7 @@ app.post("/api/host/clear-athlete-logins", (req, res) => {
   athleteLoginSessions = [];
   savePersistedHostData();
 
-  recordAuditLog("ledger_cleared", `Host Warad Asare cleared historical athlete login telemetry (${prevCount} records purged).`, HOST_EMAIL);
+  recordAuditLog("ledger_cleared", `Host ${HOST_NAME} cleared historical athlete login telemetry (${prevCount} records purged).`, HOST_EMAIL);
 
   return res.json({
     success: true,
@@ -6684,6 +6812,7 @@ async function startServer() {
     }
 
     const server = app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
       console.log(`AROH Server running on port ${PORT}`);
     });
 

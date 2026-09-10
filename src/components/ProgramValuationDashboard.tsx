@@ -179,7 +179,7 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
             ₹{valuation.verifiedCashCollectedINR.toLocaleString('en-IN')}
           </div>
           <div className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center justify-between pt-1 border-t border-blue-500/20">
-            <span>Host VPA: 9284160309@fam</span>
+            <span>Settlement: Direct Gateway</span>
             <span className="font-bold text-blue-600">100% Cryptographic</span>
           </div>
         </div>

@@ -182,32 +182,45 @@ service cloud.firestore {
       allow read: if isSignedIn();
     }
 
-    // Host Granted Subscriptions & Ledger Collections (Accessible for grant checks & host management)
+    // Sensitive Administrative, Subscription, & Financial Collections (Server-only / Host-restricted; Deny client reads & writes)
     match /hostGrantedSubscriptions/{grantId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     match /host_ledger/{ledgerId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     // Global Subscription Audit Logs
     match /subscriptionAuditLogs/{logId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     // Athlete Login Sessions & Telemetry for Host Ledger
     match /athlete_logins/{loginId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     match /athleteLogins/{loginId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
     // Registered Athletes Directory for Host Ledger
     match /all_registered_athletes/{athleteId} {
-      allow read, write: if true;
+      allow read, write: if false;
+    }
+
+    // Legacy or auxiliary grant/coupon collections
+    match /grants/{grantId} {
+      allow read, write: if false;
+    }
+
+    match /persistent_host_grants/{grantId} {
+      allow read, write: if false;
+    }
+
+    match /host_coupons/{couponId} {
+      allow read, write: if false;
     }
 
     // Connection Health Verification
