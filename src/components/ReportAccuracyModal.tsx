@@ -163,7 +163,7 @@ export const ReportAccuracyModal: React.FC<ReportAccuracyModalProps> = ({
                   <span>Model Consensus:</span>
                   <span className="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    {modelConsensusRating} ({confidenceScoreAtScan}% Certainty)
+                    {modelConsensusRating || 'AI Estimate'}
                   </span>
                 </div>
               </div>

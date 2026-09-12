@@ -484,11 +484,9 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
           )}
 
           <div className="space-y-3">
-            {items.map((item, idx) => {
-              const itemConfidence = item.confidenceScorePct || (item.modelAgreementCount ? Math.min(99, 88 + item.modelAgreementCount * 3) : 96);
-              return (
-                <div
-                  key={idx}
+            {items.map((item, idx) => (
+              <div
+                key={idx}
                   className="flex flex-col p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] hover:border-[#0F6E5F]/50 transition-all text-sm gap-3"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -597,8 +595,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                     </div>
                   )}
                 </div>
-              );
-            })}
+              ))}
           </div>
         </div>
 

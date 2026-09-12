@@ -206,6 +206,20 @@ export interface FoodItemBreakdown {
   carbsG: number;
   fatG: number;
   fiberG?: number;
+  sugarsG?: number | null;
+  sodiumMg?: number | null;
+  potassiumMg?: number | null;
+  calciumMg?: number | null;
+  ironMg?: number | null;
+  magnesiumMg?: number | null;
+  zincMg?: number | null;
+  vitaminA_ug?: number | null;
+  vitaminC_mg?: number | null;
+  vitaminD_ug?: number | null;
+  vitaminB12_ug?: number | null;
+  folate_ug?: number | null;
+  cookingMethod?: string;
+  visibleOilSheen?: 'none' | 'light' | 'heavy' | string;
   caloriesPerGram?: number;
   proteinPerGram?: number;
   carbsPerGram?: number;
@@ -216,21 +230,24 @@ export interface FoodItemBreakdown {
   hindiName?: string;
   preparationStyle?: string;
   confidenceScorePct?: number; // 0-100% item certainty
-  modelAgreementCount?: number; // e.g. 3 of 3 models agreed
+  modelAgreementCount?: number;
   verifiedByDatabase?: boolean; // Cross-referenced against USDA/IFCT
-  verifiedDatabaseName?: string; // 'USDA FoodData Central' | 'ICMR-IFCT'
+  verifiedDatabaseName?: 'ICMR-IFCT' | 'USDA FoodData Central' | string | null;
+  source?: 'database' | 'ai_estimate';
+  certainty?: number; // 0-1 from vision
+  dietaryPreferenceViolation?: string;
 }
 
 export type MealItem = FoodItemBreakdown;
 
 export interface ModelConsensusBreakdown {
   overallConsensusScore: number; // 0-100%
-  consensusRating: 'Exceptional (98%+)' | 'High (90-97%)' | 'Solid (80-89%)' | 'Re-Evaluated';
-  modelsQueried: string[];
+  consensusRating?: 'High Confidence (~80-90%)' | 'Moderate Estimate (~60-79%)' | 'Needs User Verification (<60%)' | string;
+  modelsQueried?: string[];
   volumetricModelSummary?: string;
   culinaryModelSummary?: string;
   macroValidatorSummary?: string;
-  consensusVoteRatio?: string; // e.g. "3/3 Models in Full Agreement"
+  consensusVoteRatio?: string;
   verifiedAgainstDatabase?: boolean;
   historicalVerificationDate?: string;
 }
@@ -293,7 +310,7 @@ export interface IndianCuisineIntelligenceData {
 
 export interface AIAnalysisResult {
   mealTitle: string;
-  confidence: 'High' | 'Medium' | 'Moderate';
+  confidence: 'High' | 'Medium' | 'Moderate' | 'Low' | string;
   summaryDescription: string;
   totalCalories: number;
   totalProteinG: number;
@@ -311,6 +328,12 @@ export interface AIAnalysisResult {
   goalImprovementTips: string[];
   smartSwaps: SmartSwap[];
   scientificTakeaway: string;
+  isEstimate?: boolean; // Always true for photo scans
+  confidencePct?: number; // Real confidence 0-90 cap, never hardcoded
+  requiresRefinedScan?: boolean;
+  scanFailed?: boolean;
+  dietaryPreferenceViolation?: string;
+  refinedScanPrompt?: string;
   modelConsensus?: ModelConsensusBreakdown;
   consensusScore?: number; // 0-100%
   historicalScanStatus?: 'verified' | 'needs_review' | 'batch_corrected';
