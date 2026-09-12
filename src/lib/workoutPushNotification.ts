@@ -6,8 +6,10 @@
 
 import { UserProfile, WorkoutCompletionLog, WorkoutProgram } from '../types';
 
-const STORAGE_KEY_LAST_REMINDER = 'peakform_last_6pm_reminder_date';
-const STORAGE_KEY_NOTIF_PREFS = 'peakform_workout_push_notif_prefs';
+const STORAGE_KEY_LAST_REMINDER = 'aroh_last_6pm_reminder_date';
+const LEGACY_STORAGE_KEY_LAST_REMINDER = 'peakform_last_6pm_reminder_date';
+const STORAGE_KEY_NOTIF_PREFS = 'aroh_workout_push_notif_prefs';
+const LEGACY_STORAGE_KEY_NOTIF_PREFS = 'peakform_workout_push_notif_prefs';
 
 export interface PushNotificationPrefs {
   enabled: boolean;
@@ -18,7 +20,18 @@ export interface PushNotificationPrefs {
 
 export function getStoredPushNotificationPrefs(): PushNotificationPrefs {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY_NOTIF_PREFS);
+    let raw = localStorage.getItem(STORAGE_KEY_NOTIF_PREFS);
+    if (!raw) {
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY_NOTIF_PREFS);
+      if (legacy) {
+        raw = legacy;
+        try {
+          localStorage.setItem(STORAGE_KEY_NOTIF_PREFS, legacy);
+        } catch {
+          // ignore
+        }
+      }
+    }
     if (raw) return JSON.parse(raw);
   } catch (e) {
     // ignore
@@ -95,7 +108,7 @@ export function checkAndTrigger6PMWorkoutReminder(params: {
   const todayDayName = dayNamesShort[now.getDay()];
 
   // Check if reminder was already delivered today
-  const lastReminderDate = localStorage.getItem(STORAGE_KEY_LAST_REMINDER);
+  const lastReminderDate = localStorage.getItem(STORAGE_KEY_LAST_REMINDER) || localStorage.getItem(LEGACY_STORAGE_KEY_LAST_REMINDER);
   if (lastReminderDate === todayStr && !params.forceTest) {
     return { triggered: false, reason: 'Reminder already delivered today' };
   }

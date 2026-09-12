@@ -58,15 +58,14 @@ import {
   predictGoalTimelineAPI, 
   fetchPersonalizedPlans, 
   isHostAdmin, 
-  HOST_ADMIN_CONFIG,
-  generateUPILink,
-  getUPIQRCodeUrl,
-  validateUTRNumber,
-  verifyPaymentWithBackendServer,
   createInitialTrialSubscription,
   checkUserHostGrant,
   createGrantedUserSubscription,
-  createHostLifetimeSubscription
+  createHostLifetimeSubscription,
+  getRazorpayConfig,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+  RazorpayConfig
 } from '../lib/subscription';
 import { HostGrantedSubscription } from '../types';
 import { fireCelebrationConfetti } from '../lib/confetti';
@@ -114,7 +113,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const isAgeUnder18 = Number(age) > 0 && Number(age) < 18;
   const [parentGuardianConsent, setParentGuardianConsent] = useState(Boolean(userProfile.parentGuardianConsent));
   const [parentGuardianName, setParentGuardianName] = useState(userProfile.parentGuardianName || '');
-  const [agreedToMedicalDisclaimer, setAgreedToMedicalDisclaimer] = useState(userProfile.agreedToMedicalDisclaimer ?? true);
+  const [agreedToMedicalDisclaimer, setAgreedToMedicalDisclaimer] = useState(Boolean(userProfile.agreedToMedicalDisclaimer));
 
 
   // Step 2: Lifestyle, NEAT, Circadian & Recovery (AI Driven Targets)
@@ -260,7 +259,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const [plans, setPlans] = useState<SubscriptionPlanConfig[]>([]);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanConfig | null>(null);
   const [showDirectPayment, setShowDirectPayment] = useState<boolean>(false);
-  const [utrInput, setUtrInput] = useState<string>('');
+  const [razorpayConfig, setRazorpayConfig] = useState<RazorpayConfig>({ isLive: false, keyId: null });
   const [isVerifyingPayment, setIsVerifyingPayment] = useState<boolean>(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentSuccess, setPaymentSuccess] = useState<boolean>(false);
@@ -269,6 +268,10 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   const isUserHost = isHostAdmin(userProfile.email);
 
   useEffect(() => {
+    getRazorpayConfig().then(setRazorpayConfig).catch(() => {
+      setRazorpayConfig({ isLive: false, keyId: null });
+    });
+
     if (userProfile.email) {
       checkUserHostGrant(userProfile.email).then(({ hasGrant, grant }) => {
         if (hasGrant && grant) {
@@ -608,6 +611,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
   };
 
   const handleApplyProfileAndFinish = (chosenSubscription?: UserSubscription) => {
+    if (!agreedToMedicalDisclaimer) {
+      alert('Please check the box confirming you understand and agree to the Medical Disclaimer before finishing.');
+      return;
+    }
+
     const finalDate = predictionResult?.predictedCompletionDate || mathTimeline.projectedDate;
 
     const updatedProfile: UserProfile = {
@@ -676,39 +684,99 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
     onClose();
   };
 
-  const handleVerifyPaidPlan = async () => {
+  const handleRazorpayCheckout = async () => {
     if (!selectedPlan) return;
-    setPaymentError(null);
-    setIsVerifyingPayment(true);
-
-    const validation = validateUTRNumber(utrInput);
-    if (!validation.isValid) {
-      setPaymentError(validation.error || 'Invalid 12-digit UTR reference ID.');
-      setIsVerifyingPayment(false);
+    if (!razorpayConfig.isLive || !razorpayConfig.keyId) {
+      const trialSub = createInitialTrialSubscription();
+      handleApplyProfileAndFinish(trialSub);
       return;
     }
 
+    setPaymentError(null);
+    setIsVerifyingPayment(true);
+
     try {
-      const res = await verifyPaymentWithBackendServer(
-        userProfile,
-        selectedPlan,
-        utrInput
+      const orderData = await createRazorpayOrder(
+        selectedPlan.id,
+        userProfile.email || '',
+        userProfile.name || name || 'AROH Athlete'
       );
 
-      if (!res.success || !res.subscription) {
-        setPaymentError(res.error || 'Verification failed. Please double check UTR.');
+      if (!orderData.success || !orderData.order) {
+        setPaymentError(orderData.error || 'Unable to initiate payment.');
         setIsVerifyingPayment(false);
         return;
       }
 
-      setPaymentSuccess(true);
-      setIsVerifyingPayment(false);
-      fireCelebrationConfetti();
-      setTimeout(() => {
-        handleApplyProfileAndFinish(res.subscription);
-      }, 1500);
+      const loadScript = () => {
+        return new Promise<boolean>((resolve) => {
+          if ((window as any).Razorpay) return resolve(true);
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.body.appendChild(script);
+        });
+      };
+
+      const scriptLoaded = await loadScript();
+      if (!scriptLoaded) {
+        setPaymentError('Unable to load payment gateway SDK.');
+        setIsVerifyingPayment(false);
+        return;
+      }
+
+      const options = {
+        key: razorpayConfig.keyId,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: 'AROH Pro',
+        description: `${selectedPlan.name} (${selectedPlan.durationLabel})`,
+        order_id: orderData.order.id,
+        prefill: {
+          name: userProfile.name || name || '',
+          email: userProfile.email || '',
+        },
+        theme: {
+          color: '#0F6E5F',
+        },
+        handler: async (response: any) => {
+          try {
+            const verifyRes = await verifyRazorpayPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              planId: selectedPlan.id,
+              userEmail: userProfile.email || '',
+              userName: userProfile.name || name || '',
+            });
+
+            if (verifyRes.success && verifyRes.subscription) {
+              setPaymentSuccess(true);
+              fireCelebrationConfetti();
+              setTimeout(() => {
+                handleApplyProfileAndFinish(verifyRes.subscription);
+              }, 1000);
+            } else {
+              setPaymentError(verifyRes.error || 'Payment signature verification failed.');
+            }
+          } catch (e: any) {
+            setPaymentError(e.message || 'Payment verification failed.');
+          } finally {
+            setIsVerifyingPayment(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setIsVerifyingPayment(false);
+          },
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
     } catch (e: any) {
-      setPaymentError(e.message || 'Payment verification failed');
+      setPaymentError(e.message || 'Payment initiation error.');
       setIsVerifyingPayment(false);
     }
   };
@@ -754,7 +822,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   Let's Build Your Athlete Profile
                 </h2>
                 <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1">
-                  We calculate your metabolic rate, lean tissue preservation threshold, and the 100% exact date you will reach your physique milestone.
+                  We calculate your metabolic rate, lean tissue preservation threshold, and the estimated timeline to reach your physique milestone.
                 </p>
               </div>
 
@@ -781,7 +849,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   {[
-                    { id: 'lose_fat', label: 'Lose Fat', desc: 'Targeted adipose loss while preserving 100% muscle mass' },
+                    { id: 'lose_fat', label: 'Lose Fat', desc: 'Targeted adipose loss while preserving lean muscle mass' },
                     { id: 'build_muscle', label: 'Build Muscle', desc: 'Maximized myofibrillar hypertrophy with lean surplus' },
                     { id: 'recomp', label: 'Recomposition', desc: 'Burn stubborn fat and build lean muscle concurrently' },
                   ].map((item) => (
@@ -994,7 +1062,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     {isTimelineFeasible ? <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" /> : <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500" />}
                     <span>
                       {isTimelineFeasible
-                        ? `Required pace: ${reqWeeklyRate} kg/week (100% biologically safe & achievable)`
+                        ? `Required pace: ${reqWeeklyRate} kg/week (biologically safe & achievable pace)`
                         : `Required pace: ${reqWeeklyRate} kg/week (Timeline is aggressive — AI will evaluate feasibility in Step 5)`}
                     </span>
                   </div>
@@ -1055,7 +1123,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   Lifestyle & Energy Kinetics
                 </h2>
                 <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1">
-                  We analyze your daily movement, desk habits, sleep quality, and stress to calculate your 100% exact prescribed step and hydration targets.
+                  We analyze your daily movement, desk habits, sleep quality, and stress to calculate your personalized step and hydration targets.
                 </p>
               </div>
 
@@ -1175,7 +1243,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       </span>
                     </div>
                     <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[10px] font-extrabold uppercase">
-                      {precisionStepData?.confidenceScore ? `${precisionStepData.confidenceScore}% Accurate` : 'Calculated'}
+                      Personalized Target
                     </span>
                   </div>
 
@@ -1250,7 +1318,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   {[
                     {
                       id: 'achievable',
-                      label: `✓ Yes, 100% achievable — I commit to this target (AI Recommended for Fastest Progress)`,
+                      label: `✓ Yes, achievable — I commit to this target (Recommended for Steady Progress)`,
                       desc: `Directly drives ${aiStepsData.kcalBurn} kcal daily NEAT expenditure to hit your goal on schedule.`,
                     },
                     {
@@ -1623,7 +1691,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             </div>
           )}
 
-          {/* STEP 5: 100% Accurate AI Goal Prediction & Feasibility Verdict */}
+          {/* STEP 5: Evidence-Informed Goal Prediction & Feasibility Verdict */}
           {step === 5 && (
             <div className="space-y-5">
               {isPredicting ? (
@@ -1636,7 +1704,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       Analyzing Biological Feasibility with Deep AI...
                     </h3>
                     <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] max-w-md mx-auto">
-                      Running Hall metabolic models, hormonal adaptation limits, and Schoenfeld hypertrophy guidelines for 100000% precision.
+                      Running Hall metabolic models, hormonal adaptation limits, and Schoenfeld hypertrophy guidelines for calibrated projections.
                     </p>
                   </div>
                 </div>
@@ -1655,7 +1723,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                             ? 'bg-emerald-600 text-white'
                             : 'bg-amber-600 text-white'
                         }`}>
-                          {isTimelineFeasible ? '✓ 100% FEASIBLE & BIOLOGICALLY REALISTIC' : '⚠️ TIMELINE TOO AGGRESSIVE / BIOLOGICALLY UNSAFE'}
+                          {isTimelineFeasible ? '✓ FEASIBLE & BIOLOGICALLY REALISTIC' : '⚠️ TIMELINE TOO AGGRESSIVE / BIOLOGICALLY UNSAFE'}
                         </span>
                       </div>
                       <span className="text-xs font-mono font-extrabold text-gray-700 dark:text-gray-300">
@@ -1666,7 +1734,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     <div className="space-y-1.5 text-xs">
                       {isTimelineFeasible ? (
                         <p className="leading-relaxed font-medium">
-                          Based on your current weight of <strong>{numWeight} kg</strong>, target of <strong>{numTargetWeight} kg</strong>, and daily expenditure of <strong>{calculatedTDEE} kcal</strong>, achieving this goal in <strong>{weeksAvailable} weeks</strong> requires a safe weekly change rate of <strong>{reqWeeklyRate} kg/week</strong>. This is 100% within human physiological boundaries, preserving 100% of your lean muscle tissue with zero hormonal crash.
+                          Based on your current weight of <strong>{numWeight} kg</strong>, target of <strong>{numTargetWeight} kg</strong>, and daily expenditure of <strong>{calculatedTDEE} kcal</strong>, achieving this goal in <strong>{weeksAvailable} weeks</strong> requires a safe weekly change rate of <strong>{reqWeeklyRate} kg/week</strong>. This is well within human physiological boundaries, preserving lean muscle tissue with healthy hormonal function.
                         </p>
                       ) : (
                         <div className="space-y-2">
@@ -1721,7 +1789,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         <div className="text-base font-black text-[#0F6E5F] dark:text-[#2DD4BF] mt-0.5">
                           {macroResults.proteinG} <span className="text-xs font-normal">g</span>
                         </div>
-                        <div className="text-[9px] text-gray-400 mt-0.5">100% Muscle Retention</div>
+                        <div className="text-[9px] text-gray-400 mt-0.5">High Muscle Retention</div>
                       </div>
 
                       <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
@@ -1775,6 +1843,28 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           {/* STEP 6: Plan Selection or 1-Week Free Trial Choice */}
           {step === 6 && (
             <div className="space-y-6">
+              {/* Short Medical Disclaimer Checkbox on Onboarding Submit */}
+              <div className="p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 space-y-2.5">
+                <div className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-200">
+                  <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+                  <span>Medical Disclaimer &amp; Personal Responsibility</span>
+                </div>
+                <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed italic border-l-2 border-amber-500 pl-3">
+                  “AROH is a fitness tracking and education tool, not a doctor, dietitian, or physiotherapist. Meal calorie estimates can be wrong. Workout and form tips are general guidance. If you are under 18, have an injury, or a medical condition, get a parent/guardian and a qualified professional involved before you train or change how you eat.”
+                </p>
+                <label className="flex items-start gap-2.5 pt-1 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    id="onboarding-submit-medical-check"
+                    checked={agreedToMedicalDisclaimer}
+                    onChange={(e) => setAgreedToMedicalDisclaimer(e.target.checked)}
+                    className="w-4 h-4 mt-0.5 rounded text-[#0F6E5F] focus:ring-[#0F6E5F] accent-[#0F6E5F] cursor-pointer shrink-0"
+                  />
+                  <span className="text-xs font-bold text-gray-900 dark:text-white">
+                    I understand that AROH provides general fitness and nutrition information, not medical advice, and agree to the Medical Disclaimer.
+                  </span>
+                </label>
+              </div>
               {isUserHost ? (
                 /* HOST PRIVILEGE BANNER */
                 <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#1A1D1B] via-[#0F6E5F] to-[#083D34] text-white space-y-4 text-center">
@@ -1786,10 +1876,10 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       Verified Host Administrator
                     </span>
                     <h3 className="text-2xl sm:text-3xl font-black">
-                      Welcome, Warad Asare!
+                      Welcome, Host Administrator!
                     </h3>
                     <p className="text-xs sm:text-sm text-emerald-100/90 max-w-md mx-auto">
-                      As the creator and host of AROH, you have <strong>Permanent 100% Lifetime Access</strong>. You are never asked to select a payment plan.
+                      As the administrator of AROH, you have <strong>Permanent 100% Lifetime Access</strong>. You are never asked to select a payment plan.
                     </p>
                   </div>
 
@@ -1815,7 +1905,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       Welcome, AROH VIP Member!
                     </h3>
                     <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 max-w-md mx-auto leading-relaxed">
-                      Host <strong>Warad Asare</strong> has granted your Gmail ID (<strong>{userProfile.email}</strong>) full 100% free VIP Pro Access ({hostGrant.planName || 'VIP Access'}).
+                      An administrator has granted your Gmail ID (<strong>{userProfile.email}</strong>) full 100% free VIP Pro Access ({hostGrant.planName || 'VIP Access'}).
                     </p>
                   </div>
 
@@ -1945,63 +2035,64 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         })}
                       </div>
 
-                      {/* Selected Plan QR & UTR input */}
+                      {/* Selected Plan Details & Razorpay Checkout */}
                       {selectedPlan && (
-                        <div className="p-5 rounded-2xl bg-gray-50 dark:bg-[#111312] border border-gray-200 dark:border-gray-800 space-y-4">
-                          <div className="flex flex-col sm:flex-row items-center gap-5">
-                            <img
-                              src={getUPIQRCodeUrl(selectedPlan, userProfile.email)}
-                              alt="UPI QR Code"
-                              className="w-36 h-36 rounded-xl border border-gray-200 bg-white p-1.5 shadow-sm shrink-0"
-                            />
-                            <div className="space-y-1.5 text-xs text-left">
-                              <div className="font-bold text-gray-900 dark:text-white">
-                                Pay ₹{selectedPlan.priceINR} to Host: <strong>{HOST_ADMIN_CONFIG.name}</strong>
-                              </div>
-                              <div className="text-gray-600 dark:text-gray-400">
-                                UPI VPA: <strong className="text-[#0F6E5F] dark:text-[#2DD4BF] font-mono">{HOST_ADMIN_CONFIG.upiId}</strong>
+                        <div className="p-5 rounded-2xl bg-gray-50 dark:bg-[#111312] border border-gray-200 dark:border-gray-800 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="text-xs font-bold text-gray-900 dark:text-white">
+                                Selected: {selectedPlan.name} ({selectedPlan.durationLabel})
                               </div>
                               <div className="text-[11px] text-gray-500">
-                                Scan with FamApp, GPay, PhonePe, Paytm, or any UPI app.
+                                Total: ₹{selectedPlan.priceINR}
                               </div>
                             </div>
+                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                              Encrypted Checkout
+                            </span>
                           </div>
 
-                          {/* UTR Form */}
-                          <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-800">
-                            <label className="block text-xs font-bold text-gray-700 dark:text-gray-300">
-                              Enter 12-Digit UPI Reference ID / UTR Number:
-                            </label>
-                            <div className="flex gap-2">
-                              <input
-                                type="text"
-                                maxLength={12}
-                                placeholder="e.g. 423985123456"
-                                value={utrInput}
-                                onChange={(e) => setUtrInput(e.target.value)}
-                                className="flex-1 text-xs p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] font-mono font-bold text-gray-900 dark:text-white"
-                              />
+                          {razorpayConfig.isLive ? (
+                            <div className="space-y-2 pt-2 border-t border-gray-200 dark:border-gray-800">
                               <button
                                 type="button"
                                 disabled={isVerifyingPayment}
-                                onClick={handleVerifyPaidPlan}
-                                className="px-4 py-2.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs cursor-pointer shadow-xs disabled:opacity-50"
+                                onClick={handleRazorpayCheckout}
+                                className="w-full py-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs cursor-pointer shadow-xs disabled:opacity-50 flex items-center justify-center gap-2"
                               >
-                                {isVerifyingPayment ? 'Verifying...' : 'Verify & Unlock'}
+                                <ShieldCheck className="w-4 h-4" />
+                                <span>{isVerifyingPayment ? 'Connecting...' : `Pay ₹${selectedPlan.priceINR} via Razorpay`}</span>
+                              </button>
+                              {paymentError && (
+                                <p className="text-xs text-red-600 font-semibold">{paymentError}</p>
+                              )}
+                              {paymentSuccess && (
+                                <p className="text-xs text-emerald-600 font-bold flex items-center gap-1">
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  Payment verified successfully! Loading your program...
+                                </p>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="p-3.5 rounded-xl bg-teal-500/10 border border-teal-500/20 text-center space-y-2">
+                              <div className="text-xs font-bold text-teal-800 dark:text-teal-300">
+                                Payments coming soon — your 7-day trial is active
+                              </div>
+                              <p className="text-[11px] text-gray-600 dark:text-gray-400">
+                                Online payment checkout is being finalized. You can start immediately with full access during your 7-day free trial.
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const trialSub = createInitialTrialSubscription();
+                                  handleApplyProfileAndFinish(trialSub);
+                                }}
+                                className="w-full py-2.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs cursor-pointer shadow-xs"
+                              >
+                                Activate 7-Day Free Trial & Start Training
                               </button>
                             </div>
-
-                            {paymentError && (
-                              <p className="text-xs text-red-600 font-semibold">{paymentError}</p>
-                            )}
-
-                            {paymentSuccess && (
-                              <p className="text-xs text-emerald-600 font-bold flex items-center gap-1">
-                                <CheckCircle2 className="w-4 h-4" />
-                                Payment verified successfully! Loading your program...
-                              </p>
-                            )}
-                          </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -2097,8 +2188,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           {step === 6 && !isUserHost && (
             <button
               type="button"
+              disabled={!agreedToMedicalDisclaimer}
               onClick={() => handleApplyProfileAndFinish()}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-bold hover:bg-[#0D5B4F] transition-all shadow-md cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-bold hover:bg-[#0D5B4F] transition-all shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Check className="w-4 h-4 text-amber-300" />
               <span>Start AROH Pro</span>

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Cloud, CheckCircle2, RefreshCw, AlertCircle, ShieldCheck, Database, Zap, X, WifiOff, ArrowUpCircle } from 'lucide-react';
+import { Cloud, CheckCircle2, RefreshCw, AlertCircle, ShieldCheck, Database, Zap, X, WifiOff, ArrowUpCircle, ExternalLink, HardDrive } from 'lucide-react';
 import { User } from 'firebase/auth';
 import { useSyncStatus, getPendingQueueSnapshot, SyncJob } from '../lib/syncManager';
+import { subscribeDriveSyncStatus, DriveSyncStatus, getDriveStatus, getStoredDriveAuth } from '../lib/userMemory';
+import { connectGoogleWorkspace } from '../lib/googleWorkspace';
 
 export type SyncState = 'synced' | 'syncing' | 'validating' | 'drift_corrected' | 'offline';
 
@@ -30,8 +32,17 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
   const [isOpenPopover, setIsOpenPopover] = useState<boolean>(false);
   const [validationReport, setValidationReport] = useState<string>('Local state verified against Firestore (0 drift)');
   const [queuedJobs, setQueuedJobs] = useState<SyncJob[]>([]);
+  const [driveStatus, setDriveStatus] = useState<DriveSyncStatus>(getDriveStatus());
+  const [isReconnectingDrive, setIsReconnectingDrive] = useState<boolean>(false);
 
-  const activeSyncing = isSyncing || managerIsSyncing;
+  useEffect(() => {
+    const unsub = subscribeDriveSyncStatus((newStatus) => {
+      setDriveStatus(newStatus);
+    });
+    return unsub;
+  }, []);
+
+  const activeSyncing = isSyncing || managerIsSyncing || driveStatus.status === 'saving';
 
   useEffect(() => {
     if (activeSyncing) {
@@ -68,38 +79,60 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
     }
   };
 
+  const handleReconnectDrive = async () => {
+    if (!currentUser?.email) return;
+    setIsReconnectingDrive(true);
+    try {
+      await connectGoogleWorkspace(currentUser.email);
+    } catch (e) {
+      console.warn('Reconnect drive error:', e);
+    } finally {
+      setIsReconnectingDrive(false);
+    }
+  };
+
+  const activeEmail = currentUser?.email || '';
+  const driveAuth = getStoredDriveAuth(activeEmail);
+  const resolvedFolderId = driveStatus.folderId || driveAuth?.driveFolderId;
+
   const getBadgeContent = () => {
-    if (activeSyncing) {
+    if (!isOnline) {
+      return {
+        icon: <WifiOff className="w-3.5 h-3.5 text-zinc-400" />,
+        label: 'Offline — will sync when online',
+        colorClass: 'bg-zinc-500/10 text-zinc-700 dark:text-zinc-300 border-zinc-500/30',
+        dotClass: 'bg-zinc-400',
+        pendingBadge: pendingCount > 0 ? pendingCount : null,
+      };
+    }
+
+    if (activeSyncing || driveStatus.status === 'saving') {
       return {
         icon: <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-500" />,
-        label: pendingCount > 0 ? `Syncing (${pendingCount})...` : 'Syncing...',
+        label: 'Saving…',
         colorClass: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30',
         dotClass: 'bg-blue-500 animate-ping',
         pendingBadge: pendingCount > 0 ? pendingCount : null,
       };
     }
 
-    if (pendingCount > 0) {
+    if (driveStatus.status === 'reconnect_needed') {
       return {
-        icon: isOnline ? (
-          <ArrowUpCircle className="w-3.5 h-3.5 text-amber-500 animate-bounce" />
-        ) : (
-          <WifiOff className="w-3.5 h-3.5 text-amber-500" />
-        ),
-        label: !isOnline ? `Offline (${pendingCount} Queued)` : `${pendingCount} Pending Sync`,
+        icon: <AlertCircle className="w-3.5 h-3.5 text-amber-500" />,
+        label: 'Reconnect Google Drive',
         colorClass: 'bg-amber-500/15 text-amber-800 dark:text-amber-200 border-amber-500/40 ring-1 ring-amber-500/20',
         dotClass: 'bg-amber-500 animate-pulse',
-        pendingBadge: pendingCount,
+        pendingBadge: null,
       };
     }
 
-    if (!isOnline) {
+    if (pendingCount > 0) {
       return {
-        icon: <WifiOff className="w-3.5 h-3.5 text-zinc-400" />,
-        label: 'Offline (Local Ready)',
-        colorClass: 'bg-zinc-500/10 text-zinc-700 dark:text-zinc-300 border-zinc-500/30',
-        dotClass: 'bg-zinc-400',
-        pendingBadge: null,
+        icon: <ArrowUpCircle className="w-3.5 h-3.5 text-amber-500 animate-bounce" />,
+        label: `${pendingCount} Pending Sync`,
+        colorClass: 'bg-amber-500/15 text-amber-800 dark:text-amber-200 border-amber-500/40 ring-1 ring-amber-500/20',
+        dotClass: 'bg-amber-500 animate-pulse',
+        pendingBadge: pendingCount,
       };
     }
 
@@ -123,9 +156,11 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
       };
     }
 
+    const savedTimeLabel = driveStatus.lastSavedAt ? `Synced • saved ${driveStatus.lastSavedAt}` : (currentUser ? 'Synced' : 'Cloud Ready');
+
     return {
       icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />,
-      label: currentUser ? 'Firestore Synced' : 'Cloud Ready',
+      label: savedTimeLabel,
       colorClass: 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/30',
       dotClass: 'bg-emerald-500',
       pendingBadge: null,
@@ -142,7 +177,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
         type="button"
         onClick={() => setIsOpenPopover(!isOpenPopover)}
         className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer hover:shadow-xs ${badge.colorClass}`}
-        title={pendingCount > 0 ? `${pendingCount} items queued for cloud sync` : "Persistent Firestore Background Sync & Drift Status"}
+        title={pendingCount > 0 ? `${pendingCount} items queued for cloud sync` : "Google Drive & Cloud Sync Status"}
       >
         <span className="relative flex h-2 w-2">
           <span className={`absolute inline-flex h-full w-full rounded-full opacity-75 ${badge.dotClass}`} />
@@ -168,7 +203,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
                 <h4 className="text-sm font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
-                  Firestore Sync & Queue
+                  AROH Cloud & Drive Memory
                 </h4>
               </div>
               <button
@@ -177,6 +212,43 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
               >
                 <X className="w-4 h-4" />
               </button>
+            </div>
+
+            {/* Google Drive Status Section */}
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#1E2220] border border-slate-200 dark:border-slate-800 space-y-2.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <HardDrive className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                  <span className="text-xs font-bold text-slate-900 dark:text-white">Google Drive Storage</span>
+                </div>
+                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                  Folder: <strong>AROH AI</strong>
+                </span>
+              </div>
+
+              {resolvedFolderId && (
+                <a
+                  href={`https://drive.google.com/drive/folders/${resolvedFolderId}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full py-1.5 px-3 rounded-lg bg-cyan-600/10 hover:bg-cyan-600/20 text-cyan-700 dark:text-cyan-300 text-xs font-bold transition-all border border-cyan-500/20 flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Open my AROH AI folder</span>
+                </a>
+              )}
+
+              {driveStatus.status === 'reconnect_needed' && (
+                <button
+                  type="button"
+                  onClick={handleReconnectDrive}
+                  disabled={isReconnectingDrive}
+                  className="w-full py-1.5 px-3 rounded-lg bg-amber-600 text-white hover:bg-amber-700 text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isReconnectingDrive ? 'animate-spin' : ''}`} />
+                  <span>Reconnect Google Drive</span>
+                </button>
+              )}
             </div>
 
             {/* Pending Sync Queue Card if items exist */}
@@ -236,13 +308,6 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
               </div>
 
               <div className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2E2C]">
-                <span className="text-[#6B7280] dark:text-[#9EA8A2]">Local Storage</span>
-                <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">
-                  {isIndexedDBActive ? 'IndexedDB + LocalStorage' : 'LocalStorage'}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2E2C]">
                 <span className="text-[#6B7280] dark:text-[#9EA8A2]">Account</span>
                 <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] truncate max-w-[170px]">
                   {currentUser ? currentUser.email : 'Guest (Local Store)'}
@@ -250,11 +315,11 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
               </div>
 
               <div className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2E2C]">
-                <span className="text-[#6B7280] dark:text-[#9EA8A2]">Last Sync</span>
+                <span className="text-[#6B7280] dark:text-[#9EA8A2]">Last Drive Backup</span>
                 <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">
-                  {lastSyncedAt
-                    ? new Date(lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-                    : lastSyncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                  {driveStatus.lastSavedAt || (lastSyncedAt
+                    ? new Date(lastSyncedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    : lastSyncTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }))}
                 </span>
               </div>
 
@@ -284,3 +349,4 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
     </div>
   );
 };
+

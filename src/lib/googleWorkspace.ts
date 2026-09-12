@@ -16,7 +16,8 @@ export interface GoogleWorkspaceAuthState {
   driveFolderId: string | null;
 }
 
-const STORAGE_KEY_AUTH = 'peakform_google_workspace_auth';
+const STORAGE_KEY_AUTH = 'aroh_google_workspace_auth';
+const LEGACY_STORAGE_KEY_AUTH = 'peakform_google_workspace_auth';
 const PEAKFORM_FOLDER_NAME = 'AROH AI';
 export const AROH_FOLDER_NAME = 'AROH AI';
 
@@ -32,7 +33,16 @@ export const GOOGLE_WORKSPACE_SCOPES = [
  */
 export function getStoredGoogleWorkspaceAuth(): GoogleWorkspaceAuthState {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY_AUTH);
+    let raw = localStorage.getItem(STORAGE_KEY_AUTH);
+    if (!raw) {
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY_AUTH);
+      if (legacy) {
+        raw = legacy;
+        try {
+          localStorage.setItem(STORAGE_KEY_AUTH, legacy);
+        } catch {}
+      }
+    }
     if (raw) {
       const parsed: GoogleWorkspaceAuthState = JSON.parse(raw);
       if (parsed.expiresAt && parsed.expiresAt > Date.now() && parsed.accessToken) {
@@ -129,17 +139,11 @@ export async function connectGoogleWorkspace(emailHint?: string): Promise<{ succ
 
         tokenClient.requestAccessToken({ prompt: 'consent' });
       } else {
-        // Simulated authorized token state for sandboxed container preview
-        const mockToken = `oauth_token_${Date.now()}_aroh_ready`;
-        saveGoogleWorkspaceAuth({
-          isConnected: true,
-          accessToken: mockToken,
-          expiresAt: Date.now() + 3600 * 1000,
-          userEmail: emailHint || 'Athlete',
-          lastBackupTimestamp: new Date().toISOString(),
-          driveFolderId: 'folder_aroh_ai_root',
+        // If Google JS is missing, fail visibly: Google Drive is required to save your progress
+        resolve({
+          success: false,
+          error: 'Google Drive is required to save your progress. Google Identity Services could not be loaded.',
         });
-        resolve({ success: true, accessToken: mockToken });
       }
     } catch (err: any) {
       console.error('Google Workspace connect failure', err);
@@ -215,7 +219,7 @@ export async function uploadFileToDrive(params: {
   // Always keep a local copy cached for instant fallback
   if (typeof window !== 'undefined') {
     try {
-      localStorage.setItem(`peakform_drive_file_${fileName}`, fileContent);
+      localStorage.setItem(`aroh_drive_file_${fileName}`, fileContent);
     } catch (e) {}
   }
 
@@ -335,7 +339,7 @@ export async function backupAllDataToGoogleDrive(params: {
     token = connectResult.accessToken;
   }
 
-  const folderId = auth.driveFolderId || (await getOrCreatePeakFormFolder(token));
+  const folderId = auth.driveFolderId || (await getOrCreateArohFolder(token));
   const dateStr = new Date().toISOString().split('T')[0];
 
   // 1. Generate Meal Logs CSV
@@ -396,7 +400,6 @@ export async function backupAllDataToGoogleDrive(params: {
     const sanitized = params.userProfile.email.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
     try {
       localStorage.setItem(`aroh_drive_backup_${sanitized}`, completeBundleJson);
-      localStorage.setItem(`peakform_drive_backup_${sanitized}`, completeBundleJson);
     } catch (e) {}
   }
 
@@ -458,12 +461,11 @@ export async function backupUserProfileToGoogleDrive(profile: any): Promise<{ su
       const sanitized = profile.email.trim().toLowerCase().replace(/[^a-z0-9]/g, '_');
       try {
         localStorage.setItem(`aroh_drive_profile_${sanitized}`, JSON.stringify(profile));
-        localStorage.setItem(`peakform_drive_profile_${sanitized}`, JSON.stringify(profile));
       } catch (e) {}
     }
     const auth = getStoredGoogleWorkspaceAuth();
     if (!auth.accessToken) return { success: false };
-    const folderId = auth.driveFolderId || (await getOrCreatePeakFormFolder(auth.accessToken));
+    const folderId = auth.driveFolderId || (await getOrCreateArohFolder(auth.accessToken));
     const result = await uploadFileToDrive({
       accessToken: auth.accessToken,
       folderId,
@@ -497,7 +499,7 @@ export async function fetchUserDataFromGoogleDrive(emailHint?: string): Promise<
   // 1. Live Google Drive query if authorized token exists
   if (auth.accessToken && !auth.accessToken.startsWith('oauth_token_')) {
     try {
-      const folderId = auth.driveFolderId || (await getOrCreatePeakFormFolder(auth.accessToken));
+      const folderId = auth.driveFolderId || (await getOrCreateArohFolder(auth.accessToken));
 
       // Search for AROH_Complete_Backup.json or PeakForm_Complete_Backup.json
       const backupSearchUrl = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(
@@ -604,7 +606,9 @@ export async function fetchUserDataFromGoogleDrive(emailHint?: string): Promise<
 }
 
 /**
- * Backup Host Ledger, Discounts, and Grants accurately to Host's Google Drive
+ * Backup Host Ledger, Discounts, and Grants accurately to Host's Google Drive.
+ * Must only run if isHostAdmin AND the connected Drive email matches the host email.
+ * If athlete is signed in, this function is a no-op!
  */
 export async function backupHostLedgerToGoogleDrive(ledgerData: {
   transactions: any[];
@@ -613,9 +617,24 @@ export async function backupHostLedgerToGoogleDrive(ledgerData: {
   hostEmail: string;
 }): Promise<{ success: boolean; message?: string }> {
   try {
+    const { isHostAdmin, checkIsHostOnServer } = await import('./subscription');
+    if (!isHostAdmin()) {
+      return { success: false, message: 'Host ledger backup is only permitted for authenticated host administrators.' };
+    }
+
     const auth = getStoredGoogleWorkspaceAuth();
     if (!auth.accessToken) return { success: false, message: 'Google Drive not connected' };
-    const folderId = auth.driveFolderId || (await getOrCreatePeakFormFolder(auth.accessToken));
+
+    const driveEmail = (auth.userEmail || '').trim().toLowerCase();
+    const hostEmail = (ledgerData.hostEmail || '').trim().toLowerCase();
+
+    // Verify against server that connected drive email is indeed host
+    const isServerHost = await checkIsHostOnServer(driveEmail);
+    if (!isServerHost && driveEmail !== hostEmail) {
+      return { success: false, message: 'Connected Google Drive does not match verified Host account. Skipping host ledger backup.' };
+    }
+
+    const folderId = auth.driveFolderId || (await getOrCreateArohFolder(auth.accessToken));
     const dateStr = new Date().toISOString().split('T')[0];
 
     await Promise.all([

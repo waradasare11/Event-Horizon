@@ -230,7 +230,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                 </span>
                 <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex items-center gap-1">
                   <CheckCircle className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                  {consensusScore}% Confidence ({consensusRating})
+                  AI estimate — you can correct portions
                 </span>
                 {analysis.failoverEngaged && (
                   <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 flex items-center gap-1">
@@ -336,7 +336,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
               USDA & ICMR-IFCT Matching
             </p>
             <p className="text-[11px] text-[#6B7280] dark:text-[#9EA8A2] mt-1">
-              {analysis.modelConsensus?.macroValidatorSummary || 'Cross-referenced against verified per-100g database benchmarks to ensure 0% hallucination.'}
+              {analysis.modelConsensus?.macroValidatorSummary || 'Cross-referenced against verified per-100g database benchmarks to calibrate nutrient estimations.'}
             </p>
           </div>
         </div>
@@ -413,7 +413,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                 </span>
               </div>
               <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
-                Every component is cross-referenced with USDA/IFCT databases. Adjust gram weights or add ingredients if you modified your plate.
+                AI estimate — you can correct portions. Adjust gram weights or add custom ingredients if needed.
               </p>
             </div>
 
@@ -495,8 +495,8 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">{item.name}</span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
-                          {itemConfidence}% Certainty
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
+                          AI estimate — you can correct portions
                         </span>
                         {item.verifiedDatabaseName && (
                           <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20 flex items-center gap-1">

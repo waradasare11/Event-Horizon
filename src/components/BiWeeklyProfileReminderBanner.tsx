@@ -68,10 +68,10 @@ export const BiWeeklyProfileReminderBanner: React.FC<BiWeeklyProfileReminderBann
               </span>
             </div>
             <h4 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white font-['Space_Grotesk',sans-serif]">
-              Keep Your Athlete Profile & Metabolic Calculations 100% Accurate
+              Keep Your Athlete Profile & Metabolic Calculations Calibrated
             </h4>
             <p className="text-xs text-slate-600 dark:text-slate-300 max-w-2xl leading-relaxed">
-              It has been {daysSince} days since your last profile review. Updating your current weight ({userProfile.weightKg || '--'} kg), daily calorie targets ({userProfile.dailyCalories || '--'} kcal), and training days ensures our progressive overload and macro formulas remain laser-accurate for your Gmail account.
+              It has been {daysSince} days since your last profile review. Updating your current weight ({userProfile.weightKg || '--'} kg), daily calorie targets ({userProfile.dailyCalories || '--'} kcal), and training days ensures your progressive overload and macro formulas remain properly calibrated for your training.
             </p>
           </div>
         </div>

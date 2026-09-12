@@ -133,7 +133,7 @@ export async function sendWorkoutNotification(
     const notification = new Notification(title, {
       body,
       icon: options?.icon || '/favicon.ico',
-      tag: options?.tag || 'peakform-workout-reminder',
+      tag: options?.tag || 'aroh-workout-reminder',
       badge: '/favicon.ico',
     });
 

@@ -14,54 +14,48 @@ import {
 } from './firestoreSync';
 
 export const HOST_ADMIN_CONFIG = {
-  name: 'Warad Asare',
-  email: 'waradasare11@gmail.com',
-  upiId: '9284160309@fam',
+  name: 'Host Administrator',
+  email: '',
   appName: 'AROH Pro',
-  merchantCode: '5411',
-  defaultPin: '9284',
 };
 
-// Dedicated Immutable Storage Keys for LIFETIME_VIP Overrides
-export const LIFETIME_VIP_PREFIX = 'peakform_lifetime_vip_override_';
-
-export function setLifetimeVipOverride(email: string, grant: HostGrantedSubscription): void {
+// Storage migration helper
+function getStoredItemMigrated(arohKey: string, legacyKey: string): string | null {
   try {
-    const cleanEmail = email.trim().toLowerCase();
-    if (grant.isLifetime) {
-      localStorage.setItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`, JSON.stringify({
-        ...grant,
-        status: 'active',
-        isLifetime: true,
-        updatedAt: new Date().toISOString(),
-      }));
-    } else {
-      // Remove any lingering lifetime VIP override if the host granted a specific duration (e.g., 3 months)
-      localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
+    let val = localStorage.getItem(arohKey);
+    if (!val) {
+      const legacyVal = localStorage.getItem(legacyKey);
+      if (legacyVal) {
+        val = legacyVal;
+        try {
+          localStorage.setItem(arohKey, legacyVal);
+        } catch {}
+      }
     }
-
-    // Always keep persistent grant ledger updated with accurate duration and expiration
-    const ledgerRaw = localStorage.getItem('peakform_host_ledger');
-    let ledger: HostGrantedSubscription[] = ledgerRaw ? JSON.parse(ledgerRaw) : [];
-    ledger = ledger.filter((g) => g.email.toLowerCase() !== cleanEmail);
-    ledger.unshift(grant);
-    localStorage.setItem('peakform_host_ledger', JSON.stringify(ledger));
-  } catch (e) {
-    console.warn('Notice setting Lifetime VIP override:', e);
+    return val;
+  } catch {
+    return null;
   }
 }
 
-export function getLifetimeVipOverride(email: string): HostGrantedSubscription | null {
+// Deprecated storage helpers retained as security stubs
+export const LIFETIME_VIP_PREFIX = 'aroh_lifetime_vip_override_';
+export const LEGACY_LIFETIME_VIP_PREFIX = 'peakform_lifetime_vip_override_';
+
+export function setLifetimeVipOverride(email: string, _grant?: HostGrantedSubscription): void {
+  // Client cannot grant Pro status in localStorage.
+  // Pro status is authoritative only via server/Razorpay verification or host Firestore grant.
   try {
     const cleanEmail = email.trim().toLowerCase();
-    const raw = localStorage.getItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
-    if (raw) {
-      const parsed: HostGrantedSubscription = JSON.parse(raw);
-      if (parsed && parsed.status === 'active') {
-        return parsed;
-      }
-    }
+    localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
+    localStorage.removeItem(`${LEGACY_LIFETIME_VIP_PREFIX}${cleanEmail}`);
+    localStorage.removeItem('aroh_host_ledger');
+    localStorage.removeItem('peakform_host_ledger');
   } catch (e) {}
+}
+
+export function getLifetimeVipOverride(_email: string): HostGrantedSubscription | null {
+  // Local overrides are deprecated and ignored for security.
   return null;
 }
 
@@ -140,7 +134,8 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
   },
 ];
 
-const TRANSACTIONS_STORAGE_KEY = 'peakform_payment_transactions';
+const TRANSACTIONS_STORAGE_KEY = 'aroh_payment_transactions';
+const LEGACY_TRANSACTIONS_STORAGE_KEY = 'peakform_payment_transactions';
 
 export function createInitialTrialSubscription(): UserSubscription {
   const now = new Date();
@@ -277,7 +272,7 @@ export function createGrantedUserSubscription(grant: Partial<HostGrantedSubscrip
     paymentMethod: 'MANUAL_GRANT',
     isTrialActive: false,
     daysRemaining,
-    verifiedBy: grant.grantedByName || 'Warad Asare (Host VIP Grant)',
+    verifiedBy: grant.grantedByName || 'Host VIP Grant',
     lastPaymentVerifiedAt: new Date().toISOString(),
     isLifetime,
   };
@@ -288,25 +283,7 @@ export function computeSubscriptionStatus(sub?: UserSubscription, userEmail?: st
     return createHostLifetimeSubscription();
   }
 
-  // 1. Check if user has an active grant cached locally or verified
-  if (userEmail) {
-    const cleanEmail = userEmail.trim().toLowerCase();
-    try {
-      const directGrantRaw = localStorage.getItem(`peakform_user_grant_${cleanEmail}`);
-      if (directGrantRaw) {
-        const g: HostGrantedSubscription = JSON.parse(directGrantRaw);
-        if (g && g.status === 'active') {
-          return createGrantedUserSubscription(g);
-        }
-      }
-      const lifetimeVip = getLifetimeVipOverride(cleanEmail);
-      if (lifetimeVip && lifetimeVip.status === 'active' && lifetimeVip.isLifetime && (!directGrantRaw || JSON.parse(directGrantRaw).isLifetime !== false)) {
-        return createGrantedUserSubscription(lifetimeVip);
-      }
-    } catch (e) {}
-  }
-
-  // 2. If already a MANUAL_GRANT or Host VIP Grant, dynamically calculate remaining days
+  // 1. If already a MANUAL_GRANT or Host VIP Grant, dynamically calculate remaining days
   if (sub?.paymentMethod === 'MANUAL_GRANT' || (sub?.verifiedBy && sub.verifiedBy.includes('Host VIP Grant'))) {
     const isLifetime = Boolean(sub.isLifetime && (!sub.subscriptionEndDate || new Date(sub.subscriptionEndDate).getFullYear() >= 2090));
     if (isLifetime) {
@@ -390,45 +367,40 @@ export function computeSubscriptionStatus(sub?: UserSubscription, userEmail?: st
 }
 
 /**
- * Generate a real, strictly formatted UPI Deep Link URI
- * Format: upi://pay?pa={vpa}&pn={payeeName}&am={amount}&cu=INR&tn={note}
+ * Direct customer UPI link generation is disabled for security.
+ * Payments are securely routed through Razorpay Checkout.
  */
-export function generateUPILink(plan: SubscriptionPlanConfig, userEmail?: string): string {
-  const vpa = HOST_ADMIN_CONFIG.upiId;
-  const payeeName = encodeURIComponent(HOST_ADMIN_CONFIG.name);
-  const amount = plan.priceINR.toFixed(2);
-  const note = encodeURIComponent(`AROH AI ${plan.durationLabel} - ${userEmail || 'Member'}`);
-  return `upi://pay?pa=${vpa}&pn=${payeeName}&am=${amount}&cu=INR&tn=${note}`;
+export function generateUPILink(_plan?: SubscriptionPlanConfig, _userEmail?: string): string {
+  return '';
 }
 
 /**
- * Generates an SVG QR Code URL using QR Server API with error correction
+ * Generates QR code URL - disabled for direct customer payments.
  */
-export function getUPIQRCodeUrl(plan: SubscriptionPlanConfig, userEmail?: string): string {
-  const upiLink = generateUPILink(plan, userEmail);
-  const encoded = encodeURIComponent(upiLink);
-  return `https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=${encoded}&color=0f6e5f&bgcolor=ffffff&qzone=2&format=svg`;
+export function getUPIQRCodeUrl(_plan?: SubscriptionPlanConfig, _userEmail?: string): string {
+  return '';
 }
 
 /**
- * Validates a 12-digit UTR/UPI Reference Number strictly against anti-fraud patterns
+ * Validates a 12-digit UTR/UPI Reference Number strictly against anti-fraud patterns.
+ * Note: Customer path uses Razorpay checkout; UTR validation is never used to activate subscription.status.
  */
 export function validateUTRNumber(utr: string): { isValid: boolean; error?: string } {
   const cleaned = utr.trim().replace(/[\s-]/g, '');
 
   if (!cleaned) {
-    return { isValid: false, error: 'Please enter the 12-digit UTR / UPI Reference ID from your payment receipt.' };
+    return { isValid: false, error: 'Please enter the 12-digit reference ID.' };
   }
 
   // Must be strictly 12 numeric digits
   if (!/^\d{12}$/.test(cleaned)) {
     return { 
       isValid: false, 
-      error: `Invalid UTR format. Expected strictly 12 numeric digits (e.g. 423985123456), but received ${cleaned.length} characters.` 
+      error: `Invalid reference format. Expected strictly 12 numeric digits, but received ${cleaned.length} characters.` 
     };
   }
 
-  // Anti-fraud test: Reject obvious sequential or dummy repeats (e.g. 000000000000, 111111111111, 123456789012)
+  // Anti-fraud test: Reject obvious sequential or dummy repeats
   const dummyPatterns = [
     '000000000000',
     '111111111111',
@@ -446,14 +418,7 @@ export function validateUTRNumber(utr: string): { isValid: boolean; error?: stri
   ];
 
   if (dummyPatterns.includes(cleaned)) {
-    return { isValid: false, error: 'Fake or placeholder UTR detected. Please enter the authentic 12-digit UPI transaction reference from your bank app.' };
-  }
-
-  // Check for duplicate UTR in storage
-  const existingTxs = getStoredTransactions();
-  const isDuplicate = existingTxs.some((tx) => tx.utrNumber === cleaned && tx.status === 'verified');
-  if (isDuplicate) {
-    return { isValid: false, error: 'This UTR number has already been used and verified for another subscription. Duplicate submissions are rejected.' };
+    return { isValid: false, error: 'Placeholder or invalid reference detected.' };
   }
 
   return { isValid: true };
@@ -461,7 +426,7 @@ export function validateUTRNumber(utr: string): { isValid: boolean; error?: stri
 
 export function getStoredTransactions(): PaymentTransaction[] {
   try {
-    const raw = localStorage.getItem(TRANSACTIONS_STORAGE_KEY);
+    const raw = getStoredItemMigrated(TRANSACTIONS_STORAGE_KEY, LEGACY_TRANSACTIONS_STORAGE_KEY);
     if (raw) return JSON.parse(raw);
   } catch (e) {
     console.error('Failed reading payment transactions from storage', e);
@@ -480,6 +445,7 @@ export function saveStoredTransactions(txs: PaymentTransaction[]): void {
 export function clearStoredTransactions(): void {
   try {
     localStorage.removeItem(TRANSACTIONS_STORAGE_KEY);
+    localStorage.removeItem(LEGACY_TRANSACTIONS_STORAGE_KEY);
   } catch (e) {
     console.error('Failed clearing local transactions', e);
   }
@@ -633,7 +599,7 @@ export async function recordLocalHostAuditLog(
     id: `audit_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     timestamp: new Date().toISOString(),
     actionType,
-    actor: 'Warad Asare (Host Master)',
+    actor: 'Host Administrator',
     targetEmail,
     planId,
     amountINR,
@@ -643,11 +609,11 @@ export async function recordLocalHostAuditLog(
   };
 
   try {
-    const raw = localStorage.getItem('peakform_host_activity_logs');
+    const raw = getStoredItemMigrated('aroh_host_activity_logs', 'peakform_host_activity_logs');
     const logs: HostAuditLogEntry[] = raw ? JSON.parse(raw) : [];
     logs.unshift(newLog);
     // Keep last 100 entries locally
-    localStorage.setItem('peakform_host_activity_logs', JSON.stringify(logs.slice(0, 100)));
+    localStorage.setItem('aroh_host_activity_logs', JSON.stringify(logs.slice(0, 100)));
   } catch (e) {
     console.warn('Local audit log storage notice:', e);
   }
@@ -721,35 +687,36 @@ export async function grantUserFreeSubscription(params: {
     planId: params.planId || (isTrulyLifetime ? 'all_plans' : '3_months'),
     planName,
     grantedBy: params.email,
-    grantedByName: 'Warad Asare (Host Master)',
+    grantedByName: 'Host Administrator',
     grantedAt: now.toISOString(),
     status: 'active',
     isLifetime: isTrulyLifetime,
     durationMonths,
     durationDays,
-    notes: params.notes || (isTrulyLifetime ? 'Host Lifetime Free Subscription granted by Warad Asare' : `Host Free ${planName} granted by Warad Asare`),
+    notes: params.notes || (isTrulyLifetime ? 'Host Lifetime Free Subscription granted' : `Host Free ${planName} granted`),
     expiresAt,
   };
 
   // 1. Local storage caching for instant client-side lookup & UI responsiveness
   try {
-    const cachedGrantsRaw = localStorage.getItem('peakform_host_grants_cache') || localStorage.getItem('peakform_host_grants_v2');
+    const cachedGrantsRaw = getStoredItemMigrated('aroh_host_grants_cache', 'peakform_host_grants_cache') || localStorage.getItem('peakform_host_grants_v2');
     let cachedGrants: HostGrantedSubscription[] = cachedGrantsRaw ? JSON.parse(cachedGrantsRaw) : [];
     cachedGrants = cachedGrants.filter((g) => g.email.toLowerCase() !== cleanTargetEmail);
     cachedGrants.unshift(grantData);
-    localStorage.setItem('peakform_host_grants_cache', JSON.stringify(cachedGrants));
-    localStorage.setItem('peakform_host_grants_v2', JSON.stringify(cachedGrants));
+    localStorage.setItem('aroh_host_grants_cache', JSON.stringify(cachedGrants));
+    localStorage.setItem('aroh_host_grants_v2', JSON.stringify(cachedGrants));
 
     // Also update host ledger records in localStorage
-    const ledgerRaw = localStorage.getItem('peakform_host_ledger');
+    const ledgerRaw = getStoredItemMigrated('aroh_host_ledger', 'peakform_host_ledger');
     let ledger: HostGrantedSubscription[] = ledgerRaw ? JSON.parse(ledgerRaw) : [];
     ledger = ledger.filter((g) => g.email.toLowerCase() !== cleanTargetEmail);
     ledger.unshift(grantData);
-    localStorage.setItem('peakform_host_ledger', JSON.stringify(ledger));
+    localStorage.setItem('aroh_host_ledger', JSON.stringify(ledger));
 
     // Update any cached user profile for this target email
-    const profileKey = `peakform_user_profile_${cleanTargetEmail}`;
-    const rawProfile = localStorage.getItem(profileKey);
+    const profileKey = `aroh_user_profile_${cleanTargetEmail}`;
+    const legacyProfileKey = `peakform_user_profile_${cleanTargetEmail}`;
+    const rawProfile = getStoredItemMigrated(profileKey, legacyProfileKey);
     if (rawProfile) {
       const p = JSON.parse(rawProfile);
       p.subscription = createGrantedUserSubscription(grantData);
@@ -757,27 +724,24 @@ export async function grantUserFreeSubscription(params: {
     }
 
     // Also update active session profile if matching
-    const activeProfileRaw = localStorage.getItem('peakform_user_profile');
+    const activeProfileRaw = getStoredItemMigrated('aroh_user_profile', 'peakform_user_profile');
     if (activeProfileRaw) {
       const ap = JSON.parse(activeProfileRaw);
       if (ap.email && ap.email.trim().toLowerCase() === cleanTargetEmail) {
         ap.subscription = createGrantedUserSubscription(grantData);
-        localStorage.setItem('peakform_user_profile', JSON.stringify(ap));
+        localStorage.setItem('aroh_user_profile', JSON.stringify(ap));
       }
     }
 
     // Dedicated per-user grant storage
-    localStorage.setItem(`peakform_user_grant_${cleanTargetEmail}`, JSON.stringify(grantData));
-    if (params.isLifetime) {
-      setLifetimeVipOverride(cleanTargetEmail, grantData);
-    } else {
-      localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanTargetEmail}`);
-    }
+    localStorage.setItem(`aroh_user_grant_${cleanTargetEmail}`, JSON.stringify(grantData));
+    localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanTargetEmail}`);
+    localStorage.removeItem(`${LEGACY_LIFETIME_VIP_PREFIX}${cleanTargetEmail}`);
 
     // Record activity log immediately
     recordLocalHostAuditLog(
       'free_access_granted',
-      `Host Warad Asare granted 100% Free VIP Access to ${cleanTargetEmail} (${planName}). Duration: ${durationDays} days.`,
+      `Host granted 100% Free VIP Access to ${cleanTargetEmail} (${planName}). Duration: ${durationDays} days.`,
       cleanTargetEmail,
       params.planId || 'all_plans',
       0,
@@ -785,7 +749,9 @@ export async function grantUserFreeSubscription(params: {
     );
 
     if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('aroh_grant_updated', { detail: grantData }));
       window.dispatchEvent(new CustomEvent('peakform_grant_updated', { detail: grantData }));
+      window.dispatchEvent(new CustomEvent('aroh_subscription_updated', { detail: createGrantedUserSubscription(grantData) }));
       window.dispatchEvent(new CustomEvent('peakform_subscription_updated', { detail: createGrantedUserSubscription(grantData) }));
     }
   } catch (e) {
@@ -859,7 +825,10 @@ export async function fetchHostGrantedSubscriptions(pin?: string, email?: string
 
   // 1. Read local storage cache first for instant response
   try {
-    const rawKeys = ['peakform_host_ledger', 'peakform_host_grants_v2', 'peakform_host_grants_cache'];
+    const rawKeys = [
+      'aroh_host_ledger', 'aroh_host_grants_v2', 'aroh_host_grants_cache',
+      'peakform_host_ledger', 'peakform_host_grants_v2', 'peakform_host_grants_cache'
+    ];
     for (const key of rawKeys) {
       const raw = localStorage.getItem(key);
       if (raw) {
@@ -927,9 +896,9 @@ export async function fetchHostGrantedSubscriptions(pin?: string, email?: string
   // Keep local caches fully synced
   try {
     if (merged.length > 0) {
-      localStorage.setItem('peakform_host_ledger', JSON.stringify(merged));
-      localStorage.setItem('peakform_host_grants_v2', JSON.stringify(merged));
-      localStorage.setItem('peakform_host_grants_cache', JSON.stringify(merged));
+      localStorage.setItem('aroh_host_ledger', JSON.stringify(merged));
+      localStorage.setItem('aroh_host_grants_v2', JSON.stringify(merged));
+      localStorage.setItem('aroh_host_grants_cache', JSON.stringify(merged));
     }
   } catch (e) {
     // ignore
@@ -946,7 +915,10 @@ export async function revokeHostGrantedSubscription(email: string, pin: string, 
   
   // Clean from local storage
   try {
-    const rawKeys = ['peakform_host_ledger', 'peakform_host_grants_v2', 'peakform_host_grants_cache'];
+    const rawKeys = [
+      'aroh_host_ledger', 'aroh_host_grants_v2', 'aroh_host_grants_cache',
+      'peakform_host_ledger', 'peakform_host_grants_v2', 'peakform_host_grants_cache'
+    ];
     for (const key of rawKeys) {
       const raw = localStorage.getItem(key);
       if (raw) {
@@ -1018,14 +990,15 @@ export async function checkUserHostGrant(email: string): Promise<{ hasGrant: boo
 
   const updateActiveProfileWithGrant = (grant: HostGrantedSubscription) => {
     try {
-      const pRaw = localStorage.getItem('peakform_user_profile');
+      const pRaw = getStoredItemMigrated('aroh_user_profile', 'peakform_user_profile');
       if (pRaw) {
         const p = JSON.parse(pRaw);
         if (p && p.email && p.email.trim().toLowerCase() === cleanEmail) {
           const grantedSub = createGrantedUserSubscription(grant);
           p.subscription = grantedSub;
-          localStorage.setItem('peakform_user_profile', JSON.stringify(p));
+          localStorage.setItem('aroh_user_profile', JSON.stringify(p));
           if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('aroh_subscription_updated', { detail: grantedSub }));
             window.dispatchEvent(new CustomEvent('peakform_subscription_updated', { detail: grantedSub }));
           }
         }
@@ -1033,76 +1006,11 @@ export async function checkUserHostGrant(email: string): Promise<{ hasGrant: boo
     } catch (e) {}
   };
 
-  // 1. Check direct user grant storage first
-  try {
-    const directUserGrantRaw = localStorage.getItem(`peakform_user_grant_${cleanEmail}`);
-    if (directUserGrantRaw) {
-      const g: HostGrantedSubscription = JSON.parse(directUserGrantRaw);
-      if (g && g.status === 'active') {
-        if (g.isLifetime) {
-          setLifetimeVipOverride(cleanEmail, g);
-        } else {
-          localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
-        }
-        updateActiveProfileWithGrant(g);
-        return { hasGrant: true, isHost: false, grant: g };
-      }
-    }
-  } catch (e) {}
-
-  // 2. Check dedicated immutable per-user LIFETIME_VIP override key
-  const lifetimeVip = getLifetimeVipOverride(cleanEmail);
-  if (lifetimeVip && lifetimeVip.status === 'active' && lifetimeVip.isLifetime) {
-    updateActiveProfileWithGrant(lifetimeVip);
-    return { hasGrant: true, isHost: false, grant: lifetimeVip };
-  }
-
-  // 3. Check local cached ledger & grant collections
-  try {
-    const rawKeys = ['peakform_host_ledger', 'peakform_host_grants_v2', 'peakform_host_grants_cache'];
-    for (const key of rawKeys) {
-      const raw = localStorage.getItem(key);
-      if (raw) {
-        const grants: HostGrantedSubscription[] = JSON.parse(raw);
-        if (Array.isArray(grants)) {
-          const matched = grants.find((g) => g && g.email && g.email.trim().toLowerCase() === cleanEmail && g.status === 'active');
-          if (matched) {
-            localStorage.setItem(`peakform_user_grant_${cleanEmail}`, JSON.stringify(matched));
-            if (matched.isLifetime) {
-              setLifetimeVipOverride(cleanEmail, matched);
-            } else {
-              localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
-            }
-            updateActiveProfileWithGrant(matched);
-            return { hasGrant: true, isHost: false, grant: matched };
-          }
-        }
-      }
-    }
-  } catch (e) {
-    // continue
-  }
-
-  // 4. Query backend server endpoint
+  // 1. Query backend server endpoint (authoritative)
   try {
     const res = await fetch(`/api/subscription/check-user-grant?email=${encodeURIComponent(cleanEmail)}`);
     const data = await res.json();
     if (data.success && data.hasGrant && data.grant) {
-      // Cache this grant locally
-      try {
-        localStorage.setItem(`peakform_user_grant_${cleanEmail}`, JSON.stringify(data.grant));
-        if (data.grant.isLifetime) {
-          setLifetimeVipOverride(cleanEmail, data.grant);
-        } else {
-          localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
-        }
-        const raw = localStorage.getItem('peakform_host_grants_cache');
-        const list: HostGrantedSubscription[] = raw ? JSON.parse(raw) : [];
-        const filtered = list.filter((g) => g.email.toLowerCase() !== cleanEmail);
-        filtered.unshift(data.grant);
-        localStorage.setItem('peakform_host_grants_cache', JSON.stringify(filtered));
-        localStorage.setItem('peakform_host_ledger', JSON.stringify(filtered));
-      } catch (err) {}
       updateActiveProfileWithGrant(data.grant);
       return { hasGrant: true, isHost: false, grant: data.grant };
     }
@@ -1110,29 +1018,17 @@ export async function checkUserHostGrant(email: string): Promise<{ hasGrant: boo
     // fallback to firestore
   }
 
-  // 5. Query Firestore across top-level 'grants' and redundant collections
+  // 2. Query Firestore across top-level 'grants' and redundant collections
   try {
     const { fetchHostGrantedSubscriptionByEmail, fetchAllHostGrantedSubscriptions } = await import('./firestoreSync');
     const firestoreGrant = await fetchHostGrantedSubscriptionByEmail(cleanEmail);
     if (firestoreGrant && firestoreGrant.status === 'active') {
-      localStorage.setItem(`peakform_user_grant_${cleanEmail}`, JSON.stringify(firestoreGrant));
-      if (firestoreGrant.isLifetime) {
-        setLifetimeVipOverride(cleanEmail, firestoreGrant);
-      } else {
-        localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
-      }
       updateActiveProfileWithGrant(firestoreGrant);
       return { hasGrant: true, isHost: false, grant: firestoreGrant };
     }
     const allGrants = await fetchAllHostGrantedSubscriptions();
     const matchedInAll = allGrants.find((g) => g && g.email && g.email.trim().toLowerCase() === cleanEmail && g.status === 'active');
     if (matchedInAll) {
-      localStorage.setItem(`peakform_user_grant_${cleanEmail}`, JSON.stringify(matchedInAll));
-      if (matchedInAll.isLifetime) {
-        setLifetimeVipOverride(cleanEmail, matchedInAll);
-      } else {
-        localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
-      }
       updateActiveProfileWithGrant(matchedInAll);
       return { hasGrant: true, isHost: false, grant: matchedInAll };
     }
@@ -1157,7 +1053,7 @@ export async function fetchHostCoupons(pin: string, email: string): Promise<Host
 
   // 1. Read local storage
   try {
-    const raw = localStorage.getItem('peakform_host_coupons');
+    const raw = getStoredItemMigrated('aroh_host_coupons', 'peakform_host_coupons');
     if (raw) {
       const list: HostCouponCode[] = JSON.parse(raw);
       if (Array.isArray(list)) {
@@ -1201,7 +1097,7 @@ export async function fetchHostCoupons(pin: string, email: string): Promise<Host
   const results = Array.from(map.values()).sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
   
   try {
-    localStorage.setItem('peakform_host_coupons', JSON.stringify(results));
+    localStorage.setItem('aroh_host_coupons', JSON.stringify(results));
   } catch (e) {}
 
   return results;
@@ -1246,7 +1142,7 @@ export async function createHostCouponCode(params: {
     redeemedBy: [],
     expiresAt: params.expiresAt,
     createdAt: new Date().toISOString(),
-    createdBy: 'Warad Asare (Host Master)',
+    createdBy: 'Host Administrator',
     status: 'active',
     notes: params.notes || `Host Free Subscription Coupon for ${planName}`,
     integrityHash: `COUPON_${cleanCode}_${actualDays}_${Date.now()}`,
@@ -1254,11 +1150,11 @@ export async function createHostCouponCode(params: {
 
   // Local sync
   try {
-    const raw = localStorage.getItem('peakform_host_coupons');
+    const raw = getStoredItemMigrated('aroh_host_coupons', 'peakform_host_coupons');
     let list: HostCouponCode[] = raw ? JSON.parse(raw) : [];
     list = list.filter((c) => c.code !== cleanCode);
     list.unshift(couponRecord);
-    localStorage.setItem('peakform_host_coupons', JSON.stringify(list));
+    localStorage.setItem('aroh_host_coupons', JSON.stringify(list));
   } catch (e) {}
 
   // Non-blocking Firestore sync
@@ -1276,7 +1172,7 @@ export async function createHostCouponCode(params: {
       recordLocalHostAuditLog(
         'coupon_created',
         `Created Free Subscription Coupon '${cleanCode}' for ${planName} (Expires: ${new Date(params.expiresAt).toLocaleDateString()}).`,
-        HOST_ADMIN_CONFIG.email,
+        params.email || 'host@aroh.fit',
         params.planId,
         0,
         { couponCode: cleanCode, planName, expiresAt: params.expiresAt }
@@ -1289,7 +1185,7 @@ export async function createHostCouponCode(params: {
     recordLocalHostAuditLog(
       'coupon_created',
       `Created Local Offline Free Subscription Coupon '${cleanCode}' for ${planName}.`,
-      HOST_ADMIN_CONFIG.email,
+      params.email || 'host@aroh.fit',
       params.planId
     );
     return { success: true, message: `Coupon '${cleanCode}' created locally!`, coupon: couponRecord };
@@ -1307,15 +1203,15 @@ export async function revokeHostCouponCode(
 ): Promise<boolean> {
   const couponId = couponIdOrCode;
   const code = emailArg ? codeOrPin || couponIdOrCode : couponIdOrCode;
-  const pin = emailArg ? pinOrEmail || HOST_ADMIN_CONFIG.defaultPin : (codeOrPin || HOST_ADMIN_CONFIG.defaultPin);
-  const email = emailArg || pinOrEmail || HOST_ADMIN_CONFIG.email;
+  const pin = emailArg ? pinOrEmail || '' : (codeOrPin || '');
+  const email = emailArg || pinOrEmail || '';
 
   try {
-    const raw = localStorage.getItem('peakform_host_coupons');
+    const raw = getStoredItemMigrated('aroh_host_coupons', 'peakform_host_coupons');
     if (raw) {
       let list: HostCouponCode[] = JSON.parse(raw);
       list = list.map((c) => (c.id === couponId || c.code.toUpperCase() === code.toUpperCase()) ? { ...c, status: 'revoked' as const } : c);
-      localStorage.setItem('peakform_host_coupons', JSON.stringify(list));
+      localStorage.setItem('aroh_host_coupons', JSON.stringify(list));
     }
   } catch (e) {}
 
@@ -1363,7 +1259,7 @@ export async function validateHostCouponCode(code: string, userEmail?: string): 
   } catch (e: any) {
     // Fallback: Check local coupons
     try {
-      const raw = localStorage.getItem('peakform_host_coupons');
+      const raw = getStoredItemMigrated('aroh_host_coupons', 'peakform_host_coupons');
       if (raw) {
         const list: HostCouponCode[] = JSON.parse(raw);
         const matched = list.find((c) => c.code === cleanCode && c.status === 'active');
@@ -1426,22 +1322,23 @@ export async function redeemHostCouponCode(
       
       // Set local grant cache and lifetime override if applicable
       if (data.grant) {
-        localStorage.setItem(`peakform_user_grant_${cleanEmail}`, JSON.stringify(data.grant));
+        localStorage.setItem(`aroh_user_grant_${cleanEmail}`, JSON.stringify(data.grant));
         if (data.grant.isLifetime) {
           setLifetimeVipOverride(cleanEmail, data.grant);
         } else {
           localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
+          localStorage.removeItem(`${LEGACY_LIFETIME_VIP_PREFIX}${cleanEmail}`);
         }
         syncHostGrantedSubscription(data.grant).catch(() => {});
       }
 
       // Update cached user profile
       try {
-        const rawProfile = localStorage.getItem('peakform_user_profile');
+        const rawProfile = getStoredItemMigrated('aroh_user_profile', 'peakform_user_profile');
         if (rawProfile) {
           const p = JSON.parse(rawProfile);
           p.subscription = activeSub;
-          localStorage.setItem('peakform_user_profile', JSON.stringify(p));
+          localStorage.setItem('aroh_user_profile', JSON.stringify(p));
         }
       } catch (err) {}
 
@@ -1463,15 +1360,17 @@ export async function redeemHostCouponCode(
       }).catch(() => {});
 
       if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('aroh_subscription_updated', { detail: activeSub }));
         window.dispatchEvent(new CustomEvent('peakform_subscription_updated', { detail: activeSub }));
         if (data.grant) {
+          window.dispatchEvent(new CustomEvent('aroh_grant_updated', { detail: data.grant }));
           window.dispatchEvent(new CustomEvent('peakform_grant_updated', { detail: data.grant }));
         }
       }
 
       return {
         success: true,
-        message: data.message || `Coupon '${cleanCode}' redeemed successfully! 100% Free VIP Pro unlocked.`,
+        message: data.message || `Coupon '${cleanCode}' redeemed successfully! VIP Pro unlocked.`,
         subscription: activeSub,
         grant: data.grant,
       };
@@ -1480,7 +1379,7 @@ export async function redeemHostCouponCode(
   } catch (e: any) {
     // Fallback: Check local coupons list
     try {
-      const raw = localStorage.getItem('peakform_host_coupons');
+      const raw = getStoredItemMigrated('aroh_host_coupons', 'peakform_host_coupons');
       if (raw) {
         const coupons: HostCouponCode[] = JSON.parse(raw);
         const matched = coupons.find(c => c.code.toUpperCase() === cleanCode && c.status === 'active');
@@ -1492,7 +1391,7 @@ export async function redeemHostCouponCode(
             planId: matched.planId,
             planName: matched.planName,
             grantedBy: matched.createdBy,
-            grantedByName: 'Host Warad Asare (Coupon)',
+            grantedByName: 'Host Administrator (Coupon)',
             grantedAt: new Date().toISOString(),
             status: 'active',
             isLifetime: matched.planId === 'all_plans' || matched.planId === '3_years',
@@ -1502,11 +1401,12 @@ export async function redeemHostCouponCode(
             notes: `Redeemed coupon ${cleanCode}`,
           };
           const fallbackSub = createGrantedUserSubscription(fallbackGrant);
-          localStorage.setItem(`peakform_user_grant_${cleanEmail}`, JSON.stringify(fallbackGrant));
+          localStorage.setItem(`aroh_user_grant_${cleanEmail}`, JSON.stringify(fallbackGrant));
           if (fallbackGrant.isLifetime) {
             setLifetimeVipOverride(cleanEmail, fallbackGrant);
           } else {
             localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
+            localStorage.removeItem(`${LEGACY_LIFETIME_VIP_PREFIX}${cleanEmail}`);
           }
           syncHostGrantedSubscription(fallbackGrant).catch(() => {});
           return {
@@ -1605,100 +1505,58 @@ export function recordPaymentTransaction(
 ): { transaction: PaymentTransaction; updatedSubscription: UserSubscription } {
   const cleanedUtr = utrNumber.trim().replace(/[\s-]/g, '');
   const now = new Date();
-  const durationDays = plan.durationDays || Math.round(plan.durationMonths * 30.5);
-  const end = new Date(now.getTime() + durationDays * 24 * 60 * 60 * 1000);
 
   const tx: PaymentTransaction = {
     id: `tx_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
     userId: user.id,
-    userEmail: user.email || 'athlete@aroh.fit',
+    userEmail: user.email || '',
     userName: user.name || 'AROH Athlete',
     planId: plan.id,
     planName: plan.name,
     durationLabel: plan.durationLabel,
     amountINR: plan.priceINR,
     utrNumber: cleanedUtr,
-    recipientVpa: HOST_ADMIN_CONFIG.upiId,
-    recipientName: HOST_ADMIN_CONFIG.name,
-    status: 'verified', // Auto-verified with 12-digit anti-fraud cryptographic checksum
+    recipientVpa: '',
+    recipientName: 'AROH Pro',
+    status: 'pending',
     createdAt: now.toISOString(),
     verifiedAt: now.toISOString(),
-    verifiedBy: `${HOST_ADMIN_CONFIG.name} (Host Automated QR Verification Gateway)`,
-    notes: `Verified ₹${plan.priceINR} payment via UPI to ${HOST_ADMIN_CONFIG.name} (${HOST_ADMIN_CONFIG.upiId}).`,
+    verifiedBy: 'System',
+    notes: 'Direct UTR entry is disabled. Pending Razorpay confirmation.',
   };
 
-  const updatedSubscription: UserSubscription = {
-    status: 'active',
-    planId: plan.id,
-    planName: plan.name,
-    trialStartDate: user.subscription?.trialStartDate || now.toISOString(),
-    trialEndDate: user.subscription?.trialEndDate || now.toISOString(),
-    subscriptionStartDate: now.toISOString(),
-    subscriptionEndDate: end.toISOString(),
-    amountPaidINR: plan.priceINR,
-    utrNumber: cleanedUtr,
-    paymentMethod: 'UPI_QR',
-    isTrialActive: false,
-    daysRemaining: durationDays,
-    lastPaymentVerifiedAt: now.toISOString(),
-    verifiedBy: 'Warad Asare',
+  // Client cannot grant Pro status. Return existing subscription.
+  return { 
+    transaction: tx, 
+    updatedSubscription: user.subscription || createInitialTrialSubscription() 
   };
-
-  const currentTxs = getStoredTransactions();
-  saveStoredTransactions([tx, ...currentTxs.filter(t => t.utrNumber !== cleanedUtr)]);
-
-  return { transaction: tx, updatedSubscription };
 }
 
 export async function verifyPaymentWithBackendServer(
-  user: UserProfile,
-  plan: SubscriptionPlanConfig,
-  utrNumber: string
+  _user: UserProfile,
+  _plan: SubscriptionPlanConfig,
+  _utrNumber: string
 ): Promise<{ success: boolean; error?: string; subscription?: UserSubscription; transaction?: PaymentTransaction }> {
-  try {
-    const response = await fetch('/api/subscription/verify-payment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId: user.id,
-        userEmail: user.email || 'athlete@aroh.fit',
-        userName: user.name || 'AROH Athlete',
-        planId: plan.id,
-        amountINR: plan.priceINR,
-        utrNumber,
-        recipientVpa: HOST_ADMIN_CONFIG.upiId,
-      }),
-    });
-
-    const data = await response.json();
-    if (!response.ok || !data.success) {
-      return {
-        success: false,
-        error: data.error || 'Payment verification failed against host ledger.',
-      };
-    }
-
-    const { transaction, updatedSubscription } = recordPaymentTransaction(user, plan, utrNumber);
-    return {
-      success: true,
-      subscription: updatedSubscription,
-      transaction,
-    };
-  } catch (err: any) {
-    console.warn('Backend verification network fallback:', err);
-    // Offline / direct fallback
-    const { transaction, updatedSubscription } = recordPaymentTransaction(user, plan, utrNumber);
-    return {
-      success: true,
-      subscription: updatedSubscription,
-      transaction,
-    };
-  }
+  // Manual UTR submission is disabled.
+  return {
+    success: false,
+    error: 'Direct UTR verification is disabled. Subscriptions are activated via Razorpay or Host verified grants.',
+  };
 }
 
 export function isHostAdmin(_userEmail?: string | null): boolean {
   if (typeof window === 'undefined') return false;
   return sessionStorage.getItem('aroh_host_authenticated') === 'true';
+}
+
+export async function checkIsHostOnServer(email?: string | null): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/host/whoami${email ? `?email=${encodeURIComponent(email)}` : ''}`);
+    const data = await res.json();
+    return Boolean(data && data.isHost);
+  } catch {
+    return false;
+  }
 }
 
 export function setHostAdminSession(authenticated: boolean): void {
@@ -1755,7 +1613,7 @@ export async function fetchHostAuditLogs(pin?: string, email?: string): Promise<
 
   // 1. Read local storage cache first
   try {
-    const raw = localStorage.getItem('peakform_host_activity_logs');
+    const raw = getStoredItemMigrated('aroh_host_activity_logs', 'peakform_host_activity_logs');
     if (raw) {
       const localLogs: HostAuditLogEntry[] = JSON.parse(raw);
       if (Array.isArray(localLogs)) {
@@ -1797,7 +1655,7 @@ export async function fetchHostAuditLogs(pin?: string, email?: string): Promise<
   );
 
   try {
-    localStorage.setItem('peakform_host_activity_logs', JSON.stringify(sorted.slice(0, 100)));
+    localStorage.setItem('aroh_host_activity_logs', JSON.stringify(sorted.slice(0, 100)));
   } catch (e) {}
 
   return sorted;
@@ -1838,7 +1696,7 @@ export function exportAuditLogsToCSV(logs: HostAuditLogEntry[]): void {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.setAttribute('href', url);
-  link.setAttribute('download', `peakform_host_audit_log_${new Date().toISOString().split('T')[0]}.csv`);
+  link.setAttribute('download', `aroh_host_audit_log_${new Date().toISOString().split('T')[0]}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -1893,8 +1751,8 @@ export function exportHostLedgerToCSV(grants: HostGrantedSubscription[]): void {
       `"${g.expiresAt || (g.isLifetime ? 'NEVER' : '')}"`,
       `"${expiresFormatted}"`,
       `"${remainingTime}"`,
-      `"${g.grantedByName || HOST_ADMIN_CONFIG.name}"`,
-      '"Cryptographically Verified by Host Warad Asare"',
+      `"${g.grantedByName || 'Host Administrator'}"`,
+      '"Cryptographically Verified by Host"',
       `"${(g.notes || '').replace(/"/g, '""')}"`,
       `"${new Date().toISOString()}"`,
     ];
@@ -1932,7 +1790,7 @@ export async function notifyAllActiveSubscribers(
     throw new Error(data.error || 'Failed to dispatch notifications');
   } catch (err: any) {
     // Client-side fallback: calculate notifications from local cache
-    const rawLedger = localStorage.getItem('peakform_host_ledger') || localStorage.getItem('peakform_host_grants_cache');
+    const rawLedger = getStoredItemMigrated('aroh_host_ledger', 'peakform_host_ledger') || getStoredItemMigrated('aroh_host_grants_cache', 'peakform_host_grants_cache');
     const grants: HostGrantedSubscription[] = rawLedger ? JSON.parse(rawLedger) : [];
     const now = Date.now();
     const activeGrants = grants.filter((g) => {
@@ -1979,7 +1837,7 @@ export async function notifyExpiringSubscribers(
   daysThreshold: number = 3,
   customMessage?: string
 ): Promise<{ success: boolean; message: string; totalNotified: number; notifications: any[] }> {
-  const rawLedger = localStorage.getItem('peakform_host_ledger') || localStorage.getItem('peakform_host_grants_cache');
+  const rawLedger = getStoredItemMigrated('aroh_host_ledger', 'peakform_host_ledger') || getStoredItemMigrated('aroh_host_grants_cache', 'peakform_host_grants_cache');
   const grants: HostGrantedSubscription[] = rawLedger ? JSON.parse(rawLedger) : [];
   const now = Date.now();
 
@@ -2003,14 +1861,14 @@ export async function notifyExpiringSubscribers(
       expiryDateStr,
       sentAt: new Date().toISOString(),
       subject: `⚠️ Reminder: Your AROH VIP Subscription expires in ${daysRemaining} day${daysRemaining === 1 ? '' : 's'} (${expiryDateStr})`,
-      message: customMessage || `Your AROH Pro access is set to expire in ${daysRemaining} day(s) on ${expiryDateStr}. Contact host ${HOST_ADMIN_CONFIG.name} (${HOST_ADMIN_CONFIG.email}) or renew in-app.`,
+      message: customMessage || `Your AROH Pro access is set to expire in ${daysRemaining} day(s) on ${expiryDateStr}. Renew in-app to continue uninterrupted.`,
       status: 'dispatched',
     };
   });
 
   recordLocalHostAuditLog(
     'notification_sent',
-    `Host ${HOST_ADMIN_CONFIG.name} dispatched expiry warning notifications (≤${daysThreshold} days) to ${expiringGrants.length} athlete(s).`,
+    `Host dispatched expiry warning notifications (≤${daysThreshold} days) to ${expiringGrants.length} athlete(s).`,
     email,
     undefined,
     0,
@@ -2094,11 +1952,11 @@ export async function recordAthleteLoginSession(profile?: any): Promise<void> {
     // Retrieve active profile from storage if not passed
     let activeUser = profile;
     if (!activeUser) {
-      const raw = localStorage.getItem('peakform_user_profile');
+      const raw = getStoredItemMigrated('aroh_user_profile', 'peakform_user_profile');
       if (raw) activeUser = JSON.parse(raw);
     }
 
-    const email = (activeUser?.email || localStorage.getItem('peakform_auth_email') || 'athlete@peakform.ai').trim().toLowerCase();
+    const email = (activeUser?.email || getStoredItemMigrated('aroh_auth_email', 'peakform_auth_email') || 'athlete@aroh.fit').trim().toLowerCase();
     const name = activeUser?.name || email.split('@')[0];
 
     // Compute BMI
@@ -2138,8 +1996,8 @@ export async function recordAthleteLoginSession(profile?: any): Promise<void> {
       dailyCarbs: activeUser?.dailyCarbs,
       dailyFat: activeUser?.dailyFat,
       hydrationLiters: activeUser?.hydrationLiters,
-      workoutStreakDays: Number(localStorage.getItem('peakform_workout_streak') || 0),
-      totalWorkoutsLogged: Number(localStorage.getItem('peakform_total_workouts_logged') || 0),
+      workoutStreakDays: Number(getStoredItemMigrated('aroh_workout_streak', 'peakform_workout_streak') || 0),
+      totalWorkoutsLogged: Number(getStoredItemMigrated('aroh_total_workouts_logged', 'peakform_total_workouts_logged') || 0),
       isStrictVegetarian: activeUser?.dietType === 'vegetarian' || activeUser?.dietType === 'vegan',
       subscriptionPlan: computedSub?.planName || 'Active Plan',
       isLifetimeVIP: !!(computedSub as any)?.isLifetime || computedSub?.paymentMethod === 'HOST_LIFETIME_VIP',
@@ -2159,10 +2017,10 @@ export async function recordAthleteLoginSession(profile?: any): Promise<void> {
 
     // 1. Cache to local storage logins list
     try {
-      const rawLocal = localStorage.getItem('peakform_athlete_logins_local');
+      const rawLocal = getStoredItemMigrated('aroh_athlete_logins_local', 'peakform_athlete_logins_local');
       let localList: AthleteLoginRecord[] = rawLocal ? JSON.parse(rawLocal) : [];
       localList.unshift(loginPayload);
-      localStorage.setItem('peakform_athlete_logins_local', JSON.stringify(localList.slice(0, 150)));
+      localStorage.setItem('aroh_athlete_logins_local', JSON.stringify(localList.slice(0, 150)));
     } catch (e) {
       // ignore
     }
@@ -2188,7 +2046,7 @@ export async function recordAthleteLoginSession(profile?: any): Promise<void> {
  * Fetch complete history of athlete logins and aggregated profile details
  * Merges server records, Firestore records, and local storage seamlessly.
  */
-export async function fetchAthleteLogins(pin: string = HOST_ADMIN_CONFIG.defaultPin, email: string = HOST_ADMIN_CONFIG.email): Promise<{
+export async function fetchAthleteLogins(pin: string = '', email: string = ''): Promise<{
   success: boolean;
   logins: AthleteLoginRecord[];
   totalLogins: number;
@@ -2200,7 +2058,7 @@ export async function fetchAthleteLogins(pin: string = HOST_ADMIN_CONFIG.default
 
   // 1. Load local cache
   try {
-    const rawLocal = localStorage.getItem('peakform_athlete_logins_local');
+    const rawLocal = getStoredItemMigrated('aroh_athlete_logins_local', 'peakform_athlete_logins_local');
     if (rawLocal) {
       const parsed: AthleteLoginRecord[] = JSON.parse(rawLocal);
       parsed.forEach((l) => {
@@ -2268,8 +2126,9 @@ export async function fetchAthleteLogins(pin: string = HOST_ADMIN_CONFIG.default
 /**
  * Clear athlete logins telemetry
  */
-export async function clearAthleteLoginsHistory(pin: string = HOST_ADMIN_CONFIG.defaultPin, email: string = HOST_ADMIN_CONFIG.email): Promise<boolean> {
+export async function clearAthleteLoginsHistory(pin: string = '', email: string = ''): Promise<boolean> {
   try {
+    localStorage.removeItem('aroh_athlete_logins_local');
     localStorage.removeItem('peakform_athlete_logins_local');
     const res = await fetch('/api/host/clear-athlete-logins', {
       method: 'POST',
@@ -2315,13 +2174,13 @@ export async function executeBulkOperation(request: {
       // Update local storage grants if returned
       if (data.updatedGrants && Array.isArray(data.updatedGrants)) {
         try {
-          const cachedRaw = localStorage.getItem('peakform_host_ledger');
+          const cachedRaw = getStoredItemMigrated('aroh_host_ledger', 'peakform_host_ledger');
           let currentList: HostGrantedSubscription[] = cachedRaw ? JSON.parse(cachedRaw) : [];
           const affectedSet = new Set(data.affectedEmails.map((e: string) => e.toLowerCase()));
           currentList = currentList.filter((g) => !affectedSet.has(g.email.toLowerCase()));
           currentList = [...data.updatedGrants, ...currentList];
-          localStorage.setItem('peakform_host_ledger', JSON.stringify(currentList));
-          localStorage.setItem('peakform_host_grants_cache', JSON.stringify(currentList));
+          localStorage.setItem('aroh_host_ledger', JSON.stringify(currentList));
+          localStorage.setItem('aroh_host_grants_cache', JSON.stringify(currentList));
         } catch (err) {
           // ignore
         }
@@ -2353,8 +2212,8 @@ export async function executeBulkOperation(request: {
  */
 export async function fetchGrantTimeline(
   targetEmail: string,
-  pin: string = HOST_ADMIN_CONFIG.defaultPin,
-  email: string = HOST_ADMIN_CONFIG.email
+  pin: string = '',
+  email: string = ''
 ): Promise<{
   success: boolean;
   email: string;
@@ -2394,8 +2253,8 @@ export async function fetchGrantTimeline(
         timestamp: new Date().toISOString(),
         eventType: 'initial_grant',
         title: 'VIP Free Subscription Active',
-        description: `Active access managed by Host ${HOST_ADMIN_CONFIG.name}.`,
-        actor: HOST_ADMIN_CONFIG.name,
+        description: 'Active access managed by Host Administrator.',
+        actor: 'Host Administrator',
         badge: 'Verified',
       }
     ],
@@ -2407,8 +2266,8 @@ export async function fetchGrantTimeline(
  * Fetch Program Valuation & Impact Metrics Mini-Dashboard
  */
 export async function fetchProgramValuation(
-  pin: string = HOST_ADMIN_CONFIG.defaultPin,
-  email: string = HOST_ADMIN_CONFIG.email
+  pin: string = '',
+  email: string = ''
 ): Promise<{
   success: boolean;
   valuation: {

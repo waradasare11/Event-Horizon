@@ -127,17 +127,19 @@ export const Footer: React.FC<FooterProps> = ({
 
         {/* Bottom Tier: Legal Navigation Links & Operator Attribution */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
-          {/* Legal Navigation Links with route paths */}
-          <nav className="flex items-center gap-3 sm:gap-5 flex-wrap justify-center md:justify-start" aria-label="Legal Links">
+          {/* Customer Navigation: AROH • Privacy • Terms • Disclaimer • Contact */}
+          <nav className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center md:justify-start" aria-label="Customer Navigation">
+            <span className="font-bold text-slate-800 dark:text-slate-200 tracking-tight">AROH</span>
+
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+
             <button
               type="button"
               onClick={() => onOpenLegal('privacy')}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors flex items-center gap-1 cursor-pointer font-medium"
+              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer font-medium"
               title="Privacy Policy under DPDP Act, 2023"
             >
-              <Shield className="w-3.5 h-3.5" />
-              <span>Privacy Policy</span>
-              <span className="text-[10px] text-slate-400 font-mono">(/privacy)</span>
+              Privacy
             </button>
 
             <span className="text-slate-300 dark:text-slate-700">•</span>
@@ -145,12 +147,10 @@ export const Footer: React.FC<FooterProps> = ({
             <button
               type="button"
               onClick={() => onOpenLegal('terms')}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors flex items-center gap-1 cursor-pointer font-medium"
+              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer font-medium"
               title="Terms of Service & 7-Day Trial"
             >
-              <FileText className="w-3.5 h-3.5" />
-              <span>Terms of Service</span>
-              <span className="text-[10px] text-slate-400 font-mono">(/terms)</span>
+              Terms
             </button>
 
             <span className="text-slate-300 dark:text-slate-700">•</span>
@@ -158,12 +158,21 @@ export const Footer: React.FC<FooterProps> = ({
             <button
               type="button"
               onClick={() => onOpenLegal('disclaimer')}
-              className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors flex items-center gap-1 cursor-pointer font-medium"
+              className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer font-medium"
               title="Medical Disclaimer"
             >
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>Medical Disclaimer</span>
-              <span className="text-[10px] text-slate-400 font-mono">(/disclaimer)</span>
+              Disclaimer
+            </button>
+
+            <span className="text-slate-300 dark:text-slate-700">•</span>
+
+            <button
+              type="button"
+              onClick={onOpenReportError}
+              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer font-medium"
+              title="Contact Support / Report Issue"
+            >
+              Contact
             </button>
 
             <span className="text-slate-300 dark:text-slate-700">•</span>
@@ -171,24 +180,10 @@ export const Footer: React.FC<FooterProps> = ({
             <button
               type="button"
               onClick={() => onOpenLegal('refund')}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors flex items-center gap-1 cursor-pointer font-medium"
-              title="48-Hour Refund Policy"
+              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
+              title="Refund Policy"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
-              <span>Refund Policy</span>
-              <span className="text-[10px] text-slate-400 font-mono">(/refund)</span>
-            </button>
-
-            <span className="text-slate-300 dark:text-slate-700">•</span>
-
-            <button
-              type="button"
-              onClick={() => onOpenLegal('cookies')}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors flex items-center gap-1 cursor-pointer font-medium"
-              title="Cookies and Local Storage"
-            >
-              <Cookie className="w-3.5 h-3.5" />
-              <span>Cookies</span>
+              Refund
             </button>
 
             <span className="text-slate-300 dark:text-slate-700">•</span>
@@ -196,11 +191,10 @@ export const Footer: React.FC<FooterProps> = ({
             <button
               type="button"
               onClick={() => onOpenLegal('delete-data')}
-              className="text-red-600/80 dark:text-red-400/80 hover:text-red-600 dark:hover:text-red-400 transition-colors flex items-center gap-1 cursor-pointer font-bold"
+              className="text-red-600/80 dark:text-red-400/80 hover:text-red-600 dark:hover:text-red-400 transition-colors cursor-pointer font-medium"
               title="Permanently Delete My Data & Account"
             >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Delete My Data</span>
+              Delete My Data
             </button>
           </nav>
 
@@ -208,14 +202,18 @@ export const Footer: React.FC<FooterProps> = ({
           <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 flex-wrap justify-center">
             <div className="flex items-center gap-1">
               <MapPin className="w-3 h-3 text-teal-500" />
-              <span>Warad Asare • Pune, Maharashtra, India</span>
+              <span>AROH • Pune, Maharashtra, India</span>
             </div>
             <span>•</span>
             <div className="flex items-center gap-1">
               <Mail className="w-3 h-3 text-teal-500" />
-              <a href="mailto:waradasare11@gmail.com" className="hover:underline text-teal-600 dark:text-teal-400">
-                waradasare11@gmail.com
-              </a>
+              <button
+                type="button"
+                onClick={() => onOpenLegal('privacy')}
+                className="hover:underline text-teal-600 dark:text-teal-400 cursor-pointer"
+              >
+                support@aroh.fit
+              </button>
             </div>
           </div>
         </div>

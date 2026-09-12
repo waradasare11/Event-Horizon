@@ -231,7 +231,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
             </div>
             <div>
               <div className="text-xs font-bold text-red-700 dark:text-red-400 flex items-center gap-1.5">
-                <span>100% Accurate YouTube Video Tutorial</span>
+                <span>Verified YouTube Video Tutorial</span>
                 <span className="px-1.5 py-0.2 bg-red-100 dark:bg-red-950/60 text-[10px] rounded font-semibold text-red-600 dark:text-red-300">Verified</span>
               </div>
               <div className="text-[11px] text-[#6B7280] dark:text-[#9EA8A2]">

@@ -16,6 +16,7 @@ export const db = initializeFirestore(
 );
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('https://www.googleapis.com/auth/drive.file');
 
 export enum OperationType {
   CREATE = 'create',
@@ -82,6 +83,45 @@ export async function signInWithGoogle(): Promise<User | null> {
   try {
     googleProvider.setCustomParameters({ prompt: 'select_account' });
     const result = await signInWithPopup(auth, googleProvider);
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const accessToken = credential?.accessToken || null;
+    const email = (result.user?.email || '').trim().toLowerCase();
+
+    if (accessToken && email) {
+      const sanitized = email.replace(/[^a-z0-9]/g, '_');
+      const expiresAt = Date.now() + 3500 * 1000;
+      let driveFolderId: string | null = null;
+
+      try {
+        const { getOrCreateArohFolder } = await import('./googleWorkspace');
+        driveFolderId = await getOrCreateArohFolder(accessToken);
+      } catch (fErr) {
+        console.warn('Initial folder check warning:', fErr);
+      }
+
+      const authPayload = {
+        accessToken,
+        expiresAt,
+        email,
+        driveFolderId,
+        lastBackupTimestamp: new Date().toISOString(),
+      };
+
+      try {
+        localStorage.setItem(`aroh_drive_auth__usr_${sanitized}`, JSON.stringify(authPayload));
+        localStorage.setItem('aroh_google_workspace_auth', JSON.stringify({
+          isConnected: true,
+          accessToken,
+          expiresAt,
+          userEmail: email,
+          driveFolderId,
+          lastBackupTimestamp: authPayload.lastBackupTimestamp,
+        }));
+      } catch (e) {
+        console.warn('Failed saving drive auth state', e);
+      }
+    }
+
     return result.user;
   } catch (error) {
     console.error('Failed to sign in with Google:', error);

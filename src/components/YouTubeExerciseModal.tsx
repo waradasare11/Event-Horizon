@@ -52,7 +52,7 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400 flex items-center gap-1">
                 <span>Verified Exercise Tutorials</span>
-                <span className="px-1.5 py-0.2 rounded bg-red-100 dark:bg-red-950/70 text-red-700 dark:text-red-300 font-bold text-[10px]">100% Accurate</span>
+                <span className="px-1.5 py-0.2 rounded bg-red-100 dark:bg-red-950/70 text-red-700 dark:text-red-300 font-bold text-[10px]">Verified Video</span>
               </span>
               <h3 className="text-lg font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                 Watch Form Tutorial

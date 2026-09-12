@@ -338,7 +338,7 @@ export function executeMultiModelConsensusReconciliation(
     totalFiberG,
     goalAlignmentScore: Math.min(100, Math.max(70, Math.round(overallConsensusScore))),
     goalFitVerdict: overallConsensusScore >= 90 ? 'Optimal Macro & Micronutrient Profile' : 'Balanced Whole Food Composition',
-    scientificTakeaway: `Benchmarked with ${overallConsensusScore}% confidence score using cross-database verification against verified nutritional standards.`,
+    scientificTakeaway: 'AI estimate calibrated with cross-database nutritional references — you can correct portions.',
     consensusScore: overallConsensusScore,
     items: unifiedItems,
     goalImprovementTips: [

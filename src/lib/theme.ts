@@ -1,10 +1,22 @@
 export type ThemeMode = 'light' | 'dark' | 'system';
 
-const THEME_STORAGE_KEY = 'peakform_theme_preference';
+const THEME_STORAGE_KEY = 'aroh_theme_preference';
+const LEGACY_THEME_STORAGE_KEY = 'peakform_theme_preference';
 
 export function getStoredTheme(): ThemeMode {
   try {
-    const saved = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
+    let saved = localStorage.getItem(THEME_STORAGE_KEY) as ThemeMode | null;
+    if (!saved) {
+      const legacy = localStorage.getItem(LEGACY_THEME_STORAGE_KEY) as ThemeMode | null;
+      if (legacy === 'light' || legacy === 'dark' || legacy === 'system') {
+        saved = legacy;
+        try {
+          localStorage.setItem(THEME_STORAGE_KEY, legacy);
+        } catch {
+          // ignore
+        }
+      }
+    }
     if (saved === 'light' || saved === 'dark' || saved === 'system') {
       return saved;
     }

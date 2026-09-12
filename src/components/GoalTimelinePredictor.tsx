@@ -150,11 +150,11 @@ export const GoalTimelinePredictor: React.FC<GoalTimelinePredictorProps> = ({
           </p>
         </div>
 
-        {/* Confidence Badge */}
+        {/* Model Badge */}
         <div className="flex items-center gap-2 shrink-0">
-          <div className="px-3 py-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-black flex items-center gap-1.5">
+          <div className="px-3 py-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            <span>{confidenceScore}% Prediction Confidence</span>
+            <span>AI Projection Model</span>
           </div>
         </div>
       </div>

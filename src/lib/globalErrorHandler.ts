@@ -3,7 +3,7 @@
  * 
  * Captures all unhandled Promise rejections and uncaught runtime errors across the entire app.
  * Stores detailed error diagnostics into Firestore under the 'ClientErrorLogs' collection,
- * allowing the Host Admin (Warad Asare) to diagnose and resolve client issues centrally.
+ * allowing the Host Admin to diagnose and resolve client issues centrally.
  */
 
 import { auth, db } from './firebase';
@@ -28,7 +28,8 @@ export interface ClientErrorLog {
 }
 
 const ERROR_LOGS_COLLECTION = 'ClientErrorLogs';
-const LOCAL_ERROR_CACHE_KEY = 'peakform_client_error_logs';
+const STORAGE_KEY = 'aroh_client_error_logs';
+const LEGACY_STORAGE_KEY = 'peakform_client_error_logs';
 const MAX_LOCAL_LOGS = 50;
 
 function detectPlatform(): ClientErrorLog['platform'] {
@@ -52,7 +53,13 @@ function detectDeviceType(): ClientErrorLog['deviceType'] {
 
 export function getLocalErrorLogs(): ClientErrorLog[] {
   try {
-    const raw = localStorage.getItem(LOCAL_ERROR_CACHE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (raw) {
+        localStorage.setItem(STORAGE_KEY, raw);
+      }
+    }
     if (raw) {
       return JSON.parse(raw);
     }
@@ -66,7 +73,7 @@ export function saveLocalErrorLog(log: ClientErrorLog): void {
   try {
     const current = getLocalErrorLogs();
     const updated = [log, ...current].slice(0, MAX_LOCAL_LOGS);
-    localStorage.setItem(LOCAL_ERROR_CACHE_KEY, JSON.stringify(updated));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   } catch (e) {
     console.warn('Failed saving error to local cache', e);
   }
@@ -84,7 +91,7 @@ export async function logClientError(errorDetails: Partial<ClientErrorLog>): Pro
     lineno: errorDetails.lineno || 0,
     colno: errorDetails.colno || 0,
     timestamp: new Date().toISOString(),
-    userEmail: currentUser?.email || 'unauthenticated@peakform.ai',
+    userEmail: currentUser?.email || 'unauthenticated@aroh.fit',
     userId: currentUser?.uid || 'anonymous',
     userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'Node.js',
     platform: detectPlatform(),
@@ -132,7 +139,8 @@ export async function fetchClientErrorLogs(): Promise<ClientErrorLog[]> {
  */
 export async function clearAllClientErrorLogs(): Promise<boolean> {
   try {
-    localStorage.removeItem(LOCAL_ERROR_CACHE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(LEGACY_STORAGE_KEY);
     if (db) {
       const q = query(collection(db, ERROR_LOGS_COLLECTION), limit(100));
       const snap = await getDocs(q);

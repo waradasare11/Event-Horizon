@@ -16,6 +16,16 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
+// Explicit robots.txt handler for search engine crawlers & compliance
+app.get("/robots.txt", (_req, res) => {
+  const robotsPath = path.join(process.cwd(), "public", "robots.txt");
+  if (fs.existsSync(robotsPath)) {
+    res.type("text/plain").sendFile(robotsPath);
+  } else {
+    res.type("text/plain").send("User-agent: *\nAllow: /\nAllow: /privacy\nAllow: /terms\nAllow: /disclaimer\nAllow: /refund\nAllow: /cookies\nDisallow: /api/\n");
+  }
+});
+
 // Middleware for parsing JSON with a generous limit for base64 image data
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
@@ -4132,9 +4142,9 @@ Return ONLY a valid JSON object matching this schema:
 
 // 14. Subscription Plans, Host Master PIN Security & Tamper-Proof Financial Gateway
 const HOST_SECRET_KEY = process.env.HOST_SECRET_KEY || crypto.randomBytes(32).toString("hex");
-const HOST_VPA = process.env.HOST_UPI_VPA || "9284160309@fam";
-const HOST_NAME = process.env.HOST_NAME || "Warad Asare";
-const HOST_EMAIL = (process.env.HOST_EMAIL || "waradasare11@gmail.com").trim().toLowerCase();
+const HOST_VPA = (process.env.HOST_UPI_VPA || "").trim();
+const HOST_NAME = process.env.HOST_NAME || "AROH Administrator";
+const HOST_EMAIL = (process.env.HOST_EMAIL || "").trim().toLowerCase();
 
 const BASE_OFFICIAL_PLANS = [
   {
@@ -4508,7 +4518,10 @@ function hashPin(pin: string): string {
   return crypto.createHmac("sha256", HOST_SECRET_KEY).update(`${pin}::${PIN_SALT}`).digest("hex");
 }
 
-let runtimeHashedPin: string | null = hashPin((process.env.HOST_SECURITY_PIN || "9284").trim());
+// set HOST_SECURITY_PIN in env, never default to a real PIN
+let runtimeHashedPin: string | null = process.env.HOST_SECURITY_PIN
+  ? hashPin(process.env.HOST_SECURITY_PIN.trim())
+  : null;
 
 // In-memory rate limiting and lockout tracking for Host Security PIN
 // Enforces max 5 attempts per 15 minutes, with lockout upon 5 failed attempts
@@ -4709,12 +4722,17 @@ app.get("/api/subscription/plans", (req, res) => {
   return res.json({
     success: true,
     isHost,
-    host: {
-      name: HOST_NAME,
-      vpa: HOST_VPA,
-      email: HOST_EMAIL,
-    },
     plans: personalizedPlans,
+  });
+});
+
+// 14.1b Host Identity Check
+app.get("/api/host/whoami", (req, res) => {
+  const queryEmail = (req.query.email as string || req.headers["x-user-email"] as string || "").trim().toLowerCase();
+  const isHost = Boolean(HOST_EMAIL && queryEmail && queryEmail === HOST_EMAIL);
+  return res.json({
+    isHost,
+    appName: "AROH Pro",
   });
 });
 
@@ -5259,7 +5277,7 @@ app.post("/api/host/grant-free-subscription", (req, res) => {
     isLifetime: isTrulyLifetime,
     durationMonths,
     durationDays,
-    notes: notes || (isTrulyLifetime ? "Host Lifetime Free Subscription granted by Warad Asare" : `Host Free ${planName} granted by Warad Asare`),
+    notes: notes || (isTrulyLifetime ? `Host Lifetime Free Subscription granted by ${HOST_NAME}` : `Host Free ${planName} granted by ${HOST_NAME}`),
     expiresAt,
   };
 
@@ -6218,7 +6236,7 @@ app.post("/api/host/bulk-operations", (req, res) => {
           isLifetime: false,
           durationMonths: Math.max(1, Math.round(daysToAdd / 30)),
           durationDays: daysToAdd,
-          notes: notes || `Batch Extension +${daysToAdd} Days by Host Warad Asare`,
+          notes: notes || `Batch Extension +${daysToAdd} Days by Host ${HOST_NAME}`,
           expiresAt: new Date(now.getTime() + daysToAdd * 24 * 60 * 60 * 1000).toISOString(),
         };
         hostGrantedSubscriptions.unshift(newGrant);
@@ -6229,7 +6247,7 @@ app.post("/api/host/bulk-operations", (req, res) => {
 
     recordAuditLog(
       "free_access_granted",
-      `Host Warad Asare executed Batch Duration Extension (+${daysToAdd} days) for ${updatedCount} athletes.`,
+      `Host ${HOST_NAME} executed Batch Duration Extension (+${daysToAdd} days) for ${updatedCount} athletes.`,
       HOST_EMAIL,
       undefined,
       0,
@@ -6264,7 +6282,7 @@ app.post("/api/host/bulk-operations", (req, res) => {
           isLifetime: true,
           durationMonths: 1200,
           durationDays: 36500,
-          notes: notes || `Batch Upgraded to Lifetime VIP by Host Warad Asare`,
+          notes: notes || `Batch Upgraded to Lifetime VIP by Host ${HOST_NAME}`,
           expiresAt: "2099-12-31T23:59:59.000Z",
         };
         hostGrantedSubscriptions.unshift(newGrant);
@@ -6275,7 +6293,7 @@ app.post("/api/host/bulk-operations", (req, res) => {
 
     recordAuditLog(
       "free_access_granted",
-      `Host Warad Asare executed Batch Lifetime VIP Upgrade for ${updatedCount} athletes.`,
+      `Host ${HOST_NAME} executed Batch Lifetime VIP Upgrade for ${updatedCount} athletes.`,
       HOST_EMAIL,
       "all_plans",
       0,
@@ -6296,7 +6314,7 @@ app.post("/api/host/bulk-operations", (req, res) => {
 
     recordAuditLog(
       "notification_sent" as any,
-      `Host Warad Asare sent batch notification to ${sanitizedTargetEmails.length} athletes.`,
+      `Host ${HOST_NAME} sent batch notification to ${sanitizedTargetEmails.length} athletes.`,
       HOST_EMAIL,
       undefined,
       0,
@@ -6324,7 +6342,7 @@ app.post("/api/host/bulk-operations", (req, res) => {
 
     recordAuditLog(
       "discount_deleted",
-      `Host Warad Asare executed Batch Revoke for ${updatedCount} athletes.`,
+      `Host ${HOST_NAME} executed Batch Revoke for ${updatedCount} athletes.`,
       HOST_EMAIL,
       undefined,
       0,
@@ -6369,8 +6387,8 @@ app.get("/api/host/grant-timeline/:email", (req, res) => {
       timestamp: grant.grantedAt,
       eventType: "initial_grant",
       title: "VIP Free Access Granted",
-      description: `Host ${grant.grantedByName || "Warad Asare"} activated ${grant.planName} (${grant.isLifetime ? "Lifetime VIP" : `${grant.durationDays} Days`}).`,
-      actor: grant.grantedByName || "Host Warad Asare",
+      description: `Host ${grant.grantedByName || HOST_NAME} activated ${grant.planName} (${grant.isLifetime ? "Lifetime VIP" : `${grant.durationDays} Days`}).`,
+      actor: grant.grantedByName || `Host ${HOST_NAME}`,
       planName: grant.planName,
       durationLabel: grant.isLifetime ? "Lifetime VIP" : `${grant.durationDays} Days`,
       badge: grant.isLifetime ? "Lifetime VIP" : "Active Plan",

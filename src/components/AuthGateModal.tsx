@@ -6,7 +6,6 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { signInWithGoogle } from '../lib/firebase';
-import { fireCelebrationConfetti } from '../lib/confetti';
 
 interface AuthGateModalProps {
   isOpen: boolean;
@@ -29,7 +28,6 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
       setAuthError(null);
       const user = await signInWithGoogle();
       if (user && user.email) {
-        fireCelebrationConfetti();
         onSuccessAuth(user.email, user.displayName || 'AROH Athlete');
       } else {
         setAuthError('Sign in requires a valid Google account with an email address.');
@@ -171,13 +169,21 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
           </div>
         </div>
 
-        {/* Security Footer */}
-        <div className="px-6 py-3.5 bg-[#FAFAF8] dark:bg-[#111312] border-t border-[#E5E7EB] dark:border-[#242826] text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex items-center justify-between shrink-0">
+        {/* Security Footer & Compliance Links */}
+        <div className="px-6 py-3.5 bg-[#FAFAF8] dark:bg-[#111312] border-t border-[#E5E7EB] dark:border-[#242826] text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0">
           <span className="flex items-center gap-1.5">
             <Lock className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Encrypted & Verified Session</span>
+            <span>Encrypted Session • DPDP Act, 2023 Compliant</span>
           </span>
-          <span className="font-semibold text-[#0F6E5F] dark:text-[#2DD4BF]">AROH v2.4</span>
+          <div className="flex items-center gap-2 font-medium">
+            <a href="/privacy" className="hover:text-[#0F6E5F] dark:hover:text-[#2DD4BF] underline">Privacy</a>
+            <span>•</span>
+            <a href="/terms" className="hover:text-[#0F6E5F] dark:hover:text-[#2DD4BF] underline">Terms</a>
+            <span>•</span>
+            <a href="/disclaimer" className="hover:text-amber-600 dark:hover:text-amber-400 underline">Disclaimer</a>
+            <span>•</span>
+            <a href="/refund" className="hover:text-[#0F6E5F] dark:hover:text-[#2DD4BF] underline">Refunds</a>
+          </div>
         </div>
       </div>
     </div>

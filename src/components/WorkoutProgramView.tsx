@@ -608,7 +608,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
       onUpdateWorkoutProgram(updatedProgram);
     }
 
-    setRecentSwapBanner(`Successfully swapped in "${swap.name}" (${swap.matchPercentage}% EMG match) with joint safety protection!`);
+    setRecentSwapBanner(`Successfully swapped in "${swap.name}" (${swap.matchPercentage}% biomechanical match) with joint safety protection!`);
     setTimeout(() => setRecentSwapBanner(null), 6000);
   };
 

@@ -35,7 +35,8 @@ export interface PerformanceSummary {
   recentErrors: PerformanceMetric[];
 }
 
-const STORAGE_KEY = 'peakform_ai_performance_metrics';
+const STORAGE_KEY = 'aroh_ai_performance_metrics';
+const LEGACY_STORAGE_KEY = 'peakform_ai_performance_metrics';
 const MAX_METRICS_COUNT = 300;
 
 // Seed realistic initial baseline sample logs if empty so the host sees rich telemetry immediately
@@ -83,7 +84,18 @@ function loadMetricsFromStorage(): PerformanceMetric[] {
     return getInitialSampleMetrics();
   }
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+      if (legacy) {
+        raw = legacy;
+        try {
+          localStorage.setItem(STORAGE_KEY, legacy);
+        } catch {
+          // ignore
+        }
+      }
+    }
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {

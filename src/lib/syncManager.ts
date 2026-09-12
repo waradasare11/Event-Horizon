@@ -71,7 +71,16 @@ if (typeof window !== 'undefined') {
 
 function loadQueueFromStorage(): SyncJob[] {
   try {
-    const raw = localStorage.getItem(QUEUE_STORAGE_KEY) || localStorage.getItem('peakform_pending_sync_queue');
+    let raw = localStorage.getItem(QUEUE_STORAGE_KEY);
+    if (!raw) {
+      const legacy = localStorage.getItem('peakform_pending_sync_queue');
+      if (legacy) {
+        raw = legacy;
+        try {
+          localStorage.setItem(QUEUE_STORAGE_KEY, legacy);
+        } catch {}
+      }
+    }
     if (raw) return JSON.parse(raw);
   } catch (e) {
     console.error('Failed to load sync queue from localStorage', e);
@@ -83,7 +92,6 @@ function saveQueueToStorage(queue: SyncJob[]): void {
   try {
     const serialized = JSON.stringify(queue);
     localStorage.setItem(QUEUE_STORAGE_KEY, serialized);
-    localStorage.setItem('peakform_pending_sync_queue', serialized);
   } catch (e) {
     console.error('Failed to save sync queue to localStorage', e);
   }
@@ -91,7 +99,17 @@ function saveQueueToStorage(queue: SyncJob[]): void {
 
 function loadLastSyncTimestamp(): string | null {
   try {
-    return localStorage.getItem(LAST_SYNCED_STORAGE_KEY) || localStorage.getItem('peakform_last_synced_timestamp');
+    let ts = localStorage.getItem(LAST_SYNCED_STORAGE_KEY);
+    if (!ts) {
+      const legacy = localStorage.getItem('peakform_last_synced_timestamp');
+      if (legacy) {
+        ts = legacy;
+        try {
+          localStorage.setItem(LAST_SYNCED_STORAGE_KEY, legacy);
+        } catch {}
+      }
+    }
+    return ts;
   } catch {
     return null;
   }
@@ -101,7 +119,6 @@ function saveLastSyncTimestamp(iso: string): void {
   lastSyncTimestamp = iso;
   try {
     localStorage.setItem(LAST_SYNCED_STORAGE_KEY, iso);
-    localStorage.setItem('peakform_last_synced_timestamp', iso);
   } catch {}
 }
 

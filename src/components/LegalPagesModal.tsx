@@ -17,7 +17,8 @@ import {
   Camera,
   Mic,
   Database,
-  ArrowRight
+  ArrowRight,
+  LogIn
 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { executeCompleteAccountDataErasure, DataDeletionSummary } from '../lib/dataDeletion';
@@ -31,6 +32,7 @@ interface LegalPagesModalProps {
   userProfile?: UserProfile;
   onDataDeleted?: () => void;
   onCompleteDataErasure?: () => void;
+  onSignIn?: () => void;
 }
 
 export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
@@ -40,6 +42,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
   userProfile,
   onDataDeleted,
   onCompleteDataErasure,
+  onSignIn,
 }) => {
   const [activeTab, setActiveTab] = useState<LegalTabType>(initialTab);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -124,7 +127,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
                 </span>
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Operated by Warad Asare • Pune, Maharashtra, India
+                Operated by AROH AI Technologies • Pune, Maharashtra, India
               </p>
             </div>
           </div>
@@ -354,7 +357,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
                   </p>
                   <ul className="list-disc pl-5 space-y-1 text-slate-600 dark:text-slate-400">
                     <li>Available billing tiers include: 1 Month Pro (₹89), 3 Months Transformation (₹239), 6 Months Elite (₹479), 1 Year Master (₹919), 2 Years (₹1,820), 3 Years (₹2,700), and Lifetime access.</li>
-                    <li>Payments are made via UPI (Unified Payments Interface) or authorized Indian payment gateways directly to the operator (Warad Asare).</li>
+                    <li>Payments are securely processed via authorized Indian payment gateways (including Razorpay, UPI, cards, and net banking).</li>
                     <li>Subscriptions are one-time prepayments for the stated duration; there are no hidden recurring auto-debits without your explicit UPI mandate consent.</li>
                   </ul>
                 </section>
@@ -550,7 +553,35 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
                 </p>
               </div>
 
-              {deletionSummary ? (
+              {/* Requirement 3: If logged out, show "Sign in to delete your data" */}
+              {!userProfile?.email || !userProfile.email.includes('@') ? (
+                <div className="p-6 rounded-2xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-center space-y-4 max-w-md mx-auto">
+                  <div className="w-12 h-12 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center mx-auto">
+                    <Lock className="w-6 h-6" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                      Sign In to Delete Your Data
+                    </h4>
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                      To exercise your Right to Erasure under Section 12 of the DPDP Act, 2023, you must sign in first. We need to verify which Gmail account and associated cloud records to wipe.
+                    </p>
+                  </div>
+                  {onSignIn && (
+                    <button
+                      type="button"
+                      onClick={onSignIn}
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    >
+                      <LogIn className="w-4 h-4" />
+                      <span>Sign In with Google</span>
+                    </button>
+                  )}
+                  <p className="text-[11px] text-slate-500 italic">
+                    If you do not have an account, no personal data is stored on our servers.
+                  </p>
+                </div>
+              ) : deletionSummary ? (
                 <div className="p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-3">
                   <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
                   <h4 className="text-base font-bold text-emerald-800 dark:text-emerald-300">

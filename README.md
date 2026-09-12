@@ -1,6 +1,6 @@
-# AROH — Evidence-Based Workout & Nutrition Coaching Platform
+# AROH — evidence-informed workout and nutrition coaching for India.
 
-AROH is a science-guided fitness and nutrition coaching SaaS inspired by exercise physiology principles (like BuiltWithScience). It combines real-time AI computer vision for instant meal photo scanning, a deterministic Mifflin-St Jeor metabolic calculation engine, EMG-backed resistance training programs, and interactive body composition analytics.
+AROH is an evidence-informed workout and nutrition coaching platform for India. It combines AI computer vision for meal photo scanning, a deterministic Mifflin-St Jeor metabolic calculation engine, resistance training programs, and interactive body composition analytics.
 
 ---
 
@@ -8,7 +8,7 @@ AROH is a science-guided fitness and nutrition coaching SaaS inspired by exercis
 
 1. **AI Vision Meal Scanner & Nutritional Analysis**:
    - Live camera capture or photo upload powered by **Gemini 3.7 Flash**.
-   - Sub-10 second breakdown of identified ingredients, portion weights in grams, calories, and macronutrients.
+   - Breakdown of identified ingredients, portion weights in grams, calories, and macronutrients (AI estimate — you can correct portions).
    - Goal alignment scoring (1-100), scientific verdicts, and 1-click **AI Smart Swaps**.
    - Interactive portion slider to adjust weights and instantly re-estimate macros.
 

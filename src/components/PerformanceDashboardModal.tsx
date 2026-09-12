@@ -301,7 +301,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
                 Host Master Authorization Required
               </h3>
               <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1">
-                This diagnostic telemetry dashboard is restricted to the host administrator (Warad Asare). Enter your Host PIN to unlock.
+                This diagnostic telemetry dashboard is restricted to the host administrator. Enter your Host PIN to unlock.
               </p>
             </div>
 

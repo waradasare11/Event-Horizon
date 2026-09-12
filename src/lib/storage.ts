@@ -3,33 +3,37 @@ import { INITIAL_USER_PROFILE, INITIAL_SAMPLE_MEAL_LOGS, INITIAL_SAMPLE_BODY_MET
 import { MASTER_WORKOUT_PROGRAMS } from '../data/workoutPrograms';
 
 const STORAGE_KEYS = {
-  PROFILE: 'peakform_user_profile',
-  MEAL_LOGS: 'peakform_meal_logs',
-  BODY_METRICS: 'peakform_body_metrics',
-  WORKOUT_PROGRAMS: 'peakform_workout_programs',
-  CHECK_INS: 'peakform_check_ins',
-  AI_MEAL_PLAN: 'peakform_ai_meal_plan',
-  CUSTOM_RECIPES: 'peakform_custom_recipes',
-  WORKOUT_LOGS: 'peakform_workout_logs',
-  FORM_ANALYSES: 'peakform_form_analyses',
-  SMART_SHOPPING_LIST: 'peakform_smart_shopping_list',
+  PROFILE: 'aroh_user_profile',
+  MEAL_LOGS: 'aroh_meal_logs',
+  BODY_METRICS: 'aroh_body_metrics',
+  WORKOUT_PROGRAMS: 'aroh_workout_programs',
+  CHECK_INS: 'aroh_check_ins',
+  AI_MEAL_PLAN: 'aroh_ai_meal_plan',
+  CUSTOM_RECIPES: 'aroh_custom_recipes',
+  WORKOUT_LOGS: 'aroh_workout_logs',
+  FORM_ANALYSES: 'aroh_form_analyses',
+  SMART_SHOPPING_LIST: 'aroh_smart_shopping_list',
+  COACH_CHAT: 'aroh_coach_chat',
+};
+
+const LEGACY_STORAGE_KEYS: Record<string, string> = {
+  aroh_user_profile: 'peakform_user_profile',
+  aroh_meal_logs: 'peakform_meal_logs',
+  aroh_body_metrics: 'peakform_body_metrics',
+  aroh_workout_programs: 'peakform_workout_programs',
+  aroh_check_ins: 'peakform_check_ins',
+  aroh_ai_meal_plan: 'peakform_ai_meal_plan',
+  aroh_custom_recipes: 'peakform_custom_recipes',
+  aroh_workout_logs: 'peakform_workout_logs',
+  aroh_form_analyses: 'peakform_form_analyses',
+  aroh_smart_shopping_list: 'peakform_smart_shopping_list',
+  aroh_coach_chat: 'peakform_coach_chat',
 };
 
 export function getUserScopedKey(baseKey: string, userEmail?: string): string {
   let email = userEmail;
   if (!email && typeof window !== 'undefined') {
-    try {
-      email = localStorage.getItem('peakform_current_active_email') || '';
-      if (!email) {
-        const rawProf = localStorage.getItem(STORAGE_KEYS.PROFILE);
-        if (rawProf) {
-          const parsed = JSON.parse(rawProf);
-          email = parsed.email || '';
-        }
-      }
-    } catch (e) {
-      // ignore
-    }
+    email = getCurrentActiveEmail();
   }
 
   if (!email || !email.includes('@')) return baseKey;
@@ -40,7 +44,8 @@ export function getUserScopedKey(baseKey: string, userEmail?: string): string {
 export function setCurrentActiveEmail(email: string): void {
   try {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('peakform_current_active_email', email.trim().toLowerCase());
+      const clean = email.trim().toLowerCase();
+      localStorage.setItem('aroh_current_active_email', clean);
     }
   } catch (e) {
     // ignore
@@ -50,12 +55,56 @@ export function setCurrentActiveEmail(email: string): void {
 export function getCurrentActiveEmail(): string {
   try {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('peakform_current_active_email') || '';
+      let email = localStorage.getItem('aroh_current_active_email');
+      if (!email) {
+        email = localStorage.getItem('peakform_current_active_email');
+        if (email) {
+          localStorage.setItem('aroh_current_active_email', email);
+        }
+      }
+      return email || '';
     }
   } catch (e) {
     // ignore
   }
   return '';
+}
+
+/**
+ * Migration-aware item reader:
+ * Checks new aroh_ key first, falls back to legacy peakform_ key, copies over, and returns.
+ */
+function readStorageItemWithMigration(key: string, userEmail?: string): string | null {
+  if (typeof window === 'undefined') return null;
+  const scopedKey = getUserScopedKey(key, userEmail);
+  const val = localStorage.getItem(scopedKey);
+  if (val) return val;
+
+  // Check legacy scoped key
+  const legacyBase = LEGACY_STORAGE_KEYS[key] || key.replace(/^aroh_/, 'peakform_');
+  const legacyScoped = getUserScopedKey(legacyBase, userEmail);
+  const legacyVal = localStorage.getItem(legacyScoped);
+  if (legacyVal) {
+    try {
+      localStorage.setItem(scopedKey, legacyVal);
+    } catch (e) {}
+    return legacyVal;
+  }
+
+  // Fallback to unscoped new key
+  const baseVal = localStorage.getItem(key);
+  if (baseVal) return baseVal;
+
+  // Fallback to unscoped legacy key
+  const baseLegacyVal = localStorage.getItem(legacyBase);
+  if (baseLegacyVal) {
+    try {
+      localStorage.setItem(key, baseLegacyVal);
+    } catch (e) {}
+    return baseLegacyVal;
+  }
+
+  return null;
 }
 
 export function getStoredProfile(userEmail?: string): UserProfile {
@@ -68,12 +117,24 @@ export function getStoredProfile(userEmail?: string): UserProfile {
 
     // If scoped key didn't have it, check Drive persistent profile cache
     if (!raw && sanitized) {
-      raw = localStorage.getItem(`peakform_drive_profile_${sanitized}`);
+      raw = localStorage.getItem(`aroh_drive_profile_${sanitized}`);
+      if (!raw) {
+        raw = localStorage.getItem(`peakform_drive_profile_${sanitized}`);
+        if (raw) {
+          localStorage.setItem(`aroh_drive_profile_${sanitized}`, raw);
+        }
+      }
     }
 
     // If still not found, check complete Drive backup cache
     if (!raw && sanitized) {
-      const driveBackup = localStorage.getItem(`peakform_drive_backup_${sanitized}`);
+      let driveBackup = localStorage.getItem(`aroh_drive_backup_${sanitized}`);
+      if (!driveBackup) {
+        driveBackup = localStorage.getItem(`peakform_drive_backup_${sanitized}`);
+        if (driveBackup) {
+          localStorage.setItem(`aroh_drive_backup_${sanitized}`, driveBackup);
+        }
+      }
       if (driveBackup) {
         try {
           const parsedBundle = JSON.parse(driveBackup);
@@ -140,7 +201,7 @@ export function saveStoredProfile(profile: UserProfile): void {
 
     if (email) {
       const sanitized = email.replace(/[^a-z0-9]/g, '_');
-      localStorage.setItem(`peakform_drive_profile_${sanitized}`, serialized);
+      localStorage.setItem(`aroh_drive_profile_${sanitized}`, serialized);
     }
   } catch (e) {
     console.error('Failed saving user profile to storage', e);
@@ -149,13 +210,15 @@ export function saveStoredProfile(profile: UserProfile): void {
 
 export function getStoredMealLogs(userEmail?: string): MealLog[] {
   try {
-    const scopedKey = getUserScopedKey(STORAGE_KEYS.MEAL_LOGS, userEmail);
-    const raw = localStorage.getItem(scopedKey) || localStorage.getItem(STORAGE_KEYS.MEAL_LOGS);
-    if (raw) return JSON.parse(raw);
+    const raw = readStorageItemWithMigration(STORAGE_KEYS.MEAL_LOGS, userEmail);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
   } catch (e) {
     console.error('Failed reading meal logs from storage', e);
   }
-  return INITIAL_SAMPLE_MEAL_LOGS;
+  return [];
 }
 
 export function saveStoredMealLogs(logs: MealLog[], userEmail?: string): void {
@@ -205,13 +268,15 @@ export function clearStoredMealLogs(userEmail?: string): void {
 
 export function getStoredBodyMetrics(userEmail?: string): BodyMetric[] {
   try {
-    const scopedKey = getUserScopedKey(STORAGE_KEYS.BODY_METRICS, userEmail);
-    const raw = localStorage.getItem(scopedKey) || localStorage.getItem(STORAGE_KEYS.BODY_METRICS);
-    if (raw) return JSON.parse(raw);
+    const raw = readStorageItemWithMigration(STORAGE_KEYS.BODY_METRICS, userEmail);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
   } catch (e) {
     console.error('Failed reading body metrics from storage', e);
   }
-  return INITIAL_SAMPLE_BODY_METRICS;
+  return [];
 }
 
 export function saveStoredBodyMetrics(metrics: BodyMetric[], userEmail?: string): void {
@@ -389,13 +454,40 @@ export function deleteStoredCustomRecipe(id: string): CustomGeneratedRecipe[] {
 
 export function getStoredWorkoutLogs(userEmail?: string): WorkoutCompletionLog[] {
   try {
-    const scopedKey = getUserScopedKey(STORAGE_KEYS.WORKOUT_LOGS, userEmail);
-    const raw = localStorage.getItem(scopedKey) || localStorage.getItem(STORAGE_KEYS.WORKOUT_LOGS);
-    if (raw) return JSON.parse(raw);
+    const raw = readStorageItemWithMigration(STORAGE_KEYS.WORKOUT_LOGS, userEmail);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
   } catch (e) {
     console.error('Failed reading workout logs from storage', e);
   }
-  return INITIAL_SAMPLE_WORKOUT_LOGS;
+  return [];
+}
+
+export function getStoredCoachMessages(userEmail?: string): any[] {
+  try {
+    const raw = readStorageItemWithMigration(STORAGE_KEYS.COACH_CHAT, userEmail);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed.slice(-100);
+    }
+  } catch (e) {
+    console.error('Failed reading coach messages from storage', e);
+  }
+  return [];
+}
+
+export function saveStoredCoachMessages(messages: any[], userEmail?: string): void {
+  try {
+    const capped = messages.slice(-100);
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.COACH_CHAT, userEmail);
+    const serialized = JSON.stringify(capped);
+    localStorage.setItem(scopedKey, serialized);
+    localStorage.setItem(STORAGE_KEYS.COACH_CHAT, serialized);
+  } catch (e) {
+    console.error('Failed saving coach messages to storage', e);
+  }
 }
 
 export function saveStoredWorkoutLogs(logs: WorkoutCompletionLog[], userEmail?: string): void {

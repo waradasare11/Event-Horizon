@@ -1,0 +1,13 @@
+# robots.txt for AROH (aroh.ai)
+User-agent: *
+Allow: /
+Allow: /privacy
+Allow: /terms
+Allow: /disclaimer
+Allow: /refund
+Allow: /cookies
+
+# Disallow internal backend API endpoints
+Disallow: /api/
+
+Sitemap: https://ais-pre-eqnbxasrfiuycivceav4at-89777324204.asia-east1.run.app/sitemap.xml

@@ -14,6 +14,8 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { UserProfile, SearchCitation } from '../types';
+import { getStoredCoachMessages, saveStoredCoachMessages } from '../lib/storage';
+import { saveUserMemory } from '../lib/userMemory';
 
 interface Message {
   id: string;
@@ -28,20 +30,19 @@ interface AICoachChatProps {
 }
 
 const QUICK_QUESTIONS = [
-  'How do I break through a fat loss weight plateau safely with refeeds?',
-  'What does research say about lengthened partials vs full ROM for hypertrophy?',
+  'Guide: Metabolic Adaptation & Refeeds — How to break fat loss plateaus safely',
+  'Guide: Lengthened Partials & Volume — Optimal weekly sets and RIR for hypertrophy',
+  'Guide: Protein Distribution & Creatine — ISSN evidence on leucine threshold and saturation',
   'Optimal daily protein distribution & per-meal leucine threshold?',
   'Should I do cardio before or after heavy lifting to avoid the interference effect?',
-  'What is the evidence on creatine monohydrate timing and saturation?',
   'What are the best chest exercises if I have shoulder impingement?',
 ];
 
-export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'msg-init',
-      role: 'assistant',
-      content: `Hello ${userProfile.name || 'there'}! I am your AROH Science Coach, powered by sports science literature, exercise physiology, and real-time Google Search grounding (inspired by BuiltWithScience and ISSN guidelines). 
+function buildDefaultWelcomeMessage(userProfile: UserProfile): Message {
+  return {
+    id: 'msg-init',
+    role: 'assistant',
+    content: `Hello ${userProfile.name || 'there'}! I am your AROH Science Coach, powered by sports science literature, exercise physiology, and real-time Google Search grounding (inspired by BuiltWithScience and ISSN guidelines). 
 
 I have your personalized profile loaded:
 • **Goal:** ${userProfile.goal === 'lose_fat' ? 'Fat Loss & Muscle Preservation' : userProfile.goal === 'build_muscle' ? 'Hypertrophy & Lean Bulk' : 'Body Recomposition'}
@@ -50,15 +51,44 @@ I have your personalized profile loaded:
 • **Restrictions/Injuries:** ${userProfile.injuries?.join(', ') || 'None'}
 
 Ask me anything about fat loss biology, muscle hypertrophy mechanics, EMG muscle activation, nutrition timing, or evidence-based supplements!`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    },
-  ]);
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  };
+}
+
+export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const stored = getStoredCoachMessages(userProfile.email);
+    if (stored && stored.length > 0) {
+      return stored;
+    }
+    return [buildDefaultWelcomeMessage(userProfile)];
+  });
+
+  // Re-sync when switching athlete profile
+  useEffect(() => {
+    const stored = getStoredCoachMessages(userProfile.email);
+    if (stored && stored.length > 0) {
+      setMessages(stored);
+    } else {
+      setMessages([buildDefaultWelcomeMessage(userProfile)]);
+    }
+  }, [userProfile.email]);
 
   const [inputPrompt, setInputPrompt] = useState('');
   const [useSearchGrounding, setUseSearchGrounding] = useState<boolean>(true);
   const [enableThinking, setEnableThinking] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
+
+  const persistMessages = (newMsgs: Message[]) => {
+    const capped = newMsgs.slice(-100);
+    setMessages(capped);
+    saveStoredCoachMessages(capped, userProfile.email);
+    saveUserMemory('coach_chat', {
+      email: userProfile.email,
+      coachChat: { messages: capped as any },
+    });
+  };
 
   useEffect(() => {
     chatBottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -75,7 +105,8 @@ Ask me anything about fat loss biology, muscle hypertrophy mechanics, EMG muscle
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const updatedWithUser = [...messages, userMsg];
+    persistMessages(updatedWithUser);
     setInputPrompt('');
     setIsLoading(true);
 
@@ -84,7 +115,7 @@ Ask me anything about fat loss biology, muscle hypertrophy mechanics, EMG muscle
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, userMsg].map((m) => ({
+          messages: updatedWithUser.map((m) => ({
             role: m.role,
             content: m.content,
           })),
@@ -107,7 +138,7 @@ Ask me anything about fat loss biology, muscle hypertrophy mechanics, EMG muscle
         citations: data.citations || [],
       };
 
-      setMessages((prev) => [...prev, botMsg]);
+      persistMessages([...updatedWithUser, botMsg]);
     } catch (err: any) {
       console.error('Coach chat error:', err);
       const errorMsg: Message = {
@@ -116,7 +147,7 @@ Ask me anything about fat loss biology, muscle hypertrophy mechanics, EMG muscle
         content: `I ran into a temporary issue connecting to the Gemini engine: ${err.message || 'Please try again.'}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
-      setMessages((prev) => [...prev, errorMsg]);
+      persistMessages([...updatedWithUser, errorMsg]);
     } finally {
       setIsLoading(false);
     }

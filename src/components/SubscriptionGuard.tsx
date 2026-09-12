@@ -156,7 +156,7 @@ export const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
               Renew Your AROH Pro Access
             </h3>
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-              Your 7-day free trial has concluded. Upgrade to any plan starting at only <strong>₹89/mo</strong> via our verified host QR code (Warad Asare).
+              Your 7-day free trial has concluded. Upgrade to Pro to continue your personalized workout and nutrition coaching.
             </p>
           </div>
 

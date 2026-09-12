@@ -1,6 +1,6 @@
 {
   "name": "AROH",
-  "description": "Evidence-based workout and nutrition coaching platform with interactive progress tracking and AI meal analysis.",
+  "description": "AROH — evidence-informed workout and nutrition coaching for India.",
   "requestFramePermissions": ["camera", "microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

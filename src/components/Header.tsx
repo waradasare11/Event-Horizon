@@ -1,27 +1,16 @@
 import React from 'react';
 import { 
-  Camera, 
+  Sun,
   Utensils, 
   Dumbbell, 
   TrendingUp, 
   Bot, 
-  Sparkles, 
-  RefreshCw, 
-  UserCheck, 
-  Globe, 
+  Settings,
   Flame, 
-  Activity, 
   LogIn, 
   LogOut,
-  Cloud,
-  CheckCircle2,
-  Download,
   Crown,
-  ShieldCheck,
-  QrCode,
-  Award,
-  CheckSquare,
-  BookOpen
+  UserCheck
 } from 'lucide-react';
 import { UserProfile } from '../types';
 import { ThemeToggle } from './ThemeToggle';
@@ -35,14 +24,10 @@ interface HeaderProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   userProfile: UserProfile;
-  onOpenCheckIn: () => void;
-  onOpenOnboarding: () => void;
+  onOpenSettings: () => void;
+  onOpenCheckIn?: () => void;
+  onOpenOnboarding?: () => void;
   onOpenSubscriptionModal?: () => void;
-  onOpenHostAdminModal?: () => void;
-  onOpenPerformanceDashboard?: () => void;
-  onOpenKeepSync?: () => void;
-  onExportData?: () => void;
-  onForceSync?: () => void;
   caloriesConsumedToday: number;
   proteinConsumedToday: number;
   currentStreak?: number;
@@ -53,23 +38,20 @@ interface HeaderProps {
   onSignIn?: () => void;
   onSignOut?: () => void;
   isSyncing?: boolean;
+  onForceSync?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   userProfile,
+  onOpenSettings,
   onOpenCheckIn,
   onOpenOnboarding,
   onOpenSubscriptionModal,
-  onOpenHostAdminModal,
-  onOpenPerformanceDashboard,
-  onOpenKeepSync,
-  onExportData,
-  onForceSync,
   caloriesConsumedToday,
   proteinConsumedToday,
-  currentStreak = 14,
+  currentStreak = 0,
   theme = 'system',
   effectiveTheme = 'light',
   onThemeChange = () => {},
@@ -77,6 +59,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSignIn = () => {},
   onSignOut = () => {},
   isSyncing = false,
+  onForceSync = () => {},
 }) => {
   const caloriePercent = Math.min(100, Math.round((caloriesConsumedToday / (userProfile.dailyCalories || 2000)) * 100));
   const proteinPercent = Math.min(100, Math.round((proteinConsumedToday / (userProfile.dailyProtein || 150)) * 100));
@@ -85,41 +68,39 @@ export const Header: React.FC<HeaderProps> = ({
   const userEmail = userProfile.email || currentUser?.email || undefined;
   const activeSub = computeSubscriptionStatus(userProfile.subscription, userEmail);
 
+  // 5 Focused Tabs
   const navItems = [
-    { id: 'scan', label: 'Meal Scanner', icon: Camera },
-    { id: 'nutrition', label: 'Meals & Food', icon: Utensils },
-    { id: 'workouts', label: 'Workout Plans', icon: Dumbbell },
-    { id: 'library', label: 'Library', icon: BookOpen },
-    { id: 'form', label: 'Posture & Form', icon: Activity },
-    { id: 'projector', label: 'Body Preview', icon: Sparkles },
-    { id: 'progress', label: 'My Progress', icon: TrendingUp },
-    { id: 'challenges', label: 'Community', icon: Award },
-    { id: 'research', label: 'Fitness Guides', icon: Globe },
-    { id: 'coach', label: 'Ask AI Coach', icon: Bot },
+    { id: 'today', label: 'Today', icon: Sun },
+    { id: 'food', label: 'Food', icon: Utensils },
+    { id: 'workout', label: 'Workout', icon: Dumbbell },
+    { id: 'progress', label: 'Progress', icon: TrendingUp },
+    { id: 'coach', label: 'Coach', icon: Bot },
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 dark:bg-[#080B14]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
-      {/* Top Banner / User Quick Metrics */}
+    <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#111312]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-3">
-          {/* Logo & Brand with Uploaded Logo Asset */}
-          <div className="flex items-center gap-3 shrink-0 cursor-pointer" onClick={() => setActiveTab('workouts')}>
+          {/* Logo & Brand */}
+          <div 
+            className="flex items-center gap-3 shrink-0 cursor-pointer" 
+            onClick={() => setActiveTab('today')}
+          >
             <ArohLogo size="md" />
           </div>
 
-          {/* Daily Quick Summary Widget */}
-          <div className="hidden lg:flex items-center gap-6 bg-slate-50 dark:bg-[#0E1424] px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+          {/* Daily Quick Summary Widget (Visible on lg+ screens) */}
+          <div className="hidden lg:flex items-center gap-6 bg-slate-50 dark:bg-[#161817] px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
             <div className="text-left">
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-                <span>Daily Calories</span>
+                <span>Today's Energy</span>
                 <span className="font-semibold text-slate-900 dark:text-white">
-                  {caloriesConsumedToday} / {userProfile.dailyCalories} kcal
+                  {caloriesConsumedToday} / {userProfile.dailyCalories || 2000} kcal
                 </span>
               </div>
               <div className="w-28 bg-slate-200 dark:bg-slate-800 rounded-full h-2 mt-1 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-teal-500 to-emerald-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${caloriePercent}%` }}
                 />
               </div>
@@ -131,83 +112,53 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                 <span>Protein</span>
                 <span className="font-semibold text-slate-900 dark:text-white">
-                  {proteinConsumedToday}g / {userProfile.dailyProtein}g
+                  {proteinConsumedToday}g / {userProfile.dailyProtein || 150}g
                 </span>
               </div>
               <div className="w-24 bg-slate-200 dark:bg-slate-800 rounded-full h-2 mt-1 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-purple-400 to-indigo-500 h-2 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-teal-500 to-indigo-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${proteinPercent}%` }}
                 />
               </div>
             </div>
           </div>
 
-          {/* Action Buttons, Auth, & Theme Toggle */}
+          {/* Action Buttons & Settings */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Persistent Firestore Sync & Drift Status Indicator */}
+            {/* Sync Indicator */}
             <SyncStatusIndicator
               isSyncing={isSyncing}
               currentUser={currentUser}
               onForceSync={onForceSync}
             />
 
-            {/* Theme Toggle Button */}
+            {/* Theme Toggle */}
             <ThemeToggle
               theme={theme}
               effectiveTheme={effectiveTheme}
               onThemeChange={onThemeChange}
             />
 
-            {/* Subscription Pro Status & Upgrade Trigger */}
-            <button
-              onClick={onOpenSubscriptionModal}
-              className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl border transition-all shadow-2xs cursor-pointer ${
-                activeSub.status === 'active'
-                  ? 'bg-cyan-500/15 border-cyan-400/40 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-500/25'
-                  : 'bg-purple-500/15 border-purple-500/30 text-purple-800 dark:text-purple-300 hover:bg-purple-500/25'
-              }`}
-              title="View AROH Pro Subscription, QR Payment & Active Tier"
+            {/* Streak Badge */}
+            <div
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-700 dark:text-orange-400"
+              title="Current training consistency streak"
             >
-              <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-              <span>{getPlanDisplayBadge(activeSub, isHost)}</span>
-            </button>
-
-            {/* Streak Quick Badge */}
-            <button
-              onClick={() => setActiveTab('workouts')}
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-cyan-500/15 to-purple-500/15 dark:from-cyan-500/20 dark:to-purple-500/20 border border-cyan-400/30 dark:border-cyan-400/40 text-cyan-800 dark:text-cyan-300 hover:scale-105 transition-all shadow-2xs cursor-pointer"
-              title="View Training Consistency Streak & 28-Day Matrix"
-            >
-              <Flame className="w-3.5 h-3.5 text-cyan-400 fill-cyan-400" />
+              <Flame className="w-3.5 h-3.5 fill-orange-500 text-orange-500" />
               <span>{currentStreak}d</span>
-            </button>
+            </div>
 
-            {/* Google Keep Launcher */}
-            {onOpenKeepSync && (
-              <button
-                id="header-google-keep-btn"
-                type="button"
-                onClick={onOpenKeepSync}
-                className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-400/30 hover:bg-purple-500/20 transition-all shadow-xs cursor-pointer"
-                title="Sync workout, macros & groceries to Google Keep"
-              >
-                <CheckSquare className="w-3.5 h-3.5 text-purple-500 dark:text-purple-400" />
-                <span className="hidden sm:inline">Keep</span>
-              </button>
-            )}
-
-            {/* Profile Button */}
+            {/* Settings Gear Button */}
             <button
-              onClick={onOpenOnboarding}
-              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 text-white hover:opacity-95 transition-all shadow-md shadow-cyan-500/20 cursor-pointer"
-              title="Update profile stats, goal, injuries, or preferences"
+              onClick={onOpenSettings}
+              className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+              title="Settings, Tools & Account"
             >
-              <UserCheck className="w-3.5 h-3.5 text-white" />
-              <span className="hidden sm:inline">Profile</span>
+              <Settings className="w-4 h-4" />
             </button>
 
-            {/* Google Sign-in / Cloud Sync status */}
+            {/* User Avatar / Sign-In */}
             {currentUser ? (
               <div className="flex items-center gap-1.5 pl-1 border-l border-slate-200 dark:border-slate-800">
                 {currentUser.photoURL ? (
@@ -215,37 +166,34 @@ export const Header: React.FC<HeaderProps> = ({
                     src={currentUser.photoURL}
                     alt={currentUser.displayName || 'User Avatar'}
                     referrerPolicy="no-referrer"
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-cyan-400/40 object-cover"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-teal-500/30 object-cover cursor-pointer"
+                    onClick={onOpenSettings}
                     title={`Signed in as ${currentUser.email || currentUser.displayName}`}
                   />
                 ) : (
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-cyan-500 to-indigo-600 text-white font-bold text-xs flex items-center justify-center">
+                  <button
+                    onClick={onOpenSettings}
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-white font-bold text-xs flex items-center justify-center cursor-pointer"
+                  >
                     {(currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()}
-                  </div>
+                  </button>
                 )}
-                <button
-                  onClick={onSignOut}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
-                  title="Sign out of Firebase"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                </button>
               </div>
             ) : (
               <button
                 onClick={onSignIn}
-                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-[#0E1424] border border-cyan-400/40 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/10 transition-all shadow-xs cursor-pointer"
-                title="Sign in with Google to sync workouts, meals & analyses across devices"
+                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 hover:bg-teal-500/20 transition-all cursor-pointer"
+                title="Sign in with Google"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                <span>Sign In</span>
+                <span className="hidden sm:inline">Sign In</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex space-x-1 overflow-x-auto pb-2 scrollbar-none border-t border-slate-200/60 dark:border-slate-800/80 pt-2">
+        {/* Desktop Tab Navigation (Hidden on mobile where BottomTabBar is active) */}
+        <div className="hidden md:flex space-x-1 border-t border-slate-200/60 dark:border-slate-800/80 pt-2 pb-2.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -253,10 +201,10 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-gradient-to-r from-cyan-500 to-indigo-600 text-white shadow-md shadow-cyan-500/25'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#141C34]'
+                    ? 'bg-[#0F6E5F] text-white shadow-md shadow-teal-900/15'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1A1D1B]'
                 }`}
               >
                 <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
@@ -269,5 +217,3 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
-
-

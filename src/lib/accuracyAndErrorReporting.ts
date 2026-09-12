@@ -22,8 +22,10 @@ import {
 import { AIAccuracyReport, AppErrorReport } from '../types';
 import { getGlobalSyncState, GlobalSyncState } from './syncManager';
 
-const LOCAL_ACCURACY_REPORTS_KEY = 'peakform_accuracy_reports_local';
-const LOCAL_ERROR_REPORTS_KEY = 'peakform_error_reports_local';
+const STORAGE_KEY_ACCURACY = 'aroh_accuracy_reports_local';
+const LEGACY_STORAGE_KEY_ACCURACY = 'peakform_accuracy_reports_local';
+const STORAGE_KEY_ERROR = 'aroh_error_reports_local';
+const LEGACY_STORAGE_KEY_ERROR = 'peakform_error_reports_local';
 
 /**
  * Submits an AI Accuracy report to the Firestore improvement queue
@@ -131,8 +133,8 @@ export async function submitAppErrorReport(
   const fullReport: AppErrorReport = {
     id,
     userId: user?.uid || 'guest_user',
-    userEmail: user?.email || 'guest@peakform.ai',
-    userName: user?.displayName || 'Peak Athlete',
+    userEmail: user?.email || 'guest@aroh.fit',
+    userName: user?.displayName || 'AROH Athlete',
     reportedAt: new Date().toISOString(),
     errorType: errorData.errorType,
     title: errorData.title,
@@ -277,7 +279,13 @@ export async function updateAppErrorReportStatus(
 function getLocalAccuracyReports(): AIAccuracyReport[] {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') return [];
   try {
-    const raw = localStorage.getItem(LOCAL_ACCURACY_REPORTS_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY_ACCURACY);
+    if (!raw) {
+      raw = localStorage.getItem(LEGACY_STORAGE_KEY_ACCURACY);
+      if (raw) {
+        localStorage.setItem(STORAGE_KEY_ACCURACY, raw);
+      }
+    }
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -293,14 +301,20 @@ function saveLocalAccuracyReport(report: AIAccuracyReport): void {
 function saveAllLocalAccuracyReports(list: AIAccuracyReport[]): void {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
   try {
-    localStorage.setItem(LOCAL_ACCURACY_REPORTS_KEY, JSON.stringify(list));
+    localStorage.setItem(STORAGE_KEY_ACCURACY, JSON.stringify(list));
   } catch {}
 }
 
 function getLocalAppErrorReports(): AppErrorReport[] {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') return [];
   try {
-    const raw = localStorage.getItem(LOCAL_ERROR_REPORTS_KEY);
+    let raw = localStorage.getItem(STORAGE_KEY_ERROR);
+    if (!raw) {
+      raw = localStorage.getItem(LEGACY_STORAGE_KEY_ERROR);
+      if (raw) {
+        localStorage.setItem(STORAGE_KEY_ERROR, raw);
+      }
+    }
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
@@ -316,6 +330,6 @@ function saveLocalAppErrorReport(report: AppErrorReport): void {
 function saveAllLocalAppErrorReports(list: AppErrorReport[]): void {
   if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
   try {
-    localStorage.setItem(LOCAL_ERROR_REPORTS_KEY, JSON.stringify(list));
+    localStorage.setItem(STORAGE_KEY_ERROR, JSON.stringify(list));
   } catch {}
 }

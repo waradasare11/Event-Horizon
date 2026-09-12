@@ -1037,14 +1037,14 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                     <Scale className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300 text-[10px] font-black uppercase tracking-wider mb-1">
-                      Strict 95% Confidence Threshold Notice
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wider mb-1">
+                      Portion Guidance
                     </div>
                     <h3 className="font-bold text-sm sm:text-base text-amber-900 dark:text-amber-100">
-                      Consensus Confidence: {analysisResult.consensusScore || 88}% (<span className="text-red-600 dark:text-red-400">Under 95% Goal</span>)
+                      AI estimate — you can correct portions
                     </h3>
                     <p className="text-xs text-amber-800/90 dark:text-amber-200/90 mt-1 leading-relaxed">
-                      Due to complex food layering or occluded gravies, single-view confidence is under 95%. Take a secondary 45° angle photo to activate <strong>Stereoscopic 3D Volumetric Consensus</strong> and reach 98%+ precision.
+                      Due to food layering or gravies, this is an AI estimate. You can directly edit the portion weights below or capture a secondary angle to refine the estimate.
                     </p>
                   </div>
                 </div>

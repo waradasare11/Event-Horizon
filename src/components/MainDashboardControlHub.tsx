@@ -153,7 +153,7 @@ export const MainDashboardControlHub: React.FC<MainDashboardControlHubProps> = (
             <span>Pro Plan</span>
           </button>
 
-          {/* 5. Host Master Admin Ledger (For Warad Asare / Host) */}
+          {/* 5. Host Admin Ledger (For Host Administrator) */}
           {isHost && (
             <>
               {onOpenHostAdminModal && (
@@ -161,7 +161,7 @@ export const MainDashboardControlHub: React.FC<MainDashboardControlHubProps> = (
                   id="dashboard-host-admin-btn"
                   onClick={onOpenHostAdminModal}
                   className="w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-black rounded-xl bg-purple-600 hover:bg-purple-700 active:scale-95 text-white shadow-xs transition-all cursor-pointer whitespace-nowrap"
-                  title="Host Admin Portal (Warad Asare) - Verified Payment Ledger"
+                  title="Host Admin Portal - Verified Payment Ledger"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-purple-200 shrink-0" />
                   <span>Host Ledger</span>

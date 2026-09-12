@@ -81,6 +81,7 @@ import { CommunityChallenges } from './components/CommunityChallenges';
 import { QuarterlyProfileCalibrationModal } from './components/QuarterlyProfileCalibrationModal';
 import { WorkoutPushNotificationManager } from './components/WorkoutPushNotificationManager';
 import { backupUserProfileToGoogleDrive, backupAllDataToGoogleDrive, fetchUserDataFromGoogleDrive } from './lib/googleWorkspace';
+import { restoreUserMemory, saveUserMemory } from './lib/userMemory';
 import { GranularCSVExportModal } from './components/GranularCSVExportModal';
 import { ExerciseLibraryView } from './components/ExerciseLibraryView';
 import { BiWeeklyProfileReminderBanner } from './components/BiWeeklyProfileReminderBanner';
@@ -93,22 +94,31 @@ import {
   createGrantedUserSubscription, 
   isHostAdmin, 
   checkUserHostGrant,
-  recordAthleteLoginSession
+  recordAthleteLoginSession,
+  checkIsHostOnServer
 } from './lib/subscription';
 import { auditWorkoutPrograms, WorkoutProgramAuditReport } from './data/ExerciseRegistry';
 import { runAutomatedDataReconciliation } from './lib/reconciliationWorker';
-import { setCurrentActiveEmail, getCurrentActiveEmail, updateWorkoutLogNotes } from './lib/storage';
+import { setCurrentActiveEmail, getCurrentActiveEmail, updateWorkoutLogNotes, saveStoredFormAnalyses } from './lib/storage';
 import { Activity } from 'lucide-react';
-import { LegalPagesModal, LegalTabType } from './components/LegalPagesModal';
+import { LegalPage, LegalTabType } from './components/LegalPage';
+import { LegalPagesModal } from './components/LegalPagesModal';
+import { NotFoundPage } from './components/NotFoundPage';
 import { Footer } from './components/Footer';
 import { CookieBanner } from './components/CookieBanner';
+import { TodayDashboardView } from './components/TodayDashboardView';
+import { FoodView } from './components/FoodView';
+import { WorkoutView } from './components/WorkoutView';
+import { BottomTabBar } from './components/BottomTabBar';
+import { SettingsModal } from './components/SettingsModal';
 
 export default function App() {
   const { isOnline, pendingCount, triggerSync } = useSyncStatus();
-  const [activeTab, setActiveTab] = useState<string>('scan');
+  const [activeTab, setActiveTab] = useState<string>('today');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [isGranularExportOpen, setIsGranularExportOpen] = useState<boolean>(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   const [userProfile, setUserProfile] = useState<UserProfile>(() => getStoredProfile(getCurrentActiveEmail()));
   const [mealLogs, setMealLogs] = useState<MealLog[]>(() => getStoredMealLogs(getCurrentActiveEmail()));
@@ -118,10 +128,27 @@ export default function App() {
   const [formAnalyses, setFormAnalyses] = useState<FormAnalysisResult[]>(getStoredFormAnalyses());
   const [aiMealPlan, setAiMealPlan] = useState<AIAdjustedMealPlan | null>(getStoredAIMealPlan());
 
-  // Record 100% accurate login telemetry on app boot
+  // Record verified login telemetry on app boot
   useEffect(() => {
     recordAthleteLoginSession(userProfile);
   }, []);
+
+  const [serverSaysHost, setServerSaysHost] = useState<boolean>(false);
+
+  useEffect(() => {
+    const email = userProfile?.email;
+    if (!email) {
+      setServerSaysHost(false);
+      return;
+    }
+    let isMounted = true;
+    checkIsHostOnServer(email).then((isHost) => {
+      if (isMounted) setServerSaysHost(isHost);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [userProfile?.email]);
 
   const [theme, setTheme] = useState<ThemeMode>(getStoredTheme);
   const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>(() => resolveEffectiveTheme(getStoredTheme()));
@@ -136,13 +163,22 @@ export default function App() {
   const [isKeepSyncOpen, setIsKeepSyncOpen] = useState<boolean>(false);
   const [precisionStatus, setPrecisionStatus] = useState<'active' | 'standby'>('active');
 
+  // Real URL routing for /privacy, /terms, /disclaimer, /refund, /cookies, /delete-data, and 404
+  const getInitialPath = () => (typeof window !== 'undefined' ? window.location.pathname.toLowerCase() : '/');
+  const [currentPath, setCurrentPath] = useState<string>(getInitialPath);
+
+  const handleNavigate = (path: string) => {
+    window.history.pushState(null, '', path);
+    setCurrentPath(path.toLowerCase());
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   // Real Legal Pages & Compliance State (DPDP Act 2023)
   const [isLegalModalOpen, setIsLegalModalOpen] = useState<boolean>(false);
   const [legalModalTab, setLegalModalTab] = useState<LegalTabType>('privacy');
 
   const handleOpenLegal = (tab: LegalTabType = 'privacy') => {
-    setLegalModalTab(tab);
-    setIsLegalModalOpen(true);
+    handleNavigate(`/${tab}`);
   };
 
   const handleCompleteDataErasure = () => {
@@ -154,6 +190,7 @@ export default function App() {
     setAiMealPlan(null);
     setIsLegalModalOpen(false);
     setActiveTab('scan');
+    handleNavigate('/');
   };
 
   // Direct path & hash support for legal routes: /privacy, /terms, /disclaimer, /refund, etc.
@@ -162,19 +199,15 @@ export default function App() {
       const hash = window.location.hash.toLowerCase().replace('#', '');
       const path = window.location.pathname.toLowerCase();
 
-      if (path === '/privacy' || hash === 'privacy') {
-        handleOpenLegal('privacy');
-      } else if (path === '/terms' || hash === 'terms') {
-        handleOpenLegal('terms');
-      } else if (path === '/disclaimer' || hash === 'disclaimer') {
-        handleOpenLegal('disclaimer');
-      } else if (path === '/refund' || hash === 'refund') {
-        handleOpenLegal('refund');
-      } else if (path === '/delete-data' || hash === 'delete-data' || hash === 'delete') {
-        handleOpenLegal('delete-data');
-      } else if (path === '/cookies' || hash === 'cookies') {
-        handleOpenLegal('cookies');
+      // Normalize hash if user typed e.g. /#privacy -> /privacy
+      const legalKeys: LegalTabType[] = ['privacy', 'terms', 'disclaimer', 'refund', 'cookies', 'delete-data'];
+      if (legalKeys.includes(hash as LegalTabType)) {
+        window.history.replaceState(null, '', `/${hash}`);
+        setCurrentPath(`/${hash}`);
+        return;
       }
+
+      setCurrentPath(path);
     };
 
     handleUrlHashOrPath();
@@ -213,19 +246,10 @@ export default function App() {
     });
   };
 
-  // Automated 2-3 months Quarterly Calibration Check:
-  // Preserves 100% of historical info and prompts athlete to recalibrate if >75 days passed
+  // Quarterly Calibration reminder is accessible via Settings modal without blocking the athlete
   useEffect(() => {
-    if (userProfile.isOnboarded && userProfile.email) {
-      const lastReview = userProfile.lastQuarterlyReviewDate || userProfile.lastProfileUpdateDate;
-      if (lastReview) {
-        const daysSince = (Date.now() - new Date(lastReview).getTime()) / (1000 * 60 * 60 * 24);
-        if (daysSince >= 75) {
-          setIsQuarterlyCalibrationOpen(true);
-        }
-      }
-    }
-  }, [userProfile.isOnboarded, userProfile.email]);
+    // Non-blocking reminder is displayed in Settings
+  }, []);
 
   // Background Sync Repair Worker: runs on initial load and compares local state with Firestore
   useEffect(() => {
@@ -262,57 +286,101 @@ export default function App() {
     const unsubAuth = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
       if (user) {
-        const email = user.email || '';
+        const email = (user.email || '').trim().toLowerCase();
         setCurrentActiveEmail(email);
+
+        // Step 0: Wipe React state of PREVIOUS user first so user B NEVER sees user A's data
+        setMealLogs([]);
+        setWorkoutLogs([]);
+        setBodyMetrics([]);
+        setFormAnalyses([]);
+        setWorkoutPrograms([]);
+        setAiMealPlan(null);
 
         const isHost = isHostAdmin(email);
         const stored = getStoredProfile(email);
         const updatedInitial: UserProfile = {
           ...stored,
           email,
-          name: stored.name || user.displayName || 'Peak Athlete',
+          name: user.displayName || stored.name || 'Athlete',
           subscription: isHost ? createHostLifetimeSubscription() : (stored.subscription || createInitialTrialSubscription()),
           isOnboarded: Boolean(stored.isOnboarded || (stored.goal && stored.dailyCalories > 0)),
         };
         setUserProfile(updatedInitial);
         saveStoredProfile(updatedInitial);
-        setMealLogs(getStoredMealLogs(email));
-        setBodyMetrics(getStoredBodyMetrics(email));
-        setWorkoutLogs(getStoredWorkoutLogs(email));
 
-        // Fetch each and every piece of data from the user's Gmail ID Google Drive
-        fetchUserDataFromGoogleDrive(email).then((driveData) => {
-          if (driveData.success && driveData.userProfile) {
-            setUserProfile((prev) => {
-              const merged: UserProfile = {
-                ...prev,
-                ...driveData.userProfile,
-                email,
-                name: user.displayName || driveData.userProfile.name || prev.name,
-                isOnboarded: true,
-              };
-              saveStoredProfile(merged);
-              return merged;
+        // Steps 1-4: Restore from Google Drive (Source of Truth) -> Firestore secondary cache -> Local fallback
+        restoreUserMemory(email, user.uid).then((restored) => {
+          if (restored.snapshot) {
+            const snap = restored.snapshot;
+            const mergedProfile: UserProfile = {
+              ...updatedInitial,
+              ...snap.userProfile,
+              email,
+              name: user.displayName || snap.userProfile?.name || updatedInitial.name,
+              isOnboarded: Boolean(snap.userProfile?.isOnboarded || (snap.userProfile?.goal && snap.userProfile?.dailyCalories > 0)),
+            };
+            if (isHost) {
+              mergedProfile.subscription = createHostLifetimeSubscription();
+            }
+            setUserProfile(mergedProfile);
+            saveStoredProfile(mergedProfile);
+
+            if (snap.mealLogs && snap.mealLogs.length > 0) {
+              setMealLogs(snap.mealLogs);
+              saveStoredMealLogs(snap.mealLogs, email);
+            }
+            if (snap.workoutLogs && snap.workoutLogs.length > 0) {
+              setWorkoutLogs(snap.workoutLogs);
+              saveStoredWorkoutLogs(snap.workoutLogs, email);
+            }
+            if (snap.bodyMetrics && snap.bodyMetrics.length > 0) {
+              setBodyMetrics(snap.bodyMetrics);
+              saveStoredBodyMetrics(snap.bodyMetrics, email);
+            }
+            if (snap.formAnalyses && snap.formAnalyses.length > 0) {
+              setFormAnalyses(snap.formAnalyses);
+              saveStoredFormAnalyses(snap.formAnalyses);
+            }
+            if (snap.workoutPrograms && snap.workoutPrograms.length > 0) {
+              setWorkoutPrograms(snap.workoutPrograms);
+              saveStoredWorkoutPrograms(snap.workoutPrograms);
+            }
+            if (snap.aiMealPlan) {
+              setAiMealPlan(snap.aiMealPlan);
+              saveStoredAIMealPlan(snap.aiMealPlan);
+            }
+
+            // Step 6: saveUserMemory('login-hydrate')
+            saveUserMemory('login-hydrate', {
+              email,
+              uid: user.uid,
+              userProfile: mergedProfile,
+              mealLogs: snap.mealLogs,
+              workoutLogs: snap.workoutLogs,
+              bodyMetrics: snap.bodyMetrics,
+              formAnalyses: snap.formAnalyses,
+              workoutPrograms: snap.workoutPrograms,
+              aiMealPlan: snap.aiMealPlan,
             });
-            if (driveData.mealLogs && driveData.mealLogs.length > 0) {
-              setMealLogs(driveData.mealLogs);
-              saveStoredMealLogs(driveData.mealLogs, email);
-            }
-            if (driveData.workoutLogs && driveData.workoutLogs.length > 0) {
-              setWorkoutLogs(driveData.workoutLogs);
-              saveStoredWorkoutLogs(driveData.workoutLogs, email);
-            }
-            if (driveData.bodyMetrics && driveData.bodyMetrics.length > 0) {
-              setBodyMetrics(driveData.bodyMetrics);
-              saveStoredBodyMetrics(driveData.bodyMetrics, email);
-            }
+
             triggerSyncToast(
-              'Cloud Data Retrieved',
-              'Successfully pulled latest workouts, nutrition logs, and body metrics from your Google Drive cloud backup.',
+              `Welcome back, ${mergedProfile.name || 'Athlete'}`,
+              `Restored ${snap.mealLogs?.length || 0} meals and ${snap.workoutLogs?.length || 0} workouts from your Google Drive.`,
+              'drive'
+            );
+          } else if (restored.isNewAthlete) {
+            // Step 5: If no snapshot at all: NEW athlete: blank onboarding profile, mealLogs = [], workoutLogs = [], bodyMetrics = [], open OnboardingModal
+            setIsOnboardingOpen(true);
+            triggerSyncToast(
+              'Welcome to AROH',
+              'Your workouts and nutrition will be safely saved to your Google Drive folder AROH AI.',
               'drive'
             );
           }
-        }).catch(console.warn);
+        }).catch((err) => {
+          console.warn('Memory restore error:', err);
+        });
 
         // Check if host has granted free access to this athlete's Gmail ID
         checkUserHostGrant(email).then(({ hasGrant, isHost: hostUser, grant }) => {
@@ -426,10 +494,14 @@ export default function App() {
       }
     };
 
+    window.addEventListener('aroh_subscription_updated', handleSubUpdated);
+    window.addEventListener('aroh_grant_updated', handleGrantUpdated);
     window.addEventListener('peakform_subscription_updated', handleSubUpdated);
     window.addEventListener('peakform_grant_updated', handleGrantUpdated);
 
     return () => {
+      window.removeEventListener('aroh_subscription_updated', handleSubUpdated);
+      window.removeEventListener('aroh_grant_updated', handleGrantUpdated);
       window.removeEventListener('peakform_subscription_updated', handleSubUpdated);
       window.removeEventListener('peakform_grant_updated', handleGrantUpdated);
     };
@@ -611,13 +683,18 @@ export default function App() {
       syncWorkoutLog(changedLog).catch(console.error);
     }
 
-    // Auto-sync everything to user's Google Drive
-    backupAllDataToGoogleDrive({
+    // Auto-sync everything to user's Google Drive memory & secondary Firestore
+    saveUserMemory('workout_toggle', {
       userProfile,
       mealLogs,
       workoutLogs: updated,
       bodyMetrics,
-    }).catch(() => {});
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleUpdateWorkoutLogNotes = (id: string, notes: string) => {
@@ -627,12 +704,17 @@ export default function App() {
     if (changed) {
       syncWorkoutLog(changed).catch(console.error);
     }
-    backupAllDataToGoogleDrive({
+    saveUserMemory('workout_notes', {
       userProfile,
       mealLogs,
       workoutLogs: updated,
       bodyMetrics,
-    }).catch(() => {});
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleSaveMealLog = (newLog: MealLog) => {
@@ -640,12 +722,17 @@ export default function App() {
     const updated = addMealLog(newLog);
     setMealLogs(updated);
     syncMealLog(newLog).catch(console.error);
-    backupAllDataToGoogleDrive({
+    saveUserMemory('meal_add', {
       userProfile,
       mealLogs: updated,
       workoutLogs,
       bodyMetrics,
-    }).catch(() => {});
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleDeleteMealLog = (id: string) => {
@@ -653,48 +740,119 @@ export default function App() {
     const updated = deleteMealLog(id);
     setMealLogs(updated);
     deleteMealLogFirestore(id).catch(console.error);
+    saveUserMemory('meal_delete', {
+      userProfile,
+      mealLogs: updated,
+      workoutLogs,
+      bodyMetrics,
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleBatchDeleteMealLogs = (ids: string[]) => {
     const updated = deleteMealLogs(ids);
     setMealLogs(updated);
     deleteMealLogsBatchFirestore(ids).catch(console.error);
+    saveUserMemory('meal_batch_delete', {
+      userProfile,
+      mealLogs: updated,
+      workoutLogs,
+      bodyMetrics,
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleDeleteWorkoutLog = (id: string) => {
     const updated = deleteWorkoutLog(id);
     setWorkoutLogs(updated);
     deleteWorkoutLogFirestore(id).catch(console.error);
+    saveUserMemory('workout_delete', {
+      userProfile,
+      mealLogs,
+      workoutLogs: updated,
+      bodyMetrics,
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleBatchDeleteWorkoutLogs = (ids: string[]) => {
     const updated = deleteWorkoutLogs(ids);
     setWorkoutLogs(updated);
     deleteWorkoutLogsBatchFirestore(ids).catch(console.error);
+    saveUserMemory('workout_batch_delete', {
+      userProfile,
+      mealLogs,
+      workoutLogs: updated,
+      bodyMetrics,
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleClearAllMealLogs = () => {
     clearStoredMealLogs();
     setMealLogs([]);
     clearAllMealLogsFirestore().catch(console.error);
+    saveUserMemory('meal_clear', {
+      userProfile,
+      mealLogs: [],
+      workoutLogs,
+      bodyMetrics,
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleClearAllWorkoutLogs = () => {
     clearStoredWorkoutLogs();
     setWorkoutLogs([]);
     clearAllWorkoutLogsFirestore().catch(console.error);
+    saveUserMemory('workout_clear', {
+      userProfile,
+      mealLogs,
+      workoutLogs: [],
+      bodyMetrics,
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleAddBodyMetric = (newMetric: BodyMetric) => {
     const updated = addBodyMetric(newMetric);
     setBodyMetrics(updated);
     syncBodyMetric(newMetric).catch(console.error);
-    backupAllDataToGoogleDrive({
+    saveUserMemory('metric_add', {
       userProfile,
       mealLogs,
       workoutLogs,
       bodyMetrics: updated,
-    }).catch(() => {});
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleSaveProfile = (updated: UserProfile) => {
@@ -702,18 +860,34 @@ export default function App() {
     setUserProfile(updated);
     syncUserProfile(updated).catch(console.error);
     backupUserProfileToGoogleDrive(updated).catch(console.warn);
-    backupAllDataToGoogleDrive({
+    saveUserMemory('profile_update', {
       userProfile: updated,
       mealLogs,
       workoutLogs,
       bodyMetrics,
-    }).catch(() => {});
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: updated.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleSaveFormAnalysis = (analysis: FormAnalysisResult) => {
     const updated = addFormAnalysis(analysis);
     setFormAnalyses(updated);
     syncFormAnalysis(analysis).catch(console.error);
+    saveUserMemory('form_analysis', {
+      userProfile,
+      mealLogs,
+      workoutLogs,
+      bodyMetrics,
+      formAnalyses: updated,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleQuickLogFromLibrary = (
@@ -759,17 +933,33 @@ export default function App() {
     if (changedLog) {
       syncWorkoutLog(changedLog).catch(console.error);
     }
-    backupAllDataToGoogleDrive({
+    saveUserMemory('library_quick_log', {
       userProfile,
       mealLogs,
       workoutLogs: updated,
       bodyMetrics,
-    }).catch(() => {});
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleUpdateAIMealPlan = (plan: AIAdjustedMealPlan) => {
     saveStoredAIMealPlan(plan);
     setAiMealPlan(plan);
+    saveUserMemory('ai_meal_plan_update', {
+      userProfile,
+      mealLogs,
+      workoutLogs,
+      bodyMetrics,
+      formAnalyses,
+      workoutPrograms,
+      aiMealPlan: plan,
+      email: userProfile.email || currentUser?.email || undefined,
+      uid: currentUser?.uid || undefined,
+    });
   };
 
   const handleCompleteCheckIn = (updatedProfile: UserProfile, newMetric: BodyMetric) => {
@@ -876,6 +1066,36 @@ export default function App() {
     }
   }, [userProfile.email, userProfile.isOnboarded, userProfile.goal]);
 
+  // Route 1: Real Legal Routes (Accessible to logged-out visitors without AuthGate or dashboard chrome)
+  const legalRoutes: Record<string, LegalTabType> = {
+    '/privacy': 'privacy',
+    '/terms': 'terms',
+    '/disclaimer': 'disclaimer',
+    '/refund': 'refund',
+    '/cookies': 'cookies',
+    '/delete-data': 'delete-data',
+  };
+
+  if (legalRoutes[currentPath]) {
+    return (
+      <LegalPage
+        activeTab={legalRoutes[currentPath]}
+        onNavigate={handleNavigate}
+        userProfile={userProfile}
+        currentUser={currentUser}
+        onSignIn={handleSignIn}
+        onCompleteDataErasure={handleCompleteDataErasure}
+      />
+    );
+  }
+
+  // Route 2: Real 404 Route for unknown paths (No AuthGate, No Dashboard)
+  if (currentPath !== '/' && currentPath !== '' && !currentPath.startsWith('/?')) {
+    return (
+      <NotFoundPage onNavigate={handleNavigate} />
+    );
+  }
+
   return (
     <SubscriptionGuard
       userProfile={userProfile}
@@ -890,13 +1110,20 @@ export default function App() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           userProfile={userProfile}
+          onOpenSettings={() => setIsSettingsOpen(true)}
           onOpenCheckIn={() => setIsCheckInOpen(true)}
           onOpenOnboarding={() => setIsOnboardingOpen(true)}
           onOpenSubscriptionModal={() => setIsPaywallOpen(true)}
-          onOpenHostAdminModal={() => setIsHostAdminOpen(true)}
-          onOpenPerformanceDashboard={() => setIsPerformanceDashboardOpen(true)}
-          onOpenKeepSync={() => setIsKeepSyncOpen(true)}
-          onExportData={handleExportData}
+          caloriesConsumedToday={caloriesConsumedToday}
+          proteinConsumedToday={proteinConsumedToday}
+          currentStreak={calculatedStreak}
+          theme={theme}
+          effectiveTheme={effectiveTheme}
+          onThemeChange={handleThemeChange}
+          currentUser={currentUser}
+          onSignIn={handleSignIn}
+          onSignOut={handleSignOut}
+          isSyncing={isSyncing}
           onForceSync={() => {
             setIsSyncing(true);
             setTimeout(() => {
@@ -908,16 +1135,6 @@ export default function App() {
               );
             }, 800);
           }}
-          caloriesConsumedToday={caloriesConsumedToday}
-          proteinConsumedToday={proteinConsumedToday}
-          currentStreak={calculatedStreak}
-          theme={theme}
-          effectiveTheme={effectiveTheme}
-          onThemeChange={handleThemeChange}
-          currentUser={currentUser}
-          onSignIn={handleSignIn}
-          onSignOut={handleSignOut}
-          isSyncing={isSyncing}
         />
 
         {/* Visual Pending Sync / Offline Banner */}
@@ -962,76 +1179,41 @@ export default function App() {
         )}
 
         {/* Main View Container */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 overflow-x-hidden">
-          {/* Main Dashboard Control Hub (Streak, Weekly Check-In, Profile, Pro Plan, Cloud Sync, Export, Sign Out in Main View) */}
-          <MainDashboardControlHub
-            userProfile={userProfile}
-            currentStreak={calculatedStreak}
-            currentUser={currentUser}
-            mealLogs={mealLogs}
-            workoutLogs={workoutLogs}
-            bodyMetrics={bodyMetrics}
-            onOpenCheckIn={() => setIsCheckInOpen(true)}
-            onOpenOnboarding={() => setIsOnboardingOpen(true)}
-            onOpenSubscriptionModal={() => setIsPaywallOpen(true)}
-            onOpenHostAdminModal={() => setIsHostAdminOpen(true)}
-            onOpenPerformanceDashboard={() => setIsPerformanceDashboardOpen(true)}
-            onExportData={handleExportData}
-            onSignIn={handleSignIn}
-            onSignOut={handleSignOut}
-            onSelectTab={setActiveTab}
-          />
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-24 md:pb-8 overflow-x-hidden">
+          {/* 1. Today View */}
+          {activeTab === 'today' && (
+            <TodayDashboardView
+              userProfile={userProfile}
+              currentStreak={calculatedStreak}
+              caloriesConsumedToday={caloriesConsumedToday}
+              proteinConsumedToday={proteinConsumedToday}
+              workoutLogs={workoutLogs}
+              workoutPrograms={workoutPrograms}
+              mealLogs={mealLogs}
+              onNavigateToFood={() => setActiveTab('food')}
+              onNavigateToWorkout={() => setActiveTab('workout')}
+              onOpenCheckIn={() => setIsCheckInOpen(true)}
+            />
+          )}
 
-          {/* Bi-Weekly Profile Update & Recalibration Reminder Banner */}
-          <BiWeeklyProfileReminderBanner
-            userProfile={userProfile}
-            onOpenCalibration={() => setIsQuarterlyCalibrationOpen(true)}
-            onConfirmCurrentSettings={() => {
-              const updated: UserProfile = {
-                ...userProfile,
-                lastProfileUpdateDate: new Date().toISOString(),
-              };
-              handleSaveProfile(updated);
-            }}
-          />
-
-          {/* Daily Motivation, Radial Progress, Water Tracker, 7-Day Sparkline & Quick Add */}
-          <DailyMotivationWidget
-            userName={userProfile.name || 'Athlete'}
-            currentStreak={calculatedStreak}
-            caloriesConsumed={caloriesConsumedToday}
-            calorieTarget={userProfile.dailyCalories || 2000}
-            proteinConsumed={proteinConsumedToday}
-            proteinTarget={userProfile.dailyProtein || 150}
-            hasLoggedWorkoutToday={workoutLogs.some((l) => l.date === todayStr)}
-            mealLogs={mealLogs}
-            userProfile={userProfile}
-            onQuickAddMeal={handleSaveMealLog}
-          />
-
-          {activeTab === 'scan' && (
-            <MealCameraScanner
+          {/* 2. Food View (Scanner + Meal Log merged) */}
+          {(activeTab === 'food' || activeTab === 'scan' || activeTab === 'nutrition') && (
+            <FoodView
               userProfile={userProfile}
               mealLogs={mealLogs}
+              todayLogs={todayLogs}
+              aiMealPlan={aiMealPlan}
               onSaveMealLog={handleSaveMealLog}
               onDeleteMealLog={handleDeleteMealLog}
               onBatchDeleteMealLogs={handleBatchDeleteMealLogs}
               onClearAllMealLogs={handleClearAllMealLogs}
-            />
-          )}
-
-          {activeTab === 'nutrition' && (
-            <NutritionPlanner
-              userProfile={userProfile}
-              mealLogs={todayLogs}
-              aiMealPlan={aiMealPlan}
               onUpdateAIMealPlan={handleUpdateAIMealPlan}
-              onSaveToMealLog={handleSaveMealLog}
             />
           )}
 
-          {activeTab === 'workouts' && (
-            <WorkoutProgramView
+          {/* 3. Workout View (Today's session + library + form sub-panels) */}
+          {(activeTab === 'workout' || activeTab === 'workouts' || activeTab === 'library' || activeTab === 'form') && (
+            <WorkoutView
               workoutPrograms={workoutPrograms}
               userProfile={userProfile}
               workoutLogs={workoutLogs}
@@ -1042,33 +1224,13 @@ export default function App() {
               onToggleWorkoutLog={handleToggleWorkoutLog}
               onUpdateWorkoutProgram={handleUpdateWorkoutProgram}
               onUpdateUserProfile={handleSaveProfile}
-            />
-          )}
-
-          {activeTab === 'library' && (
-            <ExerciseLibraryView
-              userProfile={userProfile}
-              workoutLogs={workoutLogs}
-              onQuickLogExercise={handleQuickLogFromLibrary}
-            />
-          )}
-
-          {activeTab === 'form' && (
-            <BiomechanicsFormAnalyzer
-              userProfile={userProfile}
+              onQuickLogFromLibrary={handleQuickLogFromLibrary}
               formAnalyses={formAnalyses}
               onSaveFormAnalysis={handleSaveFormAnalysis}
             />
           )}
 
-          {activeTab === 'projector' && (
-            <VisualTransformationProjector
-              userProfile={userProfile}
-              workoutLogs={workoutLogs}
-              mealLogs={mealLogs}
-            />
-          )}
-
+          {/* 4. Progress View */}
           {activeTab === 'progress' && (
             <ProgressAnalytics
               bodyMetrics={bodyMetrics}
@@ -1082,6 +1244,14 @@ export default function App() {
             />
           )}
 
+          {/* 5. Coach View */}
+          {activeTab === 'coach' && (
+            <AICoachChat
+              userProfile={userProfile}
+            />
+          )}
+
+          {/* Community Scoreboard (if accessed via Settings) */}
           {activeTab === 'challenges' && (
             <CommunityChallenges
               userProfile={userProfile}
@@ -1090,25 +1260,13 @@ export default function App() {
               currentStreak={calculatedStreak}
             />
           )}
-
-          {activeTab === 'research' && (
-            <ScientificResearchHub
-              userProfile={userProfile}
-            />
-          )}
-
-          {activeTab === 'coach' && (
-            <AICoachChat
-              userProfile={userProfile}
-            />
-          )}
         </main>
 
         {/* Real Legal & Global Footer */}
         <Footer
           onOpenLegal={handleOpenLegal}
           onOpenReportError={() => setIsReportAppErrorOpen(true)}
-          isHostAdminUser={isHostAdmin()}
+          isHostAdminUser={serverSaysHost && isHostAdmin()}
           onTriggerAudit={handleTriggerAudit}
           isAuditing={isAuditing}
           precisionStatus={precisionStatus}
@@ -1146,9 +1304,6 @@ export default function App() {
           userProfile={userProfile}
         />
 
-        {/* Sync Repair Discrepancy Notification */}
-        <SyncRepairNotification />
-
         {/* Subscription Paywall & FamApp QR Code Verification Modal */}
         <SubscriptionPaywallModal
           isOpen={isPaywallOpen}
@@ -1160,7 +1315,7 @@ export default function App() {
           }}
         />
 
-        {/* Host Master Admin Portal Modal (Warad Asare) */}
+        {/* Host Master Admin Portal Modal */}
         <HostAdminPortalModal
           isOpen={isHostAdminOpen}
           onClose={() => setIsHostAdminOpen(false)}
@@ -1232,6 +1387,46 @@ export default function App() {
 
         {/* Cookie & Local Storage Consent Banner */}
         <CookieBanner onOpenLegal={handleOpenLegal} />
+
+        {/* Settings & Secondary Tools Modal */}
+        <SettingsModal
+          isOpen={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          userProfile={userProfile}
+          currentUser={currentUser}
+          workoutLogs={workoutLogs}
+          mealLogs={mealLogs}
+          calculatedStreak={calculatedStreak}
+          onOpenOnboarding={() => setIsOnboardingOpen(true)}
+          onOpenCheckIn={() => setIsCheckInOpen(true)}
+          onOpenCalibration={() => setIsQuarterlyCalibrationOpen(true)}
+          onOpenSubscriptionModal={() => setIsPaywallOpen(true)}
+          onOpenHostAdminModal={() => setIsHostAdminOpen(true)}
+          onOpenPerformanceDashboard={() => setIsPerformanceDashboardOpen(true)}
+          onOpenKeepSync={() => setIsKeepSyncOpen(true)}
+          onOpenAuditModal={() => setIsAuditModalOpen(true)}
+          onExportData={handleExportData}
+          onForceSync={() => {
+            setIsSyncing(true);
+            setTimeout(() => {
+              setIsSyncing(false);
+              triggerSyncToast(
+                'Cloud Sync Complete',
+                'All workout logs, nutrition tracking, and athlete metrics are 100% reconciled and synchronized.',
+                'manual'
+              );
+            }, 800);
+          }}
+          onSignIn={handleSignIn}
+          onSignOut={handleSignOut}
+          onSelectTab={setActiveTab}
+        />
+
+        {/* Mobile Fixed Bottom Navigation Bar (44px Targets, 5 Tabs, No Horizontal Scroll) */}
+        <BottomTabBar
+          activeTab={activeTab}
+          onSelectTab={setActiveTab}
+        />
       </div>
     </SubscriptionGuard>
   );

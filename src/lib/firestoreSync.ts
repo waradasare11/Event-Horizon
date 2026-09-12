@@ -134,7 +134,7 @@ export function buildSubscriptionFromHostGrant(grant: HostGrantedSubscription): 
     paymentMethod: 'MANUAL_GRANT',
     isTrialActive: false,
     daysRemaining,
-    verifiedBy: grant.grantedByName || 'Warad Asare (Host VIP Grant)',
+    verifiedBy: grant.grantedByName || 'Host Administrator (VIP Grant)',
     lastPaymentVerifiedAt: new Date().toISOString(),
     isLifetime,
   };
@@ -985,7 +985,7 @@ export async function recordHostVerificationLogFirestore(entry: {
     ...entry,
     id: logId,
     timestamp: entry.timestamp || new Date().toISOString(),
-    performedBy: entry.performedBy || entry.actorEmail || 'Warad Asare',
+    performedBy: entry.performedBy || entry.actorEmail || 'Host Administrator',
     verifiedByPin: entry.verifiedByPin ?? true,
     authMethod: entry.authMethod || 'HOST_PASSWORD_AUTHENTICATED',
     status: entry.status || 'AUTHENTICATED',

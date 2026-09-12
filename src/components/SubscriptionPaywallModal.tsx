@@ -1,40 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   ShieldCheck, 
-  Check, 
-  Copy, 
-  QrCode, 
   Sparkles, 
   Lock, 
-  ExternalLink, 
   AlertCircle, 
   CheckCircle2, 
   Crown,
   CreditCard,
-  Smartphone,
-  Info,
-  Clock,
-  ArrowRight,
   Ticket,
   Tag,
-  Gift
+  Gift,
+  ArrowRight
 } from 'lucide-react';
 import { 
   SUBSCRIPTION_PLANS, 
-  HOST_ADMIN_CONFIG, 
-  generateUPILink, 
-  getUPIQRCodeUrl, 
-  validateUTRNumber, 
-  recordPaymentTransaction,
-  verifyPaymentWithBackendServer,
   fetchPersonalizedPlans,
   isHostAdmin,
   createHostLifetimeSubscription,
   createGrantedUserSubscription,
   checkUserHostGrant,
   redeemHostCouponCode,
-  validateHostCouponCode
+  getRazorpayConfig,
+  createRazorpayOrder,
+  verifyRazorpayPayment,
+  RazorpayConfig
 } from '../lib/subscription';
 import { SubscriptionPlanConfig, UserProfile, UserSubscription } from '../types';
 import { fireCelebrationConfetti } from '../lib/confetti';
@@ -56,12 +46,10 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanConfig>(
     SUBSCRIPTION_PLANS.find((p) => p.id === '1_year') || SUBSCRIPTION_PLANS[1]
   );
-  const [utrInput, setUtrInput] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationError, setVerificationError] = useState<string | null>(null);
+  const [razorpayConfig, setRazorpayConfig] = useState<RazorpayConfig>({ isLive: false, keyId: null });
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [verificationSuccess, setVerificationSuccess] = useState<boolean>(false);
-  const [copiedUPI, setCopiedUPI] = useState(false);
-  const [copiedAmount, setCopiedAmount] = useState(false);
 
   const [hasHostGrant, setHasHostGrant] = useState<boolean>(false);
   const [grantDetails, setGrantDetails] = useState<any>(null);
@@ -73,9 +61,14 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
   const [couponError, setCouponError] = useState<string | null>(null);
   const [couponSuccess, setCouponSuccess] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) {
-      // 1. Fetch personalized pricing
+      // 1. Fetch Razorpay config
+      getRazorpayConfig().then(setRazorpayConfig).catch(() => {
+        setRazorpayConfig({ isLive: false, keyId: null });
+      });
+
+      // 2. Fetch personalized pricing
       fetchPersonalizedPlans(userProfile.email).then((res) => {
         setPlansList(res.plans);
         const freePlan = res.plans.find((p) => p.priceINR === 0);
@@ -83,7 +76,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
         setSelectedPlan(preferred);
       });
 
-      // 2. Check direct host grant
+      // 3. Check direct host grant
       if (userProfile.email) {
         checkUserHostGrant(userProfile.email).then(({ hasGrant, grant }) => {
           if (hasGrant) {
@@ -99,49 +92,96 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
 
   const isUserHost = isHostAdmin(userProfile.email);
 
-  const handleCopyUPI = () => {
-    navigator.clipboard.writeText(HOST_ADMIN_CONFIG.upiId);
-    setCopiedUPI(true);
-    setTimeout(() => setCopiedUPI(false), 2000);
-  };
-
-  const handleCopyAmount = () => {
-    navigator.clipboard.writeText(selectedPlan.priceINR.toString());
-    setCopiedAmount(true);
-    setTimeout(() => setCopiedAmount(false), 2000);
-  };
-
-  const handleVerifyPayment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setVerificationError(null);
-    setIsVerifying(true);
-
-    const validation = validateUTRNumber(utrInput);
-    if (!validation.isValid) {
-      setVerificationError(validation.error || 'Invalid UTR reference number.');
-      setIsVerifying(false);
+  // Razorpay Checkout Trigger
+  const handleRazorpayCheckout = async () => {
+    if (!razorpayConfig.isLive || !razorpayConfig.keyId) {
       return;
     }
+    setIsProcessingPayment(true);
+    setPaymentError(null);
 
     try {
-      const res = await verifyPaymentWithBackendServer(
-        userProfile,
-        selectedPlan,
-        utrInput
+      const orderData = await createRazorpayOrder(
+        selectedPlan.id,
+        userProfile.email || '',
+        userProfile.name || 'AROH Athlete'
       );
 
-      if (!res.success || !res.subscription) {
-        setVerificationError(res.error || 'Payment verification failed against host gateway.');
-        setIsVerifying(false);
+      if (!orderData.success || !orderData.order) {
+        setPaymentError(orderData.error || 'Unable to initiate Razorpay checkout order.');
+        setIsProcessingPayment(false);
         return;
       }
 
-      setVerificationSuccess(true);
-      setIsVerifying(false);
-      onSubscriptionUpdated(res.subscription);
+      // Load Razorpay checkout script dynamically if needed
+      const loadScript = () => {
+        return new Promise<boolean>((resolve) => {
+          if ((window as any).Razorpay) return resolve(true);
+          const script = document.createElement('script');
+          script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+          script.onload = () => resolve(true);
+          script.onerror = () => resolve(false);
+          document.body.appendChild(script);
+        });
+      };
+
+      const scriptLoaded = await loadScript();
+      if (!scriptLoaded) {
+        setPaymentError('Unable to load payment gateway SDK. Please check your network connection.');
+        setIsProcessingPayment(false);
+        return;
+      }
+
+      const options = {
+        key: razorpayConfig.keyId,
+        amount: orderData.order.amount,
+        currency: orderData.order.currency,
+        name: 'AROH Pro',
+        description: `${selectedPlan.name} (${selectedPlan.durationLabel})`,
+        order_id: orderData.order.id,
+        prefill: {
+          name: userProfile.name || '',
+          email: userProfile.email || '',
+        },
+        theme: {
+          color: '#0F6E5F',
+        },
+        handler: async (response: any) => {
+          try {
+            const verifyRes = await verifyRazorpayPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              planId: selectedPlan.id,
+              userEmail: userProfile.email || '',
+              userName: userProfile.name || '',
+            });
+
+            if (verifyRes.success && verifyRes.subscription) {
+              fireCelebrationConfetti();
+              setVerificationSuccess(true);
+              onSubscriptionUpdated(verifyRes.subscription);
+            } else {
+              setPaymentError(verifyRes.error || 'Payment signature verification failed.');
+            }
+          } catch (e: any) {
+            setPaymentError(e.message || 'Payment verification failed.');
+          } finally {
+            setIsProcessingPayment(false);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setIsProcessingPayment(false);
+          },
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
     } catch (err: any) {
-      setVerificationError(err.message || 'Verification failed. Please retry.');
-      setIsVerifying(false);
+      setPaymentError(err.message || 'Payment initiation error.');
+      setIsProcessingPayment(false);
     }
   };
 
@@ -166,7 +206,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
     setIsRedeemingCoupon(true);
 
     try {
-      const res = await redeemHostCouponCode(code, email, userProfile.name || 'Peak Athlete');
+      const res = await redeemHostCouponCode(code, email, userProfile.name || 'AROH Athlete');
       if (!res.success || !res.subscription) {
         setCouponError(res.error || 'Invalid or expired coupon code.');
         setIsRedeemingCoupon(false);
@@ -174,7 +214,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
       }
 
       fireCelebrationConfetti();
-      setCouponSuccess(`🎉 Coupon code "${code}" verified & redeemed successfully for ${res.subscription.planName}!`);
+      setCouponSuccess(`Coupon code "${code}" verified & redeemed for ${res.subscription.planName}!`);
       setVerificationSuccess(true);
       onSubscriptionUpdated(res.subscription);
     } catch (err: any) {
@@ -185,8 +225,6 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
   };
 
   const displayPlans = plansList && plansList.length > 0 ? plansList : SUBSCRIPTION_PLANS;
-  const upiDeepLink = generateUPILink(selectedPlan, userProfile.email);
-  const qrCodeUrl = getUPIQRCodeUrl(selectedPlan, userProfile.email);
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
@@ -196,13 +234,13 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
           <div className="space-y-1 relative z-10">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-emerald-200 border border-white/20">
               <Crown className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
-              <span>Official AROH Pro Subscription</span>
+              <span>Official AROH Pro Membership</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
               Unlock Unlimited Master Coaching
             </h2>
             <p className="text-xs sm:text-sm text-emerald-100/90 max-w-xl">
-              Host & Verified Payee: <strong>{HOST_ADMIN_CONFIG.name}</strong> • Direct Zero-Fee UPI Gateway
+              Personalized workout logs, precision nutrition tracking, and biochemical AI analysis
             </p>
           </div>
 
@@ -223,35 +261,27 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
 
             <div className="space-y-2">
               <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
-                100% Verified & Authenticated
+                Verified &amp; Authenticated
               </span>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
                 Subscription Activated Successfully!
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300 max-w-md mx-auto">
-                Thank you for subscribing to <strong>{selectedPlan.name}</strong>! Your payment of ₹{selectedPlan.priceINR} has been logged in our secure ledger.
+                Thank you for subscribing to <strong>{selectedPlan.name}</strong>! Your account has full, unrestricted access to all AROH Pro features.
               </p>
             </div>
 
             <div className="bg-[#FAFAF8] dark:bg-[#1A1D1C] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 max-w-md mx-auto text-xs text-left space-y-2">
               <div className="flex justify-between">
-                <span className="text-gray-500">Beneficiary Host:</span>
-                <span className="font-bold text-gray-800 dark:text-gray-200">{HOST_ADMIN_CONFIG.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">UPI ID:</span>
-                <span className="font-bold text-gray-800 dark:text-gray-200">{HOST_ADMIN_CONFIG.upiId}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">UTR / Ref Number:</span>
-                <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">{utrInput}</span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-gray-500">Plan Duration:</span>
                 <span className="font-bold text-gray-800 dark:text-gray-200">{selectedPlan.durationLabel}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-500">Amount Paid:</span>
+                <span className="text-gray-500">Status:</span>
+                <span className="font-bold text-emerald-600 dark:text-emerald-400">Active</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Amount:</span>
                 <span className="font-bold text-[#0F6E5F] dark:text-[#2DD4BF] text-sm">₹{selectedPlan.priceINR}</span>
               </div>
             </div>
@@ -264,7 +294,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
             </button>
           </div>
         ) : (
-          /* Subscription Selection & QR Payment Form */
+          /* Subscription Selection & Payment View */
           <div className="p-6 sm:p-8 space-y-6 max-h-[75vh] overflow-y-auto">
             {/* 1. Plan Tier Selector */}
             <div>
@@ -289,7 +319,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                       key={plan.id}
                       onClick={() => {
                         setSelectedPlan(plan);
-                        setVerificationError(null);
+                        setPaymentError(null);
                       }}
                       className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative flex flex-col justify-between ${
                         isSelected
@@ -359,36 +389,20 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                   </span>
                   <h4 className="text-lg font-black text-gray-900 dark:text-white">
                     {grantDetails?.isLifetime 
-                      ? '100% Free Lifetime Pro Access Granted' 
-                      : `100% Free VIP Access Granted (${grantDetails?.planName || selectedPlan.name})`}
+                      ? 'Complimentary Lifetime Pro Access Granted' 
+                      : `Complimentary VIP Access Granted (${grantDetails?.planName || selectedPlan.name})`}
                   </h4>
                   <p className="text-xs text-gray-600 dark:text-gray-300 max-w-md mx-auto">
-                    Host <strong>Warad Asare</strong> has granted your Gmail ID (<strong>{userProfile.email}</strong>) full VIP membership.
+                    Administrator has granted your Gmail ID (<strong>{userProfile.email}</strong>) full VIP membership.
                     {grantDetails?.isLifetime 
-                      ? ' Lifetime access is 100% unlocked!' 
-                      : ` Valid for ${grantDetails?.durationDays || selectedPlan.durationDays || 90} days (Expires: ${grantDetails?.expiresAt ? new Date(grantDetails.expiresAt).toLocaleDateString() : 'Active'}).`} No payment required!
+                      ? ' Lifetime access is active!' 
+                      : ` Valid for ${grantDetails?.durationDays || selectedPlan.durationDays || 90} days.`} No payment required!
                   </p>
                 </div>
 
                 <button
                   type="button"
-                  onClick={async () => {
-                    setIsVerifying(true);
-                    try {
-                      const res = await verifyPaymentWithBackendServer(
-                        userProfile,
-                        selectedPlan.priceINR === 0 ? selectedPlan : { ...selectedPlan, priceINR: 0 },
-                        grantDetails?.isLifetime ? 'HOST_LIFETIME_GRANT' : 'MANUAL_GRANT'
-                      );
-                      if (res.subscription) {
-                        setVerificationSuccess(true);
-                        onSubscriptionUpdated(res.subscription);
-                        return;
-                      }
-                    } catch (e) {
-                      // Fallback: Use verified grant details
-                    }
-
+                  onClick={() => {
                     const fallbackSub = isUserHost
                       ? createHostLifetimeSubscription()
                       : createGrantedUserSubscription(grantDetails || {
@@ -400,18 +414,16 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                           durationDays: selectedPlan.durationDays || 90,
                           grantedAt: new Date().toISOString(),
                           expiresAt: new Date(Date.now() + (selectedPlan.durationDays || 90) * 86400000).toISOString(),
-                          grantedBy: 'Warad Asare (Host VIP)',
+                          grantedBy: 'Host VIP Grant',
                         });
 
                     setVerificationSuccess(true);
                     onSubscriptionUpdated(fallbackSub);
-                    setIsVerifying(false);
                   }}
-                  disabled={isVerifying}
                   className="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>{isVerifying ? 'Activating VIP Membership...' : 'Activate 100% Free VIP Pro Access Now'}</span>
+                  <span>Activate Complimentary VIP Pro Access Now</span>
                 </button>
               </div>
             )}
@@ -423,7 +435,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                   <div className="flex items-center gap-2">
                     <Ticket className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                     <span className="text-xs font-black uppercase tracking-wider text-gray-800 dark:text-gray-200">
-                      Have a Host VIP Coupon Voucher?
+                      Have a VIP Coupon Voucher?
                     </span>
                   </div>
                   <button
@@ -442,7 +454,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                         <Tag className="w-3.5 h-3.5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                         <input
                           type="text"
-                          placeholder="e.g. PEAK-VIP2026"
+                          placeholder="e.g. AROH-PRO2026"
                           value={couponCodeInput}
                           onChange={(e) => {
                             setCouponCodeInput(e.target.value.toUpperCase());
@@ -485,137 +497,84 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
               </div>
             </div>
 
-            {/* 2. QR Code & UPI Transfer Details */}
+            {/* 2. Razorpay Payment Gateway or Payments Coming Soon */}
             {selectedPlan.priceINR > 0 && (
-              <>
-                <div className="bg-[#FAFAF8] dark:bg-[#1A1D1C] p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                      <QrCode className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
-                      <span>2. Scan QR Code or Pay via UPI (Exact Amount: ₹{selectedPlan.priceINR})</span>
-                    </label>
-                    <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
-                      0% Convenience Fee
-                    </span>
-                  </div>
+              <div className="space-y-4">
+                {razorpayConfig.isLive ? (
+                  /* Razorpay Live Checkout View */
+                  <div className="bg-[#FAFAF8] dark:bg-[#1A1D1C] p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                        <CreditCard className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                        <span>2. Complete Checkout via Razorpay</span>
+                      </label>
+                      <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                        Encrypted 256-Bit SSL
+                      </span>
+                    </div>
 
-                  <div className="flex flex-col sm:flex-row items-center gap-6">
-                    {/* Visual QR Code */}
-                    <div className="bg-white p-3 rounded-2xl shadow-md border border-gray-200 shrink-0 text-center">
-                      <img
-                        src={qrCodeUrl}
-                        alt={`UPI QR Code for ₹${selectedPlan.priceINR} to Warad Asare`}
-                        referrerPolicy="no-referrer"
-                        className="w-44 h-44 object-contain rounded-lg mx-auto"
-                      />
-                      <div className="mt-1 text-[10px] font-bold text-gray-600">
-                        Scan with GPay / PhonePe / Paytm / BHIM
+                    <div className="p-4 rounded-xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-700 space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Selected Plan:</span>
+                        <span className="font-bold text-gray-900 dark:text-white">{selectedPlan.name} ({selectedPlan.durationLabel})</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">Amount Due:</span>
+                        <span className="font-bold text-[#0F6E5F] dark:text-[#2DD4BF] text-sm">₹{selectedPlan.priceINR}</span>
+                      </div>
+                      <div className="flex justify-between text-gray-500">
+                        <span>Payment Methods:</span>
+                        <span>UPI, Cards, NetBanking, Wallets</span>
                       </div>
                     </div>
 
-                    {/* Direct Pay Options */}
-                    <div className="flex-1 space-y-3 w-full text-xs">
-                      <div className="p-3 rounded-xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-700 space-y-1.5">
-                        <div className="text-gray-500 dark:text-gray-400 font-semibold">Verified Host & Payee</div>
-                        <div className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
-                          <span>{HOST_ADMIN_CONFIG.name}</span>
-                          <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                        </div>
-                      </div>
-
-                      {/* Copy UPI VPA */}
-                      <div className="flex items-center justify-between p-3 rounded-xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-700">
-                        <div>
-                          <div className="text-gray-500 dark:text-gray-400 font-semibold">Host UPI ID</div>
-                          <div className="font-mono font-bold text-gray-900 dark:text-white text-xs sm:text-sm">
-                            {HOST_ADMIN_CONFIG.upiId}
-                          </div>
-                        </div>
-                        <button
-                          onClick={handleCopyUPI}
-                          className="px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 text-gray-800 dark:text-gray-200 font-bold flex items-center gap-1 cursor-pointer transition-colors"
-                        >
-                          {copiedUPI ? (
-                            <>
-                              <Check className="w-3.5 h-3.5 text-emerald-500" />
-                              <span className="text-emerald-600">Copied</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3.5 h-3.5 text-gray-500" />
-                              <span>Copy UPI</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-
-                      {/* 1-Tap Mobile UPI Trigger */}
-                      <a
-                        href={upiDeepLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold flex items-center justify-center gap-2 shadow-xs transition-all text-xs"
-                      >
-                        <Smartphone className="w-4 h-4" />
-                        <span>Tap to Pay ₹{selectedPlan.priceINR} in UPI App (Mobile)</span>
-                        <ExternalLink className="w-3.5 h-3.5 ml-1 opacity-80" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 3. Anti-Scam UTR Verification Box */}
-                <div className="space-y-3">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300">
-                    3. Enter 12-Digit UPI Reference Number (UTR) to Verify
-                  </label>
-                  
-                  <form onSubmit={handleVerifyPayment} className="space-y-3">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        maxLength={12}
-                        value={utrInput}
-                        onChange={(e) => {
-                          const val = e.target.value.replace(/\D/g, '');
-                          setUtrInput(val);
-                          setVerificationError(null);
-                        }}
-                        placeholder="e.g. 423985123456 (12 digits)"
-                        className="w-full text-sm font-mono tracking-wider p-3.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1A1D1C] text-gray-900 dark:text-white focus:outline-hidden focus:ring-2 focus:ring-[#0F6E5F]"
-                      />
-                      <div className="absolute right-3 top-3.5 text-xs font-semibold text-gray-400">
-                        {utrInput.length}/12 digits
-                      </div>
-                    </div>
-
-                    {verificationError && (
+                    {paymentError && (
                       <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-300 text-xs flex items-start gap-2">
                         <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                        <span>{verificationError}</span>
+                        <span>{paymentError}</span>
                       </div>
                     )}
 
                     <button
-                      type="submit"
-                      disabled={isVerifying || utrInput.length < 12}
+                      onClick={handleRazorpayCheckout}
+                      disabled={isProcessingPayment}
                       className="w-full py-3.5 px-4 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
                     >
                       <ShieldCheck className="w-4 h-4 text-emerald-300" />
                       <span>
-                        {isVerifying ? 'Verifying Transaction with Host Gateway...' : `Verify UTR & Activate ${selectedPlan.durationLabel} Pro`}
+                        {isProcessingPayment ? 'Connecting to Razorpay...' : `Pay ₹${selectedPlan.priceINR} via Razorpay`}
                       </span>
                     </button>
-                  </form>
-
-                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-800 dark:text-amber-300 flex items-start gap-2">
-                    <Info className="w-4 h-4 shrink-0 mt-0.5" />
-                    <span>
-                      <strong>Anti-Fraud Protection:</strong> Each UTR is cryptographically cross-checked against our ledger to guarantee exact recipient matching to <strong>{HOST_ADMIN_CONFIG.name}</strong> ({HOST_ADMIN_CONFIG.upiId}). Submissions with duplicate or falsified references are automatically rejected.
-                    </span>
                   </div>
-                </div>
-              </>
+                ) : (
+                  /* Payments Coming Soon Banner (Razorpay not configured) */
+                  <div className="bg-gradient-to-br from-teal-500/10 via-emerald-500/5 to-teal-500/10 p-6 rounded-2xl border border-teal-500/20 text-center space-y-4">
+                    <div className="w-12 h-12 rounded-2xl bg-teal-600/20 text-teal-600 dark:text-teal-400 flex items-center justify-center mx-auto">
+                      <ShieldCheck className="w-6 h-6" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-teal-700 dark:text-teal-300 bg-teal-500/20 px-2.5 py-1 rounded-md">
+                        Payments coming soon — your 7-day trial is active
+                      </span>
+                      <h4 className="text-base font-bold text-gray-900 dark:text-white pt-1">
+                        Enjoy Full Pro Access During Setup
+                      </h4>
+                      <p className="text-xs text-gray-600 dark:text-gray-300 max-w-md mx-auto leading-relaxed">
+                        Online payment processing via Razorpay is currently being finalized. You have full, unrestricted access to all AROH Pro features during your active 7-day free trial.
+                      </p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs shadow-md transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <span>Continue with 7-Day Free Access</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
             )}
           </div>
         )}
@@ -624,9 +583,9 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
         <div className="px-6 py-4 bg-[#FAFAF8] dark:bg-[#111312] border-t border-[#E5E7EB] dark:border-[#242826] text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex items-center justify-between">
           <span className="flex items-center gap-1.5">
             <Lock className="w-3.5 h-3.5 text-emerald-500" />
-            <span>Host Verified: Warad Asare (waradasare11@gmail.com)</span>
+            <span>AROH Pro • Encrypted 256-Bit SSL Checkout</span>
           </span>
-          <span>100% Anti-Scam Guarantee</span>
+          <span>7-Day Risk-Free Guarantee</span>
         </div>
       </div>
     </div>

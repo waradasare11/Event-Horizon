@@ -1,25 +1,20 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { 
   Trophy, 
   Flame, 
   Dumbbell, 
   TrendingUp, 
   Award, 
-  Users, 
   Sparkles, 
   Target, 
-  ChevronRight, 
-  Heart, 
   CheckCircle2, 
   ShieldCheck, 
   Zap, 
-  Medal, 
-  Share2, 
-  Filter,
+  Calendar,
+  Lock,
   ArrowUpRight
 } from 'lucide-react';
-import { UserProfile, WorkoutCompletionLog, MealLog, CommunityChallenge, ChallengeLeaderboardEntry } from '../types';
-import confetti from 'canvas-confetti';
+import { UserProfile, WorkoutCompletionLog, MealLog } from '../types';
 
 interface CommunityChallengesProps {
   userProfile: UserProfile;
@@ -28,195 +23,41 @@ interface CommunityChallengesProps {
   currentStreak: number;
 }
 
-const INITIAL_COMMUNITY_CHALLENGES: CommunityChallenge[] = [
-  {
-    id: 'volume-10m',
-    title: '10,000,000 kg Collective Volume Quest',
-    category: 'volume',
-    description: 'Every bench press, squat, deadlift, and curl logged by AROH athletes counts toward our shared 10M kg goal.',
-    targetMetric: 'Total Weight Lifted',
-    currentCommunityTotal: 7428590,
-    goalCommunityTotal: 10000000,
-    unit: 'kg',
-    participantCount: 4218,
-    startDate: '2026-08-01',
-    endDate: '2026-09-30',
-    rewardBadge: '🏆 Titan Lifter 2026',
-    leaderboard: [
-      {
-        id: 'user_1',
-        athleteName: 'Vikram Rajput',
-        emailMasked: 'vi***t@gmail.com',
-        rank: 1,
-        totalScore: 148200,
-        unit: 'kg',
-        badge: '👑 Diamond Titan',
-        lastActive: '12 min ago',
-        cheersCount: 342,
-      },
-      {
-        id: 'user_2',
-        athleteName: 'Ananya Sharma',
-        emailMasked: 'an***a@gmail.com',
-        rank: 2,
-        totalScore: 132450,
-        unit: 'kg',
-        badge: '⚡ Master Hypertrophy',
-        lastActive: '45 min ago',
-        cheersCount: 289,
-      },
-      {
-        id: 'user_3',
-        athleteName: 'Rohan Deshmukh',
-        emailMasked: 'ro***h@gmail.com',
-        rank: 3,
-        totalScore: 119800,
-        unit: 'kg',
-        badge: '🔥 Powerhouse',
-        lastActive: '2 hours ago',
-        cheersCount: 215,
-      },
-      {
-        id: 'user_4',
-        athleteName: 'Pooja Iyer',
-        emailMasked: 'po***r@gmail.com',
-        rank: 4,
-        totalScore: 98400,
-        unit: 'kg',
-        badge: '💪 Glute & Squat Specialist',
-        lastActive: '3 hours ago',
-        cheersCount: 164,
-      },
-      {
-        id: 'user_5',
-        athleteName: 'Sameer Khan',
-        emailMasked: 'sa***n@gmail.com',
-        rank: 5,
-        totalScore: 87500,
-        unit: 'kg',
-        badge: '🎖️ Iron Athlete',
-        lastActive: '5 hours ago',
-        cheersCount: 122,
-      },
-    ],
-  },
-  {
-    id: 'streak-100k',
-    title: '100,000 Days Consistency Milestone',
-    category: 'streak',
-    description: 'Consistency beats intensity. Build your personal streak to boost the global community endurance score.',
-    targetMetric: 'Total Workout Days Logged',
-    currentCommunityTotal: 68420,
-    goalCommunityTotal: 100000,
-    unit: 'days',
-    participantCount: 5120,
-    startDate: '2026-07-01',
-    endDate: '2026-10-31',
-    rewardBadge: '🔥 Unbroken Iron Will',
-    leaderboard: [
-      {
-        id: 'user_s1',
-        athleteName: 'Kabir Mehta',
-        emailMasked: 'ka***a@gmail.com',
-        rank: 1,
-        totalScore: 184,
-        unit: 'days',
-        badge: '💎 180+ Day Streak Legend',
-        lastActive: 'Today',
-        cheersCount: 512,
-      },
-      {
-        id: 'user_s2',
-        athleteName: 'Sneha Patel',
-        emailMasked: 'sn***l@gmail.com',
-        rank: 2,
-        totalScore: 142,
-        unit: 'days',
-        badge: '🔥 100+ Day Club',
-        lastActive: 'Today',
-        cheersCount: 398,
-      },
-      {
-        id: 'user_s3',
-        athleteName: 'Amit Verma',
-        emailMasked: 'am***a@gmail.com',
-        rank: 3,
-        totalScore: 98,
-        unit: 'days',
-        badge: '⚡ Relentless Warrior',
-        lastActive: 'Yesterday',
-        cheersCount: 265,
-      },
-    ],
-  },
-  {
-    id: 'nutrition-clean',
-    title: '50,000 Clean Protein & Macro Days',
-    category: 'nutrition',
-    description: 'Hit 90%+ of your daily protein target with precision meal tracking to claim the Golden Macro Seal.',
-    targetMetric: 'Daily High-Protein Days',
-    currentCommunityTotal: 34190,
-    goalCommunityTotal: 50000,
-    unit: 'days',
-    participantCount: 3890,
-    startDate: '2026-08-15',
-    endDate: '2026-10-15',
-    rewardBadge: '🥗 Master Nutritionist',
-    leaderboard: [
-      {
-        id: 'user_n1',
-        athleteName: 'Dr. Arjun Saxena',
-        emailMasked: 'ar***a@gmail.com',
-        rank: 1,
-        totalScore: 89,
-        unit: 'clean days',
-        badge: '🧬 Perfect Macro Ratio',
-        lastActive: 'Today',
-        cheersCount: 420,
-      },
-      {
-        id: 'user_n2',
-        athleteName: 'Meera Nambiar',
-        emailMasked: 'me***r@gmail.com',
-        rank: 2,
-        totalScore: 76,
-        unit: 'clean days',
-        badge: '🥑 High-Protein Vegan Ace',
-        lastActive: 'Today',
-        cheersCount: 310,
-      },
-    ],
-  },
-];
-
 export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
   userProfile,
   workoutLogs,
   mealLogs,
   currentStreak,
 }) => {
-  const [selectedChallengeId, setSelectedChallengeId] = useState<string>('volume-10m');
-  const [activeFilter, setActiveFilter] = useState<'all' | 'volume' | 'streak' | 'nutrition'>('all');
-  const [cheeredAthletes, setCheeredAthletes] = useState<Record<string, number>>({});
-  const [joinedChallenges, setJoinedChallenges] = useState<Record<string, boolean>>({
-    'volume-10m': true,
-    'streak-100k': true,
-    'nutrition-clean': true,
-  });
+  // 1. Compute personal volume this week (last 7 days) from real workout logs
+  const personalVolumeThisWeek = useMemo(() => {
+    const now = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(now.getDate() - 7);
+    const sevenDaysAgoStr = sevenDaysAgo.toISOString().split('T')[0];
 
-  // Calculate current user's actual personal total volume lifted across all logged workouts
-  const userTotalVolumeKg = useMemo(() => {
-    return workoutLogs.reduce((total, log) => {
+    return workoutLogs
+      .filter((log) => log.date >= sevenDaysAgoStr)
+      .reduce((sum, log) => {
+        if (log.totalVolumeKg && log.totalVolumeKg > 0) {
+          return sum + log.totalVolumeKg;
+        }
+        return sum;
+      }, 0);
+  }, [workoutLogs]);
+
+  // 2. Compute personal all-time volume from real workout logs
+  const personalVolumeAllTime = useMemo(() => {
+    return workoutLogs.reduce((sum, log) => {
       if (log.totalVolumeKg && log.totalVolumeKg > 0) {
-        return total + log.totalVolumeKg;
+        return sum + log.totalVolumeKg;
       }
-      // Estimate if not recorded: duration * 120kg equivalent
-      return total + (log.durationMin || 45) * 80;
+      return sum;
     }, 0);
   }, [workoutLogs]);
 
-  // Clean nutrition days logged
-  const userCleanNutritionDays = useMemo(() => {
+  // 3. Compute clean nutrition adherence days from real meal logs
+  const cleanNutritionDays = useMemo(() => {
     const targetProtein = userProfile.dailyProtein || 140;
     const dateMap: Record<string, number> = {};
     mealLogs.forEach((m) => {
@@ -225,392 +66,300 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
     return Object.values(dateMap).filter((p) => p >= targetProtein * 0.85).length;
   }, [mealLogs, userProfile.dailyProtein]);
 
-  const selectedChallenge = useMemo(() => {
-    return INITIAL_COMMUNITY_CHALLENGES.find((c) => c.id === selectedChallengeId) || INITIAL_COMMUNITY_CHALLENGES[0];
-  }, [selectedChallengeId]);
+  // 4. Sorted recent sessions from real athlete logs
+  const recentSessions = useMemo(() => {
+    return [...workoutLogs]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 5);
+  }, [workoutLogs]);
 
-  // Merge current user dynamically into leaderboard
-  const enrichedLeaderboard = useMemo(() => {
-    let userScore = 0;
-    let unit = selectedChallenge.unit;
+  // 5. Personal milestone badges computed purely from this athlete's data
+  const personalMilestones = useMemo(() => {
+    return [
+      {
+        id: 'first-workout',
+        title: 'First Step on the Iron Path',
+        desc: 'Log your first completed training session',
+        unlocked: workoutLogs.length >= 1,
+        progress: `${Math.min(workoutLogs.length, 1)} / 1 session`,
+        badge: '🥉 Debut Lifter',
+      },
+      {
+        id: 'streak-7',
+        title: '7-Day Discipline Master',
+        desc: 'Maintain a 7-day consecutive workout streak',
+        unlocked: currentStreak >= 7,
+        progress: `${Math.min(currentStreak, 7)} / 7 days`,
+        badge: '⚡ Consistent Warrior',
+      },
+      {
+        id: 'vol-10k',
+        title: '10,000 kg Volume Club',
+        desc: 'Accumulate 10,000 kg of total resistance load',
+        unlocked: personalVolumeAllTime >= 10000,
+        progress: `${Math.min(personalVolumeAllTime, 10000).toLocaleString()} / 10,000 kg`,
+        badge: '💪 Heavy Mover',
+      },
+      {
+        id: 'protein-7',
+        title: '7 Clean Nutrition Days',
+        desc: 'Hit your daily protein target for 7 logged days',
+        unlocked: cleanNutritionDays >= 7,
+        progress: `${Math.min(cleanNutritionDays, 7)} / 7 days`,
+        badge: '🥗 Fueling Ace',
+      },
+      {
+        id: 'vol-50k',
+        title: '50,000 kg Hypertrophy Club',
+        desc: 'Lift 50,000 kg across all logged exercises',
+        unlocked: personalVolumeAllTime >= 50000,
+        progress: `${Math.min(personalVolumeAllTime, 50000).toLocaleString()} / 50,000 kg`,
+        badge: '🔥 Iron Titan',
+      },
+    ];
+  }, [workoutLogs.length, currentStreak, personalVolumeAllTime, cleanNutritionDays]);
 
-    if (selectedChallenge.category === 'volume') {
-      userScore = userTotalVolumeKg;
-    } else if (selectedChallenge.category === 'streak') {
-      userScore = Math.max(currentStreak, workoutLogs.length);
-    } else if (selectedChallenge.category === 'nutrition') {
-      userScore = userCleanNutritionDays;
-    }
-
-    const currentUserEntry: ChallengeLeaderboardEntry = {
-      id: 'current_user',
-      athleteName: `${userProfile.name || 'You'} (You)`,
-      emailMasked: userProfile.email ? `${userProfile.email.slice(0, 3)}***@gmail.com` : 'you***@gmail.com',
-      rank: 6,
-      totalScore: userScore,
-      unit,
-      badge: '🚀 Active Challenger',
-      lastActive: 'Just now',
-      isCurrentUser: true,
-      cheersCount: cheeredAthletes['current_user'] || 18,
-    };
-
-    const combined = [...selectedChallenge.leaderboard, currentUserEntry];
-    // Sort descending by totalScore
-    combined.sort((a, b) => b.totalScore - a.totalScore);
-    // Assign ranks
-    return combined.map((entry, index) => ({
-      ...entry,
-      rank: index + 1,
-      cheersCount: (entry.cheersCount || 0) + (cheeredAthletes[entry.id] || 0),
-    }));
-  }, [selectedChallenge, userTotalVolumeKg, currentStreak, workoutLogs.length, userCleanNutritionDays, userProfile, cheeredAthletes]);
-
-  const progressPercent = Math.min(
-    100,
-    Math.round((selectedChallenge.currentCommunityTotal / selectedChallenge.goalCommunityTotal) * 100)
-  );
-
-  const handleCheer = (athleteId: string) => {
-    setCheeredAthletes((prev) => ({
-      ...prev,
-      [athleteId]: (prev[athleteId] || 0) + 1,
-    }));
-    try {
-      confetti({
-        particleCount: 25,
-        spread: 45,
-        origin: { y: 0.7 },
-        colors: ['#0F6E5F', '#E8912D', '#3B82F6'],
-      });
-    } catch (e) {}
-  };
-
-  const handleJoinToggle = (challengeId: string) => {
-    setJoinedChallenges((prev) => {
-      const next = !prev[challengeId];
-      if (next) {
-        try {
-          confetti({
-            particleCount: 60,
-            spread: 60,
-            origin: { y: 0.6 },
-            colors: ['#0F6E5F', '#E8912D', '#10B981'],
-          });
-        } catch (e) {}
-      }
-      return { ...prev, [challengeId]: next };
-    });
-  };
-
-  const filteredChallenges = INITIAL_COMMUNITY_CHALLENGES.filter((c) => {
-    if (activeFilter === 'all') return true;
-    return c.category === activeFilter;
-  });
+  const athleteDisplayName = userProfile.name?.trim() || 'AROH Athlete';
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      {/* Hero Community Header */}
-      <div className="bg-gradient-to-r from-[#0F6E5F] via-[#0D5B4F] to-[#134E48] rounded-2xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-semibold text-emerald-200 mb-3 border border-white/10">
-              <Users className="w-3.5 h-3.5" />
-              AROH Global Athlete Network
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-              Community Challenges & Live Leaderboard
+    <div className="space-y-6 animate-in fade-in duration-200">
+      {/* Header Banner */}
+      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+            <h1 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
+              Personal Athletic Scoreboard
             </h1>
-            <p className="text-sm text-emerald-100/90 mt-2 leading-relaxed">
-              Lift together, stay accountable, and conquer massive community milestones. Your personal workouts and clean nutrition directly advance the global goal!
-            </p>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
+              Verified Data Only
+            </span>
           </div>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+            Real performance telemetry for <strong>{athleteDisplayName}</strong>.
+          </p>
+        </div>
 
-          <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
-            <div className="px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-center min-w-[120px]">
-              <div className="text-xs text-emerald-200">Your Lifted Volume</div>
-              <div className="text-xl font-extrabold text-white mt-0.5">
-                {userTotalVolumeKg.toLocaleString()} <span className="text-xs font-medium">kg</span>
-              </div>
-            </div>
-
-            <div className="px-4 py-3 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-center min-w-[120px]">
-              <div className="text-xs text-emerald-200">Active Streak</div>
-              <div className="text-xl font-extrabold text-[#E8912D] mt-0.5 flex items-center justify-center gap-1">
-                <Flame className="w-4 h-4 fill-current" />
-                {currentStreak} <span className="text-xs font-medium text-white">days</span>
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
+          <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+          <span>Zero Fabricated Social Proof</span>
         </div>
       </div>
 
-      {/* Challenge Category Filter Tabs */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          <button
-            onClick={() => setActiveFilter('all')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
-              activeFilter === 'all'
-                ? 'bg-[#0F6E5F] text-white shadow-sm'
-                : 'bg-white dark:bg-[#1E211F] text-[#5A605B] dark:text-[#9CA3AF] border border-[#E5E7EB] dark:border-[#2A2E2C] hover:bg-gray-50'
-            }`}
-          >
-            All Challenges ({INITIAL_COMMUNITY_CHALLENGES.length})
-          </button>
-          <button
-            onClick={() => setActiveFilter('volume')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeFilter === 'volume'
-                ? 'bg-[#0F6E5F] text-white shadow-sm'
-                : 'bg-white dark:bg-[#1E211F] text-[#5A605B] dark:text-[#9CA3AF] border border-[#E5E7EB] dark:border-[#2A2E2C] hover:bg-gray-50'
-            }`}
-          >
-            <Dumbbell className="w-3.5 h-3.5" />
-            Lifting Volume
-          </button>
-          <button
-            onClick={() => setActiveFilter('streak')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeFilter === 'streak'
-                ? 'bg-[#0F6E5F] text-white shadow-sm'
-                : 'bg-white dark:bg-[#1E211F] text-[#5A605B] dark:text-[#9CA3AF] border border-[#E5E7EB] dark:border-[#2A2E2C] hover:bg-gray-50'
-            }`}
-          >
-            <Flame className="w-3.5 h-3.5 text-[#E8912D]" />
-            Consistency Streaks
-          </button>
-          <button
-            onClick={() => setActiveFilter('nutrition')}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-              activeFilter === 'nutrition'
-                ? 'bg-[#0F6E5F] text-white shadow-sm'
-                : 'bg-white dark:bg-[#1E211F] text-[#5A605B] dark:text-[#9CA3AF] border border-[#E5E7EB] dark:border-[#2A2E2C] hover:bg-gray-50'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            Clean Nutrition
-          </button>
+      {/* Mandatory Empty State Banner */}
+      <div className="p-5 sm:p-6 rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-start gap-3.5 text-left shadow-xs">
+        <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+          <Lock className="w-5 h-5" />
         </div>
-
-        <div className="text-xs text-[#5A605B] dark:text-[#9CA3AF] flex items-center gap-1.5">
-          <ShieldCheck className="w-4 h-4 text-[#0F6E5F]" />
-          Live Verified Athlete Logs
+        <div className="space-y-1 flex-1">
+          <h2 className="text-sm font-bold text-amber-950 dark:text-amber-200">
+            Challenges unlock when more athletes join. For now this is your private scoreboard.
+          </h2>
+          <p className="text-xs text-amber-900/80 dark:text-amber-300/80 leading-relaxed">
+            AROH never displays artificial participant counts or simulated leaderboards. As real athletes join the community network, authentic multiplayer challenges and collective milestones will unlock right here.
+          </p>
         </div>
       </div>
 
-      {/* Main Challenge Grid & Active Milestone Progress */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left 2 Cols: Milestone Progress & Challenge Selector */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Active Featured Milestone Card */}
-          <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#2A2E2C] rounded-2xl p-6 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0F6E5F] dark:text-[#4ade80]">
-                  Shared Community Milestone
-                </span>
-                <h2 className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-0.5">
-                  {selectedChallenge.title}
-                </h2>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center gap-1">
-                  <Award className="w-3.5 h-3.5" />
-                  {selectedChallenge.rewardBadge}
-                </span>
-                <button
-                  onClick={() => handleJoinToggle(selectedChallenge.id)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors ${
-                    joinedChallenges[selectedChallenge.id]
-                      ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border border-emerald-300'
-                      : 'bg-[#0F6E5F] text-white hover:bg-[#0D5B4F]'
-                  }`}
-                >
-                  {joinedChallenges[selectedChallenge.id] ? '✓ Joined' : '+ Join Challenge'}
-                </button>
-              </div>
-            </div>
-
-            <p className="text-sm text-[#5A605B] dark:text-[#9CA3AF] mb-6">
-              {selectedChallenge.description}
-            </p>
-
-            {/* Giant Progress Bar */}
-            <div className="space-y-2 mb-6">
-              <div className="flex items-center justify-between text-xs font-bold">
-                <span className="text-[#1A1D1B] dark:text-[#E8ECE9]">
-                  Community Progress: {selectedChallenge.currentCommunityTotal.toLocaleString()} / {selectedChallenge.goalCommunityTotal.toLocaleString()} {selectedChallenge.unit}
-                </span>
-                <span className="text-[#0F6E5F] dark:text-[#4ade80] text-sm font-extrabold">
-                  {progressPercent}% Complete
-                </span>
-              </div>
-              <div className="w-full h-4 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden p-0.5">
-                <div
-                  className="h-full bg-gradient-to-r from-[#0F6E5F] to-[#10B981] rounded-full transition-all duration-700 shadow-sm"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-              <div className="flex items-center justify-between text-xs text-gray-500">
-                <span>{(selectedChallenge.goalCommunityTotal - selectedChallenge.currentCommunityTotal).toLocaleString()} {selectedChallenge.unit} remaining</span>
-                <span>{selectedChallenge.participantCount.toLocaleString()} athletes participating</span>
-              </div>
-            </div>
-
-            {/* User Contribution Snapshot */}
-            <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1E211F] border border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#0F6E5F]/15 text-[#0F6E5F] dark:text-[#4ade80] flex items-center justify-center font-bold">
-                  {userProfile.name?.slice(0, 1) || 'U'}
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500">Your Verified Contribution</div>
-                  <div className="text-sm font-bold text-[#1A1D1B] dark:text-white">
-                    {selectedChallenge.category === 'volume' && `${userTotalVolumeKg.toLocaleString()} kg lifted`}
-                    {selectedChallenge.category === 'streak' && `${currentStreak} day streak`}
-                    {selectedChallenge.category === 'nutrition' && `${userCleanNutritionDays} clean protein days`}
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-lg">
-                <Zap className="w-3.5 h-3.5" />
-                Contributing to Community Goal
-              </div>
+      {/* Real Personal Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Personal Workout Streak */}
+        <div className="p-5 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Workout Streak
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center">
+              <Flame className="w-4 h-4" />
             </div>
           </div>
-
-          {/* Other Available Challenges Carousel/List */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
-              <Target className="w-4 h-4 text-[#0F6E5F]" />
-              Select Active Community Quest
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {filteredChallenges.map((challenge) => {
-                const isSelected = challenge.id === selectedChallengeId;
-                return (
-                  <button
-                    key={challenge.id}
-                    onClick={() => setSelectedChallengeId(challenge.id)}
-                    className={`p-4 rounded-xl text-left transition-all border ${
-                      isSelected
-                        ? 'bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 border-[#0F6E5F] shadow-sm'
-                        : 'bg-white dark:bg-[#161817] border-gray-200 dark:border-gray-800 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="text-xs font-bold text-[#0F6E5F] dark:text-[#4ade80] mb-1 capitalize">
-                      {challenge.category} Challenge
-                    </div>
-                    <div className="text-sm font-bold text-gray-900 dark:text-white line-clamp-1">
-                      {challenge.title}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-2 flex items-center justify-between">
-                      <span>{challenge.participantCount} Lifters</span>
-                      <span className="font-semibold text-gray-700 dark:text-gray-300">
-                        {Math.round((challenge.currentCommunityTotal / challenge.goalCommunityTotal) * 100)}%
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+              {currentStreak}
+            </span>
+            <span className="text-xs font-semibold text-gray-500">
+              {currentStreak === 1 ? 'day' : 'days'}
+            </span>
           </div>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400">
+            Consecutive training consistency
+          </p>
         </div>
 
-        {/* Right Col: Live Leaderboard */}
-        <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#2A2E2C] rounded-2xl p-6 shadow-sm flex flex-col h-full">
-          <div className="flex items-center justify-between gap-2 mb-4 pb-3 border-b border-gray-100 dark:border-gray-800">
+        {/* Card 2: Personal Volume This Week */}
+        <div className="p-5 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Volume This Week
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-teal-500/10 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center">
+              <Dumbbell className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+              {personalVolumeThisWeek.toLocaleString()}
+            </span>
+            <span className="text-xs font-semibold text-gray-500">kg</span>
+          </div>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400">
+            Resistance tonnage moved in last 7 days
+          </p>
+        </div>
+
+        {/* Card 3: Total Workouts Logged */}
+        <div className="p-5 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              Total Sessions
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <Award className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+              {workoutLogs.length}
+            </span>
+            <span className="text-xs font-semibold text-gray-500">
+              {workoutLogs.length === 1 ? 'workout' : 'workouts'}
+            </span>
+          </div>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400">
+            All-time completed training sessions
+          </p>
+        </div>
+
+        {/* Card 4: All-Time Cumulative Volume */}
+        <div className="p-5 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              All-Time Volume
+            </span>
+            <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+              <TrendingUp className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-2xl sm:text-3xl font-black text-gray-900 dark:text-white">
+              {personalVolumeAllTime.toLocaleString()}
+            </span>
+            <span className="text-xs font-semibold text-gray-500">kg</span>
+          </div>
+          <p className="text-[11px] text-gray-500 dark:text-gray-400">
+            Cumulative career resistance workload
+          </p>
+        </div>
+      </div>
+
+      {/* Two Columns: Personal Milestones & Recent Sessions */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column: Personal Milestone Badges */}
+        <div className="p-6 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-amber-500" />
-              <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">
-                Leaderboard Rankings
-              </h3>
+              <Sparkles className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+              <h2 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
+                Personal Milestones
+              </h2>
             </div>
-            <span className="text-xs px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 font-medium">
-              Live Verified
+            <span className="text-xs font-medium text-gray-500">
+              {personalMilestones.filter((m) => m.unlocked).length} of {personalMilestones.length} unlocked
             </span>
           </div>
 
-          {/* Leaderboard entries list */}
-          <div className="space-y-2.5 flex-1 overflow-y-auto max-h-[480px] pr-1">
-            {enrichedLeaderboard.map((entry) => {
-              const isTop3 = entry.rank <= 3;
-              return (
-                <div
-                  key={entry.id}
-                  className={`p-3 rounded-xl border transition-all flex items-center justify-between gap-3 ${
-                    entry.isCurrentUser
-                      ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-700 shadow-sm'
-                      : isTop3
-                      ? 'bg-amber-50/40 dark:bg-amber-950/10 border-amber-200 dark:border-amber-900/40'
-                      : 'bg-gray-50/60 dark:bg-[#1E211F]/60 border-gray-200/70 dark:border-gray-800'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    {/* Rank Badge */}
-                    <div
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center font-extrabold text-xs shrink-0 ${
-                        entry.rank === 1
-                          ? 'bg-amber-400 text-amber-950 shadow-sm'
-                          : entry.rank === 2
-                          ? 'bg-slate-300 text-slate-900'
-                          : entry.rank === 3
-                          ? 'bg-amber-700 text-white'
-                          : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                      }`}
-                    >
-                      {entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : entry.rank === 3 ? '🥉' : entry.rank}
-                    </div>
-
-                    {/* Athlete Name & Masked Email */}
-                    <div className="min-w-0">
-                      <div className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] truncate flex items-center gap-1.5">
-                        {entry.athleteName}
-                        {entry.isCurrentUser && (
-                          <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[10px] font-bold">
-                            YOU
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-[11px] text-gray-500 truncate flex items-center gap-1">
-                        <span>{entry.emailMasked}</span>
-                        <span>•</span>
-                        <span className="text-amber-600 dark:text-amber-400 font-medium">{entry.badge}</span>
-                      </div>
-                    </div>
+          <div className="space-y-3">
+            {personalMilestones.map((milestone) => (
+              <div
+                key={milestone.id}
+                className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
+                  milestone.unlocked
+                    ? 'bg-teal-500/5 dark:bg-teal-500/10 border-teal-500/30'
+                    : 'bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-800 opacity-70'
+                }`}
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-gray-900 dark:text-white">
+                      {milestone.title}
+                    </span>
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300">
+                      {milestone.badge}
+                    </span>
                   </div>
-
-                  {/* Score & Cheers */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <div className="text-right">
-                      <div className="text-xs font-extrabold text-[#0F6E5F] dark:text-[#4ade80]">
-                        {entry.totalScore.toLocaleString()}
-                      </div>
-                      <div className="text-[10px] text-gray-400">{entry.unit}</div>
-                    </div>
-
-                    <button
-                      onClick={() => handleCheer(entry.id)}
-                      title="Send Cheers & Kudos"
-                      className="p-1.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:bg-rose-50 dark:hover:bg-rose-950/30 hover:border-rose-300 text-rose-500 flex items-center gap-1 text-[11px] font-bold transition-all shadow-xs"
-                    >
-                      <Heart className="w-3.5 h-3.5 fill-current" />
-                      <span>{entry.cheersCount || 0}</span>
-                    </button>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                    {milestone.desc}
+                  </p>
+                  <div className="text-[10px] font-mono text-teal-600 dark:text-teal-400 font-semibold pt-0.5">
+                    {milestone.progress}
                   </div>
                 </div>
-              );
-            })}
+
+                <div className="shrink-0">
+                  {milestone.unlocked ? (
+                    <div className="w-7 h-7 rounded-full bg-teal-600 text-white flex items-center justify-center">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-400 flex items-center justify-center">
+                      <Lock className="w-3.5 h-3.5" />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Column: Recent Verified Workouts */}
+        <div className="p-6 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+              <h2 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
+                Recent Training Sessions
+              </h2>
+            </div>
+            <span className="text-xs font-medium text-gray-500">
+              Last {recentSessions.length} recorded
+            </span>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 text-center text-xs text-gray-500 flex items-center justify-center gap-1">
-            <Medal className="w-3.5 h-3.5 text-amber-500" />
-            Top 10% athletes receive verified Community Trophy badges
-          </div>
+          {recentSessions.length === 0 ? (
+            <div className="p-8 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-center space-y-2">
+              <Dumbbell className="w-8 h-8 text-gray-400 mx-auto" />
+              <p className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                No workouts logged yet. Complete a training session in the Workout tab to start building your scoreboard!
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {recentSessions.map((session, idx) => (
+                <div
+                  key={session.id || idx}
+                  className="p-3.5 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 flex items-center justify-between gap-3"
+                >
+                  <div className="space-y-0.5">
+                    <div className="text-xs font-bold text-gray-900 dark:text-white">
+                      {session.dayName || 'Training Session'}
+                    </div>
+                    <div className="text-[11px] text-gray-500">
+                      {session.date} • {session.durationMin || 45} min
+                    </div>
+                  </div>
+
+                  <div className="text-right">
+                    <div className="text-xs font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">
+                      {(session.totalVolumeKg || 0).toLocaleString()} kg
+                    </div>
+                    <div className="text-[10px] text-gray-400">
+                      {session.exercisesCompleted || session.loggedExercises?.length || 0} exercises
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

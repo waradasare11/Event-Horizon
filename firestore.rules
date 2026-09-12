@@ -153,33 +153,33 @@ service cloud.firestore {
     // Global Host Accuracy Correction Queue (supports PascalCase and camelCase)
     match /AccuracyCorrectionQueue/{correctionId} {
       allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
-      allow read: if isSignedIn();
+      allow read: if false;
     }
     match /accuracyCorrectionQueue/{correctionId} {
       allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
-      allow read: if isSignedIn();
+      allow read: if false;
     }
 
     // Global Host Correction Queue (supports PascalCase and camelCase)
     match /CorrectionQueue/{correctionId} {
       allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
-      allow read: if isSignedIn();
+      allow read: if false;
     }
     match /correctionQueue/{correctionId} {
       allow create: if isSignedIn() && isValidId(correctionId) && incoming().userId == request.auth.uid;
-      allow read: if isSignedIn();
+      allow read: if false;
     }
 
     // Global Host Improvement Queue
     match /improvementQueue/{reportId} {
       allow create: if isSignedIn() && isValidId(reportId) && incoming().userId == request.auth.uid;
-      allow read: if isSignedIn();
+      allow read: if false;
     }
 
     // Global Host App Error Reports
     match /appErrorReports/{reportId} {
       allow create: if isSignedIn() && isValidId(reportId) && incoming().userId == request.auth.uid;
-      allow read: if isSignedIn();
+      allow read: if false;
     }
 
     // Sensitive Administrative, Subscription, & Financial Collections (Server-only / Host-restricted; Deny client reads & writes)
