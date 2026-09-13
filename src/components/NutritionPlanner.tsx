@@ -41,6 +41,8 @@ interface NutritionPlannerProps {
   aiMealPlan: AIAdjustedMealPlan | null;
   onUpdateAIMealPlan: (plan: AIAdjustedMealPlan) => void;
   onSaveToMealLog: (log: MealLog) => void;
+  isSubscriptionExpired?: boolean;
+  onOpenPaywall?: () => void;
 }
 
 export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
@@ -49,6 +51,8 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
   aiMealPlan,
   onUpdateAIMealPlan,
   onSaveToMealLog,
+  isSubscriptionExpired = false,
+  onOpenPaywall = () => {},
 }) => {
   const [plannerSubView, setPlannerSubView] = useState<'per_gram_builder' | 'recipe_gen' | 'daily_blueprint' | 'smart_grocery' | 'recipe_database'>('per_gram_builder');
   const [isGeneratingPlan, setIsGeneratingPlan] = useState<boolean>(false);
@@ -60,7 +64,14 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
 
   // Intermittent Fasting state
   const [fastingSettings, setFastingSettings] = useState<IntermittentFastingSettings>(() => {
-    const saved = localStorage.getItem('peakform_intermittent_fasting_settings');
+    let saved = localStorage.getItem('aroh_intermittent_fasting_settings');
+    if (!saved) {
+      saved = localStorage.getItem('peakform_intermittent_fasting_settings');
+      if (saved) {
+        localStorage.setItem('aroh_intermittent_fasting_settings', saved);
+        localStorage.removeItem('peakform_intermittent_fasting_settings');
+      }
+    }
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -81,7 +92,14 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
 
   // Weight Loss Mode State (applies automatic 20% deficit to maintenance TDEE)
   const [isWeightLossMode, setIsWeightLossMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem('peakform_weight_loss_mode');
+    let saved = localStorage.getItem('aroh_weight_loss_mode');
+    if (saved === null) {
+      saved = localStorage.getItem('peakform_weight_loss_mode');
+      if (saved !== null) {
+        localStorage.setItem('aroh_weight_loss_mode', saved);
+        localStorage.removeItem('peakform_weight_loss_mode');
+      }
+    }
     if (saved !== null) {
       return saved === 'true';
     }
@@ -91,14 +109,14 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
   const toggleWeightLossMode = () => {
     setIsWeightLossMode((prev) => {
       const next = !prev;
-      localStorage.setItem('peakform_weight_loss_mode', String(next));
+      localStorage.setItem('aroh_weight_loss_mode', String(next));
       return next;
     });
   };
 
   const handleUpdateFastingSettings = (newSettings: IntermittentFastingSettings) => {
     setFastingSettings(newSettings);
-    localStorage.setItem('peakform_intermittent_fasting_settings', JSON.stringify(newSettings));
+    localStorage.setItem('aroh_intermittent_fasting_settings', JSON.stringify(newSettings));
   };
 
   // Determine if current time falls within fasting hours
@@ -147,6 +165,10 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
     : '0.00';
 
   const handleGenerateAIMealPlan = async () => {
+    if (isSubscriptionExpired) {
+      onOpenPaywall();
+      return;
+    }
     try {
       setIsGeneratingPlan(true);
       setErrorMessage(null);

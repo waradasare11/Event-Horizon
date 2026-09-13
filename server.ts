@@ -4251,20 +4251,20 @@ const BASE_OFFICIAL_PLANS = [
     id: "plan_3y",
     durationMonths: 36,
     durationDays: 1095,
-    durationLabel: "3 Years Lifetime Physique",
+    durationLabel: "3 Years Extended Plan",
     priceINR: 2700,
-    savingsBadge: "Best Lifetime Value (₹75/mo)",
-    description: "Ultimate lifetime physique mastery. Guaranteed lowest rate with priority AI processing and continuous feature updates.",
+    savingsBadge: "Long-term Value (₹75/mo)",
+    description: "Multi-year fitness and nutrition programming with priority AI processing.",
     isPopular: false,
   },
   {
     id: "3_years",
     durationMonths: 36,
     durationDays: 1095,
-    durationLabel: "3 Years Lifetime Physique",
+    durationLabel: "3 Years Extended Plan",
     priceINR: 2700,
-    savingsBadge: "Best Lifetime Value (₹75/mo)",
-    description: "Ultimate lifetime physique mastery. Guaranteed lowest rate with priority AI processing and continuous feature updates.",
+    savingsBadge: "Long-term Value (₹75/mo)",
+    description: "Multi-year fitness and nutrition programming with priority AI processing.",
     isPopular: false,
   },
 ];
@@ -4708,7 +4708,10 @@ app.get("/api/subscription/plans", (req, res) => {
   const userEmail = (req.query.email as string) || "";
   const isHost = userEmail.toLowerCase() === HOST_EMAIL.toLowerCase();
 
-  const personalizedPlans = BASE_OFFICIAL_PLANS.map((basePlan) => {
+  const hiddenIds = new Set(["6_months", "plan_2y", "2_years", "plan_3y", "3_years"]);
+  const visibleBasePlans = BASE_OFFICIAL_PLANS.filter((p) => !hiddenIds.has(p.id));
+
+  const personalizedPlans = visibleBasePlans.map((basePlan) => {
     const calc = calculateEffectivePlanPrice(basePlan, userEmail);
     return {
       ...basePlan,
@@ -5248,7 +5251,7 @@ app.post("/api/host/grant-free-subscription", (req, res) => {
       durationMonths = 24;
       durationDays = 730;
     } else if (selectedPlanId === "3_years" || selectedPlanId === "plan_3y") {
-      planName = "3 Years Lifetime Physique";
+      planName = "3-Year Plan";
       durationMonths = 36;
       durationDays = 1095;
     } else {
@@ -5569,7 +5572,7 @@ app.post("/api/host/coupons/create", (req, res) => {
       actualDays = 730;
       actualMonths = 24;
     } else if (selectedPlanId === "3_years" || selectedPlanId === "plan_3y") {
-      planName = "3 Years Lifetime Physique";
+      planName = "3-Year Plan";
       actualDays = 1095;
       actualMonths = 36;
     } else {

@@ -135,7 +135,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
   const isVegetarianUser = userProfile.dietType === 'vegetarian' || userProfile.dietType === 'vegan' || userProfile.dietType === 'eggetarian';
 
   const [shoppingList, setShoppingList] = useState<SmartShoppingList>(() => {
-    const stored = getStoredSmartShoppingList();
+    const stored = getStoredSmartShoppingList(userProfile.email);
     if (stored) {
       // If user is vegetarian, verify no meat items in stored list
       if (isVegetarianUser) {
@@ -166,6 +166,24 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
       lastCompiledAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     };
   });
+
+  // Re-sync shopping list when user switches email
+  useEffect(() => {
+    const stored = getStoredSmartShoppingList(userProfile.email);
+    if (stored) {
+      if (isVegetarianUser) {
+        const NON_VEG_WORDS = ['chicken', 'salmon', 'beef', 'turkey', 'pork', 'tuna', 'fish', 'meat', 'shrimp', 'bacon'];
+        const hasMeat = stored.items.some((i) => NON_VEG_WORDS.some((kw) => i.name.toLowerCase().includes(kw)));
+        if (!hasMeat) {
+          setShoppingList(stored);
+          return;
+        }
+      } else {
+        setShoppingList(stored);
+        return;
+      }
+    }
+  }, [userProfile.email, isVegetarianUser, userProfile.goal]);
 
   const [daysMultiplier, setDaysMultiplier] = useState<number>(shoppingList.daysMultiplier || 7);
   const [isCompiling, setIsCompiling] = useState<boolean>(false);
@@ -216,12 +234,12 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
 
   // Synchronize changes to local storage
   useEffect(() => {
-    saveStoredSmartShoppingList(shoppingList);
-  }, [shoppingList]);
+    saveStoredSmartShoppingList(shoppingList, userProfile.email);
+  }, [shoppingList, userProfile.email]);
 
   // Handle Toggle Checkbox
   const handleToggleItem = (itemId: string) => {
-    const updated = toggleStoredShoppingItemPurchased(itemId);
+    const updated = toggleStoredShoppingItemPurchased(itemId, userProfile.email);
     if (updated) {
       setShoppingList(updated);
       const target = updated.items.find((i) => i.id === itemId);
@@ -405,7 +423,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
       };
 
       setShoppingList(newList);
-      saveStoredSmartShoppingList(newList);
+      saveStoredSmartShoppingList(newList, userProfile.email);
 
       // Sync items to Firestore
       newList.items.forEach((item) => syncShoppingListItem(item).catch(console.error));

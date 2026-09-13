@@ -140,6 +140,44 @@ export const Header: React.FC<HeaderProps> = ({
               onThemeChange={onThemeChange}
             />
 
+            {/* Subscription Status Badge */}
+            {(() => {
+              const badgeConfig = (() => {
+                if (activeSub.status === 'trial' || activeSub.isTrialActive) {
+                  const days = Math.max(0, activeSub.daysRemaining ?? 0);
+                  return {
+                    label: `Trial · ${days}d left`,
+                    className: 'bg-teal-500/10 text-teal-700 dark:text-teal-300 border-teal-500/25 hover:bg-teal-500/20',
+                    dot: 'bg-teal-500',
+                  };
+                }
+                if (activeSub.status === 'active') {
+                  return {
+                    label: 'Pro',
+                    className: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/25 hover:bg-emerald-500/20',
+                    dot: 'bg-emerald-500',
+                  };
+                }
+                return {
+                  label: 'Expired — view only',
+                  className: 'bg-rose-500/10 text-rose-700 dark:text-rose-400 border-rose-500/25 hover:bg-rose-500/20',
+                  dot: 'bg-rose-500',
+                };
+              })();
+
+              return (
+                <button
+                  type="button"
+                  onClick={onOpenSubscriptionModal}
+                  className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl border transition-all cursor-pointer ${badgeConfig.className}`}
+                  title="Subscription status — Click to view plans"
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${badgeConfig.dot}`} />
+                  <span>{badgeConfig.label}</span>
+                </button>
+              );
+            })()}
+
             {/* Streak Badge */}
             <div
               className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-700 dark:text-orange-400"

@@ -95,15 +95,17 @@ import {
   isHostAdmin, 
   checkUserHostGrant,
   recordAthleteLoginSession,
-  checkIsHostOnServer
+  checkIsHostOnServer,
+  computeSubscriptionStatus
 } from './lib/subscription';
 import { auditWorkoutPrograms, WorkoutProgramAuditReport } from './data/ExerciseRegistry';
 import { runAutomatedDataReconciliation } from './lib/reconciliationWorker';
 import { setCurrentActiveEmail, getCurrentActiveEmail, updateWorkoutLogNotes, saveStoredFormAnalyses } from './lib/storage';
-import { Activity } from 'lucide-react';
+import { Activity, Bot } from 'lucide-react';
 import { LegalPage, LegalTabType } from './components/LegalPage';
 import { LegalPagesModal } from './components/LegalPagesModal';
 import { NotFoundPage } from './components/NotFoundPage';
+import { LandingPage } from './components/LandingPage';
 import { Footer } from './components/Footer';
 import { CookieBanner } from './components/CookieBanner';
 import { TodayDashboardView } from './components/TodayDashboardView';
@@ -1096,6 +1098,23 @@ export default function App() {
     );
   }
 
+  // Public Landing Page for unauthenticated visitors (Logged-in users skip straight to dashboard)
+  const isLoggedIn = Boolean((currentUser && currentUser.email) || (userProfile.email && userProfile.email.includes('@')));
+
+  if (!isLoggedIn) {
+    return (
+      <LandingPage
+        onSignIn={handleSignIn}
+        onNavigate={handleNavigate}
+      />
+    );
+  }
+
+  const isHost = isHostAdmin(userProfile.email) || isHostAdmin(currentUser?.email);
+  const userEmail = userProfile.email || currentUser?.email || undefined;
+  const activeSub = computeSubscriptionStatus(userProfile.subscription, userEmail);
+  const isSubscriptionExpired = !isHost && activeSub.status === 'expired';
+
   return (
     <SubscriptionGuard
       userProfile={userProfile}
@@ -1130,7 +1149,7 @@ export default function App() {
               setIsSyncing(false);
               triggerSyncToast(
                 'Cloud Sync Complete',
-                'All workout logs, nutrition tracking, and athlete metrics are 100% reconciled and synchronized.',
+                'All workout logs, nutrition tracking, and athlete metrics are verified and synchronized.',
                 'manual'
               );
             }, 800);
@@ -1208,6 +1227,8 @@ export default function App() {
               onBatchDeleteMealLogs={handleBatchDeleteMealLogs}
               onClearAllMealLogs={handleClearAllMealLogs}
               onUpdateAIMealPlan={handleUpdateAIMealPlan}
+              isSubscriptionExpired={isSubscriptionExpired}
+              onOpenPaywall={() => setIsPaywallOpen(true)}
             />
           )}
 
@@ -1227,6 +1248,8 @@ export default function App() {
               onQuickLogFromLibrary={handleQuickLogFromLibrary}
               formAnalyses={formAnalyses}
               onSaveFormAnalysis={handleSaveFormAnalysis}
+              isSubscriptionExpired={isSubscriptionExpired}
+              onOpenPaywall={() => setIsPaywallOpen(true)}
             />
           )}
 
@@ -1246,9 +1269,36 @@ export default function App() {
 
           {/* 5. Coach View */}
           {activeTab === 'coach' && (
-            <AICoachChat
-              userProfile={userProfile}
-            />
+            isSubscriptionExpired ? (
+              <div className="max-w-xl mx-auto my-12 p-8 rounded-3xl bg-white dark:bg-[#161817] border border-amber-500/30 text-center space-y-4 shadow-xl animate-in zoom-in-95">
+                <div className="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center">
+                  <Bot className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">
+                    Pro Coach Feature
+                  </span>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-2">
+                    AI Coach & Telemetry Locked
+                  </h3>
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed max-w-md mx-auto">
+                  Your 7-day free trial has expired. Your logged workouts, food history, and progress records are completely safe. Upgrade to Pro to continue unlimited coaching conversations and nutritional check-ins.
+                </p>
+                <div className="pt-2">
+                  <button
+                    onClick={() => setIsPaywallOpen(true)}
+                    className="px-6 py-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs font-bold shadow-md cursor-pointer transition-colors inline-flex items-center gap-2"
+                  >
+                    <span>Upgrade to Pro — ₹89/mo</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <AICoachChat
+                userProfile={userProfile}
+              />
+            )
           )}
 
           {/* Community Scoreboard (if accessed via Settings) */}
@@ -1412,7 +1462,7 @@ export default function App() {
               setIsSyncing(false);
               triggerSyncToast(
                 'Cloud Sync Complete',
-                'All workout logs, nutrition tracking, and athlete metrics are 100% reconciled and synchronized.',
+                'All workout logs, nutrition tracking, and athlete metrics are verified and synchronized.',
                 'manual'
               );
             }, 800);

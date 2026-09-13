@@ -138,97 +138,34 @@ export const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
     );
   }
 
-  // Step 3 Enforcement: If subscription expired, render ONLY the lockscreen paywall.
-  // Zero dashboard components are mounted.
-  if (!hasAccess) {
-    return (
-      <div className="min-h-screen bg-[#FAFAF8] dark:bg-[#111312] flex items-center justify-center p-4">
-        <div className="bg-white dark:bg-[#161817] p-8 rounded-3xl max-w-lg w-full border border-gray-200 dark:border-gray-800 shadow-2xl text-center space-y-5 animate-in zoom-in-95">
-          <div className="w-16 h-16 rounded-full bg-amber-500/10 border-2 border-amber-500 flex items-center justify-center mx-auto text-amber-500">
-            <Lock className="w-8 h-8" />
-          </div>
+  // Step 3 Enforcement: If subscription expired, allow read-only access to dashboard logs
+  // with a top warning banner and upgrade CTA. Sub-features (Scanner, Coach, AI plans, Form analyzer)
+  // are restricted inside their respective components.
+  const isExpired = !hasAccess;
 
-          <div className="space-y-2">
-            <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">
-              1-Week Free Trial Expired
-            </span>
-            <h3 className="text-2xl font-black text-gray-900 dark:text-white">
-              Renew Your AROH Pro Access
-            </h3>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
-              Your 7-day free trial has concluded. Upgrade to Pro to continue your personalized workout and nutrition coaching.
-            </p>
-          </div>
-
-          {grantCheckNotice && (
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
-              {grantCheckNotice}
-            </div>
-          )}
-
-          <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-gray-200 dark:border-gray-800 text-xs text-left space-y-1.5">
-            <div className="flex justify-between">
-              <span className="text-gray-500">1 Month:</span>
-              <strong className="text-gray-900 dark:text-white">₹89</strong>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">3 Months:</span>
-              <strong className="text-gray-900 dark:text-white">₹239 (Save 11%)</strong>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">1 Year:</span>
-              <strong className="text-emerald-600 dark:text-emerald-400">₹919 (Save 14% • Popular)</strong>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">2 Years:</span>
-              <strong className="text-gray-900 dark:text-white">₹1820</strong>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-500">3 Years:</span>
-              <strong className="text-amber-600 dark:text-amber-400">₹2700 (Best Lifetime Value)</strong>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <button
-              onClick={() => setIsPaywallOpen(true)}
-              className="w-full py-3.5 px-4 rounded-2xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer"
-            >
-              <QrCode className="w-4 h-4" />
-              <span>Scan FamApp QR Code & Unlock Pro</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-
-            <button
-              type="button"
-              onClick={handleManualGrantCheck}
-              disabled={isCheckingGrant}
-              className="w-full py-2.5 px-4 rounded-xl bg-gray-100 dark:bg-[#202422] hover:bg-emerald-500/10 hover:text-emerald-600 text-gray-700 dark:text-gray-300 font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-gray-200 dark:border-gray-800 disabled:opacity-50"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isCheckingGrant ? 'animate-spin text-emerald-500' : ''}`} />
-              <span>{isCheckingGrant ? 'Verifying Host VIP Grant...' : 'Check Host VIP Free Pass'}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Subscription Paywall Modal */}
-        <SubscriptionPaywallModal
-          isOpen={isPaywallOpen}
-          onClose={() => setIsPaywallOpen(false)}
-          userProfile={userProfile}
-          onSubscriptionUpdated={(sub) => {
-            onUpdateSubscription(sub);
-            setIsPaywallOpen(false);
-          }}
-        />
-      </div>
-    );
-  }
-
-  // All 3 conditions satisfied: Authenticated, Onboarded, and Active Subscription / Trial.
   return (
-    <>
+    <div className="relative min-h-screen flex flex-col">
+      {/* Top Banner for Expired Subscriptions */}
+      {isExpired && (
+        <div className="sticky top-0 z-50 bg-amber-500/15 border-b border-amber-500/30 text-amber-900 dark:text-amber-200 px-4 py-2 sm:py-2.5 flex items-center justify-between text-xs font-medium backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shrink-0" />
+            <span className="text-[11px] sm:text-xs">
+              Trial expired. Your data is safe. Upgrade to continue using AI scanning and coaching.
+            </span>
+          </div>
+          <button
+            onClick={() => setIsPaywallOpen(true)}
+            className="ml-3 shrink-0 px-3 py-1 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs shadow-xs transition-colors cursor-pointer whitespace-nowrap"
+          >
+            Upgrade — ₹89/mo
+          </button>
+        </div>
+      )}
+
       {children}
+
+      {/* Subscription Paywall Modal */}
       <SubscriptionPaywallModal
         isOpen={isPaywallOpen}
         onClose={() => setIsPaywallOpen(false)}
@@ -238,6 +175,6 @@ export const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
           setIsPaywallOpen(false);
         }}
       />
-    </>
+    </div>
   );
 };

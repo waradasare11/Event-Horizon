@@ -92,16 +92,6 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
     popular: true,
   },
   {
-    id: '6_months',
-    name: 'Semi-Annual Transformation',
-    durationLabel: '6 Months',
-    durationMonths: 6,
-    durationDays: 180,
-    priceINR: 479,
-    monthlyEquivalentINR: 79.8,
-    savingsBadge: 'Save 12%',
-  },
-  {
     id: '1_year',
     name: 'Annual Master Athlete',
     durationLabel: '1 Year (12 Months)',
@@ -111,26 +101,6 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanConfig[] = [
     monthlyEquivalentINR: 76.5,
     savingsBadge: 'Save 14%',
     bestValue: true,
-  },
-  {
-    id: '2_years',
-    name: '2-Year Elite Mastery',
-    durationLabel: '2 Years (24 Months)',
-    durationMonths: 24,
-    durationDays: 730,
-    priceINR: 1820,
-    monthlyEquivalentINR: 75.8,
-    savingsBadge: 'Save 15%',
-  },
-  {
-    id: '3_years',
-    name: '3-Year Lifetime Physique',
-    durationLabel: '3 Years (36 Months)',
-    durationMonths: 36,
-    durationDays: 1095,
-    priceINR: 2700,
-    monthlyEquivalentINR: 75.0,
-    savingsBadge: 'Best Lifetime Value (₹75/mo)',
   },
 ];
 
@@ -672,7 +642,7 @@ export async function grantUserFreeSubscription(params: {
   } else if (params.planId === '3_years' || params.planId === 'plan_3y') {
     durationDays = 1095;
     durationMonths = 36;
-    planName = '3 Years Lifetime Physique';
+    planName = '3-Year Plan';
   }
 
   const now = new Date();

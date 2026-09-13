@@ -617,22 +617,18 @@ export async function backupHostLedgerToGoogleDrive(ledgerData: {
   hostEmail: string;
 }): Promise<{ success: boolean; message?: string }> {
   try {
-    const { isHostAdmin, checkIsHostOnServer } = await import('./subscription');
-    if (!isHostAdmin()) {
-      return { success: false, message: 'Host ledger backup is only permitted for authenticated host administrators.' };
-    }
-
+    const { checkIsHostOnServer } = await import('./subscription');
     const auth = getStoredGoogleWorkspaceAuth();
-    if (!auth.accessToken) return { success: false, message: 'Google Drive not connected' };
+    const driveEmail = (auth.userEmail || ledgerData.hostEmail || '').trim().toLowerCase();
 
-    const driveEmail = (auth.userEmail || '').trim().toLowerCase();
-    const hostEmail = (ledgerData.hostEmail || '').trim().toLowerCase();
-
-    // Verify against server that connected drive email is indeed host
+    // Verify against /api/host/whoami that this email is host. Must strictly no-op otherwise.
     const isServerHost = await checkIsHostOnServer(driveEmail);
-    if (!isServerHost && driveEmail !== hostEmail) {
-      return { success: false, message: 'Connected Google Drive does not match verified Host account. Skipping host ledger backup.' };
+    if (!isServerHost) {
+      console.warn('backupHostLedgerToGoogleDrive no-op: /api/host/whoami indicates email is not host:', driveEmail);
+      return { success: true, message: 'No-op: email is not verified host on /api/host/whoami.' };
     }
+
+    if (!auth.accessToken) return { success: false, message: 'Google Drive not connected' };
 
     const folderId = auth.driveFolderId || (await getOrCreateArohFolder(auth.accessToken));
     const dateStr = new Date().toISOString().split('T')[0];

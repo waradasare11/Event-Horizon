@@ -79,6 +79,9 @@ export interface AroHDriveAuth {
   lastBackupTimestamp?: string | null;
 }
 
+export const USER_MEMORY_DRIVE_FOLDER = 'AROH AI';
+export const USER_MEMORY_FILE_NAME = 'AROH_UserMemory.json';
+
 // Global listeners for Drive Sync Status
 type StatusListener = (status: DriveSyncStatus) => void;
 const statusListeners = new Set<StatusListener>();
@@ -321,18 +324,18 @@ export async function clearPendingOfflineSync(email: string): Promise<void> {
 export function sanitizeSnapshotForDrive(snapshot: UserMemorySnapshot): UserMemorySnapshot {
   const activeEmail = (getCurrentActiveEmail() || snapshot.email || '').trim().toLowerCase();
 
-  // Strip food photos > 100KB to keep user memory compact and ultra-fast
+  // Strip food photos > 80KB to keep user memory compact and ultra-fast (< 80KB thumbnail allowed)
   const cleanedMealLogs = (snapshot.mealLogs || []).map((meal) => {
     const cleaned: any = { ...meal };
-    if (cleaned.photoUrl && typeof cleaned.photoUrl === 'string' && cleaned.photoUrl.startsWith('data:') && cleaned.photoUrl.length > 100000) {
+    if (cleaned.photoUrl && typeof cleaned.photoUrl === 'string' && cleaned.photoUrl.startsWith('data:') && cleaned.photoUrl.length > 80000) {
       delete cleaned.photoUrl;
     }
-    if (cleaned.imageUrl && typeof cleaned.imageUrl === 'string' && cleaned.imageUrl.startsWith('data:') && cleaned.imageUrl.length > 100000) {
+    if (cleaned.imageUrl && typeof cleaned.imageUrl === 'string' && cleaned.imageUrl.startsWith('data:') && cleaned.imageUrl.length > 80000) {
       delete cleaned.imageUrl;
     }
     if (cleaned.items && Array.isArray(cleaned.items)) {
       cleaned.items = cleaned.items.map((it: any) => {
-        if (it.photoUri && it.photoUri.startsWith('data:') && it.photoUri.length > 100000) {
+        if (it.photoUri && it.photoUri.startsWith('data:') && it.photoUri.length > 80000) {
           const { photoUri, ...rest } = it;
           return rest;
         }
@@ -706,6 +709,10 @@ if (typeof window !== 'undefined') {
     }
   });
 
+  window.addEventListener('pagehide', () => {
+    flushUserMemory();
+  });
+
   window.addEventListener('beforeunload', () => {
     flushUserMemory();
   });
@@ -833,9 +840,9 @@ export async function restoreUserMemory(
           if (downloadRes.ok) {
             const rawText = await downloadRes.text();
             const parsed = JSON.parse(rawText);
-            // IDENTITY RULE: If backup.email exists and does not match active email -> DISCARD
-            if (parsed && parsed.email && parsed.email.trim().toLowerCase() !== cleanEmail) {
-              console.warn('Discarded Drive backup with mismatched email:', parsed.email, '!=', cleanEmail);
+            // IDENTITY RULE: If backup.email does not exist or does not match active auth email -> DISCARD
+            if (!parsed || !parsed.email || parsed.email.trim().toLowerCase() !== cleanEmail) {
+              console.warn('Discarded Drive backup with missing or mismatched email:', parsed?.email, '!=', cleanEmail);
             } else if (parsed && (parsed.userProfile || parsed.schemaVersion)) {
               driveSnapshot = sanitizeSnapshotForDrive({
                 schemaVersion: 1,
@@ -878,7 +885,10 @@ export async function restoreUserMemory(
       const fsDoc = await getDoc(userMainRef);
       if (fsDoc.exists()) {
         const fsData = fsDoc.data();
-        if (fsData && (fsData.userProfile || fsData.schemaVersion)) {
+        // IDENTITY RULE: If snapshot.email does not exist or does not match active auth email -> DISCARD
+        if (!fsData || !fsData.email || fsData.email.trim().toLowerCase() !== cleanEmail) {
+          console.warn('Discarded Firestore snapshot with missing or mismatched email:', fsData?.email, '!=', cleanEmail);
+        } else if (fsData && (fsData.userProfile || fsData.schemaVersion)) {
           firestoreSnapshot = sanitizeSnapshotForDrive({
             ...fsData,
             savedAt: fsData.savedAt || fsData.updatedAt || new Date().toISOString(),
@@ -939,8 +949,13 @@ export async function restoreUserMemory(
 
   // Step 4: Check Local scoped cache fallback
   const localSnapshot = loadUserMemoryFromLocal(cleanEmail);
-  if (localSnapshot && (localSnapshot.userProfile?.goal || localSnapshot.mealLogs?.length > 0 || localSnapshot.workoutLogs?.length > 0)) {
-    return { snapshot: localSnapshot, isNewAthlete: false, source: 'local' };
+  if (localSnapshot) {
+    // IDENTITY RULE: If local snapshot email does not match active auth email -> DISCARD
+    if (!localSnapshot.email || localSnapshot.email.trim().toLowerCase() !== cleanEmail) {
+      console.warn('Discarded local snapshot with missing or mismatched email:', localSnapshot.email, '!=', cleanEmail);
+    } else if (localSnapshot.userProfile?.goal || (localSnapshot.mealLogs && localSnapshot.mealLogs.length > 0) || (localSnapshot.workoutLogs && localSnapshot.workoutLogs.length > 0)) {
+      return { snapshot: localSnapshot, isNewAthlete: false, source: 'local' };
+    }
   }
 
   // Step 5: No previous data exists for this user anywhere -> NEW athlete

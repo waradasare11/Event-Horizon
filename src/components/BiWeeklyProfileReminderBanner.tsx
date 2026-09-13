@@ -15,7 +15,12 @@ export const BiWeeklyProfileReminderBanner: React.FC<BiWeeklyProfileReminderBann
 }) => {
   const [isDismissed, setIsDismissed] = useState<boolean>(() => {
     try {
-      const snoozedUntil = localStorage.getItem('peakform_profile_reminder_snoozed_until');
+      const legacy = localStorage.getItem('peakform_profile_reminder_snoozed_until');
+      if (legacy) {
+        localStorage.setItem('aroh_profile_reminder_snoozed_until', legacy);
+        localStorage.removeItem('peakform_profile_reminder_snoozed_until');
+      }
+      const snoozedUntil = localStorage.getItem('aroh_profile_reminder_snoozed_until');
       if (snoozedUntil) {
         return Date.now() < Number(snoozedUntil);
       }
@@ -45,7 +50,7 @@ export const BiWeeklyProfileReminderBanner: React.FC<BiWeeklyProfileReminderBann
     try {
       // Snooze for 3 days
       const threeDaysMs = 3 * 24 * 60 * 60 * 1000;
-      localStorage.setItem('peakform_profile_reminder_snoozed_until', String(Date.now() + threeDaysMs));
+      localStorage.setItem('aroh_profile_reminder_snoozed_until', String(Date.now() + threeDaysMs));
     } catch {
       // ignore
     }

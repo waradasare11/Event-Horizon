@@ -72,10 +72,10 @@ function buildCoachingGuides(formalName: string, queryBase: string): CoachingCha
     {
       channelId: 'jeremy-ethier',
       channelName: 'Jeremy Ethier',
-      coachName: 'Built With Science EMG Activation',
+      coachName: 'Built With Science Biomechanics',
       query: `Jeremy Ethier ${formalName} form`,
       url: `https://www.youtube.com/results?search_query=${enc(`Jeremy Ethier ${formalName} form`)}`,
-      badge: 'EMG Validated',
+      badge: 'Evidence-Based',
       icon: 'JE',
     },
     {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, Utensils, Sparkles } from 'lucide-react';
+import { Camera, Utensils, Sparkles, Lock } from 'lucide-react';
 import { UserProfile, MealLog, AIAdjustedMealPlan } from '../types';
 import { MealCameraScanner } from './MealCameraScanner';
 import { NutritionPlanner } from './NutritionPlanner';
@@ -14,6 +14,8 @@ interface FoodViewProps {
   onBatchDeleteMealLogs: (ids: string[]) => void;
   onClearAllMealLogs: () => void;
   onUpdateAIMealPlan: (plan: AIAdjustedMealPlan) => void;
+  isSubscriptionExpired?: boolean;
+  onOpenPaywall?: () => void;
 }
 
 export const FoodView: React.FC<FoodViewProps> = ({
@@ -26,8 +28,10 @@ export const FoodView: React.FC<FoodViewProps> = ({
   onBatchDeleteMealLogs,
   onClearAllMealLogs,
   onUpdateAIMealPlan,
+  isSubscriptionExpired = false,
+  onOpenPaywall = () => {},
 }) => {
-  const [subTab, setSubTab] = useState<'scanner' | 'log'>('scanner');
+  const [subTab, setSubTab] = useState<'scanner' | 'log'>(isSubscriptionExpired ? 'log' : 'scanner');
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
@@ -66,17 +70,44 @@ export const FoodView: React.FC<FoodViewProps> = ({
 
       {/* Render Sub-View */}
       {subTab === 'scanner' ? (
-        <MealCameraScanner
-          userProfile={userProfile}
-          mealLogs={mealLogs}
-          onSaveMealLog={(meal) => {
-            onSaveMealLog(meal);
-            // Optionally switch to log after saving or stay
-          }}
-          onDeleteMealLog={onDeleteMealLog}
-          onBatchDeleteMealLogs={onBatchDeleteMealLogs}
-          onClearAllMealLogs={onClearAllMealLogs}
-        />
+        isSubscriptionExpired ? (
+          <div className="max-w-xl mx-auto my-8 p-8 rounded-3xl bg-white dark:bg-[#161817] border border-amber-500/30 text-center space-y-4 shadow-xl animate-in zoom-in-95">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center">
+              <Camera className="w-7 h-7" />
+            </div>
+            <div className="space-y-1">
+              <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">
+                Pro Scanner Feature
+              </span>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-2">
+                AI Meal Camera Scanner Locked
+              </h3>
+            </div>
+            <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed max-w-md mx-auto">
+              Your 7-day free trial has expired. You can still view your nutrition history, today's logs, and add items manually. Upgrade to Pro to unlock instant camera plate scanning with Indian food database tables.
+            </p>
+            <div className="pt-2">
+              <button
+                onClick={onOpenPaywall}
+                className="px-6 py-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs font-bold shadow-md cursor-pointer transition-colors inline-flex items-center gap-2"
+              >
+                <span>Upgrade to Pro — ₹89/mo</span>
+              </button>
+            </div>
+          </div>
+        ) : (
+          <MealCameraScanner
+            userProfile={userProfile}
+            mealLogs={mealLogs}
+            onSaveMealLog={(meal) => {
+              onSaveMealLog(meal);
+              // Optionally switch to log after saving or stay
+            }}
+            onDeleteMealLog={onDeleteMealLog}
+            onBatchDeleteMealLogs={onBatchDeleteMealLogs}
+            onClearAllMealLogs={onClearAllMealLogs}
+          />
+        )
       ) : (
         <NutritionPlanner
           userProfile={userProfile}
@@ -84,6 +115,8 @@ export const FoodView: React.FC<FoodViewProps> = ({
           aiMealPlan={aiMealPlan}
           onUpdateAIMealPlan={onUpdateAIMealPlan}
           onSaveToMealLog={onSaveMealLog}
+          isSubscriptionExpired={isSubscriptionExpired}
+          onOpenPaywall={onOpenPaywall}
         />
       )}
     </div>

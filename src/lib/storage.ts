@@ -75,27 +75,36 @@ export function getCurrentActiveEmail(): string {
  * Checks new aroh_ key first, falls back to legacy peakform_ key, copies over, and returns.
  */
 function readStorageItemWithMigration(key: string, userEmail?: string): string | null {
-  if (typeof window === 'undefined') return null;
-  const scopedKey = getUserScopedKey(key, userEmail);
-  const val = localStorage.getItem(scopedKey);
-  if (val) return val;
+  if (typeof window === 'undefined' && typeof localStorage === 'undefined') return null;
+  const effectiveEmail = (userEmail !== undefined ? userEmail : getCurrentActiveEmail()).trim().toLowerCase();
 
-  // Check legacy scoped key
-  const legacyBase = LEGACY_STORAGE_KEYS[key] || key.replace(/^aroh_/, 'peakform_');
-  const legacyScoped = getUserScopedKey(legacyBase, userEmail);
-  const legacyVal = localStorage.getItem(legacyScoped);
-  if (legacyVal) {
-    try {
-      localStorage.setItem(scopedKey, legacyVal);
-    } catch (e) {}
-    return legacyVal;
+  // If this read is for an authenticated user with an email, strictly isolate to their scoped key
+  if (effectiveEmail && effectiveEmail.includes('@')) {
+    const scopedKey = getUserScopedKey(key, effectiveEmail);
+    const val = localStorage.getItem(scopedKey);
+    if (val) return val;
+
+    // Check legacy scoped key
+    const legacyBase = LEGACY_STORAGE_KEYS[key] || key.replace(/^aroh_/, 'peakform_');
+    const legacyScoped = getUserScopedKey(legacyBase, effectiveEmail);
+    const legacyVal = localStorage.getItem(legacyScoped);
+    if (legacyVal) {
+      try {
+        localStorage.setItem(scopedKey, legacyVal);
+      } catch (e) {}
+      return legacyVal;
+    }
+
+    // STRICT USER ISOLATION: Never fall back to another user's unscoped global key
+    return null;
   }
 
-  // Fallback to unscoped new key
+  // Only if guest / unauthenticated:
   const baseVal = localStorage.getItem(key);
   if (baseVal) return baseVal;
 
   // Fallback to unscoped legacy key
+  const legacyBase = LEGACY_STORAGE_KEYS[key] || key.replace(/^aroh_/, 'peakform_');
   const baseLegacyVal = localStorage.getItem(legacyBase);
   if (baseLegacyVal) {
     try {
@@ -223,34 +232,37 @@ export function getStoredMealLogs(userEmail?: string): MealLog[] {
 
 export function saveStoredMealLogs(logs: MealLog[], userEmail?: string): void {
   try {
-    const scopedKey = getUserScopedKey(STORAGE_KEYS.MEAL_LOGS, userEmail);
+    const effectiveEmail = (userEmail !== undefined ? userEmail : getCurrentActiveEmail()).trim().toLowerCase();
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.MEAL_LOGS, effectiveEmail);
     const serialized = JSON.stringify(logs);
     localStorage.setItem(scopedKey, serialized);
-    localStorage.setItem(STORAGE_KEYS.MEAL_LOGS, serialized);
+    if (!effectiveEmail || !effectiveEmail.includes('@')) {
+      localStorage.setItem(STORAGE_KEYS.MEAL_LOGS, serialized);
+    }
   } catch (e) {
     console.error('Failed saving meal logs to storage', e);
   }
 }
 
-export function addMealLog(log: MealLog): MealLog[] {
-  const current = getStoredMealLogs();
+export function addMealLog(log: MealLog, userEmail?: string): MealLog[] {
+  const current = getStoredMealLogs(userEmail);
   const updated = [log, ...current];
-  saveStoredMealLogs(updated);
+  saveStoredMealLogs(updated, userEmail);
   return updated;
 }
 
-export function deleteMealLog(id: string): MealLog[] {
-  const current = getStoredMealLogs();
+export function deleteMealLog(id: string, userEmail?: string): MealLog[] {
+  const current = getStoredMealLogs(userEmail);
   const updated = current.filter((l) => l.id !== id);
-  saveStoredMealLogs(updated);
+  saveStoredMealLogs(updated, userEmail);
   return updated;
 }
 
-export function deleteMealLogs(ids: string[]): MealLog[] {
-  const current = getStoredMealLogs();
+export function deleteMealLogs(ids: string[], userEmail?: string): MealLog[] {
+  const current = getStoredMealLogs(userEmail);
   const idSet = new Set(ids);
   const updated = current.filter((l) => !idSet.has(l.id));
-  saveStoredMealLogs(updated);
+  saveStoredMealLogs(updated, userEmail);
   return updated;
 }
 
@@ -480,31 +492,50 @@ export function getStoredCoachMessages(userEmail?: string): any[] {
 
 export function saveStoredCoachMessages(messages: any[], userEmail?: string): void {
   try {
+    const effectiveEmail = (userEmail !== undefined ? userEmail : getCurrentActiveEmail()).trim().toLowerCase();
     const capped = messages.slice(-100);
-    const scopedKey = getUserScopedKey(STORAGE_KEYS.COACH_CHAT, userEmail);
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.COACH_CHAT, effectiveEmail);
     const serialized = JSON.stringify(capped);
     localStorage.setItem(scopedKey, serialized);
-    localStorage.setItem(STORAGE_KEYS.COACH_CHAT, serialized);
+    if (!effectiveEmail || !effectiveEmail.includes('@')) {
+      localStorage.setItem(STORAGE_KEYS.COACH_CHAT, serialized);
+    }
   } catch (e) {
     console.error('Failed saving coach messages to storage', e);
   }
 }
 
+export function clearStoredCoachMessages(userEmail?: string): void {
+  try {
+    const effectiveEmail = (userEmail !== undefined ? userEmail : getCurrentActiveEmail()).trim().toLowerCase();
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.COACH_CHAT, effectiveEmail);
+    localStorage.removeItem(scopedKey);
+    if (!effectiveEmail || !effectiveEmail.includes('@')) {
+      localStorage.removeItem(STORAGE_KEYS.COACH_CHAT);
+    }
+  } catch (e) {
+    console.error('Failed clearing coach messages from storage', e);
+  }
+}
+
 export function saveStoredWorkoutLogs(logs: WorkoutCompletionLog[], userEmail?: string): void {
   try {
-    const scopedKey = getUserScopedKey(STORAGE_KEYS.WORKOUT_LOGS, userEmail);
+    const effectiveEmail = (userEmail !== undefined ? userEmail : getCurrentActiveEmail()).trim().toLowerCase();
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.WORKOUT_LOGS, effectiveEmail);
     const serialized = JSON.stringify(logs);
     localStorage.setItem(scopedKey, serialized);
-    localStorage.setItem(STORAGE_KEYS.WORKOUT_LOGS, serialized);
+    if (!effectiveEmail || !effectiveEmail.includes('@')) {
+      localStorage.setItem(STORAGE_KEYS.WORKOUT_LOGS, serialized);
+    }
   } catch (e) {
     console.error('Failed saving workout logs to storage', e);
   }
 }
 
-export function addWorkoutLog(log: WorkoutCompletionLog): WorkoutCompletionLog[] {
-  const current = getStoredWorkoutLogs();
+export function addWorkoutLog(log: WorkoutCompletionLog, userEmail?: string): WorkoutCompletionLog[] {
+  const current = getStoredWorkoutLogs(userEmail);
   const updated = [log, ...current.filter((l) => l.date !== log.date || l.dayId !== log.dayId)];
-  saveStoredWorkoutLogs(updated);
+  saveStoredWorkoutLogs(updated, userEmail);
   return updated;
 }
 
@@ -657,9 +688,9 @@ export function addFormAnalysis(analysis: FormAnalysisResult): FormAnalysisResul
   return updated;
 }
 
-export function getStoredSmartShoppingList(): SmartShoppingList | null {
+export function getStoredSmartShoppingList(userEmail?: string): SmartShoppingList | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.SMART_SHOPPING_LIST);
+    const raw = readStorageItemWithMigration(STORAGE_KEYS.SMART_SHOPPING_LIST, userEmail);
     if (raw) return JSON.parse(raw);
   } catch (e) {
     console.error('Failed reading smart shopping list from storage', e);
@@ -667,26 +698,48 @@ export function getStoredSmartShoppingList(): SmartShoppingList | null {
   return null;
 }
 
-export function saveStoredSmartShoppingList(list: SmartShoppingList | null): void {
+export function saveStoredSmartShoppingList(list: SmartShoppingList | null, userEmail?: string): void {
   try {
+    const effectiveEmail = (userEmail !== undefined ? userEmail : getCurrentActiveEmail()).trim().toLowerCase();
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.SMART_SHOPPING_LIST, effectiveEmail);
     if (list) {
-      localStorage.setItem(STORAGE_KEYS.SMART_SHOPPING_LIST, JSON.stringify(list));
+      const serialized = JSON.stringify(list);
+      localStorage.setItem(scopedKey, serialized);
+      if (!effectiveEmail || !effectiveEmail.includes('@')) {
+        localStorage.setItem(STORAGE_KEYS.SMART_SHOPPING_LIST, serialized);
+      }
     } else {
-      localStorage.removeItem(STORAGE_KEYS.SMART_SHOPPING_LIST);
+      localStorage.removeItem(scopedKey);
+      if (!effectiveEmail || !effectiveEmail.includes('@')) {
+        localStorage.removeItem(STORAGE_KEYS.SMART_SHOPPING_LIST);
+      }
     }
   } catch (e) {
     console.error('Failed saving smart shopping list to storage', e);
   }
 }
 
-export function toggleStoredShoppingItemPurchased(itemId: string): SmartShoppingList | null {
-  const current = getStoredSmartShoppingList();
+export function clearStoredSmartShoppingList(userEmail?: string): void {
+  try {
+    const effectiveEmail = (userEmail !== undefined ? userEmail : getCurrentActiveEmail()).trim().toLowerCase();
+    const scopedKey = getUserScopedKey(STORAGE_KEYS.SMART_SHOPPING_LIST, effectiveEmail);
+    localStorage.removeItem(scopedKey);
+    if (!effectiveEmail || !effectiveEmail.includes('@')) {
+      localStorage.removeItem(STORAGE_KEYS.SMART_SHOPPING_LIST);
+    }
+  } catch (e) {
+    console.error('Failed clearing smart shopping list', e);
+  }
+}
+
+export function toggleStoredShoppingItemPurchased(itemId: string, userEmail?: string): SmartShoppingList | null {
+  const current = getStoredSmartShoppingList(userEmail);
   if (!current) return null;
   const updatedItems = current.items.map((item) =>
     item.id === itemId ? { ...item, isPurchased: !item.isPurchased } : item
   );
   const updatedList: SmartShoppingList = { ...current, items: updatedItems };
-  saveStoredSmartShoppingList(updatedList);
+  saveStoredSmartShoppingList(updatedList, userEmail);
   return updatedList;
 }
 

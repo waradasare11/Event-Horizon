@@ -224,7 +224,10 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
     }
   };
 
-  const displayPlans = plansList && plansList.length > 0 ? plansList : SUBSCRIPTION_PLANS;
+  const rawPlans = plansList && plansList.length > 0 ? plansList : SUBSCRIPTION_PLANS;
+  const displayPlans = rawPlans.filter(
+    (p) => !['6_months', '2_years', '3_years', 'plan_2y', 'plan_3y'].includes(p.id)
+  );
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">

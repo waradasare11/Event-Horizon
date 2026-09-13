@@ -2003,7 +2003,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
                       {/* Plans Grid */}
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                        {plans.filter(p => p.priceINR > 0).map((plan) => {
+                        {plans
+                          .filter(p => p.priceINR > 0 && !['6_months', '2_years', '3_years', 'plan_2y', 'plan_3y'].includes(p.id))
+                          .map((plan) => {
                           const isSelected = selectedPlan?.id === plan.id;
                           return (
                             <button

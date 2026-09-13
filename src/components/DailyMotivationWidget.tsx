@@ -318,10 +318,20 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
 
   // 'Remind me to train' notification settings
   const [remindWorkout, setRemindWorkout] = useState<boolean>(() => {
-    return localStorage.getItem('peakform_remind_workout') === 'true';
+    let legacy = localStorage.getItem('peakform_remind_workout');
+    if (legacy !== null) {
+      localStorage.setItem('aroh_remind_workout', legacy);
+      localStorage.removeItem('peakform_remind_workout');
+    }
+    return localStorage.getItem('aroh_remind_workout') === 'true';
   });
   const [workoutReminderTime, setWorkoutReminderTime] = useState<string>(() => {
-    return localStorage.getItem('peakform_workout_reminder_time') || '18:00';
+    let legacy = localStorage.getItem('peakform_workout_reminder_time');
+    if (legacy !== null) {
+      localStorage.setItem('aroh_workout_reminder_time', legacy);
+      localStorage.removeItem('peakform_workout_reminder_time');
+    }
+    return localStorage.getItem('aroh_workout_reminder_time') || '18:00';
   });
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(() => {
     return typeof window !== 'undefined' && 'Notification' in window ? Notification.permission : 'default';
@@ -333,11 +343,11 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
   }, [waterGlasses, todayKey]);
 
   useEffect(() => {
-    localStorage.setItem('peakform_remind_workout', remindWorkout ? 'true' : 'false');
+    localStorage.setItem('aroh_remind_workout', remindWorkout ? 'true' : 'false');
   }, [remindWorkout]);
 
   useEffect(() => {
-    localStorage.setItem('peakform_workout_reminder_time', workoutReminderTime);
+    localStorage.setItem('aroh_workout_reminder_time', workoutReminderTime);
   }, [workoutReminderTime]);
 
   const addGlass = () => {

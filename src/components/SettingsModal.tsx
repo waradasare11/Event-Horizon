@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   Settings, 
@@ -17,10 +17,16 @@ import {
   BookOpen, 
   ChevronRight,
   Sparkles,
-  Award
+  Award,
+  HelpCircle,
+  CheckCircle2,
+  CloudOff,
+  AlertCircle
 } from 'lucide-react';
 import { UserProfile, WorkoutCompletionLog, MealLog } from '../types';
 import { isHostAdmin, computeSubscriptionStatus, getPlanDisplayBadge } from '../lib/subscription';
+import { HelpArticlesModal } from './HelpArticlesModal';
+import { subscribeDriveSyncStatus, getDriveStatus, DriveSyncStatus } from '../lib/userMemory';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -68,6 +74,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSelectTab,
 }) => {
   if (!isOpen) return null;
+
+  const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
+  const [defaultHelpArticleId, setDefaultHelpArticleId] = useState<string>('scan-meal');
+  const [driveStatus, setDriveStatus] = useState<DriveSyncStatus>(() => getDriveStatus());
+
+  useEffect(() => {
+    return subscribeDriveSyncStatus((status) => {
+      setDriveStatus(status);
+    });
+  }, []);
 
   const isHost = isHostAdmin(userProfile.email) || isHostAdmin(currentUser?.email);
   const activeSub = computeSubscriptionStatus(userProfile.subscription, userProfile.email || currentUser?.email);
@@ -186,9 +202,56 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           {/* Data Management & Sync */}
           <div className="space-y-2">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider px-1">
-              Data & Cloud Backups
-            </h3>
+            <div className="flex items-center justify-between px-1">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Data & Cloud Backups
+              </h3>
+              {/* Drive status pill: Synced / Saving / Offline / Reconnect */}
+              <div className="flex items-center">
+                {!currentUser ? (
+                  <button
+                    onClick={onSignIn}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    <LogIn className="w-3 h-3 text-teal-600 dark:text-teal-400" />
+                    <span>Drive: Sign In</span>
+                  </button>
+                ) : (typeof navigator !== 'undefined' && !navigator.onLine) || driveStatus.status === 'offline' ? (
+                  <span
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/30 whitespace-nowrap"
+                    title="Offline mode active — changes stored locally and will sync when reconnected"
+                  >
+                    <CloudOff className="w-3 h-3 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <span>Offline</span>
+                  </span>
+                ) : driveStatus.status === 'saving' ? (
+                  <span
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/30 whitespace-nowrap"
+                    title="Saving snapshot to Google Drive folder 'AROH AI'"
+                  >
+                    <RefreshCw className="w-3 h-3 text-teal-600 dark:text-teal-400 animate-spin shrink-0" />
+                    <span>Saving</span>
+                  </span>
+                ) : driveStatus.status === 'reconnect_needed' || driveStatus.status === 'error' ? (
+                  <button
+                    onClick={onSignIn}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/10 hover:bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/40 transition-all cursor-pointer whitespace-nowrap animate-pulse"
+                    title="Google Drive session expired. Click to reconnect authorization."
+                  >
+                    <AlertCircle className="w-3 h-3 text-rose-600 dark:text-rose-400 shrink-0" />
+                    <span>Reconnect</span>
+                  </button>
+                ) : (
+                  <span
+                    className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 whitespace-nowrap"
+                    title="Google Drive folder 'AROH AI' is up to date"
+                  >
+                    <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span>Synced</span>
+                  </span>
+                )}
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 onClick={() => {
@@ -263,6 +326,23 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
+              </button>
+
+              <button
+                onClick={() => {
+                  setDefaultHelpArticleId('scan-meal');
+                  setShowHelpModal(true);
+                }}
+                className="w-full p-3 rounded-2xl bg-teal-500/10 border border-teal-500/25 text-left hover:bg-teal-500/15 transition-all flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2.5">
+                  <HelpCircle className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                  <div>
+                    <div className="text-xs font-bold text-gray-900 dark:text-white">Help & User Guide (8 Articles)</div>
+                    <div className="text-[11px] text-gray-500">Meal scanning, fixing grams, billing & privacy</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-teal-600 dark:text-teal-400" />
               </button>
             </div>
           </div>
@@ -351,6 +431,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           )}
         </div>
       </div>
+
+      <HelpArticlesModal
+        isOpen={showHelpModal}
+        onClose={() => setShowHelpModal(false)}
+        defaultArticleId={defaultHelpArticleId}
+      />
     </div>
   );
 };

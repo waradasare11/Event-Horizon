@@ -100,6 +100,20 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
   currentUserProfile,
   onUpdateSubscription,
 }) => {
+  const hostEmail = (currentUserProfile?.email || '').trim().toLowerCase();
+  const [serverIsHost, setServerIsHost] = useState<boolean | null>(null);
+  const [isCheckingHost, setIsCheckingHost] = useState<boolean>(true);
+  const [isAuthenticatedSession, setIsAuthenticatedSession] = useState<boolean>(() => {
+    try {
+      return sessionStorage.getItem('aroh_host_authenticated') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [gatePinInput, setGatePinInput] = useState<string>('');
+  const [gatePinError, setGatePinError] = useState<string | null>(null);
+  const [isVerifyingGatePin, setIsVerifyingGatePin] = useState<boolean>(false);
+
   // Navigation Tabs
   const [activeTab, setActiveTab] = useState<TabType>('ledger');
 
@@ -194,7 +208,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
   const loadLedger = async () => {
     setIsLoadingLedger(true);
     try {
-      const records = await fetchHostGrantedSubscriptions(hostPassword || '', HOST_ADMIN_CONFIG.email);
+      const records = await fetchHostGrantedSubscriptions(hostPassword || '', hostEmail);
       setGrantedList(records);
     } catch (e) {
       console.warn('Error loading host ledger:', e);
@@ -220,7 +234,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
   const loadCoupons = async () => {
     setIsLoadingCoupons(true);
     try {
-      const list = await fetchHostCoupons(hostPassword || '', HOST_ADMIN_CONFIG.email);
+      const list = await fetchHostCoupons(hostPassword || '', hostEmail);
       setCouponsList(list);
     } catch (e) {
       console.warn('Error loading host coupons:', e);
@@ -233,7 +247,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
   const loadActivityLogs = async () => {
     setIsLoadingLogs(true);
     try {
-      const logs = await fetchHostAuditLogs(hostPassword || '', HOST_ADMIN_CONFIG.email);
+      const logs = await fetchHostAuditLogs(hostPassword || '', hostEmail);
       setActivityLogs(logs);
     } catch (e) {
       console.warn('Error loading activity logs:', e);
@@ -255,20 +269,72 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      loadLedger();
-      loadPersistentGrants();
-      loadCoupons();
-      loadActivityLogs();
-      loadVerificationLogs();
-      setGrantSuccessMsg(null);
-      setGrantErrorMsg(null);
-      setCouponSuccessMsg(null);
-      setCouponErrorMsg(null);
-      setNotifyResult(null);
+  // Verify PIN at security gate
+  const handleVerifyGatePin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!gatePinInput.trim()) {
+      setGatePinError('Please enter the Host PIN.');
+      return;
     }
-  }, [isOpen]);
+    setIsVerifyingGatePin(true);
+    setGatePinError(null);
+    try {
+      const isValid = await forceVerifyHostPassword(gatePinInput.trim(), hostEmail);
+      if (isValid) {
+        try {
+          sessionStorage.setItem('aroh_host_authenticated', 'true');
+        } catch {}
+        setIsAuthenticatedSession(true);
+        setHostPassword(gatePinInput.trim());
+      } else {
+        setGatePinError('Invalid Host Security PIN.');
+      }
+    } catch (err: any) {
+      setGatePinError(err?.message || 'Verification failed.');
+    } finally {
+      setIsVerifyingGatePin(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let isMounted = true;
+    setIsCheckingHost(true);
+
+    fetch(`/api/host/whoami?email=${encodeURIComponent(hostEmail)}`, {
+      headers: { 'x-user-email': hostEmail }
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!isMounted) return;
+        const validHost = Boolean(data.isHost);
+        setServerIsHost(validHost);
+        if (validHost && isAuthenticatedSession) {
+          loadLedger();
+          loadPersistentGrants();
+          loadCoupons();
+          loadActivityLogs();
+          loadVerificationLogs();
+        }
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setServerIsHost(false);
+      })
+      .finally(() => {
+        if (isMounted) setIsCheckingHost(false);
+      });
+
+    setGrantSuccessMsg(null);
+    setGrantErrorMsg(null);
+    setCouponSuccessMsg(null);
+    setCouponErrorMsg(null);
+    setNotifyResult(null);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, hostEmail, isAuthenticatedSession]);
 
   // Generate random coupon code
   const handleGenerateRandomCode = () => {
@@ -404,7 +470,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
     try {
       // 1. Verify Host PIN with fallback & force verification
-      const isPinValid = await forceVerifyHostPassword(cleanPin, HOST_ADMIN_CONFIG.email);
+      const isPinValid = await forceVerifyHostPassword(cleanPin, hostEmail);
       if (!isPinValid) {
         setGrantErrorMsg('Incorrect Host Verification Password. Please enter the valid Host Security PIN.');
         setIsSubmitting(false);
@@ -424,7 +490,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
       // 3. Execute Grant across Server, Firestore (Triple-Redundant) and Local Storage
       const result = await grantUserFreeSubscription({
         pin: cleanPin,
-        email: HOST_ADMIN_CONFIG.email,
+        email: hostEmail,
         targetEmail: cleanTargetEmail,
         planId: preset.planId,
         isLifetime: preset.isLifetime,
@@ -471,7 +537,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     const pin = hostPassword || '';
     setIsRevoking(true);
     try {
-      const ok = await revokeHostGrantedSubscription(emailToRevoke, pin, HOST_ADMIN_CONFIG.email);
+      const ok = await revokeHostGrantedSubscription(emailToRevoke, pin, hostEmail);
       if (ok) {
         recordLocalHostAuditLog(
           'discount_deleted',
@@ -539,7 +605,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
       const pin = hostPassword || '';
       const res = await executeBulkOperation({
         pin,
-        email: HOST_ADMIN_CONFIG.email,
+        email: hostEmail,
         targetEmails: selectedEmails,
         action,
         extensionDays: extensionDays || bulkExtensionDaysInput,
@@ -576,7 +642,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     setIsNotifyingExpiring(true);
     try {
       const pin = hostPassword || '';
-      const result = await notifyExpiringSubscribers(pin, HOST_ADMIN_CONFIG.email, 3);
+      const result = await notifyExpiringSubscribers(pin, hostEmail, 3);
       fireCelebrationConfetti();
       setNotifyResult({
         totalNotified: result.totalNotified || expiringList.length,
@@ -588,7 +654,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
       recordLocalHostAuditLog(
         'notification_sent',
         `Host Admin sent 3-day expiry reminders to ${expiringList.length} VIP athletes.`,
-        HOST_ADMIN_CONFIG.email,
+        hostEmail,
         undefined,
         0,
         { expiringCount: expiringList.length }
@@ -681,7 +747,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     if (!window.confirm('Are you sure you want to clear the historical activity log? This will reset the log history.')) return;
     setIsClearingLogs(true);
     try {
-      await clearHostAuditLogs(hostPassword || '', HOST_ADMIN_CONFIG.email);
+      await clearHostAuditLogs(hostPassword || '', hostEmail);
       localStorage.removeItem('peakform_host_activity_logs');
       setActivityLogs([]);
       recordLocalHostAuditLog('ledger_cleared', `Host Admin cleared historical activity log archive.`);
@@ -714,7 +780,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     setIsCreatingCoupon(true);
 
     try {
-      const isPinValid = await forceVerifyHostPassword(pin, HOST_ADMIN_CONFIG.email);
+      const isPinValid = await forceVerifyHostPassword(pin, hostEmail);
       if (!isPinValid) {
         setCouponErrorMsg('Incorrect Host Verification Password. Please enter the valid Host Security PIN.');
         setIsCreatingCoupon(false);
@@ -732,7 +798,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
       const result = await createHostCouponCode({
         code,
         pin,
-        email: HOST_ADMIN_CONFIG.email,
+        email: hostEmail,
         planId: preset.planId,
         planName: preset.label,
         durationDays: preset.isLifetime ? undefined : preset.days,
@@ -765,7 +831,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     const pin = hostPassword || '';
     setIsRevokingCoupon(true);
     try {
-      const ok = await revokeHostCouponCode(code, pin, HOST_ADMIN_CONFIG.email);
+      const ok = await revokeHostCouponCode(code, pin, hostEmail);
       if (ok) {
         setCouponsList((prev) => prev.map((c) => (c.code.toUpperCase() === code.toUpperCase() ? { ...c, status: 'revoked' } : c)));
         setRevokingCouponCode(null);
@@ -802,7 +868,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
     setIsUpdatingPin(true);
     try {
-      const ok = await updateHostPIN(currentPinInput.trim(), newPinInput.trim(), HOST_ADMIN_CONFIG.email);
+      const ok = await updateHostPIN(currentPinInput.trim(), newPinInput.trim(), hostEmail);
       if (ok) {
         setPinChangeMsg('Host Security PIN successfully updated.');
         setHostPassword(newPinInput.trim());
@@ -832,7 +898,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     setIsNotifyingAll(true);
     try {
       const pin = hostPassword || '';
-      const result = await notifyAllActiveSubscribers(pin, HOST_ADMIN_CONFIG.email, customNotifyMsg);
+      const result = await notifyAllActiveSubscribers(pin, hostEmail, customNotifyMsg);
       
       fireCelebrationConfetti();
       setNotifyResult({
@@ -845,7 +911,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
       recordLocalHostAuditLog(
         'notification_sent',
         `Host Admin dispatched automated access duration alerts to ${activeGrants.length} active VIP athletes.`,
-        HOST_ADMIN_CONFIG.email,
+        hostEmail,
         undefined,
         0,
         { activeCount: activeGrants.length, customMessage: customNotifyMsg }
@@ -940,7 +1006,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
         timestamp: l.timestamp,
         performedBy: l.actor,
         actor: l.actor,
-        targetEmail: l.targetEmail || HOST_ADMIN_CONFIG.email,
+        targetEmail: l.targetEmail || hostEmail,
         action: l.actionType,
         authMethod: l.actionType === 'coupon_created' ? 'HOST_PASSWORD_PIN' : (l.details.toLowerCase().includes('coupon') ? 'COUPON_CODE_AUTHENTICATED' : 'HOST_PASSWORD_PIN'),
         pinProvidedMasked: '****',
@@ -1011,6 +1077,97 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
   if (!isOpen) return null;
 
+  if (isCheckingHost) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-[#121413] rounded-3xl max-w-md w-full p-8 border border-gray-200 dark:border-gray-800 text-center space-y-4 shadow-2xl">
+          <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Verifying Host Authorization...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (serverIsHost === false) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-[#121413] rounded-3xl max-w-md w-full p-8 border border-gray-200 dark:border-gray-800 text-center space-y-4 shadow-2xl">
+          <div className="w-12 h-12 rounded-2xl bg-rose-500/15 text-rose-600 dark:text-rose-400 mx-auto flex items-center justify-center">
+            <Lock className="w-6 h-6" />
+          </div>
+          <div className="space-y-1.5">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Host Access Restricted</h3>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Your account ({hostEmail || 'Unknown'}) is not recognized as an authorized Host Administrator.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full py-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-xs font-bold hover:bg-gray-200 dark:hover:bg-gray-700 transition-all cursor-pointer"
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticatedSession) {
+    return (
+      <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="bg-white dark:bg-[#121413] rounded-3xl max-w-md w-full p-8 border border-gray-200 dark:border-gray-800 text-center space-y-5 shadow-2xl">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
+            <KeyRound className="w-6 h-6" />
+          </div>
+          <div className="space-y-1.5">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Host Security Gate</h3>
+            <p className="text-xs text-gray-500">
+              Host account verified (<strong>{hostEmail}</strong>). Enter your Host PIN to access the administrative portal.
+            </p>
+          </div>
+          <form onSubmit={handleVerifyGatePin} className="space-y-3 text-left">
+            <div>
+              <label className="block text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1">
+                Host Security PIN
+              </label>
+              <input
+                type="password"
+                value={gatePinInput}
+                onChange={(e) => {
+                  setGatePinInput(e.target.value);
+                  setGatePinError(null);
+                }}
+                placeholder="Enter Host PIN"
+                autoFocus
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              {gatePinError && (
+                <p className="text-xs text-rose-500 font-medium mt-1.5">{gatePinError}</p>
+              )}
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 text-xs font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={isVerifyingGatePin || !gatePinInput.trim()}
+                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold disabled:opacity-50 cursor-pointer shadow-xs transition-all"
+              >
+                {isVerifyingGatePin ? 'Verifying...' : 'Unlock Portal'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
       <div className="bg-white dark:bg-[#121413] rounded-3xl max-w-4xl w-full shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden text-left my-6 flex flex-col max-h-[92vh]">
@@ -1031,7 +1188,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 </span>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Verified Host: <strong>{HOST_ADMIN_CONFIG.name}</strong> ({HOST_ADMIN_CONFIG.email})
+                Verified Host: <strong>{currentUserProfile.name || 'Host Admin'}</strong> ({hostEmail})
               </p>
             </div>
           </div>
@@ -2048,7 +2205,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
           {activeTab === 'athlete_logins' && (
             <AthleteLoginsSection
               pin={hostPassword || ''}
-              email={HOST_ADMIN_CONFIG.email}
+              email={hostEmail}
               onGrantVipToEmail={(email) => {
                 setTargetEmail(email);
                 setDurationOption('3_months');
@@ -2064,7 +2221,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
           {activeTab === 'valuation' && (
             <ProgramValuationDashboard
               pin={hostPassword || ''}
-              email={HOST_ADMIN_CONFIG.email}
+              email={hostEmail}
             />
           )}
 
@@ -2793,7 +2950,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                           </div>
 
                           <div className="flex items-center gap-2">
-                            {log.targetEmail && log.targetEmail !== HOST_ADMIN_CONFIG.email && (
+                            {log.targetEmail && log.targetEmail !== hostEmail && (
                               <button
                                 type="button"
                                 onClick={() => setSelectedTimelineEmail(log.targetEmail)}
@@ -3010,7 +3167,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
             <div className="animate-in fade-in">
               <AthleteLoginsSection 
                 pin={hostPassword || ''} 
-                email={HOST_ADMIN_CONFIG.email}
+                email={hostEmail}
                 onGrantVipToEmail={(target) => {
                   setTargetEmail(target);
                   setDurationOption('3_months');
@@ -3028,7 +3185,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
             <div className="animate-in fade-in">
               <ProgramValuationDashboard 
                 pin={hostPassword || ''} 
-                email={HOST_ADMIN_CONFIG.email}
+                email={hostEmail}
               />
             </div>
           )}
