@@ -108,10 +108,10 @@ export const LegalPage: React.FC<LegalPageProps> = ({
               <ArohLogo size="sm" />
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-sm sm:text-base tracking-tight text-gray-900 dark:text-white group-hover:text-[#0F6E5F] dark:group-hover:text-[#2DD4BF] transition-colors">
+                  <span className="font-extrabold text-sm sm:text-base tracking-tight text-gray-900 dark:text-white group-hover:text-amber-500 transition-colors">
                     AROH
                   </span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/20">
                     DPDP Act, 2023
                   </span>
                 </div>
@@ -125,7 +125,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
           <div className="flex items-center gap-2.5">
             {isAuthenticated ? (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-xs text-gray-700 dark:text-gray-300">
-                <UserIcon className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                <UserIcon className="w-3.5 h-3.5 text-amber-500" />
                 <span className="font-medium max-w-[140px] truncate">{signedInEmail}</span>
               </div>
             ) : (
@@ -162,7 +162,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
         <div className="p-6 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <Shield className="w-5 h-5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+              <Shield className="w-5 h-5 text-amber-500" />
               <h1 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
                 AROH Legal &amp; Compliance Center
               </h1>
@@ -172,11 +172,11 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 shrink-0">
-            <MapPin className="w-3.5 h-3.5 text-teal-600" />
+            <MapPin className="w-3.5 h-3.5 text-amber-500" />
             <span>Pune, India</span>
             <span>•</span>
-            <Mail className="w-3.5 h-3.5 text-teal-600" />
-            <a href="mailto:waradasare11@gmail.com" className="text-teal-600 dark:text-teal-400 underline">
+            <Mail className="w-3.5 h-3.5 text-amber-500" />
+            <a href="mailto:waradasare11@gmail.com" className="text-amber-600 dark:text-amber-400 underline">
               waradasare11@gmail.com
             </a>
           </div>
@@ -192,7 +192,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             onClick={(e) => handleTabClick('privacy', e)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'privacy'
-                ? 'bg-white dark:bg-[#161817] text-[#0F6E5F] dark:text-[#2DD4BF] shadow-xs'
+                ? 'bg-white dark:bg-[#161817] text-amber-600 dark:text-amber-400 shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -205,7 +205,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             onClick={(e) => handleTabClick('terms', e)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'terms'
-                ? 'bg-white dark:bg-[#161817] text-[#0F6E5F] dark:text-[#2DD4BF] shadow-xs'
+                ? 'bg-white dark:bg-[#161817] text-amber-600 dark:text-amber-400 shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -231,7 +231,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             onClick={(e) => handleTabClick('refund', e)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'refund'
-                ? 'bg-white dark:bg-[#161817] text-[#0F6E5F] dark:text-[#2DD4BF] shadow-xs'
+                ? 'bg-white dark:bg-[#161817] text-amber-600 dark:text-amber-400 shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -244,7 +244,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             onClick={(e) => handleTabClick('cookies', e)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'cookies'
-                ? 'bg-white dark:bg-[#161817] text-[#0F6E5F] dark:text-[#2DD4BF] shadow-xs'
+                ? 'bg-white dark:bg-[#161817] text-amber-600 dark:text-amber-400 shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -271,7 +271,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
           {/* TAB 1: PRIVACY POLICY */}
           {activeTab === 'privacy' && (
             <div className="space-y-6 animate-in fade-in duration-150">
-              <div className="p-5 rounded-2xl bg-teal-500/10 border border-teal-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <h2 className="font-extrabold text-gray-900 dark:text-white text-lg">
                     AROH Privacy Policy
@@ -288,12 +288,12 @@ export const LegalPage: React.FC<LegalPageProps> = ({
               <div className="space-y-6 text-sm text-gray-700 dark:text-gray-300">
                 <section className="space-y-2">
                   <h3 className="font-bold text-gray-900 dark:text-white text-base flex items-center gap-2">
-                    <Building className="w-4 h-4 text-teal-600" />
+                    <Building className="w-4 h-4 text-amber-500" />
                     1. Data Fiduciary &amp; Operator Identification
                   </h3>
                   <p>
                     This application (<strong>AROH</strong>) is developed, operated, and maintained by <strong>Warad Asare</strong> (individual developer and sole proprietor trading as AROH AI Technologies), located in <strong>Pune, Maharashtra, India</strong>. Contact Email:{' '}
-                    <a href="mailto:waradasare11@gmail.com" className="text-teal-600 dark:text-teal-400 font-semibold underline">
+                    <a href="mailto:waradasare11@gmail.com" className="text-amber-600 dark:text-amber-400 font-semibold underline">
                       waradasare11@gmail.com
                     </a>.
                   </p>
@@ -301,7 +301,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
 
                 <section className="space-y-2">
                   <h3 className="font-bold text-gray-900 dark:text-white text-base flex items-center gap-2">
-                    <Database className="w-4 h-4 text-teal-600" />
+                    <Database className="w-4 h-4 text-amber-500" />
                     2. Categories of Personal Data We Collect
                   </h3>
                   <p>To provide personalized exercise programming, calorie estimation, and physiological tracking, we collect only the data you explicitly provide:</p>
@@ -316,7 +316,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
 
                 <section className="space-y-2">
                   <h3 className="font-bold text-gray-900 dark:text-white text-base flex items-center gap-2">
-                    <Camera className="w-4 h-4 text-teal-600" />
+                    <Camera className="w-4 h-4 text-amber-500" />
                     3. Purpose &amp; Scoped Use of Camera &amp; Microphone
                   </h3>
                   <p>
@@ -329,7 +329,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
 
                 <section className="space-y-2">
                   <h3 className="font-bold text-gray-900 dark:text-white text-base flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-teal-600" />
+                    <Lock className="w-4 h-4 text-amber-500" />
                     4. Data Processors &amp; Hosting Locations
                   </h3>
                   <p>We work with vetted tier-1 cloud infrastructure providers:</p>
@@ -341,17 +341,17 @@ export const LegalPage: React.FC<LegalPageProps> = ({
 
                 <section className="space-y-2">
                   <h3 className="font-bold text-gray-900 dark:text-white text-base flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-teal-600" />
+                    <Shield className="w-4 h-4 text-amber-500" />
                     5. Strict No-Sale Guarantee
                   </h3>
-                  <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-900 dark:text-emerald-300 font-semibold text-xs sm:text-sm">
+                  <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-950 dark:text-amber-200 font-semibold text-xs sm:text-sm">
                     We NEVER sell, rent, lease, monetize, or trade your personal health stats, meal images, workouts, or contact information to data brokers, advertising agencies, or pharmaceutical companies. Your data exists solely to serve your athletic development.
                   </div>
                 </section>
 
                 <section className="space-y-2">
                   <h3 className="font-bold text-gray-900 dark:text-white text-base flex items-center gap-2">
-                    <UserCheck className="w-4 h-4 text-teal-600" />
+                    <UserCheck className="w-4 h-4 text-amber-500" />
                     6. Your Rights Under DPDP Act, 2023
                   </h3>
                   <p>Under Indian privacy legislation, you maintain sovereign control over your data:</p>
@@ -359,7 +359,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                     <li><strong>Right to Access &amp; Export:</strong> You can export all your logs anytime in standard CSV format or JSON backup via the "Export CSV" tool or Google Drive backup sync.</li>
                     <li><strong>Right to Correction:</strong> You can edit any profile attribute, meal log, or workout entry directly within the application.</li>
                     <li><strong>Right to Erasure (Delete My Data):</strong> You can wipe all data across Firestore, localStorage, and Drive at any time via the "Delete My Data" tab in this portal.</li>
-                    <li><strong>Right to Grievance Redressal:</strong> Direct all privacy concerns to our Grievance Officer: <strong>Warad Asare</strong> at <a href="mailto:waradasare11@gmail.com" className="text-teal-600 underline">waradasare11@gmail.com</a>. We respond to all statutory inquiries within 7 business days.</li>
+                    <li><strong>Right to Grievance Redressal:</strong> Direct all privacy concerns to our Grievance Officer: <strong>Warad Asare</strong> at <a href="mailto:waradasare11@gmail.com" className="text-amber-600 dark:text-amber-400 underline">waradasare11@gmail.com</a>. We respond to all statutory inquiries within 7 business days.</li>
                   </ul>
                 </section>
 
@@ -415,7 +415,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                 <section className="space-y-2">
                   <h3 className="font-bold text-gray-900 dark:text-white text-base">4. 48-Hour Cancellation &amp; Refund Limit</h3>
                   <p>
-                    All paid subscriptions include a <strong>48-hour satisfaction guarantee</strong>. You may request a full refund within 48 hours of purchase by contacting <a href="mailto:waradasare11@gmail.com" className="text-teal-600 underline">waradasare11@gmail.com</a>. <strong>No refunds will be granted after 48 hours</strong> from payment confirmation, except where mandated by applicable Indian consumer protection laws.
+                    All paid subscriptions include a <strong>48-hour satisfaction guarantee</strong>. You may request a full refund within 48 hours of purchase by contacting <a href="mailto:waradasare11@gmail.com" className="text-amber-600 dark:text-amber-400 underline">waradasare11@gmail.com</a>. <strong>No refunds will be granted after 48 hours</strong> from payment confirmation, except where mandated by applicable Indian consumer protection laws.
                   </p>
                 </section>
 
@@ -499,7 +499,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
           {/* TAB 4: REFUND POLICY */}
           {activeTab === 'refund' && (
             <div className="space-y-6 animate-in fade-in duration-150">
-              <div className="p-5 rounded-2xl bg-teal-500/10 border border-teal-500/20">
+              <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20">
                 <h2 className="font-extrabold text-gray-900 dark:text-white text-lg">
                   Simple &amp; Transparent Refund Policy
                 </h2>
@@ -527,7 +527,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                   <h3 className="font-bold text-gray-900 dark:text-white text-base">3. How to Request a Refund</h3>
                   <p>To request your refund within the 48-hour window:</p>
                   <ol className="list-decimal pl-5 space-y-2 text-gray-600 dark:text-gray-400">
-                    <li>Send an email from your registered AROH email address to <a href="mailto:waradasare11@gmail.com" className="text-teal-600 underline font-semibold">waradasare11@gmail.com</a>.</li>
+                    <li>Send an email from your registered AROH email address to <a href="mailto:waradasare11@gmail.com" className="text-amber-600 dark:text-amber-400 underline font-semibold">waradasare11@gmail.com</a>.</li>
                     <li>Include the subject line: <code className="px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-[11px] font-mono">Refund Request - [Your Name]</code>.</li>
                     <li>Provide your 12-digit UPI UTR reference number or payment transaction ID and your registered phone number / UPI VPA.</li>
                   </ol>
@@ -646,9 +646,9 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                   </p>
                 </div>
               ) : deletionSummary ? (
-                <div className="p-8 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 text-center space-y-3">
-                  <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto" />
-                  <h3 className="text-lg font-bold text-emerald-800 dark:text-emerald-300">
+                <div className="p-8 rounded-3xl bg-amber-500/10 border border-amber-500/20 text-center space-y-3">
+                  <CheckCircle2 className="w-12 h-12 text-amber-500 mx-auto" />
+                  <h3 className="text-lg font-bold text-amber-800 dark:text-amber-300">
                     All User Data Has Been Permanently Erased
                   </h3>
                   <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto space-y-1">
@@ -665,7 +665,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                   <div className="p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700 space-y-2">
                     <div className="flex items-center justify-between">
                       <h3 className="font-bold text-gray-900 dark:text-white">Active Account to be Wiped:</h3>
-                      <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-teal-500/15 text-teal-800 dark:text-teal-200">
+                      <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-amber-500/15 text-amber-800 dark:text-amber-200">
                         {signedInEmail}
                       </span>
                     </div>
@@ -713,11 +713,11 @@ export const LegalPage: React.FC<LegalPageProps> = ({
       <footer className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] py-8 mt-auto text-xs text-gray-500">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div className="flex items-center gap-2">
-            <MapPin className="w-3.5 h-3.5 text-teal-600" />
+            <MapPin className="w-3.5 h-3.5 text-amber-500" />
             <span>Pune, Maharashtra, India</span>
             <span>•</span>
-            <Mail className="w-3.5 h-3.5 text-teal-600" />
-            <a href="mailto:waradasare11@gmail.com" className="hover:underline text-teal-600 dark:text-teal-400">
+            <Mail className="w-3.5 h-3.5 text-amber-500" />
+            <a href="mailto:waradasare11@gmail.com" className="hover:underline text-amber-600 dark:text-amber-400">
               waradasare11@gmail.com
             </a>
           </div>
@@ -726,7 +726,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             <a
               href="/privacy"
               onClick={(e) => handleTabClick('privacy', e)}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+              className="hover:text-amber-500 transition-colors"
             >
               Privacy Policy
             </a>
@@ -734,7 +734,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             <a
               href="/terms"
               onClick={(e) => handleTabClick('terms', e)}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+              className="hover:text-amber-500 transition-colors"
             >
               Terms of Service
             </a>
@@ -742,7 +742,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             <a
               href="/disclaimer"
               onClick={(e) => handleTabClick('disclaimer', e)}
-              className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
+              className="hover:text-amber-500 transition-colors"
             >
               Medical Disclaimer
             </a>
@@ -750,7 +750,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             <a
               href="/refund"
               onClick={(e) => handleTabClick('refund', e)}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
+              className="hover:text-amber-500 transition-colors"
             >
               Refund Policy
             </a>
@@ -761,7 +761,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                 e.preventDefault();
                 onNavigate('/');
               }}
-              className="font-bold text-[#0F6E5F] dark:text-[#2DD4BF] hover:underline"
+              className="font-bold text-amber-500 hover:underline"
             >
               Open AROH App →
             </a>

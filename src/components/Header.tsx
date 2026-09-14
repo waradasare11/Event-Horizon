@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div className="w-28 bg-slate-200 dark:bg-slate-800 rounded-full h-2 mt-1 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-teal-500 to-emerald-500 h-2 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-amber-500 to-yellow-400 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${caloriePercent}%` }}
                 />
               </div>
@@ -117,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div className="w-24 bg-slate-200 dark:bg-slate-800 rounded-full h-2 mt-1 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-teal-500 to-indigo-500 h-2 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${proteinPercent}%` }}
                 />
               </div>
@@ -147,15 +147,15 @@ export const Header: React.FC<HeaderProps> = ({
                   const days = Math.max(0, activeSub.daysRemaining ?? 0);
                   return {
                     label: `Trial · ${days}d left`,
-                    className: 'bg-teal-500/10 text-teal-700 dark:text-teal-300 border-teal-500/25 hover:bg-teal-500/20',
-                    dot: 'bg-teal-500',
+                    className: 'bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/25 hover:bg-amber-500/20',
+                    dot: 'bg-amber-500',
                   };
                 }
                 if (activeSub.status === 'active') {
                   return {
                     label: 'Pro',
-                    className: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/25 hover:bg-emerald-500/20',
-                    dot: 'bg-emerald-500',
+                    className: 'bg-amber-500/20 text-amber-900 dark:text-amber-200 border-amber-500/40 hover:bg-amber-500/30',
+                    dot: 'bg-amber-500',
                   };
                 }
                 return {
@@ -204,14 +204,14 @@ export const Header: React.FC<HeaderProps> = ({
                     src={currentUser.photoURL}
                     alt={currentUser.displayName || 'User Avatar'}
                     referrerPolicy="no-referrer"
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-teal-500/30 object-cover cursor-pointer"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-amber-500/40 object-cover cursor-pointer"
                     onClick={onOpenSettings}
                     title={`Signed in as ${currentUser.email || currentUser.displayName}`}
                   />
                 ) : (
                   <button
                     onClick={onOpenSettings}
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 text-white font-bold text-xs flex items-center justify-center cursor-pointer"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-black font-bold text-xs flex items-center justify-center cursor-pointer"
                   >
                     {(currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()}
                   </button>
@@ -220,7 +220,7 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <button
                 onClick={onSignIn}
-                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20 hover:bg-teal-500/20 transition-all cursor-pointer"
+                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-amber-500 text-black hover:bg-amber-400 transition-all cursor-pointer shadow-2xs font-sans"
                 title="Sign in with Google"
               >
                 <LogIn className="w-3.5 h-3.5" />
@@ -241,11 +241,11 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => setActiveTab(item.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-[#0F6E5F] text-white shadow-md shadow-teal-900/15'
+                    ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20 font-sans'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1A1D1B]'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-black' : 'text-slate-400'}`} />
                 <span>{item.label}</span>
               </button>
             );

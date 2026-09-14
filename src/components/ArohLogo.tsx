@@ -22,21 +22,21 @@ export const ArohLogo: React.FC<ArohLogoProps> = ({
 
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      {/* Cosmic Glowing Vortex Logo Container */}
+      {/* Brand Vortex Logo Container - Black & Gold Theme */}
       <div className={`relative ${img} shrink-0 group`}>
-        {/* Ambient Neon Pulse Glow */}
-        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500/40 via-purple-600/40 to-indigo-500/40 blur-sm opacity-80 group-hover:opacity-100 transition-opacity" />
+        {/* Ambient Gold Glow */}
+        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-amber-500/30 via-yellow-500/25 to-amber-600/30 blur-sm opacity-80 group-hover:opacity-100 transition-opacity" />
         
         {/* Logo Image */}
         <img
           src="/aroh-logo.png"
           alt="AROH Smart Fitness Logo"
           referrerPolicy="no-referrer"
-          className="relative w-full h-full rounded-xl object-cover border border-cyan-400/40 shadow-lg shadow-cyan-500/20"
+          className="relative w-full h-full rounded-xl object-cover border border-amber-400/40 shadow-lg shadow-amber-500/10 bg-black"
         />
 
-        {/* Small 4-point sparkle accent */}
-        <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 text-cyan-300 pointer-events-none opacity-80">
+        {/* Small gold star accent */}
+        <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 text-amber-400 pointer-events-none opacity-90">
           ✦
         </div>
       </div>
@@ -44,14 +44,14 @@ export const ArohLogo: React.FC<ArohLogoProps> = ({
       {showText && (
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5 leading-none">
-            <span className={`font-extrabold tracking-wider ${text} bg-gradient-to-r from-cyan-300 via-indigo-200 to-purple-400 bg-clip-text text-transparent font-['Space_Grotesk',sans-serif]`}>
+            <span className={`font-extrabold tracking-wider ${text} bg-gradient-to-r from-amber-200 via-amber-400 to-yellow-500 bg-clip-text text-transparent font-['Space_Grotesk',sans-serif]`}>
               AROH
             </span>
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 tracking-wider">
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-400 tracking-wider">
               SMART
             </span>
           </div>
-          <span className={`text-[#94A3B8] dark:text-[#A5B4FC] font-medium tracking-widest uppercase mt-0.5 ${sub}`}>
+          <span className={`text-[#A1A1AA] dark:text-[#D4AF37] font-medium tracking-widest uppercase mt-0.5 ${sub}`}>
             Smart Fitness
           </span>
         </div>

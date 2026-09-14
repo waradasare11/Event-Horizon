@@ -164,7 +164,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
               <span>{isSigningIn ? 'Connecting to Google...' : 'Continue with Google (Instant 1-Week Free Trial)'}</span>
             </button>
             <p className="text-[11px] text-center text-gray-500 dark:text-gray-400 mt-2.5">
-              Secure authentication powered by Google Identity. No spam, ever.
+              Secure authentication powered by Google Identity (Email & Profile only). Optional Google Drive backup can be connected anytime from Settings.
             </p>
           </div>
         </div>

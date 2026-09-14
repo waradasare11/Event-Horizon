@@ -37,7 +37,7 @@ import {
   WorkoutCompletionLog, 
   FormAnalysisResult 
 } from './types';
-import { auth, googleProvider } from './lib/firebase';
+import { auth, createLoginGoogleProvider, googleProvider } from './lib/firebase';
 import { onAuthStateChanged, signInWithPopup, signOut, User } from 'firebase/auth';
 import { 
   syncUserProfile, 
@@ -574,7 +574,8 @@ export default function App() {
 
   const handleSignIn = async () => {
     try {
-      await signInWithPopup(auth, googleProvider);
+      const loginProvider = createLoginGoogleProvider();
+      await signInWithPopup(auth, loginProvider);
     } catch (err: any) {
       console.error('Google Sign In Error:', err);
     }

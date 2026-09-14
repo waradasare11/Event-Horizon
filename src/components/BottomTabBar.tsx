@@ -40,14 +40,14 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
               onClick={() => onSelectTab(tab.id)}
               className={`flex flex-col items-center justify-center min-h-[44px] py-1 px-1 text-center transition-all cursor-pointer ${
                 isActive
-                  ? 'text-[#0F6E5F] dark:text-[#2DD4BF] font-black'
+                  ? 'text-amber-500 dark:text-amber-400 font-black'
                   : 'text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 font-semibold'
               }`}
             >
               <div className="relative">
                 <Icon className={`w-5 h-5 transition-transform ${isActive ? 'scale-110' : ''}`} />
                 {isActive && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#0F6E5F] dark:bg-[#2DD4BF]" />
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-amber-500" />
                 )}
               </div>
               <span className="text-[10px] tracking-tight mt-1 leading-none">

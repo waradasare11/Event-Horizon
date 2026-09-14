@@ -148,10 +148,10 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
 
     if (internalState === 'drift_corrected') {
       return {
-        icon: <Zap className="w-3.5 h-3.5 text-teal-500 fill-teal-500" />,
+        icon: <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />,
         label: 'Drift Reconciled',
-        colorClass: 'bg-teal-500/10 text-teal-700 dark:text-teal-300 border-teal-500/30',
-        dotClass: 'bg-teal-500',
+        colorClass: 'bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/30',
+        dotClass: 'bg-amber-500',
         pendingBadge: null,
       };
     }
@@ -159,10 +159,10 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
     const savedTimeLabel = driveStatus.lastSavedAt ? `Synced • saved ${driveStatus.lastSavedAt}` : (currentUser ? 'Synced' : 'Cloud Ready');
 
     return {
-      icon: <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />,
+      icon: <CheckCircle2 className="w-3.5 h-3.5 text-amber-500" />,
       label: savedTimeLabel,
-      colorClass: 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/30',
-      dotClass: 'bg-emerald-500',
+      colorClass: 'bg-amber-500/10 text-amber-900 dark:text-amber-200 border-amber-500/30',
+      dotClass: 'bg-amber-500',
       pendingBadge: null,
     };
   };
@@ -201,7 +201,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
           <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] shadow-2xl z-50 p-5 space-y-4 animate-in fade-in zoom-in-95 text-left">
             <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#242826] pb-3">
               <div className="flex items-center gap-2">
-                <Database className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                <Database className="w-4 h-4 text-amber-500" />
                 <h4 className="text-sm font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                   AROH Cloud & Drive Memory
                 </h4>
@@ -218,7 +218,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
             <div className="p-3 rounded-xl bg-slate-50 dark:bg-[#1E2220] border border-slate-200 dark:border-slate-800 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <HardDrive className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                  <HardDrive className="w-4 h-4 text-amber-500" />
                   <span className="text-xs font-bold text-slate-900 dark:text-white">Google Drive Storage</span>
                 </div>
                 <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
@@ -231,7 +231,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
                   href={`https://drive.google.com/drive/folders/${resolvedFolderId}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full py-1.5 px-3 rounded-lg bg-cyan-600/10 hover:bg-cyan-600/20 text-cyan-700 dark:text-cyan-300 text-xs font-bold transition-all border border-cyan-500/20 flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-1.5 px-3 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-bold transition-all border border-amber-500/30 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                   <span>Open my AROH AI folder</span>
@@ -291,8 +291,8 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
                 )}
               </div>
             ) : (
-              <div className="p-2.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <div className="p-2.5 rounded-xl bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-amber-500 shrink-0" />
                 <span>Sync Queue Empty — 0 pending items. All local data is backed up.</span>
               </div>
             )}
@@ -301,7 +301,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
               <div className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2E2C]">
                 <span className="text-[#6B7280] dark:text-[#9EA8A2]">Connectivity</span>
                 <span className={`font-semibold flex items-center gap-1 ${
-                  isOnline ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-600 dark:text-amber-400'
+                  isOnline ? 'text-amber-700 dark:text-amber-300' : 'text-amber-600 dark:text-amber-400'
                 }`}>
                   {isOnline ? 'Online (Realtime)' : 'Offline (Local-First)'}
                 </span>
@@ -323,8 +323,8 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
                 </span>
               </div>
 
-              <div className="p-2.5 rounded-lg bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/15 border border-[#0F6E5F]/20 space-y-1">
-                <div className="text-[11px] font-bold text-[#0F6E5F] dark:text-[#2DD4BF] uppercase tracking-wider">
+              <div className="p-2.5 rounded-lg bg-amber-500/5 dark:bg-amber-500/15 border border-amber-500/20 space-y-1">
+                <div className="text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider">
                   Drift Verification
                 </div>
                 <p className="text-[11px] text-[#4B5563] dark:text-[#D1D5DB] leading-relaxed">
@@ -336,7 +336,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
             <button
               onClick={handleManualValidation}
               disabled={activeSyncing}
-              className="w-full py-2 px-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] disabled:opacity-50 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full py-2 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-sans disabled:opacity-50 text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${activeSyncing ? 'animate-spin' : ''}`} />
               <span>

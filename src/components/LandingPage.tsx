@@ -47,7 +47,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         'Official ICMR-IFCT & USDA per-100g database tables',
         'One-tap cooked gram portion sliders',
         'Workout builder & progressive overload logger',
-        'Sovereign Google Drive cloud backup (AROH AI folder)',
+        'Optional Google Drive cloud backup (connect from Settings)',
       ],
       cta: 'Start 7-Day Free Trial',
       primary: false,
@@ -116,7 +116,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     },
     {
       q: 'Where does my health and fitness data live?',
-      a: 'Your data lives directly in your personal Google account. When connected, AROH creates an app-dedicated folder named "AROH AI" inside your own Google Drive. We do not trap your fitness history in a closed proprietary walled garden; you retain absolute sovereignty over your logs and can export or delete them at any time.',
+      a: 'Your data is secured in your personal profile. You can optionally connect your Google Drive from Settings to maintain a sovereign backup folder named "AROH AI" directly inside your personal Drive. We never request Drive permissions during sign-in, ensuring a fast, verified login experience. You retain full sovereignty over your logs and can export (JSON/CSV) or delete them at any time.',
     },
     {
       q: 'Can a smartphone photo accurately weigh cooked food?',

@@ -98,10 +98,10 @@ export const Footer: React.FC<FooterProps> = ({
                     id="open-performance-dashboard-footer-btn"
                     type="button"
                     onClick={onOpenPerformanceDashboard}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-teal-500/10 hover:bg-teal-500/20 text-teal-700 dark:text-teal-300 border border-teal-500/30 font-semibold text-[11px] transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 font-semibold text-[11px] transition-all cursor-pointer"
                     title="Open Real-time Service Latency & Telemetry Dashboard"
                   >
-                    <Activity className="w-3 h-3 text-teal-600 dark:text-teal-400" />
+                    <Activity className="w-3 h-3 text-amber-500" />
                     <span>Host Latency</span>
                   </button>
                 )}
@@ -118,7 +118,7 @@ export const Footer: React.FC<FooterProps> = ({
             “AROH is a fitness tracking and education tool, not a doctor, dietitian, or physiotherapist. Meal calorie estimates can be wrong. Workout and form tips are general guidance. If you are under 18, have an injury, or a medical condition, get a parent/guardian and a qualified professional involved before you train or change how you eat.”
             <button
               onClick={() => onOpenLegal('disclaimer')}
-              className="ml-2 font-semibold text-teal-700 dark:text-teal-300 hover:underline cursor-pointer"
+              className="ml-2 font-semibold text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
             >
               Read Full Disclaimer →
             </button>
@@ -136,7 +136,7 @@ export const Footer: React.FC<FooterProps> = ({
             <button
               type="button"
               onClick={() => onOpenLegal('privacy')}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer font-medium"
+              className="hover:text-amber-500 transition-colors cursor-pointer font-medium"
               title="Privacy Policy under DPDP Act, 2023"
             >
               Privacy
@@ -147,7 +147,7 @@ export const Footer: React.FC<FooterProps> = ({
             <button
               type="button"
               onClick={() => onOpenLegal('terms')}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer font-medium"
+              className="hover:text-amber-500 transition-colors cursor-pointer font-medium"
               title="Terms of Service & 7-Day Trial"
             >
               Terms
@@ -158,7 +158,7 @@ export const Footer: React.FC<FooterProps> = ({
             <button
               type="button"
               onClick={() => onOpenLegal('disclaimer')}
-              className="hover:text-amber-600 dark:hover:text-amber-400 transition-colors cursor-pointer font-medium"
+              className="hover:text-amber-500 transition-colors cursor-pointer font-medium"
               title="Medical Disclaimer"
             >
               Disclaimer
@@ -169,7 +169,7 @@ export const Footer: React.FC<FooterProps> = ({
             <button
               type="button"
               onClick={onOpenReportError}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer font-medium"
+              className="hover:text-amber-500 transition-colors cursor-pointer font-medium"
               title="Contact Support / Report Issue"
             >
               Contact
@@ -180,7 +180,7 @@ export const Footer: React.FC<FooterProps> = ({
             <button
               type="button"
               onClick={() => onOpenLegal('refund')}
-              className="hover:text-teal-600 dark:hover:text-teal-400 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
+              className="hover:text-amber-500 transition-colors cursor-pointer text-slate-500 dark:text-slate-400"
               title="Refund Policy"
             >
               Refund
@@ -201,16 +201,16 @@ export const Footer: React.FC<FooterProps> = ({
           {/* Operator and Jurisdiction Info */}
           <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 flex-wrap justify-center">
             <div className="flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-teal-500" />
+              <MapPin className="w-3 h-3 text-amber-500" />
               <span>AROH • Pune, Maharashtra, India</span>
             </div>
             <span>•</span>
             <div className="flex items-center gap-1">
-              <Mail className="w-3 h-3 text-teal-500" />
+              <Mail className="w-3 h-3 text-amber-500" />
               <button
                 type="button"
                 onClick={() => onOpenLegal('privacy')}
-                className="hover:underline text-teal-600 dark:text-teal-400 cursor-pointer"
+                className="hover:underline text-amber-600 dark:text-amber-400 cursor-pointer"
               >
                 support@aroh.fit
               </button>
