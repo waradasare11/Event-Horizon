@@ -32,7 +32,7 @@ const LEGACY_STORAGE_KEYS: Record<string, string> = {
 
 export function getUserScopedKey(baseKey: string, userEmail?: string): string {
   let email = userEmail;
-  if (!email && typeof window !== 'undefined') {
+  if (!email && (typeof window !== 'undefined' || typeof localStorage !== 'undefined')) {
     email = getCurrentActiveEmail();
   }
 
@@ -43,7 +43,7 @@ export function getUserScopedKey(baseKey: string, userEmail?: string): string {
 
 export function setCurrentActiveEmail(email: string): void {
   try {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' || typeof localStorage !== 'undefined') {
       const clean = email.trim().toLowerCase();
       localStorage.setItem('aroh_current_active_email', clean);
     }
@@ -54,7 +54,7 @@ export function setCurrentActiveEmail(email: string): void {
 
 export function getCurrentActiveEmail(): string {
   try {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' || typeof localStorage !== 'undefined') {
       let email = localStorage.getItem('aroh_current_active_email');
       if (!email) {
         email = localStorage.getItem('peakform_current_active_email');

@@ -56,6 +56,7 @@ Ask me anything about fat loss biology, muscle hypertrophy mechanics, EMG muscle
 }
 
 export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
+  const [currentEmail, setCurrentEmail] = useState(userProfile.email);
   const [messages, setMessages] = useState<Message[]>(() => {
     const stored = getStoredCoachMessages(userProfile.email);
     if (stored && stored.length > 0) {
@@ -63,6 +64,13 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
     }
     return [buildDefaultWelcomeMessage(userProfile)];
   });
+
+  // Immediate wipe and sync in same frame if athlete email changes
+  if (userProfile.email !== currentEmail) {
+    setCurrentEmail(userProfile.email);
+    const stored = getStoredCoachMessages(userProfile.email);
+    setMessages(stored && stored.length > 0 ? stored : [buildDefaultWelcomeMessage(userProfile)]);
+  }
 
   // Re-sync when switching athlete profile
   useEffect(() => {

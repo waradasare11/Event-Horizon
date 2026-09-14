@@ -134,8 +134,8 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
 }) => {
   const isVegetarianUser = userProfile.dietType === 'vegetarian' || userProfile.dietType === 'vegan' || userProfile.dietType === 'eggetarian';
 
-  const [shoppingList, setShoppingList] = useState<SmartShoppingList>(() => {
-    const stored = getStoredSmartShoppingList(userProfile.email);
+  const buildInitialList = (email?: string): SmartShoppingList => {
+    const stored = getStoredSmartShoppingList(email);
     if (stored) {
       // If user is vegetarian, verify no meat items in stored list
       if (isVegetarianUser) {
@@ -165,24 +165,20 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
       ],
       lastCompiledAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
     };
-  });
+  };
+
+  const [currentEmail, setCurrentEmail] = useState(userProfile.email);
+  const [shoppingList, setShoppingList] = useState<SmartShoppingList>(() => buildInitialList(userProfile.email));
+
+  // Immediate wipe/sync in same frame if user switches account
+  if (userProfile.email !== currentEmail) {
+    setCurrentEmail(userProfile.email);
+    setShoppingList(buildInitialList(userProfile.email));
+  }
 
   // Re-sync shopping list when user switches email
   useEffect(() => {
-    const stored = getStoredSmartShoppingList(userProfile.email);
-    if (stored) {
-      if (isVegetarianUser) {
-        const NON_VEG_WORDS = ['chicken', 'salmon', 'beef', 'turkey', 'pork', 'tuna', 'fish', 'meat', 'shrimp', 'bacon'];
-        const hasMeat = stored.items.some((i) => NON_VEG_WORDS.some((kw) => i.name.toLowerCase().includes(kw)));
-        if (!hasMeat) {
-          setShoppingList(stored);
-          return;
-        }
-      } else {
-        setShoppingList(stored);
-        return;
-      }
-    }
+    setShoppingList(buildInitialList(userProfile.email));
   }, [userProfile.email, isVegetarianUser, userProfile.goal]);
 
   const [daysMultiplier, setDaysMultiplier] = useState<number>(shoppingList.daysMultiplier || 7);

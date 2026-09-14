@@ -96,7 +96,7 @@ describe('Per-Gmail Memory Isolation & Verification Test', () => {
     expect(restoredUserAMeals[0].name).toBe('Paneer Bhurji & Roti');
   });
 
-  it('TEST 2: Strict email check - If restored snapshot.email !== auth email, discard', () => {
+  it('TEST 2: Strict email check - If restored snapshot.email !== auth email, discard', async () => {
     const activeAuthEmail = 'user.b@gmail.com';
     const foreignSnapshot = {
       version: 1,
@@ -108,7 +108,7 @@ describe('Per-Gmail Memory Isolation & Verification Test', () => {
     };
 
     // Pass mismatched snapshot to restoreUserMemory for user.b@gmail.com
-    const result = restoreUserMemory(activeAuthEmail, foreignSnapshot);
+    const result = await restoreUserMemory(activeAuthEmail, foreignSnapshot);
 
     // Must discard completely and return null to prevent cross-account leak
     expect(result).toBeNull();

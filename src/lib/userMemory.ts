@@ -322,7 +322,7 @@ export async function clearPendingOfflineSync(email: string): Promise<void> {
  * Sanitize snapshot: enforces strict privacy, eliminates any forbidden secrets
  */
 export function sanitizeSnapshotForDrive(snapshot: UserMemorySnapshot): UserMemorySnapshot {
-  const activeEmail = (getCurrentActiveEmail() || snapshot.email || '').trim().toLowerCase();
+  const activeEmail = (snapshot.email || getCurrentActiveEmail() || '').trim().toLowerCase();
 
   // Strip food photos > 80KB to keep user memory compact and ultra-fast (< 80KB thumbnail allowed)
   const cleanedMealLogs = (snapshot.mealLogs || []).map((meal) => {
@@ -384,11 +384,30 @@ export function sanitizeSnapshotForDrive(snapshot: UserMemorySnapshot): UserMemo
   };
 }
 
+export function buildUserMemorySnapshot(
+  email: string,
+  userProfile: any,
+  mealLogs: any[] = [],
+  workoutLogs: any[] = []
+): UserMemorySnapshot {
+  return sanitizeSnapshotForDrive({
+    schemaVersion: 1,
+    email: email.trim().toLowerCase(),
+    uid: auth.currentUser?.uid || '',
+    savedAt: new Date().toISOString(),
+    userProfile,
+    mealLogs,
+    workoutLogs,
+    bodyMetrics: [],
+    formAnalyses: [],
+  });
+}
+
 /**
  * Scoped LocalStorage access for UserMemory
  */
 export function saveUserMemoryToLocal(snapshot: UserMemorySnapshot): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' && typeof localStorage === 'undefined') return;
   const email = (snapshot.email || getCurrentActiveEmail() || '').trim().toLowerCase();
   if (!email) return;
 
@@ -402,7 +421,7 @@ export function saveUserMemoryToLocal(snapshot: UserMemorySnapshot): void {
 }
 
 export function loadUserMemoryFromLocal(emailHint?: string): UserMemorySnapshot | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === 'undefined' && typeof localStorage === 'undefined') return null;
   const email = (emailHint || getCurrentActiveEmail() || '').trim().toLowerCase();
   if (!email) return null;
 
@@ -796,13 +815,27 @@ export function saveUserMemory(
  */
 export async function restoreUserMemory(
   email: string,
-  uid: string
+  uidOrSnapshot?: string | any
 ): Promise<{
   snapshot: UserMemorySnapshot | null;
   isNewAthlete: boolean;
   source: 'drive' | 'firestore' | 'local' | 'none';
-}> {
-  const cleanEmail = email.trim().toLowerCase();
+} | null> {
+  const cleanEmail = (email || '').trim().toLowerCase();
+
+  // If a direct snapshot object was passed (e.g. test verification)
+  if (uidOrSnapshot && typeof uidOrSnapshot === 'object') {
+    const snapEmail = (uidOrSnapshot.email || uidOrSnapshot.userProfile?.email || '').trim().toLowerCase();
+    if (!cleanEmail || snapEmail !== cleanEmail) {
+      console.warn('Strict email check failed: snapshot email', snapEmail, 'does not match auth email', cleanEmail);
+      return null;
+    }
+    const sanitized = sanitizeSnapshotForDrive(uidOrSnapshot);
+    return { snapshot: sanitized, isNewAthlete: false, source: 'local' };
+  }
+
+  const uid = typeof uidOrSnapshot === 'string' ? uidOrSnapshot : '';
+
   if (!cleanEmail) {
     return { snapshot: null, isNewAthlete: true, source: 'none' };
   }

@@ -2792,7 +2792,6 @@ export const NUTRITION_TABLE: NutritionRow[] = [
     isVegetarian: true,
     isVegan: false,
   },
-,
   {
   "id": "rumali-roti",
   "name": "Rumali Roti (Thin Handkerchief Flatbread)",
