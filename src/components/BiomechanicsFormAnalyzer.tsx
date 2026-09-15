@@ -191,10 +191,10 @@ export function BiomechanicsFormAnalyzer({
   return (
     <div className="space-y-8">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#0F6E5F]/10 via-[#0F6E5F]/5 to-transparent border border-[#0F6E5F]/20 rounded-2xl p-6 sm:p-8">
+      <div className="bg-gradient-to-r from-[#D4AF37]/10 via-[#D4AF37]/5 to-transparent border border-[#D4AF37]/20 rounded-2xl p-6 sm:p-8">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8] text-xs font-semibold uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] text-xs font-semibold uppercase tracking-wider">
               <Zap className="w-3.5 h-3.5" />
               Form Analysis
             </div>
@@ -208,7 +208,7 @@ export function BiomechanicsFormAnalyzer({
 
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0C584C] text-white text-sm font-semibold shadow-sm transition-all hover:scale-[1.02] cursor-pointer shrink-0"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D4AF37] hover:bg-[#0C584C] text-white text-sm font-semibold shadow-sm transition-all hover:scale-[1.02] cursor-pointer shrink-0"
           >
             <Upload className="w-4 h-4" />
             Upload Video / Photo
@@ -228,7 +228,7 @@ export function BiomechanicsFormAnalyzer({
         {/* Left Column: Media Preview & Exercise Selection */}
         <div className="lg:col-span-5 space-y-6">
           {/* Exercise Selector */}
-          <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-2xl p-5 space-y-4 shadow-xs">
+          <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl p-5 space-y-4 shadow-xs">
             <label className="block text-xs font-semibold text-[#6B7280] dark:text-[#9EA8A2] uppercase tracking-wider">
               Select Exercise to Audit
             </label>
@@ -243,8 +243,8 @@ export function BiomechanicsFormAnalyzer({
                     onClick={() => handleSelectSample(sample)}
                     className={`text-left p-3 rounded-xl border text-xs font-medium transition-all cursor-pointer flex items-center gap-2.5 ${
                       isSelected
-                        ? 'border-[#0F6E5F] bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8] font-semibold ring-1 ring-[#0F6E5F]'
-                        : 'border-[#E5E7EB] dark:border-[#242826] text-[#374151] dark:text-[#D1D5DB] hover:bg-gray-50 dark:hover:bg-[#1F2220]'
+                        ? 'border-[#D4AF37] bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] font-semibold ring-1 ring-[#D4AF37]'
+                        : 'border-[#E5E7EB] dark:border-[#2A2416] text-[#374151] dark:text-[#D1D5DB] hover:bg-gray-50 dark:hover:bg-[#1F2220]'
                     }`}
                   >
                     <span className="text-lg">{sample.thumbnail}</span>
@@ -264,16 +264,16 @@ export function BiomechanicsFormAnalyzer({
                 value={specificConcern}
                 onChange={(e) => setSpecificConcern(e.target.value)}
                 placeholder="e.g. Knee cave, lower back rounding, elbow flare..."
-                className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#242826] bg-transparent text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
+                className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] bg-transparent text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
               />
             </div>
           </div>
 
           {/* Media Player / Frame Inspection Container */}
-          <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-2xl overflow-hidden shadow-xs">
-            <div className="p-3 border-b border-[#E5E7EB] dark:border-[#242826] flex items-center justify-between bg-gray-50/50 dark:bg-[#191B1A]">
+          <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl overflow-hidden shadow-xs">
+            <div className="p-3 border-b border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between bg-gray-50/50 dark:bg-[#191B1A]">
               <div className="flex items-center gap-2 text-xs font-medium text-[#374151] dark:text-[#D1D5DB]">
-                <FileVideo className="w-4 h-4 text-[#0F6E5F]" />
+                <FileVideo className="w-4 h-4 text-[#D4AF37]" />
                 <span>{selectedExercise} Visual Feed</span>
               </div>
               <span className="text-[11px] font-mono text-[#6B7280] dark:text-[#9EA8A2] uppercase">
@@ -319,7 +319,7 @@ export function BiomechanicsFormAnalyzer({
               <button
                 onClick={handleAnalyzeLift}
                 disabled={isAnalyzing}
-                className="w-full py-3 px-4 rounded-xl bg-[#0F6E5F] hover:bg-[#0C584C] disabled:bg-gray-400 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+                className="w-full py-3 px-4 rounded-xl bg-[#D4AF37] hover:bg-[#0C584C] disabled:bg-gray-400 text-white font-semibold text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
               >
                 {isAnalyzing ? (
                   <>
@@ -345,7 +345,7 @@ export function BiomechanicsFormAnalyzer({
 
           {/* Historical Audits List */}
           {formAnalyses.length > 1 && (
-            <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-2xl p-4 space-y-3">
+            <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl p-4 space-y-3">
               <h3 className="text-xs font-semibold text-[#6B7280] dark:text-[#9EA8A2] uppercase tracking-wider">
                 Previous Movement Audits ({formAnalyses.length})
               </h3>
@@ -356,8 +356,8 @@ export function BiomechanicsFormAnalyzer({
                     onClick={() => setCurrentAnalysis(a)}
                     className={`w-full text-left p-2.5 rounded-xl border text-xs flex items-center justify-between transition-colors cursor-pointer ${
                       currentAnalysis?.id === a.id
-                        ? 'border-[#0F6E5F] bg-[#0F6E5F]/5 text-[#0F6E5F] dark:text-[#5FD1B8]'
-                        : 'border-[#E5E7EB] dark:border-[#242826] hover:bg-gray-50 dark:hover:bg-[#1F2220] text-[#374151] dark:text-[#D1D5DB]'
+                        ? 'border-[#D4AF37] bg-[#D4AF37]/5 text-[#D4AF37] dark:text-[#F0D060]'
+                        : 'border-[#E5E7EB] dark:border-[#2A2416] hover:bg-gray-50 dark:hover:bg-[#1F2220] text-[#374151] dark:text-[#D1D5DB]'
                     }`}
                   >
                     <div>
@@ -379,9 +379,9 @@ export function BiomechanicsFormAnalyzer({
         {/* Right Column: In-Depth Biomechanical Audit Result */}
         <div className="lg:col-span-7">
           {currentAnalysis ? (
-            <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
+            <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
               {/* Score Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E5E7EB] dark:border-[#242826]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#E5E7EB] dark:border-[#2A2416]">
                 <div className="space-y-1">
                   <div className="text-xs font-semibold text-[#6B7280] dark:text-[#9EA8A2] uppercase tracking-wider">
                     Biomechanical Audit Report
@@ -396,7 +396,7 @@ export function BiomechanicsFormAnalyzer({
 
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <div className="text-3xl font-extrabold text-[#0F6E5F] dark:text-[#5FD1B8]">
+                    <div className="text-3xl font-extrabold text-[#D4AF37] dark:text-[#F0D060]">
                       {currentAnalysis.formScore}
                       <span className="text-sm font-normal text-[#6B7280] dark:text-[#9EA8A2]">/100</span>
                     </div>
@@ -407,7 +407,7 @@ export function BiomechanicsFormAnalyzer({
 
                   <div className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 ${
                     currentAnalysis.injuryRiskRating === 'Low'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800'
+                      ? 'bg-[#FFFBF0] dark:bg-[#2A2416]/40 text-[#A68523] dark:text-[#F0D060] border border-[#E6D7A8] dark:border-[#2A2416]'
                       : currentAnalysis.injuryRiskRating === 'Moderate'
                       ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800'
                       : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800'
@@ -421,10 +421,10 @@ export function BiomechanicsFormAnalyzer({
               {/* Bar Path & Overall Commentary */}
               <div className="space-y-3">
                 <h3 className="text-xs font-semibold text-[#6B7280] dark:text-[#9EA8A2] uppercase tracking-wider flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-[#0F6E5F]" />
+                  <Activity className="w-4 h-4 text-[#D4AF37]" />
                   Bar Path & Movement Trajectory
                 </h3>
-                <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1F2220] border border-[#E5E7EB] dark:border-[#242826] text-xs leading-relaxed text-[#374151] dark:text-[#D1D5DB]">
+                <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1F2220] border border-[#E5E7EB] dark:border-[#2A2416] text-xs leading-relaxed text-[#374151] dark:text-[#D1D5DB]">
                   <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">Trajectory Analysis: </span>
                   {currentAnalysis.barPathQuality}
                 </div>
@@ -437,20 +437,20 @@ export function BiomechanicsFormAnalyzer({
               {currentAnalysis.jointMechanics && currentAnalysis.jointMechanics.length > 0 && (
                 <div className="space-y-3">
                   <h3 className="text-xs font-semibold text-[#6B7280] dark:text-[#9EA8A2] uppercase tracking-wider flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-[#0F6E5F]" />
+                    <Layers className="w-4 h-4 text-[#D4AF37]" />
                     Joint Alignment & Kinematics
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {currentAnalysis.jointMechanics.map((jm, i) => (
                       <div
                         key={i}
-                        className="p-3.5 rounded-xl border border-[#E5E7EB] dark:border-[#242826] bg-gray-50/50 dark:bg-[#1B1D1C] space-y-1.5 text-xs"
+                        className="p-3.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-gray-50/50 dark:bg-[#1B1D1C] space-y-1.5 text-xs"
                       >
                         <div className="flex items-center justify-between">
                           <span className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">{jm.joint}</span>
                           <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold ${
                             jm.rating === 'Optimal'
-                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                              ? 'bg-[#FDF3D0] text-[#8E701C] dark:bg-[#2A2416] dark:text-[#F0D060]'
                               : jm.rating === 'Needs Improvement'
                               ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
                               : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
@@ -487,7 +487,7 @@ export function BiomechanicsFormAnalyzer({
                           <span>{f.faultDescription}</span>
                         </div>
                         <div className="text-[11px] text-[#525B56] dark:text-[#9EA8A2] pl-1">
-                          <span className="font-semibold text-[#0F6E5F] dark:text-[#5FD1B8]">Fix: </span>
+                          <span className="font-semibold text-[#D4AF37] dark:text-[#F0D060]">Fix: </span>
                           {f.correctionCue}
                         </div>
                       </div>
@@ -500,16 +500,16 @@ export function BiomechanicsFormAnalyzer({
               {currentAnalysis.actionableCuesNextSet && currentAnalysis.actionableCuesNextSet.length > 0 && (
                 <div className="space-y-3">
                   <h3 className="text-xs font-semibold text-[#6B7280] dark:text-[#9EA8A2] uppercase tracking-wider flex items-center gap-2">
-                    <Award className="w-4 h-4 text-[#0F6E5F]" />
+                    <Award className="w-4 h-4 text-[#D4AF37]" />
                     3 Immediate Cues for Next Set
                   </h3>
                   <div className="space-y-2">
                     {currentAnalysis.actionableCuesNextSet.map((cue, i) => (
                       <div
                         key={i}
-                        className="p-3 rounded-xl bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/10 border border-[#0F6E5F]/20 text-xs flex items-start gap-3"
+                        className="p-3 rounded-xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-xs flex items-start gap-3"
                       >
-                        <span className="w-5 h-5 rounded-full bg-[#0F6E5F] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
+                        <span className="w-5 h-5 rounded-full bg-[#D4AF37] text-white flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">
                           {i + 1}
                         </span>
                         <span className="text-[#1A1D1B] dark:text-[#E8ECE9] font-medium leading-relaxed">
@@ -523,8 +523,8 @@ export function BiomechanicsFormAnalyzer({
 
               {/* Scientific Takeaway */}
               {currentAnalysis.scientificTakeaway && (
-                <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1F2220] border border-[#E5E7EB] dark:border-[#242826] text-xs text-[#525B56] dark:text-[#9EA8A2] flex items-start gap-3">
-                  <Info className="w-4 h-4 text-[#0F6E5F] shrink-0 mt-0.5" />
+                <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1F2220] border border-[#E5E7EB] dark:border-[#2A2416] text-xs text-[#525B56] dark:text-[#9EA8A2] flex items-start gap-3">
+                  <Info className="w-4 h-4 text-[#D4AF37] shrink-0 mt-0.5" />
                   <div>
                     <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">Sports Science Takeaway: </span>
                     {currentAnalysis.scientificTakeaway}
@@ -545,8 +545,8 @@ export function BiomechanicsFormAnalyzer({
               </div>
             </div>
           ) : (
-            <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-2xl p-12 text-center space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-[#0F6E5F]/10 text-[#0F6E5F] flex items-center justify-center mx-auto">
+            <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl p-12 text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-[#D4AF37]/10 text-[#D4AF37] flex items-center justify-center mx-auto">
                 <Activity className="w-7 h-7" />
               </div>
               <h3 className="text-lg font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">

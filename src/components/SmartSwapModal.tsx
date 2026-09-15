@@ -79,19 +79,19 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-      <div className="bg-white dark:bg-[#161817] rounded-3xl max-w-2xl w-full border border-[#E5E7EB] dark:border-[#242826] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 text-left my-8">
+      <div className="bg-white dark:bg-[#111111] rounded-3xl max-w-2xl w-full border border-[#E5E7EB] dark:border-[#2A2416] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 text-left my-8">
         {/* Modal Header */}
-        <div className="p-6 border-b border-[#E5E7EB] dark:border-[#242826] flex items-start justify-between gap-4 bg-gray-50/50 dark:bg-[#1C1F1D]/50">
+        <div className="p-6 border-b border-[#E5E7EB] dark:border-[#2A2416] flex items-start justify-between gap-4 bg-gray-50/50 dark:bg-[#1C1F1D]/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#0F6E5F] text-white flex items-center justify-center shadow-xs">
+            <div className="w-10 h-10 rounded-2xl bg-[#D4AF37] text-white flex items-center justify-center shadow-xs">
               <ArrowRightLeft className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-[#0F6E5F] dark:text-[#5FD1B8]">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#D4AF37] dark:text-[#F0D060]">
                   AI Smart Swap
                 </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#5FD1B8] font-bold">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] font-bold">
                   Gemini 3.7 Biomechanics
                 </span>
               </div>
@@ -130,8 +130,8 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
               </div>
             </div>
           ) : (
-            <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-300">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <div className="p-3 rounded-xl bg-[#FFFBF0] dark:bg-[#2A2416]/40 border border-[#E6D7A8] dark:border-[#2A2416]/60 flex items-center gap-2 text-xs text-[#8E701C] dark:text-[#F0D060]">
+              <ShieldCheck className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060] shrink-0" />
               <span>Zero joint injuries documented. All kinematic load profiles accessible.</span>
             </div>
           )}
@@ -146,7 +146,7 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
               <select
                 value={swapReason}
                 onChange={(e) => setSwapReason(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#0F6E5F]"
+                className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#D4AF37]"
               >
                 <option value="Equipment Busy / Unavailable">Equipment Busy / Occupied (Rack/Machine)</option>
                 <option value="Joint Pain / Discomfort Flare-Up">Joint Discomfort / Flare-Up</option>
@@ -164,7 +164,7 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
               <select
                 value={availableEquipment}
                 onChange={(e) => setAvailableEquipment(e.target.value)}
-                className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#0F6E5F]"
+                className="w-full text-xs font-semibold px-3 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#D4AF37]"
               >
                 <option value="Dumbbells & Adjustable Bench">Dumbbells & Adjustable Bench</option>
                 <option value="Cable Machine & Attachments">Cable Machine & Attachments</option>
@@ -185,7 +185,7 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
               placeholder="e.g. Mild lower back fatigue, avoid deep shoulder extension"
               value={specificDiscomfort}
               onChange={(e) => setSpecificDiscomfort(e.target.value)}
-              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#0F6E5F]"
+              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#D4AF37]"
             />
           </div>
 
@@ -193,7 +193,7 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
           <button
             onClick={handleFetchSmartSwaps}
             disabled={isLoading}
-            className="w-full py-3 px-4 rounded-xl bg-[#0F6E5F] hover:bg-[#0C584C] disabled:bg-gray-400 text-white text-xs sm:text-sm font-bold shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full py-3 px-4 rounded-xl bg-[#D4AF37] hover:bg-[#0C584C] disabled:bg-gray-400 text-white text-xs sm:text-sm font-bold shadow-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             {isLoading ? (
               <>
@@ -219,8 +219,8 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
           {swapResponse && (
             <div className="space-y-4 pt-2">
               {/* AI Safeguard Summary */}
-              <div className="p-4 rounded-2xl bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/15 border border-[#0F6E5F]/20 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#0F6E5F] dark:text-[#5FD1B8]">
+              <div className="p-4 rounded-2xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/15 border border-[#D4AF37]/20 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] dark:text-[#F0D060]">
                   <ShieldCheck className="w-4 h-4" />
                   <span>Biomechanical & Injury Rationale</span>
                 </div>
@@ -234,15 +234,15 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
                 {swapResponse.swaps.map((swap, idx) => (
                   <div
                     key={swap.id || idx}
-                    className="p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] bg-white dark:bg-[#1E201F] hover:border-[#0F6E5F] dark:hover:border-[#5FD1B8] shadow-xs space-y-3 transition-all"
+                    className="p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#1E201F] hover:border-[#D4AF37] dark:hover:border-[#F0D060] shadow-xs space-y-3 transition-all"
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FDF3D0] dark:bg-[#2A2416]/60 text-[#8E701C] dark:text-[#F0D060]">
                             {swap.matchPercentage}% Muscle Stimulus Match
                           </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#5FD1B8]">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]">
                             {swap.equipment}
                           </span>
                         </div>
@@ -253,7 +253,7 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
 
                       <button
                         onClick={() => handleSelectSwap(swap)}
-                        className="px-4 py-2 rounded-xl bg-[#0F6E5F] hover:bg-[#0C584C] text-white text-xs font-bold shadow-2xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0"
+                        className="px-4 py-2 rounded-xl bg-[#D4AF37] hover:bg-[#0C584C] text-white text-xs font-bold shadow-2xs flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0"
                       >
                         <Check className="w-3.5 h-3.5" />
                         <span>Swap Into Workout</span>
@@ -261,16 +261,16 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#161817] border border-gray-100 dark:border-[#242826]">
+                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#111111] border border-gray-100 dark:border-[#2A2416]">
                         <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] block mb-0.5">
                           Prescription:
                         </span>
-                        <span className="text-[#0F6E5F] dark:text-[#5FD1B8] font-bold">
+                        <span className="text-[#D4AF37] dark:text-[#F0D060] font-bold">
                           {swap.prescribedSetsReps}
                         </span>
                       </div>
 
-                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#161817] border border-gray-100 dark:border-[#242826]">
+                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#111111] border border-gray-100 dark:border-[#2A2416]">
                         <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] block mb-0.5">
                           Joint Safety Profile:
                         </span>
@@ -289,7 +289,7 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
                         <strong className="text-[#1A1D1B] dark:text-[#E8ECE9]">Injury Protection:</strong>{' '}
                         {swap.howItAddressesInjury}
                       </p>
-                      <p className="text-[#0F6E5F] dark:text-[#5FD1B8] font-medium">
+                      <p className="text-[#D4AF37] dark:text-[#F0D060] font-medium">
                         <strong>Execution Cue:</strong> {swap.setupCue}
                       </p>
                     </div>

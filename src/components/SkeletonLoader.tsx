@@ -73,7 +73,7 @@ export const DashboardSkeletonLoader: React.FC = () => {
         <div className="p-6 rounded-3xl bg-slate-100/70 dark:bg-[#151C2C]/70 border border-slate-200 dark:border-[#232B3E] space-y-4">
           <div className="h-5 w-36 bg-slate-300 dark:bg-slate-700 rounded-md" />
           <div className="h-40 rounded-2xl bg-slate-200/60 dark:bg-[#1A2234] flex items-center justify-center">
-            <div className="w-24 h-24 rounded-full border-4 border-slate-300 dark:border-slate-700 border-t-cyan-500 animate-spin" />
+            <div className="w-24 h-24 rounded-full border-4 border-slate-300 dark:border-slate-700 border-t-[#D4AF37] animate-spin" />
           </div>
           <div className="space-y-2 pt-2">
             <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded" />

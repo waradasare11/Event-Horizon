@@ -73,7 +73,7 @@ export const TodayDashboardView: React.FC<TodayDashboardViewProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Welcome & Streak Banner */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs font-semibold text-gray-500">
             <Calendar className="w-3.5 h-3.5" />
@@ -110,11 +110,11 @@ export const TodayDashboardView: React.FC<TodayDashboardViewProps> = ({
       {/* Main Focus Grid: Nutrition & Workout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Card 1: Today's Calories & Macros with ONE Primary CTA "Log Meal" */}
-        <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col justify-between space-y-6">
+        <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-teal-500/10 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-2xl bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center">
                   <Utensils className="w-4 h-4" />
                 </div>
                 <div>
@@ -124,7 +124,7 @@ export const TodayDashboardView: React.FC<TodayDashboardViewProps> = ({
                   <p className="text-xs text-gray-500">Target energy & macro balance</p>
                 </div>
               </div>
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300">
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#D4AF37]/10 text-[#A68523] dark:text-[#F0D060]">
                 {caloriePercent}% Goal
               </span>
             </div>
@@ -147,7 +147,7 @@ export const TodayDashboardView: React.FC<TodayDashboardViewProps> = ({
 
               <div className="w-full h-3 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
                 <div 
-                  className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-500"
+                  className="h-full rounded-full bg-gradient-to-r from-[#D4AF37] to-[#F0D060] transition-all duration-500"
                   style={{ width: `${caloriePercent}%` }}
                 />
               </div>
@@ -160,7 +160,7 @@ export const TodayDashboardView: React.FC<TodayDashboardViewProps> = ({
                 <div className="text-base font-black text-gray-900 dark:text-white">
                   {proteinConsumedToday}g
                 </div>
-                <div className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold">
+                <div className="text-[10px] text-[#B8922A] dark:text-[#F0D060] font-semibold">
                   / {targetProtein}g
                 </div>
               </div>
@@ -190,7 +190,7 @@ export const TodayDashboardView: React.FC<TodayDashboardViewProps> = ({
           {/* SINGLE PRIMARY CTA: "Log Meal" */}
           <button
             onClick={onNavigateToFood}
-            className="w-full py-3.5 px-4 rounded-2xl bg-[#0F6E5F] hover:bg-[#0c594c] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-teal-900/10 cursor-pointer"
+            className="w-full py-3.5 px-4 rounded-2xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-md shadow-[#D4AF37]/10 cursor-pointer"
           >
             <Camera className="w-4 h-4" />
             <span>Log Meal</span>
@@ -198,11 +198,11 @@ export const TodayDashboardView: React.FC<TodayDashboardViewProps> = ({
         </div>
 
         {/* Card 2: Today's Workout */}
-        <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col justify-between space-y-6">
+        <div className="p-6 sm:p-7 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col justify-between space-y-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-teal-500/10 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-2xl bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center">
                   <Dumbbell className="w-4 h-4" />
                 </div>
                 <div>
@@ -214,23 +214,23 @@ export const TodayDashboardView: React.FC<TodayDashboardViewProps> = ({
               </div>
 
               {completedWorkoutToday ? (
-                <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-[#D4AF37]/10 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/20">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Completed</span>
                 </span>
               ) : (
-                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300">
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#D4AF37]/10 text-[#A68523] dark:text-[#F0D060]">
                   Scheduled
                 </span>
               )}
             </div>
 
             {completedWorkoutToday ? (
-              <div className="p-4 rounded-2xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 space-y-2">
-                <div className="text-sm font-bold text-emerald-950 dark:text-emerald-200">
+              <div className="p-4 rounded-2xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 border border-[#D4AF37]/20 space-y-2">
+                <div className="text-sm font-bold text-[#16120A] dark:text-[#F0D060]">
                   {completedWorkoutToday.dayName || 'Training Session'} Completed!
                 </div>
-                <div className="flex items-center gap-4 text-xs text-emerald-800/80 dark:text-emerald-300/80">
+                <div className="flex items-center gap-4 text-xs text-[#8E701C]/80 dark:text-[#F0D060]/80">
                   <span>Volume: {(completedWorkoutToday.totalVolumeKg || 0).toLocaleString()} kg</span>
                   <span>•</span>
                   <span>Duration: {completedWorkoutToday.durationMin || 45} min</span>
@@ -267,14 +267,14 @@ export const TodayDashboardView: React.FC<TodayDashboardViewProps> = ({
 
       {/* Quick Today's Logged Meals (if any) */}
       {todayMeals.length > 0 && (
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-3">
+        <div className="p-6 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-gray-900 dark:text-white">
               Meals Logged Today ({todayMeals.length})
             </h3>
             <button
               onClick={onNavigateToFood}
-              className="text-xs font-bold text-[#0F6E5F] dark:text-[#2DD4BF] hover:underline flex items-center gap-1"
+              className="text-xs font-bold text-[#D4AF37] dark:text-[#F0D060] hover:underline flex items-center gap-1"
             >
               <span>View in Food Tab</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -295,7 +295,7 @@ export const TodayDashboardView: React.FC<TodayDashboardViewProps> = ({
                     {meal.proteinG}g P • {meal.carbsG || 0}g C • {meal.fatG || 0}g F
                   </div>
                 </div>
-                <div className="text-xs font-black text-teal-600 dark:text-teal-400 shrink-0">
+                <div className="text-xs font-black text-[#B8922A] dark:text-[#F0D060] shrink-0">
                   {meal.calories} kcal
                 </div>
               </div>

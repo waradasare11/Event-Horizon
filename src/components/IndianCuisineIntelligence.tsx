@@ -121,17 +121,17 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
   const indianData: IndianCuisineIntelligenceData | undefined = activeAnalysis?.indianCuisine;
 
   return (
-    <div className="bg-white dark:bg-[#161817] rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-sm overflow-hidden text-left transition-colors">
+    <div className="bg-white dark:bg-[#111111] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-sm overflow-hidden text-left transition-colors">
       {/* Module Header */}
-      <div className="p-5 sm:p-6 bg-gradient-to-r from-[#0F6E5F]/10 via-[#E8912D]/10 to-transparent dark:from-[#0F6E5F]/20 dark:via-[#E8912D]/15 border-b border-[#E5E7EB] dark:border-[#242826]">
+      <div className="p-5 sm:p-6 bg-gradient-to-r from-[#D4AF37]/10 via-[#E8912D]/10 to-transparent dark:from-[#D4AF37]/20 dark:via-[#E8912D]/15 border-b border-[#E5E7EB] dark:border-[#2A2416]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#0F6E5F] text-white flex items-center justify-center shrink-0 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-[#D4AF37] text-white flex items-center justify-center shrink-0 shadow-xs">
               <Sparkles className="w-5 h-5 text-[#E8912D]" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-[#0F6E5F]/15 text-[#0F6E5F] dark:text-[#2DD4BF]">
+                <span className="text-[11px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] dark:text-[#F0D060]">
                   ICMR-NIN & IFCT Scientific Framework
                 </span>
                 <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#E8912D]/15 text-[#E8912D]">
@@ -145,12 +145,12 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
           </div>
 
           {/* Sub-tab Navigation */}
-          <div className="flex items-center gap-1 bg-[#FAFAF8] dark:bg-[#111312] p-1 rounded-xl border border-[#E5E7EB] dark:border-[#242826] overflow-x-auto">
+          <div className="flex items-center gap-1 bg-[#FAFAF8] dark:bg-[#070707] p-1 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] overflow-x-auto">
             <button
               onClick={() => setActiveSubTab('deconstructor')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeSubTab === 'deconstructor'
-                  ? 'bg-[#0F6E5F] text-white shadow-xs'
+                  ? 'bg-[#D4AF37] text-white shadow-xs'
                   : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
               }`}
             >
@@ -160,7 +160,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
               onClick={() => setActiveSubTab('ifct_database')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeSubTab === 'ifct_database'
-                  ? 'bg-[#0F6E5F] text-white shadow-xs'
+                  ? 'bg-[#D4AF37] text-white shadow-xs'
                   : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
               }`}
             >
@@ -170,7 +170,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
               onClick={() => setActiveSubTab('cooking_fats')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeSubTab === 'cooking_fats'
-                  ? 'bg-[#0F6E5F] text-white shadow-xs'
+                  ? 'bg-[#D4AF37] text-white shadow-xs'
                   : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
               }`}
             >
@@ -180,7 +180,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
               onClick={() => setActiveSubTab('fasting_vrat')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeSubTab === 'fasting_vrat'
-                  ? 'bg-[#0F6E5F] text-white shadow-xs'
+                  ? 'bg-[#D4AF37] text-white shadow-xs'
                   : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
               }`}
             >
@@ -197,7 +197,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
           {indianData ? (
             <div className="space-y-6">
               {/* Regional & Preparation Meta Header */}
-              <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <span className="text-[11px] font-semibold text-[#6B7280] dark:text-[#9EA8A2] uppercase tracking-wider block">
                     Regional Classification
@@ -206,7 +206,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                     {indianData.regionalOrigin || 'Pan-Indian Traditional'}
                   </span>
                   {indianData.dishNameHindi && (
-                    <span className="text-xs text-[#0F6E5F] dark:text-[#2DD4BF] font-medium block mt-0.5">
+                    <span className="text-xs text-[#D4AF37] dark:text-[#F0D060] font-medium block mt-0.5">
                       {indianData.dishNameHindi}
                     </span>
                   )}
@@ -230,7 +230,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                   </span>
                   <div className="mt-0.5 flex items-center gap-1.5">
                     {indianData.isFastingOrVratApproved ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#16A34A]/10 text-[#16A34A] dark:text-emerald-400 border border-[#16A34A]/30">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#16A34A]/10 text-[#16A34A] dark:text-[#F0D060] border border-[#16A34A]/30">
                         <ShieldCheck className="w-3.5 h-3.5" />
                         100% Vrat Approved
                       </span>
@@ -248,7 +248,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
-                      <Scale className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                      <Scale className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
                       <span>IFCT Cross-Referenced Ingredient Decomposition</span>
                     </h3>
                     <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">
@@ -260,14 +260,14 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                     {indianData.ifctDatabaseCrossReferences.map((ref, idx) => (
                       <div
                         key={idx}
-                        className="p-3.5 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] flex flex-col justify-between gap-2.5"
+                        className="p-3.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] flex flex-col justify-between gap-2.5"
                       >
                         <div>
                           <div className="flex items-center justify-between">
                             <span className="font-bold text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
                               {ref.ingredientName}
                             </span>
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF]">
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
                               {ref.ifctCode || `IFCT-${idx + 10}`}
                             </span>
                           </div>
@@ -276,12 +276,12 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                           </p>
                         </div>
 
-                        <div className="pt-2 border-t border-[#E5E7EB] dark:border-[#2A2E2C] flex items-center justify-between text-[11px]">
+                        <div className="pt-2 border-t border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between text-[11px]">
                           <span className="font-semibold text-xs text-[#E8912D]">
                             {ref.detectedWeightG}g portion
                           </span>
                           <div className="flex items-center gap-2 font-medium">
-                            <span className="text-[#0F6E5F] dark:text-[#2DD4BF]">{ref.proteinPer100g}g P/100g</span>
+                            <span className="text-[#D4AF37] dark:text-[#F0D060]">{ref.proteinPer100g}g P/100g</span>
                             <span className="text-[#3B82F6]">{ref.carbsPer100g}g C/100g</span>
                             <span className="text-[#F59E0B]">{ref.fatPer100g}g F/100g</span>
                           </div>
@@ -310,8 +310,8 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                   )}
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#0F6E5F]/5 border border-[#0F6E5F]/20">
-                  <div className="flex items-center gap-2 text-xs font-bold text-[#0F6E5F] dark:text-[#2DD4BF] uppercase tracking-wider mb-2">
+                <div className="p-4 rounded-xl bg-[#D4AF37]/5 border border-[#D4AF37]/20">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#D4AF37] dark:text-[#F0D060] uppercase tracking-wider mb-2">
                     <Dumbbell className="w-4 h-4" />
                     <span>Protein & Leucine Threshold Hacks</span>
                   </div>
@@ -321,7 +321,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                       'Substitute standard dahi with Greek Yogurt / Hung Curd for double the casein density.',
                     ]).map((hack, idx) => (
                       <li key={idx} className="flex items-start gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF] shrink-0 mt-0.5" />
+                        <Check className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060] shrink-0 mt-0.5" />
                         <span>{hack}</span>
                       </li>
                     ))}
@@ -347,14 +347,14 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                 {PRESET_INDIAN_SCENARIOS.map((scenario, idx) => (
                   <div
                     key={idx}
-                    className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] hover:border-[#0F6E5F] transition-all flex flex-col justify-between gap-3 text-left"
+                    className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37] transition-all flex flex-col justify-between gap-3 text-left"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
                           {scenario.name}
                         </span>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] whitespace-nowrap">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] whitespace-nowrap">
                           {scenario.tag}
                         </span>
                       </div>
@@ -363,17 +363,17 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                       </p>
                     </div>
 
-                    <div className="pt-2 border-t border-[#E5E7EB] dark:border-[#2A2E2C] flex items-center justify-between">
+                    <div className="pt-2 border-t border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between">
                       <div className="flex items-center gap-2 text-xs font-semibold">
                         <span className="text-[#E8912D]">{scenario.calories} kcal</span>
-                        <span className="text-[#0F6E5F] dark:text-[#2DD4BF]">{scenario.protein}g P</span>
+                        <span className="text-[#D4AF37] dark:text-[#F0D060]">{scenario.protein}g P</span>
                         <span className="text-[#3B82F6]">{scenario.carbs}g C</span>
                         <span className="text-[#F59E0B]">{scenario.fat}g F</span>
                       </div>
 
                       <button
                         onClick={() => onAnalyzePresetIndianMeal?.(scenario.name, scenario.promptNotes)}
-                        className="px-2.5 py-1 rounded-lg bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer"
+                        className="px-2.5 py-1 rounded-lg bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer"
                       >
                         <span>Analyze</span>
                         <ChevronRight className="w-3 h-3" />
@@ -399,7 +399,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                 placeholder="Search IFCT database (e.g., Sabudana, Shengdana, Paneer, Poha, Roti, Sattu, Moong)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312] text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-2 focus:ring-[#0F6E5F]"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
               />
             </div>
 
@@ -410,8 +410,8 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                     selectedCategory === cat
-                      ? 'bg-[#0F6E5F] text-white shadow-xs'
-                      : 'bg-[#FAFAF8] dark:bg-[#1A1D1C] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#2A2E2C] hover:bg-[#F3F4F6]'
+                      ? 'bg-[#D4AF37] text-white shadow-xs'
+                      : 'bg-[#FAFAF8] dark:bg-[#111111] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#2A2416] hover:bg-[#F3F4F6]'
                   }`}
                 >
                   {cat}
@@ -433,8 +433,8 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                   }}
                   className={`p-3.5 rounded-xl border transition-all cursor-pointer text-left ${
                     selectedIFCTItem.id === item.id
-                      ? 'bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 border-[#0F6E5F]'
-                      : 'bg-[#FAFAF8] dark:bg-[#1A1D1C] border-[#E5E7EB] dark:border-[#2A2E2C] hover:border-[#0F6E5F]/50'
+                      ? 'bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 border-[#D4AF37]'
+                      : 'bg-[#FAFAF8] dark:bg-[#111111] border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37]/50'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -442,12 +442,12 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                       <span className="font-bold text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9] block">
                         {item.name}
                       </span>
-                      <span className="text-[11px] text-[#0F6E5F] dark:text-[#2DD4BF] font-medium block">
+                      <span className="text-[11px] text-[#D4AF37] dark:text-[#F0D060] font-medium block">
                         {item.hindiName}
                       </span>
                     </div>
                     {item.isFastingSafe && (
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#16A34A]/10 text-[#16A34A] dark:text-emerald-400 border border-[#16A34A]/20 shrink-0">
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#16A34A]/10 text-[#16A34A] dark:text-[#F0D060] border border-[#16A34A]/20 shrink-0">
                         Vrat
                       </span>
                     )}
@@ -463,12 +463,12 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
             </div>
 
             {/* Detailed Nutrition Card & Gram Slider (7 cols) */}
-            <div className="lg:col-span-7 bg-[#FAFAF8] dark:bg-[#1A1D1C] p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-5">
+            <div className="lg:col-span-7 bg-[#FAFAF8] dark:bg-[#111111] p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] space-y-5">
               <div>
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#0F6E5F]/15 text-[#0F6E5F] dark:text-[#2DD4BF]">
+                      <span className="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] dark:text-[#F0D060]">
                         {selectedIFCTItem.category}
                       </span>
                       <span className="text-[11px] font-medium text-[#6B7280] dark:text-[#9EA8A2]">
@@ -478,7 +478,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                     <h3 className="text-lg sm:text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-1">
                       {selectedIFCTItem.name}
                     </h3>
-                    <p className="text-xs text-[#0F6E5F] dark:text-[#2DD4BF] font-semibold">
+                    <p className="text-xs text-[#D4AF37] dark:text-[#F0D060] font-semibold">
                       {selectedIFCTItem.hindiName} {selectedIFCTItem.marathiName ? `• ${selectedIFCTItem.marathiName}` : ''}
                     </p>
                   </div>
@@ -494,13 +494,13 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
               </div>
 
               {/* Dynamic Grams Slider */}
-              <div className="bg-white dark:bg-[#111312] p-4 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C]">
+              <div className="bg-white dark:bg-[#070707] p-4 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416]">
                 <div className="flex items-center justify-between text-xs font-semibold mb-2">
                   <span className="text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
-                    <Sliders className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                    <Sliders className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
                     Adjust Serving Weight:
                   </span>
-                  <span className="text-[#0F6E5F] dark:text-[#2DD4BF] font-bold text-sm">
+                  <span className="text-[#D4AF37] dark:text-[#F0D060] font-bold text-sm">
                     {portionGrams} grams
                   </span>
                 </div>
@@ -511,7 +511,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                   step={5}
                   value={portionGrams}
                   onChange={(e) => setPortionGrams(Number(e.target.value))}
-                  className="w-full accent-[#0F6E5F] cursor-pointer"
+                  className="w-full accent-[#D4AF37] cursor-pointer"
                 />
                 <div className="flex items-center justify-between text-[11px] text-[#6B7280] dark:text-[#9EA8A2] mt-1">
                   <span>10g</span>
@@ -522,24 +522,24 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
 
               {/* Calculated Macros for Adjusted Serving */}
               <div className="grid grid-cols-4 gap-2">
-                <div className="bg-white dark:bg-[#111312] p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] text-center">
+                <div className="bg-white dark:bg-[#070707] p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] text-center">
                   <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] block">Calories</span>
                   <span className="text-base font-bold text-[#E8912D]">{customMacros.calories}</span>
                   <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">kcal</span>
                 </div>
-                <div className="bg-white dark:bg-[#111312] p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] text-center">
+                <div className="bg-white dark:bg-[#070707] p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] text-center">
                   <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] block">Protein</span>
-                  <span className="text-base font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">{customMacros.proteinG}g</span>
-                  <span className="text-[10px] text-[#0F6E5F] dark:text-[#2DD4BF]">
+                  <span className="text-base font-bold text-[#D4AF37] dark:text-[#F0D060]">{customMacros.proteinG}g</span>
+                  <span className="text-[10px] text-[#D4AF37] dark:text-[#F0D060]">
                     ({customMacros.proteinPerGram}g/g)
                   </span>
                 </div>
-                <div className="bg-white dark:bg-[#111312] p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] text-center">
+                <div className="bg-white dark:bg-[#070707] p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] text-center">
                   <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] block">Carbs</span>
                   <span className="text-base font-bold text-[#3B82F6]">{customMacros.carbsG}g</span>
                   <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">Fiber: {customMacros.fiberG}g</span>
                 </div>
-                <div className="bg-white dark:bg-[#111312] p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] text-center">
+                <div className="bg-white dark:bg-[#070707] p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] text-center">
                   <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] block">Fats</span>
                   <span className="text-base font-bold text-[#F59E0B]">{customMacros.fatG}g</span>
                   <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">
@@ -550,7 +550,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
 
               {/* Scientific Bioavailability Notes */}
               <div className="space-y-2.5 text-xs">
-                <div className="p-3 rounded-xl bg-white dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+                <div className="p-3 rounded-xl bg-white dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416]">
                   <span className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9] block mb-0.5">
                     Biochemical & Satiety Insight:
                   </span>
@@ -559,8 +559,8 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
                   </p>
                 </div>
 
-                <div className="p-3 rounded-xl bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/15 border border-[#0F6E5F]/20">
-                  <span className="font-bold text-[#0F6E5F] dark:text-[#2DD4BF] block mb-0.5">
+                <div className="p-3 rounded-xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/15 border border-[#D4AF37]/20">
+                  <span className="font-bold text-[#D4AF37] dark:text-[#F0D060] block mb-0.5">
                     Evidence-Based Fitness Hack:
                   </span>
                   <p className="text-[#374151] dark:text-[#D1D5DB] leading-relaxed text-[11px]">
@@ -586,7 +586,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+            <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
               <div className="flex items-center gap-2 font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9] mb-2">
                 <Flame className="w-4 h-4 text-[#E8912D]" />
                 <span>Pure Desi Ghee</span>
@@ -601,7 +601,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+            <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
               <div className="flex items-center gap-2 font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9] mb-2">
                 <Droplet className="w-4 h-4 text-[#F59E0B]" />
                 <span>Mustard / Groundnut Oil</span>
@@ -616,15 +616,15 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 border border-[#0F6E5F]/30">
-              <div className="flex items-center gap-2 font-bold text-sm text-[#0F6E5F] dark:text-[#2DD4BF] mb-2">
+            <div className="p-4 rounded-xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 border border-[#D4AF37]/30">
+              <div className="flex items-center gap-2 font-bold text-sm text-[#D4AF37] dark:text-[#F0D060] mb-2">
                 <Award className="w-4 h-4 text-[#E8912D]" />
                 <span>Simulated Weekly Savings</span>
               </div>
               <div className="text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                 -{Math.round(tadkaFatReductionG * 9 * 7)} <span className="text-xs font-normal text-[#6B7280]">kcal/week</span>
               </div>
-              <p className="text-xs text-[#0F6E5F] dark:text-[#2DD4BF] font-semibold mt-1">
+              <p className="text-xs text-[#D4AF37] dark:text-[#F0D060] font-semibold mt-1">
                 ≈ {((tadkaFatReductionG * 9 * 7) / 7700).toFixed(2)} kg body fat reduction / month
               </p>
             </div>
@@ -645,8 +645,8 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-3">
-              <span className="font-bold text-sm text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center gap-1.5">
+            <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] space-y-3">
+              <span className="font-bold text-sm text-[#D4AF37] dark:text-[#F0D060] flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4" />
                 Vrat-Approved High-Protein Staples
               </span>
@@ -666,7 +666,7 @@ export const IndianCuisineIntelligence: React.FC<IndianCuisineIntelligenceProps>
               </ul>
             </div>
 
-            <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-3">
+            <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] space-y-3">
               <span className="font-bold text-sm text-[#E8912D] flex items-center gap-1.5">
                 <Zap className="w-4 h-4" />
                 Fasting Pre-Workout Fuel Matrix

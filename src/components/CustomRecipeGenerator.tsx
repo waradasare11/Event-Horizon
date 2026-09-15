@@ -197,16 +197,16 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
   return (
     <div className="space-y-6 text-left">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#242826] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center">
-              <ChefHat className="w-5 h-5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+            <div className="w-8 h-8 rounded-lg bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center">
+              <ChefHat className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060]" />
             </div>
             <h2 className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
               AI Macro-Friendly Recipe Generator
             </h2>
-            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF]">
+            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]">
               Gemini 3.7 Flash
             </span>
           </div>
@@ -220,8 +220,8 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
             onClick={() => setActiveTab('create')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               activeTab === 'create'
-                ? 'bg-[#0F6E5F] text-white shadow-xs'
-                : 'bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
+                ? 'bg-[#D4AF37] text-white shadow-xs'
+                : 'bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
             }`}
           >
             Create New Recipe
@@ -230,8 +230,8 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
             onClick={() => setActiveTab('saved')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'saved'
-                ? 'bg-[#0F6E5F] text-white shadow-xs'
-                : 'bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
+                ? 'bg-[#D4AF37] text-white shadow-xs'
+                : 'bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
             }`}
           >
             <Bookmark className="w-3.5 h-3.5" />
@@ -242,7 +242,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
 
       {/* Toast Alert */}
       {successToast && (
-        <div className="p-3.5 rounded-xl bg-[#16A34A]/10 dark:bg-[#16A34A]/20 border border-[#16A34A]/20 dark:border-[#16A34A]/30 text-[#16A34A] dark:text-emerald-400 text-xs font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+        <div className="p-3.5 rounded-xl bg-[#16A34A]/10 dark:bg-[#16A34A]/20 border border-[#16A34A]/20 dark:border-[#16A34A]/30 text-[#16A34A] dark:text-[#F0D060] text-xs font-semibold flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{successToast}</span>
         </div>
@@ -260,7 +260,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
       {activeTab === 'create' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Controls & Parameters Form (5 Cols) */}
-          <div className="lg:col-span-5 bg-white dark:bg-[#161817] p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-5">
+          <div className="lg:col-span-5 bg-white dark:bg-[#111111] p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-5">
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] uppercase tracking-wide">
@@ -269,7 +269,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                 <button
                   type="button"
                   onClick={handleFitRemaining}
-                  className="text-[11px] font-bold text-[#0F6E5F] dark:text-[#2DD4BF] hover:underline flex items-center gap-1 cursor-pointer"
+                  className="text-[11px] font-bold text-[#D4AF37] dark:text-[#F0D060] hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <Sparkles className="w-3 h-3 text-[#E8912D]" />
                   <span>Fit Today's Remaining ({remainingCalories} kcal)</span>
@@ -286,8 +286,8 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                       onClick={() => handleSelectPreset(preset)}
                       className={`p-2.5 rounded-xl text-left border transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/20 ring-1 ring-[#0F6E5F] dark:ring-[#2DD4BF]'
-                          : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312] hover:bg-white dark:hover:bg-[#1E201F]'
+                          ? 'border-[#D4AF37] dark:border-[#F0D060] bg-[#D4AF37]/5 dark:bg-[#D4AF37]/20 ring-1 ring-[#D4AF37] dark:ring-[#F0D060]'
+                          : 'border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] hover:bg-white dark:hover:bg-[#1E201F]'
                       }`}
                     >
                       <div className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">{preset.label}</div>
@@ -301,7 +301,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
             </div>
 
             {/* Target Calorie & Protein Sliders / Numbers */}
-            <div className="space-y-4 pt-2 border-t border-[#E5E7EB] dark:border-[#242826]">
+            <div className="space-y-4 pt-2 border-t border-[#E5E7EB] dark:border-[#2A2416]">
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold mb-1">
                   <span className="flex items-center gap-1 text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -317,7 +317,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                   step={10}
                   value={targetCalories}
                   onChange={(e) => setTargetCalories(Number(e.target.value))}
-                  className="w-full accent-[#0F6E5F] dark:accent-[#2DD4BF] cursor-pointer"
+                  className="w-full accent-[#D4AF37] dark:accent-[#F0D060] cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">
                   <span>150 kcal (Light Snack)</span>
@@ -328,10 +328,10 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
               <div>
                 <div className="flex items-center justify-between text-xs font-semibold mb-1">
                   <span className="flex items-center gap-1 text-[#1A1D1B] dark:text-[#E8ECE9]">
-                    <Dumbbell className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                    <Dumbbell className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
                     <span>Target Recipe Protein:</span>
                   </span>
-                  <span className="font-bold text-[#0F6E5F] dark:text-[#2DD4BF] text-sm">{targetProtein} g</span>
+                  <span className="font-bold text-[#D4AF37] dark:text-[#F0D060] text-sm">{targetProtein} g</span>
                 </div>
                 <input
                   type="range"
@@ -340,7 +340,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                   step={1}
                   value={targetProtein}
                   onChange={(e) => setTargetProtein(Number(e.target.value))}
-                  className="w-full accent-[#0F6E5F] dark:accent-[#2DD4BF] cursor-pointer"
+                  className="w-full accent-[#D4AF37] dark:accent-[#F0D060] cursor-pointer"
                 />
                 <div className="flex justify-between text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">
                   <span>15g (Min Satiety)</span>
@@ -350,7 +350,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
             </div>
 
             {/* Custom Inputs */}
-            <div className="space-y-3 pt-2 border-t border-[#E5E7EB] dark:border-[#242826]">
+            <div className="space-y-3 pt-2 border-t border-[#E5E7EB] dark:border-[#2A2416]">
               <div>
                 <label className="block text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
                   Ingredients In My Fridge / Pantry (Optional):
@@ -364,7 +364,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                   }
                   value={availableIngredients}
                   onChange={(e) => setAvailableIngredients(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
+                  className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                 />
               </div>
 
@@ -376,7 +376,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                   <select
                     value={maxCookTime}
                     onChange={(e) => setMaxCookTime(Number(e.target.value))}
-                    className="w-full text-xs p-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value={10}>⚡ 10 Minutes (Ultra Fast)</option>
                     <option value={20}>⏱️ 20 Minutes (Standard)</option>
@@ -392,7 +392,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                   <select
                     value={cuisineStyle}
                     onChange={(e) => setCuisineStyle(e.target.value)}
-                    className="w-full text-xs p-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value="High-Protein Global & Mediterranean">Global / Med</option>
                     <option value="High-Protein Indian Style (Tikka/Curry/Dal)">High-Protein Indian</option>
@@ -412,7 +412,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                   placeholder="e.g. Extra crunchy, chocolate fix, high fiber, single-pan only"
                   value={specialNotes}
                   onChange={(e) => setSpecialNotes(e.target.value)}
-                  className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                  className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                 />
               </div>
             </div>
@@ -421,7 +421,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
             <button
               onClick={handleGenerateRecipe}
               disabled={isGenerating}
-              className="w-full py-3.5 px-4 rounded-xl bg-[#0F6E5F] dark:bg-[#0F6E5F] text-white font-bold text-xs sm:text-sm hover:bg-[#0D5B4F] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+              className="w-full py-3.5 px-4 rounded-xl bg-[#D4AF37] dark:bg-[#D4AF37] text-white font-bold text-xs sm:text-sm hover:bg-[#A68523] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
             >
               {isGenerating ? (
                 <>
@@ -440,11 +440,11 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
           {/* Right Recipe Output & Detail (7 Cols) */}
           <div className="lg:col-span-7 space-y-4">
             {generatedRecipe ? (
-              <div className="bg-white dark:bg-[#161817] p-6 sm:p-7 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-6 animate-in fade-in duration-300">
+              <div className="bg-white dark:bg-[#111111] p-6 sm:p-7 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-6 animate-in fade-in duration-300">
                 {/* Recipe Title & Meta Header */}
-                <div className="border-b border-[#E5E7EB] dark:border-[#242826] pb-5 space-y-2">
+                <div className="border-b border-[#E5E7EB] dark:border-[#2A2416] pb-5 space-y-2">
                   <div className="flex items-center justify-between flex-wrap gap-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF]">
+                    <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]">
                       {generatedRecipe.headlineTag}
                     </span>
                     <div className="flex items-center gap-2 text-xs text-[#6B7280] dark:text-[#9EA8A2]">
@@ -466,33 +466,33 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
 
                   {/* Macros Bar */}
                   <div className="grid grid-cols-5 gap-2 pt-2">
-                    <div className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
+                    <div className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-center">
                       <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] uppercase font-bold">Calories</div>
                       <div className="text-sm sm:text-base font-extrabold text-[#E8912D]">
                         {generatedRecipe.totalCalories}
                       </div>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
-                      <div className="text-[10px] text-[#0F6E5F] dark:text-[#2DD4BF] uppercase font-bold">Protein</div>
-                      <div className="text-sm sm:text-base font-extrabold text-[#0F6E5F] dark:text-[#2DD4BF]">
+                    <div className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-center">
+                      <div className="text-[10px] text-[#D4AF37] dark:text-[#F0D060] uppercase font-bold">Protein</div>
+                      <div className="text-sm sm:text-base font-extrabold text-[#D4AF37] dark:text-[#F0D060]">
                         {generatedRecipe.proteinG}g
                       </div>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
+                    <div className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-center">
                       <div className="text-[10px] text-[#3B82F6] dark:text-[#60A5FA] uppercase font-bold">Carbs</div>
                       <div className="text-sm sm:text-base font-extrabold text-[#3B82F6] dark:text-[#60A5FA]">
                         {generatedRecipe.carbsG}g
                       </div>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
+                    <div className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-center">
                       <div className="text-[10px] text-[#F59E0B] dark:text-[#FBBF24] uppercase font-bold">Fat</div>
                       <div className="text-sm sm:text-base font-extrabold text-[#F59E0B] dark:text-[#FBBF24]">
                         {generatedRecipe.fatG}g
                       </div>
                     </div>
-                    <div className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
-                      <div className="text-[10px] text-[#16A34A] dark:text-emerald-400 uppercase font-bold">Fiber</div>
-                      <div className="text-sm sm:text-base font-extrabold text-[#16A34A] dark:text-emerald-400">
+                    <div className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-center">
+                      <div className="text-[10px] text-[#16A34A] dark:text-[#F0D060] uppercase font-bold">Fiber</div>
+                      <div className="text-sm sm:text-base font-extrabold text-[#16A34A] dark:text-[#F0D060]">
                         {generatedRecipe.fiberG}g
                       </div>
                     </div>
@@ -500,8 +500,8 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                 </div>
 
                 {/* Science & Alignment Highlight */}
-                <div className="p-4 rounded-xl bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/15 border border-[#0F6E5F]/20 dark:border-[#0F6E5F]/30 text-xs text-[#374151] dark:text-[#D1D5DB] space-y-2">
-                  <div className="flex items-center gap-2 font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">
+                <div className="p-4 rounded-xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/15 border border-[#D4AF37]/20 dark:border-[#D4AF37]/30 text-xs text-[#374151] dark:text-[#D1D5DB] space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-[#D4AF37] dark:text-[#F0D060]">
                     <Lightbulb className="w-4 h-4 text-[#E8912D]" />
                     <span>Scientific Muscle & Satiety Rationale</span>
                   </div>
@@ -527,15 +527,15 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                           onClick={() => toggleIngredientCheck(idx)}
                           className={`w-full p-2.5 rounded-xl border text-left text-xs transition-all flex items-center justify-between cursor-pointer ${
                             isChecked
-                              ? 'bg-[#FAFAF8] dark:bg-[#111312] border-[#E5E7EB] dark:border-[#242826] line-through text-[#9CA3AF] dark:text-[#6B7280]'
-                              : 'bg-white dark:bg-[#191B1A] border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] hover:border-[#0F6E5F]/50 dark:hover:border-[#2DD4BF]/50'
+                              ? 'bg-[#FAFAF8] dark:bg-[#070707] border-[#E5E7EB] dark:border-[#2A2416] line-through text-[#9CA3AF] dark:text-[#6B7280]'
+                              : 'bg-white dark:bg-[#191B1A] border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] hover:border-[#D4AF37]/50 dark:hover:border-[#F0D060]/50'
                           }`}
                         >
                           <div className="flex items-center gap-2.5">
                             <div
                               className={`w-4 h-4 rounded-md border flex items-center justify-center text-[10px] ${
                                 isChecked
-                                  ? 'bg-[#0F6E5F] dark:bg-[#2DD4BF] border-[#0F6E5F] dark:border-[#2DD4BF] text-white dark:text-gray-900'
+                                  ? 'bg-[#D4AF37] dark:bg-[#F0D060] border-[#D4AF37] dark:border-[#F0D060] text-white dark:text-gray-900'
                                   : 'border-[#D1D5DB] dark:border-[#4B5563]'
                               }`}
                             >
@@ -544,7 +544,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                             <span className="font-semibold">{ing.item}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">{ing.amount}</span>
+                            <span className="font-bold text-[#D4AF37] dark:text-[#F0D060]">{ing.amount}</span>
                             {ing.macrosContribution && (
                               <span className="text-[10px] text-[#9CA3AF] dark:text-[#6B7280] hidden sm:inline">
                                 ({ing.macrosContribution})
@@ -571,15 +571,15 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                           onClick={() => toggleStepCheck(idx)}
                           className={`p-3 rounded-xl border text-xs cursor-pointer transition-all flex items-start gap-3 ${
                             isDone
-                              ? 'bg-[#FAFAF8] dark:bg-[#111312] border-[#E5E7EB] dark:border-[#242826] text-[#9CA3AF] dark:text-[#6B7280] line-through'
-                              : 'bg-[#FAFAF8] dark:bg-[#111312] border-[#E5E7EB] dark:border-[#242826] text-[#374151] dark:text-[#D1D5DB] hover:border-[#0F6E5F] dark:hover:border-[#2DD4BF]'
+                              ? 'bg-[#FAFAF8] dark:bg-[#070707] border-[#E5E7EB] dark:border-[#2A2416] text-[#9CA3AF] dark:text-[#6B7280] line-through'
+                              : 'bg-[#FAFAF8] dark:bg-[#070707] border-[#E5E7EB] dark:border-[#2A2416] text-[#374151] dark:text-[#D1D5DB] hover:border-[#D4AF37] dark:hover:border-[#F0D060]'
                           }`}
                         >
                           <span
                             className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
                               isDone
                                 ? 'bg-[#16A34A] text-white'
-                                : 'bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF]'
+                                : 'bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]'
                             }`}
                           >
                             {idx + 1}
@@ -592,15 +592,15 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                 </div>
 
                 {/* Chef Science Tip */}
-                <div className="p-3.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-xs text-[#6B7280] dark:text-[#9EA8A2]">
+                <div className="p-3.5 rounded-xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-xs text-[#6B7280] dark:text-[#9EA8A2]">
                   🧑‍🍳 <strong>Chef's Science Tip:</strong> {generatedRecipe.chefScienceTip}
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row items-center gap-3 pt-3 border-t border-[#E5E7EB] dark:border-[#242826]">
+                <div className="flex flex-col sm:flex-row items-center gap-3 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2416]">
                   <button
                     onClick={() => handleLogToDailyTracker(generatedRecipe)}
-                    className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#0F6E5F] dark:bg-[#0F6E5F] text-white font-bold text-xs hover:bg-[#0D5B4F] transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+                    className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-[#D4AF37] dark:bg-[#D4AF37] text-white font-bold text-xs hover:bg-[#A68523] transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
                   >
                     <Plus className="w-4 h-4 text-[#E8912D]" />
                     <span>Log to Today's Food Tracker</span>
@@ -608,11 +608,11 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
 
                   <button
                     onClick={handleSaveToRecipeBook}
-                    className="w-full sm:w-auto py-3 px-4 rounded-xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] text-[#1A1D1B] dark:text-[#E8ECE9] font-semibold text-xs hover:bg-[#FAFAF8] dark:hover:bg-[#1E201F] transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
+                    className="w-full sm:w-auto py-3 px-4 rounded-xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] font-semibold text-xs hover:bg-[#FAFAF8] dark:hover:bg-[#1E201F] transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
                   >
                     {generatedRecipe.isBookmarked ? (
                       <>
-                        <BookmarkCheck className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                        <BookmarkCheck className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
                         <span>Saved</span>
                       </>
                     ) : (
@@ -625,9 +625,9 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="bg-white dark:bg-[#161817] p-12 rounded-2xl border border-dashed border-[#E5E7EB] dark:border-[#2A2E2C] text-center space-y-4">
-                <div className="w-14 h-14 rounded-2xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center mx-auto">
-                  <ChefHat className="w-8 h-8 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+              <div className="bg-white dark:bg-[#111111] p-12 rounded-2xl border border-dashed border-[#E5E7EB] dark:border-[#2A2416] text-center space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center mx-auto">
+                  <ChefHat className="w-8 h-8 text-[#D4AF37] dark:text-[#F0D060]" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -640,7 +640,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                 <button
                   onClick={handleGenerateRecipe}
                   disabled={isGenerating}
-                  className="px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-semibold hover:bg-[#0D5B4F] transition-all shadow-xs cursor-pointer"
+                  className="px-6 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs font-semibold hover:bg-[#A68523] transition-all shadow-xs cursor-pointer"
                 >
                   Generate {targetCalories} kcal Meal Now
                 </button>
@@ -658,11 +658,11 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
               {savedRecipes.map((recipe) => (
                 <div
                   key={recipe.id}
-                  className="bg-white dark:bg-[#161817] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs flex flex-col justify-between space-y-4 hover:border-[#0F6E5F] dark:hover:border-[#2DD4BF] transition-all"
+                  className="bg-white dark:bg-[#111111] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs flex flex-col justify-between space-y-4 hover:border-[#D4AF37] dark:hover:border-[#F0D060] transition-all"
                 >
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF]">
+                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]">
                         {recipe.mealCategory}
                       </span>
                       <button
@@ -682,39 +682,39 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
                     </p>
 
                     {/* Macros grid */}
-                    <div className="grid grid-cols-4 gap-1.5 mt-3 pt-3 border-t border-[#E5E7EB] dark:border-[#242826] text-center">
-                      <div className="p-1.5 rounded bg-[#FAFAF8] dark:bg-[#111312]">
+                    <div className="grid grid-cols-4 gap-1.5 mt-3 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2416] text-center">
+                      <div className="p-1.5 rounded bg-[#FAFAF8] dark:bg-[#070707]">
                         <div className="text-[9px] text-[#6B7280] dark:text-[#9EA8A2]">Cals</div>
                         <div className="text-xs font-bold text-[#E8912D]">{recipe.totalCalories}</div>
                       </div>
-                      <div className="p-1.5 rounded bg-[#FAFAF8] dark:bg-[#111312]">
+                      <div className="p-1.5 rounded bg-[#FAFAF8] dark:bg-[#070707]">
                         <div className="text-[9px] text-[#6B7280] dark:text-[#9EA8A2]">Protein</div>
-                        <div className="text-xs font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">{recipe.proteinG}g</div>
+                        <div className="text-xs font-bold text-[#D4AF37] dark:text-[#F0D060]">{recipe.proteinG}g</div>
                       </div>
-                      <div className="p-1.5 rounded bg-[#FAFAF8] dark:bg-[#111312]">
+                      <div className="p-1.5 rounded bg-[#FAFAF8] dark:bg-[#070707]">
                         <div className="text-[9px] text-[#6B7280] dark:text-[#9EA8A2]">Carbs</div>
                         <div className="text-xs font-bold text-[#3B82F6] dark:text-[#60A5FA]">{recipe.carbsG}g</div>
                       </div>
-                      <div className="p-1.5 rounded bg-[#FAFAF8] dark:bg-[#111312]">
+                      <div className="p-1.5 rounded bg-[#FAFAF8] dark:bg-[#070707]">
                         <div className="text-[9px] text-[#6B7280] dark:text-[#9EA8A2]">Fat</div>
                         <div className="text-xs font-bold text-[#F59E0B] dark:text-[#FBBF24]">{recipe.fatG}g</div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 pt-2 border-t border-[#E5E7EB] dark:border-[#242826]">
+                  <div className="flex items-center gap-2 pt-2 border-t border-[#E5E7EB] dark:border-[#2A2416]">
                     <button
                       onClick={() => {
                         setGeneratedRecipe(recipe);
                         setActiveTab('create');
                       }}
-                      className="flex-1 py-2 rounded-lg bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs font-semibold hover:bg-white dark:hover:bg-[#1E201F] cursor-pointer"
+                      className="flex-1 py-2 rounded-lg bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs font-semibold hover:bg-white dark:hover:bg-[#1E201F] cursor-pointer"
                     >
                       View Recipe
                     </button>
                     <button
                       onClick={() => handleLogToDailyTracker(recipe)}
-                      className="py-2 px-3 rounded-lg bg-[#0F6E5F] text-white text-xs font-semibold hover:bg-[#0D5B4F] cursor-pointer"
+                      className="py-2 px-3 rounded-lg bg-[#D4AF37] text-white text-xs font-semibold hover:bg-[#A68523] cursor-pointer"
                       title="Log to today's food tracker"
                     >
                       + Log
@@ -724,8 +724,8 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
               ))}
             </div>
           ) : (
-            <div className="bg-white dark:bg-[#161817] p-12 rounded-2xl border border-dashed border-[#E5E7EB] dark:border-[#2A2E2C] text-center space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center mx-auto">
+            <div className="bg-white dark:bg-[#111111] p-12 rounded-2xl border border-dashed border-[#E5E7EB] dark:border-[#2A2416] text-center space-y-3">
+              <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center mx-auto">
                 <Bookmark className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">No Saved Recipes Yet</h3>
@@ -734,7 +734,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
               </p>
               <button
                 onClick={() => setActiveTab('create')}
-                className="px-5 py-2 rounded-xl bg-[#0F6E5F] text-white text-xs font-semibold hover:bg-[#0D5B4F] cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-[#D4AF37] text-white text-xs font-semibold hover:bg-[#A68523] cursor-pointer"
               >
                 Create Recipe
               </button>

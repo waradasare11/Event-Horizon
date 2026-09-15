@@ -105,17 +105,17 @@ export const WeeklyLiftingVolumeChart: React.FC<WeeklyLiftingVolumeChartProps> =
   const peakVolume = Math.max(...weeklyData.map((w) => w.totalVolumeKg));
 
   return (
-    <div className="bg-white dark:bg-[#161817] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-5 text-left">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E7EB] dark:border-[#242826] pb-4">
+    <div className="bg-white dark:bg-[#111111] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-5 text-left">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] border border-[#0F6E5F]/20">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] border border-[#D4AF37]/20">
               Progressive Overload Tonnage
             </span>
             <span className="text-xs text-gray-500 dark:text-gray-400">Past 3 Months (12 Weeks)</span>
           </div>
           <h3 className="text-lg font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-1 flex items-center gap-2">
-            <Dumbbell className="w-5 h-5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+            <Dumbbell className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060]" />
             <span>Weekly Total Lifting Volume (Sets × Reps × Weight)</span>
           </h3>
           <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
@@ -127,11 +127,11 @@ export const WeeklyLiftingVolumeChart: React.FC<WeeklyLiftingVolumeChartProps> =
         <div className="flex items-center gap-3 shrink-0">
           <div className="text-right">
             <div className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">This Week's Volume</div>
-            <div className="text-lg font-black text-[#0F6E5F] dark:text-[#2DD4BF]">
+            <div className="text-lg font-black text-[#D4AF37] dark:text-[#F0D060]">
               {currentWeekVolume.toLocaleString()} <span className="text-xs font-normal">kg</span>
             </div>
           </div>
-          <div className="px-3 py-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 flex items-center gap-1 text-xs font-black">
+          <div className="px-3 py-1.5 rounded-xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 border border-[#D4AF37]/30 text-[#A68523] dark:text-[#F0D060] flex items-center gap-1 text-xs font-black">
             <TrendingUp className="w-4 h-4" />
             <span>+{totalGrowthPct}% Overload</span>
           </div>
@@ -160,8 +160,8 @@ export const WeeklyLiftingVolumeChart: React.FC<WeeklyLiftingVolumeChartProps> =
         </div>
         <div className="p-3 rounded-xl bg-gray-50 dark:bg-[#1E201F] border border-gray-200 dark:border-[#282C2A]">
           <div className="text-[10px] text-gray-500 font-bold uppercase">Stimulus Status</div>
-          <div className="text-sm font-black text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-center gap-1">
-            <Zap className="w-3.5 h-3.5 fill-emerald-500" />
+          <div className="text-sm font-black text-[#B8922A] dark:text-[#F0D060] mt-0.5 flex items-center gap-1">
+            <Zap className="w-3.5 h-3.5 fill-[#D4AF37]" />
             <span>Optimal Hypertrophy</span>
           </div>
         </div>
@@ -173,8 +173,8 @@ export const WeeklyLiftingVolumeChart: React.FC<WeeklyLiftingVolumeChartProps> =
           <AreaChart data={weeklyData} margin={{ top: 10, right: 15, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="volumeColorGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#0F6E5F" stopOpacity={0.4} />
-                <stop offset="95%" stopColor="#0F6E5F" stopOpacity={0.0} />
+                <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.3} vertical={false} />
@@ -195,8 +195,8 @@ export const WeeklyLiftingVolumeChart: React.FC<WeeklyLiftingVolumeChartProps> =
                 if (active && payload && payload.length) {
                   const data = payload[0].payload;
                   return (
-                    <div className="bg-[#1E201F] text-white text-xs p-3.5 rounded-xl shadow-xl border border-[#2A2E2C] space-y-1.5">
-                      <div className="font-black text-emerald-400 border-b border-gray-700 pb-1 flex items-center justify-between gap-3">
+                    <div className="bg-[#1E201F] text-white text-xs p-3.5 rounded-xl shadow-xl border border-[#2A2416] space-y-1.5">
+                      <div className="font-black text-[#F0D060] border-b border-gray-700 pb-1 flex items-center justify-between gap-3">
                         <span>Week {data.weekNumber} ({data.weekLabel})</span>
                         <span className="text-[10px] text-gray-400 font-normal">{data.workoutCount} sessions</span>
                       </div>
@@ -217,12 +217,12 @@ export const WeeklyLiftingVolumeChart: React.FC<WeeklyLiftingVolumeChartProps> =
               type="monotone"
               dataKey="totalVolumeKg"
               name="Volume (kg)"
-              stroke="#0F6E5F"
+              stroke="#D4AF37"
               strokeWidth={3}
               fillOpacity={1}
               fill="url(#volumeColorGradient)"
-              dot={{ r: 4, fill: '#0F6E5F', strokeWidth: 2, stroke: '#FFFFFF' }}
-              activeDot={{ r: 6, fill: '#2DD4BF', stroke: '#0F6E5F', strokeWidth: 2 }}
+              dot={{ r: 4, fill: '#D4AF37', strokeWidth: 2, stroke: '#FFFFFF' }}
+              activeDot={{ r: 6, fill: '#F0D060', stroke: '#D4AF37', strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>

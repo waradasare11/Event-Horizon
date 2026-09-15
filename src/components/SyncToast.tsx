@@ -38,22 +38,22 @@ export const SyncToast: React.FC<SyncToastProps> = ({
       aria-live="polite"
       className="fixed bottom-5 right-5 z-50 max-w-md w-[calc(100vw-2.5rem)] animate-in fade-in slide-in-from-bottom-5 duration-300"
     >
-      <div className="relative overflow-hidden rounded-2xl bg-[#0F1528]/95 dark:bg-[#0B0F1E]/95 backdrop-blur-xl border border-cyan-500/40 shadow-2xl shadow-cyan-950/60 p-4 text-[#F8FAFC]">
+      <div className="relative overflow-hidden rounded-2xl bg-[#0F1528]/95 dark:bg-[#0B0F1E]/95 backdrop-blur-xl border border-[#D4AF37]/40 shadow-2xl shadow-[#D4AF37]/60 p-4 text-[#F8FAFC]">
         {/* Glowing Cosmic Accent Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-purple-500 to-indigo-500" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#D4AF37] via-[#D4AF37] to-indigo-500" />
         
         {/* Radial Ambient Glow */}
-        <div className="absolute -top-10 -right-10 w-28 h-28 bg-cyan-500/20 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-10 -right-10 w-28 h-28 bg-[#D4AF37]/20 rounded-full blur-2xl pointer-events-none" />
 
         <div className="flex items-start gap-3.5">
           {/* Vortex Status Icon */}
           <div className="relative shrink-0 mt-0.5">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-600/20 border border-cyan-400/50 flex items-center justify-center text-cyan-300 shadow-inner">
-              <CheckCircle2 className="w-5 h-5 text-cyan-300 animate-pulse" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D4AF37]/20 to-[#A68523]/20 border border-[#D4AF37]/50 flex items-center justify-center text-[#F0D060] shadow-inner">
+              <CheckCircle2 className="w-5 h-5 text-[#F0D060] animate-pulse" />
             </div>
             <span className="absolute -bottom-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-cyan-400" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#D4AF37]" />
             </span>
           </div>
 
@@ -61,7 +61,7 @@ export const SyncToast: React.FC<SyncToastProps> = ({
             <div className="flex items-center gap-2 flex-wrap">
               <h4 className="font-bold text-sm tracking-wide text-white flex items-center gap-1.5 font-['Space_Grotesk',sans-serif]">
                 <span>{message}</span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/20 border border-cyan-400/30 text-cyan-300">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/30 text-[#F0D060]">
                   {source === 'drive' ? 'Google Drive' : 'Cloud DB'}
                 </span>
               </h4>
@@ -72,10 +72,10 @@ export const SyncToast: React.FC<SyncToastProps> = ({
             </p>
 
             <div className="flex items-center gap-2 mt-2 text-[11px] text-slate-400">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#F0D060]" />
               <span>Synced at {displayTime}</span>
               <span>•</span>
-              <span className="text-cyan-300/90 font-medium">Local Cache Active</span>
+              <span className="text-[#F0D060]/90 font-medium">Local Cache Active</span>
             </div>
           </div>
 

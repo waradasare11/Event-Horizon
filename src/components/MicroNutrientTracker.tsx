@@ -282,7 +282,7 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E7EB] dark:border-[#232B3E] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 dark:bg-cyan-500/15 text-[#0F6E5F] dark:text-cyan-400 border border-transparent dark:border-cyan-500/20">
+            <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/15 text-[#D4AF37] dark:text-[#D4AF37] border border-transparent dark:border-[#D4AF37]/20">
               Micronutrient & Electrolyte Tracking
             </span>
             <span className="text-xs text-[#6B7280] dark:text-slate-400">
@@ -300,9 +300,9 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
         <button
           type="button"
           onClick={() => setShowScienceGuide(!showScienceGuide)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#182032] border border-[#E5E7EB] dark:border-[#232B3E] text-xs font-semibold text-[#4B5563] dark:text-slate-300 hover:text-[#1A1D1B] dark:hover:text-white hover:border-[#0F6E5F] dark:hover:border-cyan-500/50 transition-all self-start sm:self-auto"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#182032] border border-[#E5E7EB] dark:border-[#232B3E] text-xs font-semibold text-[#4B5563] dark:text-slate-300 hover:text-[#1A1D1B] dark:hover:text-white hover:border-[#D4AF37] dark:hover:border-[#D4AF37]/50 transition-all self-start sm:self-auto"
         >
-          <Info className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-cyan-400" />
+          <Info className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#D4AF37]" />
           <span>{showScienceGuide ? 'Hide Science Notes' : 'Why These Micros Matter'}</span>
         </button>
       </div>
@@ -310,13 +310,13 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
       {/* SCIENTIFIC EDUCATION ACCORDION */}
       {showScienceGuide && (
         <div className="p-4 sm:p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#161D2B] border border-[#E5E7EB] dark:border-[#232B3E] text-xs leading-relaxed text-[#374151] dark:text-slate-300 space-y-3 animate-in fade-in duration-200">
-          <div className="flex items-center gap-2 font-bold text-[#0F6E5F] dark:text-cyan-400">
+          <div className="flex items-center gap-2 font-bold text-[#D4AF37] dark:text-[#D4AF37]">
             <Sparkles className="w-4 h-4 text-[#E8912D]" />
             <span>The Sports Science of Micronutrient Sufficiency</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
             <div className="p-3 bg-white dark:bg-[#111622] rounded-xl border border-[#E5E7EB] dark:border-[#232B3E]">
-              <div className="font-bold text-[#16A34A] dark:text-emerald-400 flex items-center gap-1.5 mb-1">
+              <div className="font-bold text-[#16A34A] dark:text-[#F0D060] flex items-center gap-1.5 mb-1">
                 <Wheat className="w-4 h-4" />
                 <span>Fiber (14g / 1,000 kcal)</span>
               </div>
@@ -404,15 +404,15 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
 
       {/* ALL MICRONUTRIENTS MET BANNER (IF ZERO WARNINGS AND LOGS EXIST) */}
       {mealLogs.length > 0 && activeWarnings.length === 0 && !highSodiumWarning && (
-        <div className="p-4 rounded-2xl bg-emerald-50/90 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 flex items-center justify-center shrink-0">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+        <div className="p-4 rounded-2xl bg-[#FFFBF0]/90 dark:bg-[#2A2416]/40 border border-[#E6D7A8] dark:border-[#2A2416]/60 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5 text-[#B8922A] dark:text-[#F0D060]" />
           </div>
           <div>
-            <div className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
+            <div className="text-xs font-bold text-[#6A5312] dark:text-[#F0D060]">
               Optimal Micronutrient & Electrolyte Sufficiency Achieved! 🎉
             </div>
-            <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
+            <p className="text-[11px] text-[#A68523] dark:text-[#F0D060] mt-0.5">
               Your Fiber, Sodium, Calcium, and Potassium levels all meet or exceed scientifically recommended athletic thresholds today.
             </p>
           </div>
@@ -433,7 +433,7 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
               className={`p-4 sm:p-5 rounded-2xl border transition-all flex flex-col justify-between ${
                 isDeficient
                   ? 'bg-amber-50/30 dark:bg-amber-950/20 border-amber-300 dark:border-amber-700/50 ring-1 ring-amber-300/50 dark:ring-amber-500/30'
-                  : 'bg-[#FAFAF8] dark:bg-[#151C2C] border-[#E5E7EB] dark:border-[#232B3E] hover:border-[#0F6E5F] dark:hover:border-cyan-500/50'
+                  : 'bg-[#FAFAF8] dark:bg-[#151C2C] border-[#E5E7EB] dark:border-[#232B3E] hover:border-[#D4AF37] dark:hover:border-[#D4AF37]/50'
               }`}
             >
               <div>
@@ -475,7 +475,7 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
 
                   {/* Status Indicator */}
                   <div className="flex items-center justify-between text-[11px] mt-2">
-                    <span className={`font-semibold ${isDeficient ? 'text-amber-700 dark:text-amber-400' : 'text-[#0F6E5F] dark:text-cyan-400'}`}>
+                    <span className={`font-semibold ${isDeficient ? 'text-amber-700 dark:text-amber-400' : 'text-[#D4AF37] dark:text-[#D4AF37]'}`}>
                       {isDeficient ? '⚠️ Below Threshold' : pct >= 100 ? '✅ Target Satisfied' : `${pct}% of Target`}
                     </span>
                     <span className="text-[#6B7280] dark:text-slate-400">
@@ -490,7 +490,7 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
                 <button
                   type="button"
                   onClick={() => setExpandedCard(isExpanded ? null : micro.id)}
-                  className="w-full flex items-center justify-between text-[11px] font-bold text-[#0F6E5F] dark:text-cyan-400 hover:underline"
+                  className="w-full flex items-center justify-between text-[11px] font-bold text-[#D4AF37] dark:text-[#D4AF37] hover:underline"
                 >
                   <span>Top Food Boosters</span>
                   {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -516,8 +516,8 @@ export const MicroNutrientTracker: React.FC<MicroNutrientTrackerProps> = ({
                             disabled={isAdded}
                             className={`px-2 py-1 rounded-lg font-bold text-[10px] flex items-center gap-0.5 transition-all shrink-0 ${
                               isAdded
-                                ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
-                                : 'bg-[#0F6E5F] dark:bg-cyan-600 text-white hover:bg-[#0D5B4F] dark:hover:bg-cyan-500'
+                                ? 'bg-[#FDF3D0] dark:bg-[#2A2416]/60 text-[#8E701C] dark:text-[#F0D060]'
+                                : 'bg-[#D4AF37] dark:bg-[#A68523] text-white hover:bg-[#A68523] dark:hover:bg-[#D4AF37]'
                             }`}
                             title={`Log ${item.food} to today's meal log`}
                           >

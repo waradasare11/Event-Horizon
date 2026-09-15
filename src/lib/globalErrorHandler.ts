@@ -103,9 +103,15 @@ export async function logClientError(errorDetails: Partial<ClientErrorLog>): Pro
   // 1. Cache locally first
   saveLocalErrorLog(fullLog);
 
-  // 2. Transmit to Firestore if online
+  // 2. Transmit to Firestore if online and not an offline connectivity message
   try {
-    if (navigator.onLine && db) {
+    if (
+      navigator.onLine && 
+      db && 
+      !fullLog.message.includes('Could not reach Cloud Firestore backend') &&
+      !fullLog.message.includes('code=unavailable') &&
+      !fullLog.message.includes('client is offline')
+    ) {
       await addDoc(collection(db, ERROR_LOGS_COLLECTION), fullLog);
     }
   } catch (firestoreErr) {
@@ -161,10 +167,15 @@ export function initGlobalErrorHandler(): () => void {
   if (typeof window === 'undefined') return () => {};
 
   const handleGlobalError = (event: ErrorEvent) => {
-    // Ignore benign Vite / websocket messages in dev sandbox
+    // Ignore benign Vite / websocket messages in dev sandbox and Firestore offline messages
+    const msg = event.message || event.error?.message || '';
     if (
-      event.message?.includes('failed to connect to websocket') ||
-      event.message?.includes('ResizeObserver loop')
+      msg.includes('failed to connect to websocket') ||
+      msg.includes('ResizeObserver loop') ||
+      msg.includes('Could not reach Cloud Firestore backend') ||
+      msg.includes('The operation could not be completed') ||
+      msg.includes('code=unavailable') ||
+      msg.includes('client is offline')
     ) {
       return;
     }
@@ -181,8 +192,17 @@ export function initGlobalErrorHandler(): () => void {
 
   const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
     const reason = event.reason;
-    // Ignore benign network aborts
-    if (reason?.name === 'AbortError' || reason?.message?.includes('aborted')) {
+    const msg = reason?.message || String(reason) || '';
+    // Ignore benign network aborts and offline Firestore state
+    if (
+      reason?.name === 'AbortError' || 
+      msg.includes('aborted') ||
+      msg.includes('Could not reach Cloud Firestore backend') ||
+      msg.includes('The operation could not be completed') ||
+      msg.includes('code=unavailable') ||
+      msg.includes('client is offline') ||
+      reason?.code === 'unavailable'
+    ) {
       return;
     }
 

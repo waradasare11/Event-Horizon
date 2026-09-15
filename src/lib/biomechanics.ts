@@ -53,7 +53,7 @@ export function getBiomechanicalClassification(
     return {
       tier: 'primary_compound',
       tierLabel: 'Primary Heavy Compound',
-      badgeColor: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
+      badgeColor: 'bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border-[#D4AF37]/30',
       orderScore: 10,
       movementPattern: name.includes('squat') ? 'Squat (Knee Dominant)' :
                        name.includes('deadlift') || name.includes('rdl') ? 'Hinge (Hip Dominant)' :
@@ -137,7 +137,7 @@ export function getBiomechanicalClassification(
     return {
       tier: 'auxiliary_core',
       tierLabel: 'Core / Calves / Finisher',
-      badgeColor: 'bg-purple-500/15 text-purple-700 dark:text-purple-300 border-purple-500/30',
+      badgeColor: 'bg-[#D4AF37]/15 text-purple-700 dark:text-[#F0D060] border-[#D4AF37]/30',
       orderScore: 85,
       movementPattern: 'Core Stability & Accessories',
       jointType: 'Core/Auxiliary',

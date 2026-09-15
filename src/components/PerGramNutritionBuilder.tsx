@@ -269,20 +269,20 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
   return (
     <div className="space-y-6 text-left">
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#0F6E5F] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-[#1D9E75] animate-bounce">
-          <Check className="w-5 h-5 text-emerald-200" />
+        <div className="fixed bottom-6 right-6 z-50 bg-[#D4AF37] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-[#1D9E75] animate-bounce">
+          <Check className="w-5 h-5 text-[#F0D060]" />
           <span className="text-sm font-semibold">{toastMessage}</span>
         </div>
       )}
 
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#0F6E5F]/10 via-[#0F6E5F]/5 to-transparent dark:from-[#0F6E5F]/20 dark:to-transparent p-6 rounded-3xl border border-[#0F6E5F]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-[#D4AF37]/10 via-[#D4AF37]/5 to-transparent dark:from-[#D4AF37]/20 dark:to-transparent p-6 rounded-3xl border border-[#D4AF37]/20 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#0F6E5F] text-white uppercase tracking-wider">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#D4AF37] text-white uppercase tracking-wider">
               Gram-Precision Nutrition Engine
             </span>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 flex items-center gap-1">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#FDF3D0] dark:bg-[#2A2416]/60 text-[#8E701C] dark:text-[#F0D060] flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" />
               IFCT & USDA Certified
             </span>
@@ -299,7 +299,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
           <button
             onClick={handleSaveToMealLog}
             disabled={plateItems.length === 0}
-            className="w-full md:w-auto px-5 py-3 bg-[#0F6E5F] hover:bg-[#0D5A4E] text-white font-bold text-sm rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full md:w-auto px-5 py-3 bg-[#D4AF37] hover:bg-[#0D5A4E] text-white font-bold text-sm rounded-2xl shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             <Check className="w-4 h-4" />
             <span>Log Plate to Journal</span>
@@ -311,7 +311,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
         {/* Left Column: Active Plate & Per-Gram Calculator (7 cols) */}
         <div className="lg:col-span-7 space-y-6">
           {/* Plate Title and Meal Type */}
-          <div className="bg-white dark:bg-[#161817] p-5 rounded-3xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-4">
+          <div className="bg-white dark:bg-[#111111] p-5 rounded-3xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="sm:col-span-2">
                 <label className="text-xs font-bold text-[#5C6460] dark:text-[#9EA8A2] block mb-1">
@@ -321,7 +321,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
                   type="text"
                   value={mealTitle}
                   onChange={(e) => setMealTitle(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-[#FAFAF8] dark:bg-[#1F2421] border border-[#E5E7EB] dark:border-[#242826] rounded-xl text-sm font-bold text-[#1F2421] dark:text-[#F5F5F0] focus:ring-2 focus:ring-[#0F6E5F] outline-hidden"
+                  className="w-full px-3.5 py-2.5 bg-[#FAFAF8] dark:bg-[#1F2421] border border-[#E5E7EB] dark:border-[#2A2416] rounded-xl text-sm font-bold text-[#1F2421] dark:text-[#F5F5F0] focus:ring-2 focus:ring-[#D4AF37] outline-hidden"
                 />
               </div>
 
@@ -332,7 +332,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
                 <select
                   value={mealType}
                   onChange={(e) => setMealType(e.target.value as any)}
-                  className="w-full px-3.5 py-2.5 bg-[#FAFAF8] dark:bg-[#1F2421] border border-[#E5E7EB] dark:border-[#242826] rounded-xl text-sm font-bold text-[#1F2421] dark:text-[#F5F5F0] focus:ring-2 focus:ring-[#0F6E5F] outline-hidden"
+                  className="w-full px-3.5 py-2.5 bg-[#FAFAF8] dark:bg-[#1F2421] border border-[#E5E7EB] dark:border-[#2A2416] rounded-xl text-sm font-bold text-[#1F2421] dark:text-[#F5F5F0] focus:ring-2 focus:ring-[#D4AF37] outline-hidden"
                 >
                   <option value="Breakfast">Breakfast</option>
                   <option value="Lunch">Lunch</option>
@@ -344,8 +344,8 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
             </div>
 
             {/* Macro Summary Dashboard */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-[#F0F0EC] dark:border-[#242826]">
-              <div className="p-3 bg-[#FAFAF8] dark:bg-[#1A1D1C] rounded-2xl border border-[#E5E7EB] dark:border-[#242826] text-center">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 border-t border-[#F0F0EC] dark:border-[#2A2416]">
+              <div className="p-3 bg-[#FAFAF8] dark:bg-[#111111] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] text-center">
                 <div className="flex items-center justify-center gap-1 text-[#E8912D] text-xs font-bold mb-0.5">
                   <Flame className="w-3.5 h-3.5" />
                   <span>Calories</span>
@@ -355,12 +355,12 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
                 </div>
               </div>
 
-              <div className="p-3 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-100 dark:border-emerald-900/40 text-center">
-                <div className="flex items-center justify-center gap-1 text-[#0F6E5F] dark:text-[#1D9E75] text-xs font-bold mb-0.5">
+              <div className="p-3 bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 rounded-2xl border border-[#E6D7A8] dark:border-[#2A2416]/40 text-center">
+                <div className="flex items-center justify-center gap-1 text-[#D4AF37] dark:text-[#1D9E75] text-xs font-bold mb-0.5">
                   <Dumbbell className="w-3.5 h-3.5" />
                   <span>Protein</span>
                 </div>
-                <div className="text-lg font-black text-[#0F6E5F] dark:text-[#1D9E75]">
+                <div className="text-lg font-black text-[#D4AF37] dark:text-[#1D9E75]">
                   {totals.proteinG} <span className="text-xs font-normal text-[#6B7280]">g</span>
                 </div>
               </div>
@@ -389,13 +389,13 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
             {/* Leucine MPS Meter */}
             <div className="p-3.5 bg-blue-50/50 dark:bg-blue-950/20 rounded-2xl border border-blue-100 dark:border-blue-900/40 flex items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                <div className={`p-2 rounded-xl ${isMpsOptimal ? 'bg-emerald-500 text-white' : 'bg-blue-500 text-white'}`}>
+                <div className={`p-2 rounded-xl ${isMpsOptimal ? 'bg-[#D4AF37] text-white' : 'bg-blue-500 text-white'}`}>
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
                   <div className="text-xs font-bold text-[#1F2421] dark:text-[#F5F5F0] flex items-center gap-1.5">
                     <span>Muscle Protein Synthesis (MPS) Leucine:</span>
-                    <span className="font-extrabold text-[#0F6E5F] dark:text-emerald-400">{totals.leucineG}g</span>
+                    <span className="font-extrabold text-[#D4AF37] dark:text-[#F0D060]">{totals.leucineG}g</span>
                   </div>
                   <div className="text-[11px] text-[#5C6460] dark:text-[#9EA8A2]">
                     {isMpsOptimal
@@ -407,7 +407,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
 
               <span className={`px-2.5 py-1 rounded-xl text-[11px] font-bold ${
                 isMpsOptimal
-                  ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                  ? 'bg-[#FDF3D0] dark:bg-[#2A2416]/60 text-[#8E701C] dark:text-[#F0D060]'
                   : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
               }`}>
                 {isMpsOptimal ? 'MPS Optimized' : 'Building'}
@@ -416,10 +416,10 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
           </div>
 
           {/* Plate Items Table */}
-          <div className="bg-white dark:bg-[#161817] p-5 rounded-3xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-4">
+          <div className="bg-white dark:bg-[#111111] p-5 rounded-3xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-bold text-[#1F2421] dark:text-[#F5F5F0] flex items-center gap-2">
-                <Scale className="w-4 h-4 text-[#0F6E5F]" />
+                <Scale className="w-4 h-4 text-[#D4AF37]" />
                 <span>Ingredients on Your Plate ({plateItems.length})</span>
               </h3>
               <span className="text-xs font-bold text-[#5C6460] dark:text-[#9EA8A2]">
@@ -428,7 +428,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
             </div>
 
             {plateItems.length === 0 ? (
-              <div className="py-12 text-center border-2 border-dashed border-[#E5E7EB] dark:border-[#242826] rounded-2xl">
+              <div className="py-12 text-center border-2 border-dashed border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl">
                 <Scale className="w-10 h-10 text-[#9EA8A2] mx-auto mb-2 opacity-50" />
                 <p className="text-sm font-bold text-[#5C6460] dark:text-[#9EA8A2]">
                   No ingredients on your plate yet
@@ -442,14 +442,14 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
                 {plateItems.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 bg-[#FAFAF8] dark:bg-[#1A1D1C] rounded-2xl border border-[#E5E7EB] dark:border-[#242826] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                    className="p-4 bg-[#FAFAF8] dark:bg-[#111111] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-sm text-[#1F2421] dark:text-[#F5F5F0] truncate">
                           {item.name}
                         </span>
-                        <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-emerald-400">
+                        <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
                           {item.databaseSource}
                         </span>
                       </div>
@@ -463,7 +463,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
                           {item.calculatedMacros.calories} kcal
                         </span>
                         <span>•</span>
-                        <span className="text-[#0F6E5F] dark:text-emerald-400 font-bold">
+                        <span className="text-[#D4AF37] dark:text-[#F0D060] font-bold">
                           {item.calculatedMacros.proteinG}g P
                         </span>
                         <span>•</span>
@@ -478,7 +478,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-1.5 bg-white dark:bg-[#242826] px-3 py-1.5 rounded-xl border border-[#E5E7EB] dark:border-[#333835]">
+                      <div className="flex items-center gap-1.5 bg-white dark:bg-[#2A2416] px-3 py-1.5 rounded-xl border border-[#E5E7EB] dark:border-[#333835]">
                         <input
                           type="number"
                           min="1"
@@ -507,10 +507,10 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
 
         {/* Right Column: IFCT & USDA Search Database (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-white dark:bg-[#161817] p-5 rounded-3xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-4">
+          <div className="bg-white dark:bg-[#111111] p-5 rounded-3xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-4">
             <div>
               <h3 className="text-sm font-bold text-[#1F2421] dark:text-[#F5F5F0] flex items-center gap-2">
-                <Search className="w-4 h-4 text-[#0F6E5F]" />
+                <Search className="w-4 h-4 text-[#D4AF37]" />
                 <span>Search IFCT & Indian Food Database</span>
               </h3>
               <p className="text-xs text-[#5C6460] dark:text-[#9EA8A2] mt-0.5">
@@ -526,7 +526,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
                 placeholder="Search Paneer, Sabudana, Sattu, Moong Dal, Ragi..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-[#FAFAF8] dark:bg-[#1F2421] border border-[#E5E7EB] dark:border-[#242826] rounded-xl text-sm font-medium text-[#1F2421] dark:text-[#F5F5F0] focus:ring-2 focus:ring-[#0F6E5F] outline-hidden placeholder:text-[#9EA8A2]"
+                className="w-full pl-10 pr-4 py-2.5 bg-[#FAFAF8] dark:bg-[#1F2421] border border-[#E5E7EB] dark:border-[#2A2416] rounded-xl text-sm font-medium text-[#1F2421] dark:text-[#F5F5F0] focus:ring-2 focus:ring-[#D4AF37] outline-hidden placeholder:text-[#9EA8A2]"
               />
             </div>
 
@@ -538,8 +538,8 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
                   onClick={() => setSelectedCategory(cat)}
                   className={`px-3 py-1.5 text-xs font-bold rounded-xl whitespace-nowrap transition-all cursor-pointer ${
                     selectedCategory === cat
-                      ? 'bg-[#0F6E5F] text-white shadow-xs'
-                      : 'bg-[#FAFAF8] dark:bg-[#1A1D1C] text-[#5C6460] dark:text-[#9EA8A2] hover:bg-[#E5E7EB] dark:hover:bg-[#242826]'
+                      ? 'bg-[#D4AF37] text-white shadow-xs'
+                      : 'bg-[#FAFAF8] dark:bg-[#111111] text-[#5C6460] dark:text-[#9EA8A2] hover:bg-[#E5E7EB] dark:hover:bg-[#2A2416]'
                   }`}
                 >
                   {cat}
@@ -552,7 +552,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
               {filteredDatabase.map((item) => (
                 <div
                   key={item.id}
-                  className="p-3.5 bg-[#FAFAF8] dark:bg-[#1A1D1C] rounded-2xl border border-[#E5E7EB] dark:border-[#242826] hover:border-[#0F6E5F]/50 transition-all flex items-start justify-between gap-3"
+                  className="p-3.5 bg-[#FAFAF8] dark:bg-[#111111] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37]/50 transition-all flex items-start justify-between gap-3"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
@@ -560,7 +560,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
                         {item.name}
                       </span>
                       {item.isFastingSafe && (
-                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded-sm bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300">
+                        <span className="text-[9px] font-black px-1.5 py-0.5 rounded-sm bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-[#F0D060]">
                           Vrat
                         </span>
                       )}
@@ -575,7 +575,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
                         {item.per100g.calories} kcal/100g
                       </span>
                       <span>•</span>
-                      <span className="text-[#0F6E5F] dark:text-emerald-400 font-bold">
+                      <span className="text-[#D4AF37] dark:text-[#F0D060] font-bold">
                         {item.per100g.proteinG}g P
                       </span>
                       <span>•</span>
@@ -587,7 +587,7 @@ export const PerGramNutritionBuilder: React.FC<PerGramNutritionBuilderProps> = (
 
                   <button
                     onClick={() => handleAddIngredient(item)}
-                    className="p-2 bg-[#0F6E5F]/10 hover:bg-[#0F6E5F] text-[#0F6E5F] hover:text-white rounded-xl transition-all cursor-pointer"
+                    className="p-2 bg-[#D4AF37]/10 hover:bg-[#D4AF37] text-[#D4AF37] hover:text-white rounded-xl transition-all cursor-pointer"
                     title={`Add standard portion (~${item.typicalPortionG}g)`}
                   >
                     <Plus className="w-4 h-4" />

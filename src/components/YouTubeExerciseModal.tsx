@@ -42,9 +42,9 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in">
-      <div className="bg-white dark:bg-[#161817] rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 text-left">
+      <div className="bg-white dark:bg-[#111111] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 text-left">
         {/* Header */}
-        <div className="p-5 bg-gradient-to-r from-red-600/10 via-amber-500/5 to-transparent border-b border-[#E5E7EB] dark:border-[#242826] flex items-center justify-between shrink-0">
+        <div className="p-5 bg-gradient-to-r from-red-600/10 via-amber-500/5 to-transparent border-b border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center shadow-sm shrink-0">
               <Youtube className="w-5 h-5" />
@@ -70,19 +70,19 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
         {/* Body Content (Scrollable) */}
         <div className="p-6 overflow-y-auto space-y-5">
           {/* Exercise Info Card */}
-          <div className="bg-[#FAFAF8] dark:bg-[#1C1F1D] p-4 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C]">
+          <div className="bg-[#FAFAF8] dark:bg-[#1C1F1D] p-4 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416]">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${bioClass.badgeColor}`}>
                   {bioClass.tierLabel}
                 </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold border border-emerald-500/30">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060] text-[11px] font-bold border border-[#D4AF37]/30">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060]" />
                   <span>Registry Verified</span>
                 </span>
               </div>
               {targetMuscle && (
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF]">
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
                   {targetMuscle}
                 </span>
               )}
@@ -91,14 +91,14 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
               {exerciseName}
             </div>
             <div className="flex items-center gap-2 text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1 flex-wrap">
-              <span className="font-semibold text-[#0F6E5F] dark:text-[#2DD4BF]">{bioClass.movementPattern}</span>
+              <span className="font-semibold text-[#D4AF37] dark:text-[#F0D060]">{bioClass.movementPattern}</span>
               <span>•</span>
               <span>{bioClass.jointType}</span>
               {equipment && (
                 <>
                   <span>•</span>
                   <span className="flex items-center gap-1">
-                    <Dumbbell className="w-3 h-3 text-[#0F6E5F]" />
+                    <Dumbbell className="w-3 h-3 text-[#D4AF37]" />
                     {equipment}
                   </span>
                 </>
@@ -119,12 +119,12 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
 
             <button
               onClick={() => handleCopyQuery(`${cleanName} proper form exercise tutorial`, 'main-query')}
-              className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] hover:bg-gray-50 dark:hover:bg-[#252A27] font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] hover:bg-gray-50 dark:hover:bg-[#252A27] font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               {copiedId === 'main-query' ? (
                 <>
-                  <Check className="w-4 h-4 text-emerald-500" />
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">Standard Query Copied to Clipboard!</span>
+                  <Check className="w-4 h-4 text-[#D4AF37]" />
+                  <span className="text-[#B8922A] dark:text-[#F0D060] font-bold">Standard Query Copied to Clipboard!</span>
                 </>
               ) : (
                 <>
@@ -151,7 +151,7 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
                 return (
                   <div
                     key={opt.id}
-                    className="p-3 rounded-xl bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2E2C] flex items-center justify-between gap-3 hover:border-red-500/40 transition-colors"
+                    className="p-3 rounded-xl bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between gap-3 hover:border-red-500/40 transition-colors"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="w-8 h-8 rounded-lg bg-red-600/10 dark:bg-red-950/40 text-red-600 dark:text-red-400 font-bold text-xs flex items-center justify-center shrink-0">
@@ -179,7 +179,7 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
                         title={`Copy "${opt.query}"`}
                       >
                         {isCopied ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                          <Check className="w-3.5 h-3.5 text-[#D4AF37]" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
                         )}
@@ -199,8 +199,8 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
             </div>
           </div>
 
-          <div className="pt-2 border-t border-[#E5E7EB] dark:border-[#242826] flex items-center gap-2 text-[11px] text-[#6B7280] dark:text-[#9EA8A2]">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+          <div className="pt-2 border-t border-[#E5E7EB] dark:border-[#2A2416] flex items-center gap-2 text-[11px] text-[#6B7280] dark:text-[#9EA8A2]">
+            <ShieldCheck className="w-4 h-4 text-[#B8922A] shrink-0" />
             <span>Search queries are cleaned of internal tags and optimized for injury-free joint mechanics and full active range of motion.</span>
           </div>
         </div>

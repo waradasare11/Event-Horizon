@@ -198,8 +198,8 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
             className="fixed inset-0 z-40"
             onClick={() => setIsOpenPopover(false)}
           />
-          <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] shadow-2xl z-50 p-5 space-y-4 animate-in fade-in zoom-in-95 text-left">
-            <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#242826] pb-3">
+          <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] shadow-2xl z-50 p-5 space-y-4 animate-in fade-in zoom-in-95 text-left">
+            <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#2A2416] pb-3">
               <div className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-amber-500" />
                 <h4 className="text-sm font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -298,7 +298,7 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
             )}
 
             <div className="space-y-2 text-xs">
-              <div className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2416]">
                 <span className="text-[#6B7280] dark:text-[#9EA8A2]">Connectivity</span>
                 <span className={`font-semibold flex items-center gap-1 ${
                   isOnline ? 'text-amber-700 dark:text-amber-300' : 'text-amber-600 dark:text-amber-400'
@@ -307,14 +307,14 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2416]">
                 <span className="text-[#6B7280] dark:text-[#9EA8A2]">Account</span>
                 <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] truncate max-w-[170px]">
                   {currentUser ? currentUser.email : 'Guest (Local Store)'}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+              <div className="flex items-center justify-between p-2 rounded-lg bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2416]">
                 <span className="text-[#6B7280] dark:text-[#9EA8A2]">Last Drive Backup</span>
                 <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">
                   {driveStatus.lastSavedAt || (lastSyncedAt

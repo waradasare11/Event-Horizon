@@ -199,7 +199,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
         particleCount: 80,
         spread: 65,
         origin: { y: 0.6 },
-        colors: ['#0F6E5F', '#E8912D', '#16A34A'],
+        colors: ['#D4AF37', '#E8912D', '#16A34A'],
       });
     } catch (e) {
       // Ignored
@@ -210,26 +210,26 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
   const scoreColor = score >= 80 ? 'text-[#16A34A] bg-[#16A34A]/10 border-[#16A34A]/30' : score >= 60 ? 'text-[#E8912D] bg-[#E8912D]/10 border-[#E8912D]/30' : 'text-[#DC2626] bg-[#DC2626]/10 border-[#DC2626]/30';
 
   return (
-    <div className="bg-white dark:bg-[#161817] rounded-3xl border border-[#E5E7EB] dark:border-[#242826] shadow-sm overflow-hidden transition-all animate-in fade-in duration-300">
+    <div className="bg-white dark:bg-[#111111] rounded-3xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-sm overflow-hidden transition-all animate-in fade-in duration-300">
       {/* Top Banner with Meal Title & Confidence */}
-      <div className="p-5 sm:p-7 border-b border-[#E5E7EB] dark:border-[#242826] bg-gradient-to-r from-[#FAFAF8] to-white dark:from-[#1A1D1C] dark:to-[#161817]">
+      <div className="p-5 sm:p-7 border-b border-[#E5E7EB] dark:border-[#2A2416] bg-gradient-to-r from-[#FAFAF8] to-white dark:from-[#111111] dark:to-[#111111]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-4">
             {imagePreviewUrl && (
               <img
                 src={imagePreviewUrl}
                 alt="Meal preview"
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-[#E5E7EB] dark:border-[#242826] shrink-0 shadow-xs"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-[#E5E7EB] dark:border-[#2A2416] shrink-0 shadow-xs"
               />
             )}
             <div>
               <div className="flex items-center gap-2 flex-wrap mb-1">
-                <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
                   Multi-Model Consensus Vision
                 </span>
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 flex items-center gap-1">
-                  <CheckCircle className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/20 flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3 text-[#B8922A] dark:text-[#F0D060]" />
                   AI estimate — you can correct portions
                 </span>
                 {analysis.failoverEngaged && (
@@ -244,7 +244,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                     Spatial Reference Calibrated
                   </span>
                 )}
-                <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#F3F4F6] dark:bg-[#242826] text-[#4B5563] dark:text-[#9EA8A2]">
+                <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#F3F4F6] dark:bg-[#2A2416] text-[#4B5563] dark:text-[#9EA8A2]">
                   {consensusRatio}
                 </span>
               </div>
@@ -258,7 +258,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
           </div>
 
           {/* Goal Alignment Meter */}
-          <div className="flex sm:flex-col items-center sm:items-end justify-between bg-white dark:bg-[#1E201F] sm:bg-transparent dark:sm:bg-transparent p-3 sm:p-0 rounded-2xl border sm:border-0 border-[#E5E7EB] dark:border-[#242826]">
+          <div className="flex sm:flex-col items-center sm:items-end justify-between bg-white dark:bg-[#1E201F] sm:bg-transparent dark:sm:bg-transparent p-3 sm:p-0 rounded-2xl border sm:border-0 border-[#E5E7EB] dark:border-[#2A2416]">
             <div className="text-left sm:text-right">
               <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2] font-medium block">Goal Alignment</span>
               <span className="text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">{analysis.goalFitVerdict}</span>
@@ -272,27 +272,27 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
       </div>
 
       {/* Multi-Model Consensus & Database Verification Breakdown Section */}
-      <div className="p-4 sm:p-6 bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/10 border-b border-[#E5E7EB] dark:border-[#242826]">
+      <div className="p-4 sm:p-6 bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 border-b border-[#E5E7EB] dark:border-[#2A2416]">
         <div className="flex items-center justify-between gap-2 mb-3">
           <div className="flex items-center gap-2">
-            <Cpu className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+            <Cpu className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
             <h3 className="font-bold text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
               Multi-Model AI Consensus & Verification Architecture
             </h3>
           </div>
-          <span className="text-[11px] font-semibold text-[#0F6E5F] dark:text-[#2DD4BF] bg-white dark:bg-[#1A1D1C] px-2.5 py-1 rounded-lg border border-[#0F6E5F]/20">
+          <span className="text-[11px] font-semibold text-[#D4AF37] dark:text-[#F0D060] bg-white dark:bg-[#111111] px-2.5 py-1 rounded-lg border border-[#D4AF37]/20">
             3 Parallel Vision Engines
           </span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Model 1: Volumetric 3D Segmenter */}
-          <div className="p-3 rounded-2xl bg-white dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826] text-left">
+          <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-left">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#0F6E5F] dark:text-[#2DD4BF]">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#D4AF37] dark:text-[#F0D060]">
                 Engine 1: 3D Volumetrics
               </span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#D4AF37]/10 text-[#A68523] dark:text-[#F0D060]">
                 Gemini 3.7 Vision
               </span>
             </div>
@@ -305,7 +305,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
           </div>
 
           {/* Model 2: Culinary Multi-Cuisine Identifier */}
-          <div className="p-3 rounded-2xl bg-white dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826] text-left">
+          <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-left">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#E8912D]">
                 Engine 2: Culinary Decomposer
@@ -323,7 +323,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
           </div>
 
           {/* Model 3: Biochemical & USDA/IFCT Validator */}
-          <div className="p-3 rounded-2xl bg-white dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826] text-left">
+          <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-left">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                 Engine 3: Macro Validator
@@ -343,8 +343,8 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
       </div>
 
       {/* Macronutrient Metric Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-5 sm:p-6 bg-[#FAFAF8]/50 dark:bg-[#141615] border-b border-[#E5E7EB] dark:border-[#242826]">
-        <div className="bg-white dark:bg-[#161817] p-3.5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] text-left">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-5 sm:p-6 bg-[#FAFAF8]/50 dark:bg-[#111111] border-b border-[#E5E7EB] dark:border-[#2A2416]">
+        <div className="bg-white dark:bg-[#111111] p-3.5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] text-left">
           <div className="flex items-center gap-2 text-xs text-[#6B7280] dark:text-[#9EA8A2]">
             <Flame className="w-4 h-4 text-[#E8912D]" />
             <span>Calories</span>
@@ -357,20 +357,20 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#161817] p-3.5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] text-left">
-          <div className="flex items-center gap-2 text-xs text-[#0F6E5F] dark:text-[#2DD4BF]">
-            <Dumbbell className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+        <div className="bg-white dark:bg-[#111111] p-3.5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] text-left">
+          <div className="flex items-center gap-2 text-xs text-[#D4AF37] dark:text-[#F0D060]">
+            <Dumbbell className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
             <span>Protein</span>
           </div>
           <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-1">
             {currentTotalProtein.toFixed(0)} <span className="text-xs font-normal text-[#6B7280] dark:text-[#9EA8A2]">g</span>
           </div>
-          <div className="text-[11px] text-[#0F6E5F] dark:text-[#2DD4BF] font-medium mt-0.5">
+          <div className="text-[11px] text-[#D4AF37] dark:text-[#F0D060] font-medium mt-0.5">
             {Math.round((currentTotalProtein / userProfile.dailyProtein) * 100)}% of daily target
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#161817] p-3.5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] text-left">
+        <div className="bg-white dark:bg-[#111111] p-3.5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] text-left">
           <div className="flex items-center gap-2 text-xs text-[#3B82F6] dark:text-[#60A5FA]">
             <Wheat className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA]" />
             <span>Carbs</span>
@@ -383,7 +383,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
           </div>
         </div>
 
-        <div className="bg-white dark:bg-[#161817] p-3.5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] text-left">
+        <div className="bg-white dark:bg-[#111111] p-3.5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] text-left">
           <div className="flex items-center gap-2 text-xs text-[#F59E0B] dark:text-[#FBBF24]">
             <Droplet className="w-4 h-4 text-[#F59E0B] dark:text-[#FBBF24]" />
             <span>Fats</span>
@@ -407,7 +407,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                 <h3 className="font-bold text-sm sm:text-base text-[#1A1D1B] dark:text-[#E8ECE9]">
                   Verified Detected Ingredients & Portion Fine-Tuning
                 </h3>
-                <span className="text-[11px] bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] font-semibold px-2 py-0.5 rounded-md flex items-center gap-1">
+                <span className="text-[11px] bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] font-semibold px-2 py-0.5 rounded-md flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3" />
                   Consensus Calibrated
                 </span>
@@ -419,7 +419,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
 
             <button
               onClick={() => setShowAddItemForm(!showAddItemForm)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] text-xs font-semibold text-[#0F6E5F] dark:text-[#2DD4BF] hover:bg-[#FAFAF8] dark:hover:bg-[#202422] transition-colors cursor-pointer self-start sm:self-auto"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs font-semibold text-[#D4AF37] dark:text-[#F0D060] hover:bg-[#FAFAF8] dark:hover:bg-[#202422] transition-colors cursor-pointer self-start sm:self-auto"
             >
               <Plus className="w-3.5 h-3.5" />
               <span>Add Custom Ingredient</span>
@@ -428,8 +428,8 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
 
           {/* Optional Add Item Form */}
           {showAddItemForm && (
-            <div className="p-4 mb-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#0F6E5F]/30 space-y-3 text-left animate-in fade-in duration-200">
-              <div className="font-bold text-xs text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center gap-1.5">
+            <div className="p-4 mb-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#D4AF37]/30 space-y-3 text-left animate-in fade-in duration-200">
+              <div className="font-bold text-xs text-[#D4AF37] dark:text-[#F0D060] flex items-center gap-1.5">
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Extra Plate Component</span>
               </div>
@@ -441,7 +441,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                     placeholder="e.g. Greek Yogurt / Olive Oil"
                     value={newItemName}
                     onChange={(e) => setNewItemName(e.target.value)}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   />
                 </div>
                 <div>
@@ -450,7 +450,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                     type="number"
                     value={newItemWeight}
                     onChange={(e) => setNewItemWeight(Number(e.target.value))}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   />
                 </div>
                 <div>
@@ -459,7 +459,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                     type="number"
                     value={newItemCals}
                     onChange={(e) => setNewItemCals(Number(e.target.value))}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   />
                 </div>
                 <div>
@@ -468,13 +468,13 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                     type="number"
                     value={newItemProt}
                     onChange={(e) => setNewItemProt(Number(e.target.value))}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   />
                 </div>
                 <div className="flex items-end">
                   <button
                     onClick={handleAddNewItem}
-                    className="w-full py-2 bg-[#0F6E5F] text-white rounded-lg text-xs font-semibold hover:bg-[#0D5B4F] transition-colors cursor-pointer"
+                    className="w-full py-2 bg-[#D4AF37] text-white rounded-lg text-xs font-semibold hover:bg-[#A68523] transition-colors cursor-pointer"
                   >
                     Add
                   </button>
@@ -487,13 +487,13 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
             {items.map((item, idx) => (
               <div
                 key={idx}
-                  className="flex flex-col p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] hover:border-[#0F6E5F]/50 transition-all text-sm gap-3"
+                  className="flex flex-col p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37]/50 transition-all text-sm gap-3"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">{item.name}</span>
-                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/20">
                           AI estimate — you can correct portions
                         </span>
                         {item.verifiedDatabaseName && (
@@ -511,7 +511,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                       <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5 flex items-center gap-2 flex-wrap">
                         <span>{item.portionDescription}</span>
                         {item.foodCategory && (
-                          <span className="text-[10px] text-[#4B5563] dark:text-[#9EA8A2] bg-[#E5E7EB] dark:bg-[#2A2E2C] px-1.5 py-0.5 rounded">
+                          <span className="text-[10px] text-[#4B5563] dark:text-[#9EA8A2] bg-[#E5E7EB] dark:bg-[#2A2416] px-1.5 py-0.5 rounded">
                             {item.foodCategory}
                           </span>
                         )}
@@ -520,7 +520,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
 
                     <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-between sm:justify-end">
                       {/* Quick Gram Adjustment Buttons */}
-                      <div className="flex items-center gap-1 bg-white dark:bg-[#111312] p-1 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C]">
+                      <div className="flex items-center gap-1 bg-white dark:bg-[#070707] p-1 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416]">
                         <button
                           onClick={() => handleQuickAdjustWeight(idx, -25)}
                           className="px-2 py-0.5 text-xs font-bold text-[#6B7280] hover:text-[#1A1D1B] dark:hover:text-white rounded hover:bg-[#F3F4F6] dark:hover:bg-[#202422] transition-colors cursor-pointer"
@@ -532,14 +532,14 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                           type="number"
                           value={item.weightG}
                           onChange={(e) => handleUpdateItemGrams(idx, Number(e.target.value))}
-                          className="w-16 text-center text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F] rounded"
+                          className="w-16 text-center text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37] rounded"
                           min={5}
                           step={5}
                         />
                         <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2] pr-1">g</span>
                         <button
                           onClick={() => handleQuickAdjustWeight(idx, 25)}
-                          className="px-2 py-0.5 text-xs font-bold text-[#0F6E5F] dark:text-[#2DD4BF] hover:bg-[#F3F4F6] dark:hover:bg-[#202422] rounded transition-colors cursor-pointer"
+                          className="px-2 py-0.5 text-xs font-bold text-[#D4AF37] dark:text-[#F0D060] hover:bg-[#F3F4F6] dark:hover:bg-[#202422] rounded transition-colors cursor-pointer"
                           title="+25g"
                         >
                           +25g
@@ -550,7 +550,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                       <div className="flex items-center gap-2 text-xs font-bold">
                         <span className="text-[#E8912D]">{item.calories} kcal</span>
                         <span className="text-[#6B7280]">•</span>
-                        <span className="text-[#0F6E5F] dark:text-[#2DD4BF]">{item.proteinG}g P</span>
+                        <span className="text-[#D4AF37] dark:text-[#F0D060]">{item.proteinG}g P</span>
                         <span className="text-[#6B7280]">•</span>
                         <span className="text-[#3B82F6]">{item.carbsG}g C</span>
                         <span className="text-[#6B7280]">•</span>
@@ -570,25 +570,25 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
 
                   {/* Per-Gram Precision Metrics */}
                   {(item.caloriesPerGram !== undefined || item.proteinPerGram !== undefined) && (
-                    <div className="pt-2 border-t border-[#E5E7EB]/60 dark:border-[#2A2E2C]/60 flex items-center gap-3 text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex-wrap">
+                    <div className="pt-2 border-t border-[#E5E7EB]/60 dark:border-[#2A2416]/60 flex items-center gap-3 text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex-wrap">
                       <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">Calibrated Density:</span>
                       {item.caloriesPerGram !== undefined && (
-                        <span className="bg-white dark:bg-[#111312] px-2 py-0.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C]">
+                        <span className="bg-white dark:bg-[#070707] px-2 py-0.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416]">
                           {item.caloriesPerGram} kcal/g
                         </span>
                       )}
                       {item.proteinPerGram !== undefined && (
-                        <span className="bg-white dark:bg-[#111312] px-2 py-0.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#0F6E5F] dark:text-[#2DD4BF] font-bold">
+                        <span className="bg-white dark:bg-[#070707] px-2 py-0.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] text-[#D4AF37] dark:text-[#F0D060] font-bold">
                           {item.proteinPerGram}g protein/g
                         </span>
                       )}
                       {item.carbsPerGram !== undefined && (
-                        <span className="bg-white dark:bg-[#111312] px-2 py-0.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] text-blue-600 dark:text-blue-400">
+                        <span className="bg-white dark:bg-[#070707] px-2 py-0.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] text-blue-600 dark:text-blue-400">
                           {item.carbsPerGram}g carbs/g
                         </span>
                       )}
                       {item.fatPerGram !== undefined && (
-                        <span className="bg-white dark:bg-[#111312] px-2 py-0.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] text-amber-600 dark:text-amber-400">
+                        <span className="bg-white dark:bg-[#070707] px-2 py-0.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] text-amber-600 dark:text-amber-400">
                           {item.fatPerGram}g fat/g
                         </span>
                       )}
@@ -612,29 +612,29 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
         {/* AI Goal Improvement Tips & Smart Swaps */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Evidence-Based Optimization Tips */}
-          <div className="p-5 rounded-2xl bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/15 border border-[#0F6E5F]/20 text-left">
-            <div className="flex items-center gap-2 font-bold text-sm text-[#0F6E5F] dark:text-[#2DD4BF] mb-2.5">
+          <div className="p-5 rounded-2xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/15 border border-[#D4AF37]/20 text-left">
+            <div className="flex items-center gap-2 font-bold text-sm text-[#D4AF37] dark:text-[#F0D060] mb-2.5">
               <Sparkles className="w-4 h-4 text-[#E8912D]" />
               <span>Evidence-Based Goal Optimization</span>
             </div>
             <ul className="space-y-2 text-xs text-[#374151] dark:text-[#D1D5DB]">
               {analysis.goalImprovementTips.map((tip, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF] shrink-0 mt-0.5" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060] shrink-0 mt-0.5" />
                   <span>{tip}</span>
                 </li>
               ))}
             </ul>
             {analysis.scientificTakeaway && (
-              <div className="mt-3 pt-3 border-t border-[#0F6E5F]/15 text-[11px] text-[#4B5563] dark:text-[#9EA8A2] flex items-start gap-1.5">
-                <Info className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF] shrink-0 mt-0.5" />
+              <div className="mt-3 pt-3 border-t border-[#D4AF37]/15 text-[11px] text-[#4B5563] dark:text-[#9EA8A2] flex items-start gap-1.5">
+                <Info className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060] shrink-0 mt-0.5" />
                 <span><strong>Science note:</strong> {analysis.scientificTakeaway}</span>
               </div>
             )}
           </div>
 
           {/* Smart Food Swaps */}
-          <div className="p-5 rounded-2xl bg-white dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826] text-left">
+          <div className="p-5 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-left">
             <div className="flex items-center gap-2 font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9] mb-2.5">
               <ArrowRightLeft className="w-4 h-4 text-[#E8912D]" />
               <span>AI Smart Swaps (Tap to Apply)</span>
@@ -645,13 +645,13 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                 return (
                   <div
                     key={idx}
-                    className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#141615] border border-[#E5E7EB] dark:border-[#242826] flex flex-col justify-between gap-2 text-xs"
+                    className="p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] flex flex-col justify-between gap-2 text-xs"
                   >
                     <div>
                       <div className="flex items-center gap-1.5 font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">
                         <span className="line-through text-[#9CA3AF] dark:text-[#78827C]">{swap.originalItem}</span>
                         <span>→</span>
-                        <span className="text-[#0F6E5F] dark:text-[#2DD4BF]">{swap.suggestedSwap}</span>
+                        <span className="text-[#D4AF37] dark:text-[#F0D060]">{swap.suggestedSwap}</span>
                         <span className="ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#E8912D]/10 text-[#E8912D]">
                           {swap.calorieDifference}
                         </span>
@@ -664,8 +664,8 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                       onClick={() => handleApplySwap(swap.originalItem, swap.suggestedSwap, swap.calorieDifference)}
                       className={`self-end px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer ${
                         isApplied
-                          ? 'bg-[#16A34A]/10 text-[#16A34A] dark:text-emerald-400 border border-[#16A34A]/30'
-                          : 'bg-[#0F6E5F] text-white hover:bg-[#0D5B4F]'
+                          ? 'bg-[#16A34A]/10 text-[#16A34A] dark:text-[#F0D060] border border-[#16A34A]/30'
+                          : 'bg-[#D4AF37] text-white hover:bg-[#A68523]'
                       }`}
                     >
                       {isApplied ? (
@@ -685,7 +685,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
         </div>
 
         {/* Meal Logging Controls */}
-        <div className="p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826] space-y-4">
+        <div className="p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">Meal Type:</span>
@@ -696,8 +696,8 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                     onClick={() => setMealType(type)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                       mealType === type
-                        ? 'bg-[#0F6E5F] text-white shadow-xs'
-                        : 'bg-white dark:bg-[#141615] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#2A2E2C] hover:bg-[#F9FAFB] dark:hover:bg-[#1E201F]'
+                        ? 'bg-[#D4AF37] text-white shadow-xs'
+                        : 'bg-white dark:bg-[#111111] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#2A2416] hover:bg-[#F9FAFB] dark:hover:bg-[#1E201F]'
                     }`}
                   >
                     {type}
@@ -716,7 +716,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
               placeholder="e.g. Cooked with olive oil spray, ate half avocado on side"
               value={userNotes}
               onChange={(e) => setUserNotes(e.target.value)}
-              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#141615] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F] dark:focus:ring-[#2DD4BF]"
+              className="w-full text-xs px-3.5 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#111111] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37] dark:focus:ring-[#F0D060]"
             />
           </div>
 
@@ -741,7 +741,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
               <button
                 onClick={handleSaveToLog}
                 disabled={isSaved}
-                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-semibold hover:bg-[#0D5B4F] transition-all shadow-sm cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs sm:text-sm font-semibold hover:bg-[#A68523] transition-all shadow-sm cursor-pointer"
               >
                 <CheckCircle2 className="w-4 h-4 text-[#E8912D]" />
                 <span>{isSaved ? 'Saved to Tracker!' : 'Log Verified Meal to Daily Tracker'}</span>

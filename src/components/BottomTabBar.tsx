@@ -27,7 +27,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
   return (
     <nav 
       aria-label="Mobile Navigation"
-      className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#111312]/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 md:hidden transition-colors shadow-lg"
+      className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#070707]/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 md:hidden transition-colors shadow-lg"
     >
       <div className="grid grid-cols-5 h-16 max-w-lg mx-auto px-1">
         {tabs.map((tab) => {

@@ -153,7 +153,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
       target: targetProtein,
       unit: 'g',
       percentage: proteinPct,
-      fill: '#0F6E5F',
+      fill: '#D4AF37',
     },
   ];
 
@@ -183,10 +183,10 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
   return (
     <div className="space-y-8 animate-in fade-in duration-300 text-left">
       {/* Top Banner */}
-      <div className="bg-white dark:bg-[#161817] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
+      <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8]">
+            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
               Progress Dashboard
             </span>
             <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Daily Targets & Trends</span>
@@ -203,23 +203,23 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
           <button
             onClick={handleExportData}
             title="Export all data to CSV"
-            className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs sm:text-sm font-semibold hover:bg-[#F9FAFB] dark:hover:bg-[#232726] transition-all shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs sm:text-sm font-semibold hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] transition-all shadow-xs cursor-pointer"
           >
-            <Download className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+            <Download className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
             <span>Export CSV</span>
           </button>
 
           <button
             onClick={() => setShowAddMetricModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs sm:text-sm font-semibold hover:bg-[#F9FAFB] dark:hover:bg-[#232726] transition-all shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs sm:text-sm font-semibold hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] transition-all shadow-xs cursor-pointer"
           >
-            <Plus className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+            <Plus className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
             <span>Log Weight</span>
           </button>
 
           <button
             onClick={onOpenCheckIn}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-semibold hover:bg-[#0D5B4F] transition-all shadow-xs cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs sm:text-sm font-semibold hover:bg-[#A68523] transition-all shadow-xs cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-[#E8912D]" />
             <span>Weekly Check-In</span>
@@ -229,9 +229,9 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
 
       {/* Export feedback toast */}
       {exportSuccess && (
-        <div className="bg-[#0F6E5F]/10 border border-[#0F6E5F]/30 text-[#0F6E5F] dark:text-[#5FD1B8] px-4 py-3 rounded-xl flex items-center justify-between text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-2">
+        <div className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] dark:text-[#F0D060] px-4 py-3 rounded-xl flex items-center justify-between text-xs sm:text-sm font-medium animate-in fade-in slide-in-from-top-2">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+            <CheckCircle2 className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
             <span>Data exported successfully to CSV.</span>
           </div>
           <span className="text-xs opacity-75 font-mono">CSV Ready</span>
@@ -239,11 +239,11 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
       )}
 
       {/* CIRCULAR PROGRESS CHART: Daily Macronutrient & Calorie Intake vs Calculated Targets */}
-      <div className="bg-white dark:bg-[#161817] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-6 transition-colors">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] dark:border-[#242826] pb-4">
+      <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-6 transition-colors">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-4">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
-              <PieIcon className="w-5 h-5 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+              <PieIcon className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060]" />
               <span>Today's Macronutrient Intake</span>
             </h2>
             <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
@@ -252,7 +252,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8]">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
               {todayLogs.length} {todayLogs.length === 1 ? 'meal' : 'meals'} logged today
             </span>
           </div>
@@ -289,7 +289,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div className="bg-[#1E201F] text-white text-xs p-3 rounded-xl shadow-lg border border-[#2A2E2C]">
+                          <div className="bg-[#1E201F] text-white text-xs p-3 rounded-xl shadow-lg border border-[#2A2416]">
                             <div className="font-bold flex items-center gap-1.5" style={{ color: data.fill }}>
                               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: data.fill }} />
                               {data.name}
@@ -325,22 +325,22 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
           {/* Detailed Macro Status Cards */}
           <div className="lg:col-span-6 grid grid-cols-2 gap-3.5">
             {/* Protein Card */}
-            <div className="p-4 rounded-xl border border-[#0F6E5F]/30 bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/10 space-y-2">
+            <div className="p-4 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#0F6E5F] dark:text-[#5FD1B8] flex items-center gap-1.5">
+                <span className="text-xs font-bold text-[#D4AF37] dark:text-[#F0D060] flex items-center gap-1.5">
                   <Dumbbell className="w-4 h-4" />
                   Protein
                 </span>
-                <span className="text-xs font-bold text-[#0F6E5F] dark:text-[#5FD1B8]">
+                <span className="text-xs font-bold text-[#D4AF37] dark:text-[#F0D060]">
                   {proteinPct}%
                 </span>
               </div>
               <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                 {consumedProtein} <span className="text-xs font-normal text-[#6B7280] dark:text-[#9EA8A2]">/ {targetProtein}g</span>
               </div>
-              <div className="w-full bg-[#E5E7EB] dark:bg-[#242826] h-1.5 rounded-full overflow-hidden">
+              <div className="w-full bg-[#E5E7EB] dark:bg-[#2A2416] h-1.5 rounded-full overflow-hidden">
                 <div 
-                  className="bg-[#0F6E5F] h-full rounded-full transition-all" 
+                  className="bg-[#D4AF37] h-full rounded-full transition-all" 
                   style={{ width: `${Math.min(100, proteinPct)}%` }} 
                 />
               </div>
@@ -365,7 +365,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
               <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                 {consumedFat} <span className="text-xs font-normal text-[#6B7280] dark:text-[#9EA8A2]">/ {targetFat}g</span>
               </div>
-              <div className="w-full bg-[#E5E7EB] dark:bg-[#242826] h-1.5 rounded-full overflow-hidden">
+              <div className="w-full bg-[#E5E7EB] dark:bg-[#2A2416] h-1.5 rounded-full overflow-hidden">
                 <div 
                   className="bg-[#E8912D] h-full rounded-full transition-all" 
                   style={{ width: `${Math.min(100, fatPct)}%` }} 
@@ -392,7 +392,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
               <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                 {consumedCarbs} <span className="text-xs font-normal text-[#6B7280] dark:text-[#9EA8A2]">/ {targetCarbs}g</span>
               </div>
-              <div className="w-full bg-[#E5E7EB] dark:bg-[#242826] h-1.5 rounded-full overflow-hidden">
+              <div className="w-full bg-[#E5E7EB] dark:bg-[#2A2416] h-1.5 rounded-full overflow-hidden">
                 <div 
                   className="bg-[#3B82F6] h-full rounded-full transition-all" 
                   style={{ width: `${Math.min(100, carbsPct)}%` }} 
@@ -419,7 +419,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
               <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                 {consumedCalories} <span className="text-xs font-normal text-[#6B7280] dark:text-[#9EA8A2]">/ {targetCalories} kcal</span>
               </div>
-              <div className="w-full bg-[#E5E7EB] dark:bg-[#242826] h-1.5 rounded-full overflow-hidden">
+              <div className="w-full bg-[#E5E7EB] dark:bg-[#2A2416] h-1.5 rounded-full overflow-hidden">
                 <div 
                   className="bg-[#8B5CF6] h-full rounded-full transition-all" 
                   style={{ width: `${Math.min(100, calPct)}%` }} 
@@ -439,12 +439,12 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
       <D3MacroDonutChart userProfile={userProfile} mealLogs={mealLogs} />
 
       {/* Sub-view switcher: Weekly Progress Report vs Goal Timeline Predictor vs Muscle Volume Heatmap vs Consistency Matrix vs Weight Trends */}
-      <div className="flex items-center gap-2 border-b border-[#E5E7EB] dark:border-[#242826] pb-2 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveSubTab('weekly')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeSubTab === 'weekly'
-              ? 'bg-[#0F6E5F] text-white shadow-xs'
+              ? 'bg-[#D4AF37] text-white shadow-xs'
               : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
           }`}
         >
@@ -456,7 +456,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
           onClick={() => setActiveSubTab('predictor')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeSubTab === 'predictor'
-              ? 'bg-[#0F6E5F] text-white shadow-xs'
+              ? 'bg-[#D4AF37] text-white shadow-xs'
               : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
           }`}
         >
@@ -468,7 +468,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
           onClick={() => setActiveSubTab('calendar_heatmap')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeSubTab === 'calendar_heatmap'
-              ? 'bg-[#0F6E5F] text-white shadow-xs'
+              ? 'bg-[#D4AF37] text-white shadow-xs'
               : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
           }`}
         >
@@ -480,7 +480,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
           onClick={() => setActiveSubTab('muscle_heatmap')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeSubTab === 'muscle_heatmap'
-              ? 'bg-[#0F6E5F] text-white shadow-xs'
+              ? 'bg-[#D4AF37] text-white shadow-xs'
               : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
           }`}
         >
@@ -492,7 +492,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
           onClick={() => setActiveSubTab('heatmap')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeSubTab === 'heatmap'
-              ? 'bg-[#0F6E5F] text-white shadow-xs'
+              ? 'bg-[#D4AF37] text-white shadow-xs'
               : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
           }`}
         >
@@ -504,7 +504,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
           onClick={() => setActiveSubTab('trends')}
           className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer whitespace-nowrap ${
             activeSubTab === 'trends'
-              ? 'bg-[#0F6E5F] text-white shadow-xs'
+              ? 'bg-[#D4AF37] text-white shadow-xs'
               : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
           }`}
         >
@@ -619,19 +619,19 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
 
           {/* Metric Cards Summary */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-[#161817] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs">
+            <div className="bg-white dark:bg-[#111111] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs">
               <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Current Weight</div>
               <div className="text-2xl sm:text-3xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-1">
                 {currentWeight} <span className="text-sm font-normal text-[#6B7280] dark:text-[#9EA8A2]">kg</span>
               </div>
-              <div className="text-xs text-[#0F6E5F] dark:text-[#5FD1B8] font-semibold mt-1">
+              <div className="text-xs text-[#D4AF37] dark:text-[#F0D060] font-semibold mt-1">
                 {totalChange <= 0 ? `${totalChange} kg` : `+${totalChange} kg`} from start
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#161817] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs">
+            <div className="bg-white dark:bg-[#111111] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs">
               <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Target Goal</div>
-              <div className="text-2xl sm:text-3xl font-bold text-[#0F6E5F] dark:text-[#5FD1B8] mt-1">
+              <div className="text-2xl sm:text-3xl font-bold text-[#D4AF37] dark:text-[#F0D060] mt-1">
                 {userProfile.targetWeightKg} <span className="text-sm font-normal text-[#6B7280] dark:text-[#9EA8A2]">kg</span>
               </div>
               <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1">
@@ -639,7 +639,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#161817] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs">
+            <div className="bg-white dark:bg-[#111111] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs">
               <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Body Fat %</div>
               <div className="text-2xl sm:text-3xl font-bold text-[#E8912D] mt-1">
                 {bodyMetrics[bodyMetrics.length - 1]?.bodyFatPct || userProfile.bodyFatPct || 18.5} <span className="text-sm font-normal text-[#6B7280] dark:text-[#9EA8A2]">%</span>
@@ -649,7 +649,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#161817] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs">
+            <div className="bg-white dark:bg-[#111111] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs">
               <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Target Date</div>
               <div className="text-xl sm:text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-1 truncate">
                 {userProfile.targetDate || 'Target Phase'}
@@ -661,11 +661,11 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
           </div>
 
           {/* Main Interactive Chart: Actual Weight vs Safe Projected Path */}
-          <div className="bg-white dark:bg-[#161817] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] dark:border-[#242826] pb-4">
+          <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-4">
               <div>
                 <h2 className="text-lg sm:text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+                  <TrendingUp className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060]" />
                   <span>Weight Trajectory vs. Target Path</span>
                 </h2>
                 <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
@@ -674,7 +674,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
               </div>
               <div className="flex items-center gap-4 text-xs font-semibold">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full bg-[#0F6E5F]" />
+                  <span className="w-3 h-3 rounded-full bg-[#D4AF37]" />
                   <span className="text-[#1A1D1B] dark:text-[#E8ECE9]">Actual Weight (kg)</span>
                 </div>
                 <div className="flex items-center gap-1.5">
@@ -696,7 +696,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
                       backgroundColor: '#1E201F',
                       color: '#E8ECE9',
                       borderRadius: '12px',
-                      border: '1px solid #2A2E2C',
+                      border: '1px solid #2A2416',
                       fontSize: '12px',
                       boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                     }}
@@ -705,9 +705,9 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
                     type="monotone"
                     dataKey="actualWeight"
                     name="Actual Weight (kg)"
-                    stroke="#0F6E5F"
+                    stroke="#D4AF37"
                     strokeWidth={3}
-                    dot={{ r: 4, fill: '#0F6E5F' }}
+                    dot={{ r: 4, fill: '#D4AF37' }}
                     activeDot={{ r: 6 }}
                   />
                   <Line
@@ -732,8 +732,8 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
 
           {/* Adherence & Nutrition Consistency Chart */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-[#161817] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-4">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#242826] pb-3">
+            <div className="bg-white dark:bg-[#111111] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#2A2416] pb-3">
                 <div>
                   <h3 className="font-bold text-sm sm:text-base text-[#1A1D1B] dark:text-[#E8ECE9]">
                     Daily Caloric Adherence
@@ -756,25 +756,25 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
                         backgroundColor: '#1E201F',
                         color: '#E8ECE9',
                         borderRadius: '8px',
-                        border: '1px solid #2A2E2C',
+                        border: '1px solid #2A2416',
                         fontSize: '12px',
                       }}
                     />
-                    <Bar dataKey="calories" name="Consumed (kcal)" fill="#0F6E5F" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="calories" name="Consumed (kcal)" fill="#D4AF37" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#161817] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-4">
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#242826] pb-3">
+            <div className="bg-white dark:bg-[#111111] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#2A2416] pb-3">
                 <div>
                   <h3 className="font-bold text-sm sm:text-base text-[#1A1D1B] dark:text-[#E8ECE9]">
                     Protein Consistency
                   </h3>
                   <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Target: {userProfile.dailyProtein}g/day</p>
                 </div>
-                <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8]">
+                <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
                   Target: {userProfile.dailyProtein}g
                 </span>
               </div>
@@ -790,7 +790,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
                         backgroundColor: '#1E201F',
                         color: '#E8ECE9',
                         borderRadius: '8px',
-                        border: '1px solid #2A2E2C',
+                        border: '1px solid #2A2416',
                         fontSize: '12px',
                       }}
                     />
@@ -806,7 +806,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
       {/* Manual Add Weight Modal */}
       {showAddMetricModal && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#161817] rounded-2xl p-6 max-w-sm w-full shadow-xl border border-[#E5E7EB] dark:border-[#242826] animate-in zoom-in-95 duration-200 text-left">
+          <div className="bg-white dark:bg-[#111111] rounded-2xl p-6 max-w-sm w-full shadow-xl border border-[#E5E7EB] dark:border-[#2A2416] animate-in zoom-in-95 duration-200 text-left">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">Log Body Weight</h3>
               <button
@@ -827,7 +827,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
                   step="0.1"
                   value={newWeight}
                   onChange={(e) => setNewWeight(Number(e.target.value))}
-                  className="w-full text-sm px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#242826] bg-transparent text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
+                  className="w-full text-sm px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-transparent text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                   required
                 />
               </div>
@@ -841,7 +841,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
                   step="0.1"
                   value={newBodyFat}
                   onChange={(e) => setNewBodyFat(Number(e.target.value))}
-                  className="w-full text-sm px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#242826] bg-transparent text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
+                  className="w-full text-sm px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-transparent text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                 />
               </div>
 
@@ -855,7 +855,7 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 text-xs font-semibold rounded-xl bg-[#0F6E5F] text-white hover:bg-[#0D5B4F] cursor-pointer"
+                  className="px-5 py-2 text-xs font-semibold rounded-xl bg-[#D4AF37] text-white hover:bg-[#A68523] cursor-pointer"
                 >
                   Save Entry
                 </button>

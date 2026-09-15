@@ -321,7 +321,7 @@ export async function clearPendingOfflineSync(email: string): Promise<void> {
 /**
  * Sanitize snapshot: enforces strict privacy, eliminates any forbidden secrets
  */
-export function sanitizeSnapshotForDrive(snapshot: UserMemorySnapshot): UserMemorySnapshot {
+export function sanitizeSnapshotForDrive(snapshot: Partial<UserMemorySnapshot>): UserMemorySnapshot {
   const activeEmail = (snapshot.email || getCurrentActiveEmail() || '').trim().toLowerCase();
 
   // Strip food photos > 80KB to keep user memory compact and ultra-fast (< 80KB thumbnail allowed)
@@ -350,7 +350,7 @@ export function sanitizeSnapshotForDrive(snapshot: UserMemorySnapshot): UserMemo
   const cappedMessages = allMessages.slice(-100);
 
   // Clean profile: remove any host financial/internal credentials
-  const profileCopy: any = { ...snapshot.userProfile };
+  const profileCopy: any = { ...(snapshot.userProfile || {}) };
   delete profileCopy.hostPin;
   delete profileCopy.pin;
   delete profileCopy.upiId;

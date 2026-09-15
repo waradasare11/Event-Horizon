@@ -140,14 +140,14 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
       setHrAssessment({
         hrDrop: drop,
         rating: 'Optimal CNS Readiness',
-        color: 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 border-emerald-300 dark:border-emerald-800',
+        color: 'text-[#A68523] dark:text-[#F0D060] bg-[#FFFBF0] dark:bg-[#2A2416]/50 border-[#D4AF37]/50 dark:border-[#2A2416]',
         advice: 'Full parasympathetic reactivation and phosphocreatine resynthesis. Ready for max load/reps.',
       });
     } else if (drop >= 18) {
       setHrAssessment({
         hrDrop: drop,
         rating: 'Standard Recovery',
-        color: 'text-[#0F6E5F] dark:text-[#5FD1B8] bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 border-[#0F6E5F]/30',
+        color: 'text-[#D4AF37] dark:text-[#F0D060] bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 border-[#D4AF37]/30',
         advice: 'Sufficient cardiovascular recovery for working sets at targeted RPE.',
       });
     } else {
@@ -196,7 +196,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
   // Minimized floating bubble
   if (isMinimized) {
     return (
-      <div className="fixed bottom-6 right-6 z-50 bg-[#161817]/95 backdrop-blur-md text-white border-2 border-[#0F6E5F] rounded-2xl p-3.5 shadow-2xl flex items-center gap-3.5 animate-in fade-in slide-in-from-bottom-3 hover:scale-105 transition-all">
+      <div className="fixed bottom-6 right-6 z-50 bg-[#111111]/95 backdrop-blur-md text-white border-2 border-[#D4AF37] rounded-2xl p-3.5 shadow-2xl flex items-center gap-3.5 animate-in fade-in slide-in-from-bottom-3 hover:scale-105 transition-all">
         {/* Circular Progress Ring */}
         <div className="relative w-11 h-11 flex items-center justify-center shrink-0">
           <svg className="w-11 h-11 transform -rotate-90">
@@ -212,7 +212,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
               cx="22"
               cy="22"
               r={radius}
-              className="stroke-[#2DD4BF] transition-all duration-500"
+              className="stroke-[#F0D060] transition-all duration-500"
               strokeWidth="3.5"
               strokeDasharray={circumference}
               strokeDashoffset={strokeDashoffset}
@@ -229,7 +229,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
           <div className="text-[10px] text-[#9EA8A2] uppercase tracking-wider font-bold line-clamp-1 max-w-[120px]">
             {exerciseName}
           </div>
-          <div className="text-base font-black font-mono text-[#5FD1B8]">
+          <div className="text-base font-black font-mono text-[#F0D060]">
             {formatTime(timeLeft)}
           </div>
         </div>
@@ -237,7 +237,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
         <div className="flex items-center gap-1.5 border-l border-gray-700 pl-2">
           <button
             onClick={() => setIsActive(!isActive)}
-            className="p-2 rounded-lg bg-[#242826] hover:bg-[#323735] text-white transition-all cursor-pointer"
+            className="p-2 rounded-lg bg-[#2A2416] hover:bg-[#323735] text-white transition-all cursor-pointer"
             title={isActive ? 'Pause Rest' : 'Resume Rest'}
           >
             {isActive ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-white" />}
@@ -245,7 +245,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
           
           <button
             onClick={() => adjustTime(30)}
-            className="p-1.5 px-2 rounded-lg bg-[#0F6E5F] hover:bg-[#0D5B4F] text-xs font-bold text-white transition-all cursor-pointer"
+            className="p-1.5 px-2 rounded-lg bg-[#D4AF37] hover:bg-[#A68523] text-xs font-bold text-white transition-all cursor-pointer"
             title="+30s Rest"
           >
             +30s
@@ -253,7 +253,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
 
           <button
             onClick={() => setIsMinimized(false)}
-            className="p-2 rounded-lg bg-[#242826] hover:bg-[#323735] text-[#D1D5DB] transition-all cursor-pointer"
+            className="p-2 rounded-lg bg-[#2A2416] hover:bg-[#323735] text-[#D1D5DB] transition-all cursor-pointer"
             title="Expand Full Rest Timer"
           >
             <Maximize2 className="w-3.5 h-3.5" />
@@ -266,24 +266,24 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
   return (
     <div className={`text-left transition-all ${
       isFloating 
-        ? 'fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[480px] max-h-[88vh] overflow-y-auto bg-white/95 dark:bg-[#161817]/95 backdrop-blur-md border-2 border-[#0F6E5F] rounded-3xl p-5 sm:p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-4'
-        : 'bg-white dark:bg-[#161817] border-2 border-[#0F6E5F]/30 dark:border-[#0F6E5F]/40 rounded-3xl p-5 sm:p-6 shadow-xl space-y-4 relative overflow-hidden'
+        ? 'fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-[480px] max-h-[88vh] overflow-y-auto bg-white/95 dark:bg-[#111111]/95 backdrop-blur-md border-2 border-[#D4AF37] rounded-3xl p-5 sm:p-6 shadow-2xl animate-in fade-in slide-in-from-bottom-4'
+        : 'bg-white dark:bg-[#111111] border-2 border-[#D4AF37]/30 dark:border-[#D4AF37]/40 rounded-3xl p-5 sm:p-6 shadow-xl space-y-4 relative overflow-hidden'
     }`}>
       {/* Top Background Progress Bar */}
       <div 
-        className="absolute top-0 left-0 h-1.5 bg-gradient-to-r from-[#0F6E5F] via-[#2DD4BF] to-[#5FD1B8] transition-all duration-1000"
+        className="absolute top-0 left-0 h-1.5 bg-gradient-to-r from-[#D4AF37] via-[#F0D060] to-[#F0D060] transition-all duration-1000"
         style={{ width: `${progressPct}%` }}
       />
 
       {/* Header Bar */}
-      <div className="flex items-center justify-between gap-3 border-b border-[#E5E7EB] dark:border-[#242826] pb-3">
+      <div className="flex items-center justify-between gap-3 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#5FD1B8] flex items-center justify-center font-bold">
+          <div className="w-9 h-9 rounded-xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center font-bold">
             <Clock className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-[#0F6E5F] text-white">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded bg-[#D4AF37] text-white">
                 Rest Timer
               </span>
               <span className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] line-clamp-1">
@@ -301,8 +301,8 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
             onClick={() => setShowCustomSettings(!showCustomSettings)}
             className={`p-1.5 rounded-lg border text-xs font-bold flex items-center gap-1 transition-all cursor-pointer ${
               showCustomSettings 
-                ? 'bg-[#0F6E5F] text-white border-[#0F6E5F]' 
-                : 'border-[#E5E7EB] dark:border-[#2A2E2C] text-[#6B7280] dark:text-[#9EA8A2] hover:bg-gray-100 dark:hover:bg-[#1F2220]'
+                ? 'bg-[#D4AF37] text-white border-[#D4AF37]' 
+                : 'border-[#E5E7EB] dark:border-[#2A2416] text-[#6B7280] dark:text-[#9EA8A2] hover:bg-gray-100 dark:hover:bg-[#1F2220]'
             }`}
             title="Custom Duration Settings"
           >
@@ -311,7 +311,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
 
           <button
             onClick={() => setIsMuted(!isMuted)}
-            className="p-1.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#6B7280] dark:text-[#9EA8A2] hover:bg-gray-100 dark:hover:bg-[#1F2220] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] text-[#6B7280] dark:text-[#9EA8A2] hover:bg-gray-100 dark:hover:bg-[#1F2220] transition-colors cursor-pointer"
             title={isMuted ? 'Unmute Audio Chime' : 'Mute Audio Chime'}
           >
             {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
@@ -319,7 +319,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
 
           <button
             onClick={() => setIsMinimized(true)}
-            className="p-1.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#6B7280] dark:text-[#9EA8A2] hover:bg-gray-100 dark:hover:bg-[#1F2220] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] text-[#6B7280] dark:text-[#9EA8A2] hover:bg-gray-100 dark:hover:bg-[#1F2220] transition-colors cursor-pointer"
             title="Minimize to Floating Bubble"
           >
             <Minimize2 className="w-4 h-4" />
@@ -328,7 +328,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
           {onClose && (
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#6B7280] dark:text-[#9EA8A2] hover:bg-gray-100 dark:hover:bg-[#1F2220] transition-colors cursor-pointer"
+              className="p-1.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] text-[#6B7280] dark:text-[#9EA8A2] hover:bg-gray-100 dark:hover:bg-[#1F2220] transition-colors cursor-pointer"
               title="Close Timer"
             >
               <X className="w-4 h-4" />
@@ -342,7 +342,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
         <form onSubmit={handleApplyCustomDuration} className="p-3.5 rounded-2xl bg-gray-50 dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#282C2A] space-y-3 animate-in fade-in">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
-              <Sliders className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+              <Sliders className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
               <span>Custom Rest Duration Setting</span>
             </span>
             <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">1s – 1200s (20 mins)</span>
@@ -357,14 +357,14 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
                 value={customInputSec}
                 onChange={(e) => setCustomInputSec(e.target.value)}
                 placeholder="Seconds (e.g. 75)"
-                className="w-full text-xs font-bold px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#161817] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#0F6E5F]"
+                className="w-full text-xs font-bold px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#111111] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#D4AF37]"
               />
               <span className="absolute right-3 top-2 text-xs text-[#6B7280] dark:text-[#9EA8A2] font-semibold">seconds</span>
             </div>
 
             <button
               type="submit"
-              className="px-4 py-2 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs font-bold transition-all cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs font-bold transition-all cursor-pointer"
             >
               Set & Start
             </button>
@@ -379,7 +379,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
               step="15"
               value={customInputSec}
               onChange={(e) => setCustomInputSec(e.target.value)}
-              className="w-full accent-[#0F6E5F] cursor-pointer"
+              className="w-full accent-[#D4AF37] cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">
               <span>15s</span>
@@ -417,7 +417,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
         <div className="sm:col-span-6 flex items-center justify-center sm:justify-end gap-2 flex-wrap">
           <button
             onClick={() => adjustTime(-15)}
-            className="px-2.5 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] hover:bg-gray-100 dark:hover:bg-[#202322] text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] transition-all cursor-pointer"
+            className="px-2.5 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] hover:bg-gray-100 dark:hover:bg-[#202322] text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] transition-all cursor-pointer"
             title="Minus 15 seconds"
           >
             -15s
@@ -428,7 +428,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
             className={`px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 shadow-xs transition-all cursor-pointer ${
               isActive 
                 ? 'bg-amber-500 hover:bg-amber-600 text-white' 
-                : 'bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white'
+                : 'bg-[#D4AF37] hover:bg-[#A68523] text-white'
             }`}
           >
             {isActive ? (
@@ -446,7 +446,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
 
           <button
             onClick={() => adjustTime(30)}
-            className="px-2.5 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] hover:bg-gray-100 dark:hover:bg-[#202322] text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] transition-all cursor-pointer"
+            className="px-2.5 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] hover:bg-gray-100 dark:hover:bg-[#202322] text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] transition-all cursor-pointer"
             title="Add 30 seconds"
           >
             +30s
@@ -457,7 +457,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
               setTimeLeft(totalSeconds);
               setIsActive(true);
             }}
-            className="p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] hover:bg-gray-100 dark:hover:bg-[#202322] text-[#6B7280] dark:text-[#9EA8A2] transition-all cursor-pointer"
+            className="p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] hover:bg-gray-100 dark:hover:bg-[#202322] text-[#6B7280] dark:text-[#9EA8A2] transition-all cursor-pointer"
             title="Reset to Full Interval"
           >
             <RotateCcw className="w-4 h-4" />
@@ -469,15 +469,15 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
       <div className="space-y-1.5 pt-2">
         <div className="flex items-center justify-between text-[11px]">
           <span className="font-bold text-[#6B7280] dark:text-[#9EA8A2]">Evidence-Based Presets:</span>
-          <span className="text-[10px] text-[#0F6E5F] dark:text-[#5FD1B8] font-semibold">Click to load</span>
+          <span className="text-[10px] text-[#D4AF37] dark:text-[#F0D060] font-semibold">Click to load</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
           <button
             onClick={() => setPreset(45)}
             className={`text-xs p-2 rounded-xl border font-bold transition-all text-center cursor-pointer ${
               totalSeconds === 45 
-                ? 'bg-[#0F6E5F] text-white border-[#0F6E5F] shadow-xs' 
-                : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-gray-50 dark:bg-[#1E201F] text-[#4B5563] dark:text-[#D1D5DB] hover:border-[#0F6E5F]'
+                ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-xs' 
+                : 'border-[#E5E7EB] dark:border-[#2A2416] bg-gray-50 dark:bg-[#1E201F] text-[#4B5563] dark:text-[#D1D5DB] hover:border-[#D4AF37]'
             }`}
           >
             <div>45s</div>
@@ -488,8 +488,8 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
             onClick={() => setPreset(60)}
             className={`text-xs p-2 rounded-xl border font-bold transition-all text-center cursor-pointer ${
               totalSeconds === 60 
-                ? 'bg-[#0F6E5F] text-white border-[#0F6E5F] shadow-xs' 
-                : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-gray-50 dark:bg-[#1E201F] text-[#4B5563] dark:text-[#D1D5DB] hover:border-[#0F6E5F]'
+                ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-xs' 
+                : 'border-[#E5E7EB] dark:border-[#2A2416] bg-gray-50 dark:bg-[#1E201F] text-[#4B5563] dark:text-[#D1D5DB] hover:border-[#D4AF37]'
             }`}
           >
             <div>60s</div>
@@ -500,8 +500,8 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
             onClick={() => setPreset(90)}
             className={`text-xs p-2 rounded-xl border font-bold transition-all text-center cursor-pointer ${
               totalSeconds === 90 
-                ? 'bg-[#0F6E5F] text-white border-[#0F6E5F] shadow-xs' 
-                : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-gray-50 dark:bg-[#1E201F] text-[#4B5563] dark:text-[#D1D5DB] hover:border-[#0F6E5F]'
+                ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-xs' 
+                : 'border-[#E5E7EB] dark:border-[#2A2416] bg-gray-50 dark:bg-[#1E201F] text-[#4B5563] dark:text-[#D1D5DB] hover:border-[#D4AF37]'
             }`}
           >
             <div>90s</div>
@@ -512,8 +512,8 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
             onClick={() => setPreset(180)}
             className={`text-xs p-2 rounded-xl border font-bold transition-all text-center cursor-pointer ${
               totalSeconds === 180 
-                ? 'bg-[#0F6E5F] text-white border-[#0F6E5F] shadow-xs' 
-                : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-gray-50 dark:bg-[#1E201F] text-[#4B5563] dark:text-[#D1D5DB] hover:border-[#0F6E5F]'
+                ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-xs' 
+                : 'border-[#E5E7EB] dark:border-[#2A2416] bg-gray-50 dark:bg-[#1E201F] text-[#4B5563] dark:text-[#D1D5DB] hover:border-[#D4AF37]'
             }`}
           >
             <div>180s</div>
@@ -523,7 +523,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
       </div>
 
       {/* Heart Rate Recovery (HRR) Tracker Toggle */}
-      <div className="pt-2 border-t border-[#E5E7EB] dark:border-[#242826]">
+      <div className="pt-2 border-t border-[#E5E7EB] dark:border-[#2A2416]">
         <button
           onClick={() => setShowHeartRateTracker(!showHeartRateTracker)}
           className="inline-flex items-center gap-2 text-xs font-bold text-[#E8912D] hover:underline cursor-pointer"
@@ -533,7 +533,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
         </button>
 
         {showHeartRateTracker && (
-          <div className="mt-3 p-4 rounded-2xl bg-gray-50 dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-3 animate-in fade-in duration-200">
+          <div className="mt-3 p-4 rounded-2xl bg-gray-50 dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2416] space-y-3 animate-in fade-in duration-200">
             <div className="flex items-center justify-between">
               <div className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
                 <Activity className="w-4 h-4 text-[#E8912D]" />
@@ -552,7 +552,7 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
                   value={peakHrBpm}
                   onChange={(e) => setPeakHrBpm(e.target.value)}
                   placeholder="e.g. 155"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#161817] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#0F6E5F]"
+                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#111111] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#D4AF37]"
                 />
               </div>
 
@@ -565,14 +565,14 @@ export const RestIntervalTimer: React.FC<RestIntervalTimerProps> = ({
                   value={currentHrBpm}
                   onChange={(e) => setCurrentHrBpm(e.target.value)}
                   placeholder="e.g. 118"
-                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#161817] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#0F6E5F]"
+                  className="w-full text-xs px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#111111] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-1 focus:ring-[#D4AF37]"
                 />
               </div>
             </div>
 
             <button
               onClick={evaluateHeartRate}
-              className="w-full py-2 px-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0C584C] text-white text-xs font-bold transition-all cursor-pointer"
+              className="w-full py-2 px-3 rounded-xl bg-[#D4AF37] hover:bg-[#0C584C] text-white text-xs font-bold transition-all cursor-pointer"
             >
               Analyze Cardiovascular & Autonomic Readiness
             </button>

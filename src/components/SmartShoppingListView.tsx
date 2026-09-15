@@ -56,14 +56,14 @@ const CATEGORY_COLORS: Record<GroceryCategory, { bg: string; text: string; borde
     icon: '🌾',
   },
   'Fibrous Veggies & Greens': {
-    bg: 'bg-emerald-50 dark:bg-emerald-950/30',
-    text: 'text-emerald-700 dark:text-emerald-300',
-    border: 'border-emerald-200 dark:border-emerald-900/50',
+    bg: 'bg-[#FFFBF0] dark:bg-[#2A2416]/30',
+    text: 'text-[#A68523] dark:text-[#F0D060]',
+    border: 'border-[#E6D7A8] dark:border-[#2A2416]/50',
     icon: '🥦',
   },
   'Fruits & Antioxidants': {
     bg: 'bg-purple-50 dark:bg-purple-950/30',
-    text: 'text-purple-700 dark:text-purple-300',
+    text: 'text-purple-700 dark:text-[#F0D060]',
     border: 'border-purple-200 dark:border-purple-900/50',
     icon: '🫐',
   },
@@ -495,11 +495,11 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
   return (
     <div className="space-y-6 text-left animate-in fade-in duration-300">
       {/* Top Banner Card */}
-      <div className="bg-white dark:bg-[#1A1D1C] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs transition-colors">
+      <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs transition-colors">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF]">
+              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]">
                 AI Grocery Engine
               </span>
               <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2] flex items-center gap-1">
@@ -519,14 +519,14 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
           {/* Action CTAs */}
           <div className="flex flex-wrap items-center gap-3 shrink-0">
             {/* Days Multiplier Selector */}
-            <div className="flex items-center gap-1 bg-[#FAFAF8] dark:bg-[#141615] p-1 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C]">
+            <div className="flex items-center gap-1 bg-[#FAFAF8] dark:bg-[#111111] p-1 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416]">
               {[3, 5, 7].map((days) => (
                 <button
                   key={days}
                   onClick={() => setDaysMultiplier(days)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     daysMultiplier === days
-                      ? 'bg-[#0F6E5F] text-white shadow-xs'
+                      ? 'bg-[#D4AF37] text-white shadow-xs'
                       : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
                   }`}
                 >
@@ -539,7 +539,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
             <button
               onClick={handleCompileFromMealPlan}
               disabled={isCompiling}
-              className="px-4 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-bold hover:bg-[#0D5B4F] transition-all flex items-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs sm:text-sm font-bold hover:bg-[#A68523] transition-all flex items-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
             >
               <Sparkles className={`w-4 h-4 text-[#E8912D] ${isCompiling ? 'animate-spin' : ''}`} />
               <span>{isCompiling ? 'Compiling AI List...' : `Compile ${daysMultiplier}-Day List`}</span>
@@ -548,13 +548,13 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
             {/* Copy / Export Button */}
             <button
               onClick={handleCopyListToClipboard}
-              className="px-3.5 py-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#242826] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs sm:text-sm font-semibold hover:bg-[#F3F4F6] dark:hover:bg-[#2E3330] transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#2A2416] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs sm:text-sm font-semibold hover:bg-[#F3F4F6] dark:hover:bg-[#2E3330] transition-all flex items-center gap-1.5 cursor-pointer"
               title="Copy formatted grocery list to clipboard"
             >
               {copiedNotification ? (
                 <>
-                  <Check className="w-4 h-4 text-emerald-600" />
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">Copied!</span>
+                  <Check className="w-4 h-4 text-[#B8922A]" />
+                  <span className="text-[#B8922A] dark:text-[#F0D060] font-bold">Copied!</span>
                 </>
               ) : (
                 <>
@@ -568,41 +568,41 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
 
         {/* Status Notification Banner */}
         {statusMessage && (
-          <div className="mt-4 p-3 rounded-xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] text-xs font-semibold flex items-center gap-2 animate-in fade-in">
+          <div className="mt-4 p-3 rounded-xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] text-xs font-semibold flex items-center gap-2 animate-in fade-in">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{statusMessage}</span>
           </div>
         )}
 
         {/* Progress & Quick Stats Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-[#E5E7EB] dark:border-[#242826]">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-[#E5E7EB] dark:border-[#2A2416]">
           {/* Progress Bar */}
-          <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#141615] border border-[#E5E7EB] dark:border-[#242826]">
+          <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
             <div className="flex items-center justify-between text-xs">
               <span className="text-[#6B7280] dark:text-[#9EA8A2] font-semibold flex items-center gap-1.5">
-                <PackageCheck className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                <PackageCheck className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
                 <span>Supermarket Basket</span>
               </span>
               <span className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                 {purchasedItemCount} / {totalItemCount} Items ({completionPercentage}%)
               </span>
             </div>
-            <div className="w-full bg-[#E5E7EB] dark:bg-[#242826] rounded-full h-2.5 mt-2.5 overflow-hidden">
+            <div className="w-full bg-[#E5E7EB] dark:bg-[#2A2416] rounded-full h-2.5 mt-2.5 overflow-hidden">
               <div
-                className="bg-[#0F6E5F] dark:bg-[#2DD4BF] h-2.5 rounded-full transition-all duration-300"
+                className="bg-[#D4AF37] dark:bg-[#F0D060] h-2.5 rounded-full transition-all duration-300"
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
           </div>
 
           {/* Budget Range Estimation */}
-          <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#141615] border border-[#E5E7EB] dark:border-[#242826]">
+          <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
             <div className="flex items-center justify-between text-xs">
               <span className="text-[#6B7280] dark:text-[#9EA8A2] font-semibold flex items-center gap-1.5">
                 <DollarSign className="w-4 h-4 text-[#E8912D]" />
                 <span>Estimated Haul Budget</span>
               </span>
-              <span className="font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">
+              <span className="font-bold text-[#D4AF37] dark:text-[#F0D060]">
                 {shoppingList.estimatedCostRange || '$65 - $85 USD'}
               </span>
             </div>
@@ -612,7 +612,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
           </div>
 
           {/* Quick Actions / Clear Checked */}
-          <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#141615] border border-[#E5E7EB] dark:border-[#242826] flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between">
             <div>
               <div className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                 List Management
@@ -624,7 +624,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsAddingItem(!isAddingItem)}
-                className="px-3 py-1.5 rounded-lg bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] hover:bg-[#0F6E5F]/20 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] hover:bg-[#D4AF37]/20 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Item</span>
@@ -647,11 +647,11 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
       {isAddingItem && (
         <form
           onSubmit={handleAddItem}
-          className="p-5 rounded-2xl bg-white dark:bg-[#1A1D1C] border border-[#0F6E5F]/40 shadow-sm animate-in fade-in transition-colors space-y-4"
+          className="p-5 rounded-2xl bg-white dark:bg-[#111111] border border-[#D4AF37]/40 shadow-sm animate-in fade-in transition-colors space-y-4"
         >
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
-              <Plus className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+              <Plus className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
               <span>Add Custom Grocery Item</span>
             </h3>
             <button
@@ -674,7 +674,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
                 placeholder="e.g. Grass-Fed Ribeye Steak"
                 value={newItemName}
                 onChange={(e) => setNewItemName(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#141615] border border-[#E5E7EB] dark:border-[#2A2E2C] text-xs text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:border-[#0F6E5F]"
+                className="w-full px-3 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:border-[#D4AF37]"
               />
             </div>
 
@@ -685,7 +685,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
               <select
                 value={newItemCategory}
                 onChange={(e) => setNewItemCategory(e.target.value as GroceryCategory)}
-                className="w-full px-3 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#141615] border border-[#E5E7EB] dark:border-[#2A2E2C] text-xs text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:border-[#0F6E5F]"
+                className="w-full px-3 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:border-[#D4AF37]"
               >
                 <option value="Lean Protein">🥩 Lean Protein</option>
                 <option value="Complex Carbs">🌾 Complex Carbs</option>
@@ -708,7 +708,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
                 placeholder="e.g. 500g (2 steaks)"
                 value={newItemAmount}
                 onChange={(e) => setNewItemAmount(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#141615] border border-[#E5E7EB] dark:border-[#2A2E2C] text-xs text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:border-[#0F6E5F]"
+                className="w-full px-3 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:border-[#D4AF37]"
               />
             </div>
           </div>
@@ -722,7 +722,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
               placeholder="e.g. Look for organic pasture-raised or clearance markdown"
               value={newItemNotes}
               onChange={(e) => setNewItemNotes(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#141615] border border-[#E5E7EB] dark:border-[#2A2E2C] text-xs text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:border-[#0F6E5F]"
+              className="w-full px-3 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:border-[#D4AF37]"
             />
           </div>
 
@@ -730,13 +730,13 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
             <button
               type="button"
               onClick={() => setIsAddingItem(false)}
-              className="px-4 py-2 rounded-xl text-xs font-semibold text-[#6B7280] hover:bg-gray-100 dark:hover:bg-[#242826]"
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-[#6B7280] hover:bg-gray-100 dark:hover:bg-[#2A2416]"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-[#0F6E5F] text-white text-xs font-bold hover:bg-[#0D5B4F] shadow-xs cursor-pointer"
+              className="px-5 py-2 rounded-xl bg-[#D4AF37] text-white text-xs font-bold hover:bg-[#A68523] shadow-xs cursor-pointer"
             >
               Add to Grocery List
             </button>
@@ -754,7 +754,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
             placeholder="Search items or ingredients..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-xl bg-white dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826] text-xs text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:border-[#0F6E5F]"
+            className="w-full pl-9 pr-4 py-2 rounded-xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:border-[#D4AF37]"
           />
         </div>
 
@@ -765,7 +765,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               selectedCategoryFilter === 'all'
                 ? 'bg-[#1A1D1B] dark:bg-white text-white dark:text-[#1A1D1B]'
-                : 'bg-white dark:bg-[#1A1D1C] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#242826] hover:text-[#1A1D1B] dark:hover:text-white'
+                : 'bg-white dark:bg-[#111111] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#2A2416] hover:text-[#1A1D1B] dark:hover:text-white'
             }`}
           >
             All Items ({shoppingList.items.length})
@@ -790,8 +790,8 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
                 onClick={() => setSelectedCategoryFilter(cat)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1 cursor-pointer ${
                   selectedCategoryFilter === cat
-                    ? 'bg-[#0F6E5F] text-white shadow-xs'
-                    : 'bg-white dark:bg-[#1A1D1C] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#242826] hover:text-[#1A1D1B] dark:hover:text-white'
+                    ? 'bg-[#D4AF37] text-white shadow-xs'
+                    : 'bg-white dark:bg-[#111111] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#2A2416] hover:text-[#1A1D1B] dark:hover:text-white'
                 }`}
               >
                 <span>{style.icon}</span>
@@ -805,7 +805,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
 
       {/* Categorized Grocery List Cards */}
       {categoriesPresent.length === 0 ? (
-        <div className="p-12 text-center bg-white dark:bg-[#1A1D1C] rounded-2xl border border-[#E5E7EB] dark:border-[#242826]">
+        <div className="p-12 text-center bg-white dark:bg-[#111111] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416]">
           <ShoppingCart className="w-12 h-12 text-[#6B7280] mx-auto opacity-40 mb-3" />
           <h3 className="text-base font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
             No grocery items match your search
@@ -818,7 +818,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
               setSearchQuery('');
               setSelectedCategoryFilter('all');
             }}
-            className="mt-4 px-4 py-2 rounded-xl bg-[#0F6E5F] text-white text-xs font-bold hover:bg-[#0D5B4F]"
+            className="mt-4 px-4 py-2 rounded-xl bg-[#D4AF37] text-white text-xs font-bold hover:bg-[#A68523]"
           >
             Clear Filters
           </button>
@@ -833,10 +833,10 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
             return (
               <div
                 key={category}
-                className="bg-white dark:bg-[#1A1D1C] rounded-2xl border border-[#E5E7EB] dark:border-[#242826] overflow-hidden shadow-xs transition-colors flex flex-col justify-between"
+                className="bg-white dark:bg-[#111111] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] overflow-hidden shadow-xs transition-colors flex flex-col justify-between"
               >
                 {/* Category Header */}
-                <div className={`p-4 border-b border-[#E5E7EB] dark:border-[#242826] flex items-center justify-between ${style.bg}`}>
+                <div className={`p-4 border-b border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between ${style.bg}`}>
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{style.icon}</span>
                     <h3 className={`text-sm font-bold ${style.text}`}>
@@ -849,7 +849,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
                 </div>
 
                 {/* Items in this category */}
-                <div className="p-3 divide-y divide-[#F3F4F6] dark:divide-[#242826] flex-1">
+                <div className="p-3 divide-y divide-[#F3F4F6] dark:divide-[#2A2416] flex-1">
                   {catItems.map((item) => (
                     <div
                       key={item.id}
@@ -866,8 +866,8 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
                           onClick={() => handleToggleItem(item.id)}
                           className={`mt-0.5 w-5 h-5 rounded-md border flex items-center justify-center transition-all cursor-pointer shrink-0 ${
                             item.isPurchased
-                              ? 'bg-[#0F6E5F] border-[#0F6E5F] text-white shadow-xs'
-                              : 'border-[#D1D5DB] dark:border-[#3A3F3C] bg-white dark:bg-[#141615] hover:border-[#0F6E5F]'
+                              ? 'bg-[#D4AF37] border-[#D4AF37] text-white shadow-xs'
+                              : 'border-[#D1D5DB] dark:border-[#3A3F3C] bg-white dark:bg-[#111111] hover:border-[#D4AF37]'
                           }`}
                         >
                           {item.isPurchased && <Check className="w-3.5 h-3.5 stroke-[3]" />}
@@ -886,7 +886,7 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
                           </div>
 
                           <div className="flex flex-wrap items-center gap-2 mt-1">
-                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF]">
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]">
                               {item.amount}
                             </span>
 
@@ -925,8 +925,8 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
 
       {/* Science Bulk Prep & Grocery Savings Tips */}
       {shoppingList.bulkPrepTips && shoppingList.bulkPrepTips.length > 0 && (
-        <div className="p-6 rounded-2xl bg-gradient-to-br from-[#0F6E5F]/10 via-transparent to-amber-500/5 dark:from-[#0F6E5F]/20 dark:to-transparent border border-[#0F6E5F]/20">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#0F6E5F] dark:text-[#2DD4BF] uppercase tracking-wider">
+        <div className="p-6 rounded-2xl bg-gradient-to-br from-[#D4AF37]/10 via-transparent to-amber-500/5 dark:from-[#D4AF37]/20 dark:to-transparent border border-[#D4AF37]/20">
+          <div className="flex items-center gap-2 text-xs font-bold text-[#D4AF37] dark:text-[#F0D060] uppercase tracking-wider">
             <Lightbulb className="w-4 h-4 text-[#E8912D]" />
             <span>Evidence-Based Bulk Prep & Cost Optimization</span>
           </div>
@@ -938,9 +938,9 @@ export const SmartShoppingListView: React.FC<SmartShoppingListViewProps> = ({
             {shoppingList.bulkPrepTips.map((tip, idx) => (
               <div
                 key={idx}
-                className="p-3.5 rounded-xl bg-white/80 dark:bg-[#1A1D1C]/80 border border-[#E5E7EB]/80 dark:border-[#242826] text-xs text-[#1A1D1B] dark:text-[#D1D5DB] leading-relaxed flex items-start gap-2.5"
+                className="p-3.5 rounded-xl bg-white/80 dark:bg-[#111111]/80 border border-[#E5E7EB]/80 dark:border-[#2A2416] text-xs text-[#1A1D1B] dark:text-[#D1D5DB] leading-relaxed flex items-start gap-2.5"
               >
-                <div className="w-5 h-5 rounded-full bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/30 text-[#0F6E5F] dark:text-[#2DD4BF] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-5 h-5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/30 text-[#D4AF37] dark:text-[#F0D060] font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">
                   {idx + 1}
                 </div>
                 <span>{tip}</span>

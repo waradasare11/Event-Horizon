@@ -78,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#111312]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#070707]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-3">
           {/* Logo & Brand */}
@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Daily Quick Summary Widget (Visible on lg+ screens) */}
-          <div className="hidden lg:flex items-center gap-6 bg-slate-50 dark:bg-[#161817] px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div className="hidden lg:flex items-center gap-6 bg-slate-50 dark:bg-[#111111] px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
             <div className="text-left">
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                 <span>Today's Energy</span>

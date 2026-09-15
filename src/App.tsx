@@ -1124,7 +1124,7 @@ export default function App() {
       onSaveProfile={handleSaveProfile}
       onExportData={handleExportData}
     >
-      <div className="min-h-screen bg-[#FAFAF8] dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] font-sans flex flex-col selection:bg-[#0F6E5F]/20 selection:text-[#0F6E5F] transition-colors duration-200">
+      <div className="min-h-screen bg-[#F7F1E3] dark:bg-[#070707] text-[#16120A] dark:text-[#F4EBD0] font-sans flex flex-col selection:bg-[#D4AF37]/30 selection:text-[#F0D060] transition-colors duration-200">
         {/* App Header & Navigation */}
         <Header
           activeTab={activeTab}
@@ -1161,13 +1161,13 @@ export default function App() {
         {(pendingCount > 0 || !isOnline) && (
           <div 
             id="pending-sync-alert-banner"
-            className="w-full bg-cyan-500/10 border-b border-cyan-500/20 px-4 py-2 text-xs font-medium text-cyan-900 dark:text-cyan-200 transition-all animate-in fade-in slide-in-from-top-1"
+            className="w-full bg-[#D4AF37]/10 border-b border-[#D4AF37]/20 px-4 py-2 text-xs font-medium text-[#6A5312] dark:text-[#F0D060] transition-all animate-in fade-in slide-in-from-top-1"
           >
             <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]" />
                 </span>
                 <span>
                   {!isOnline 
@@ -1189,7 +1189,7 @@ export default function App() {
                       })
                       .finally(() => setIsSyncing(false));
                   }}
-                  className="px-2.5 py-1 rounded-md bg-gradient-to-r from-cyan-600 to-indigo-600 hover:opacity-90 text-white font-semibold text-[11px] transition-all cursor-pointer shadow-xs"
+                  className="px-2.5 py-1 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#A68523] hover:opacity-90 text-white font-semibold text-[11px] transition-all cursor-pointer shadow-xs"
                 >
                   Sync Now ({pendingCount})
                 </button>
@@ -1271,7 +1271,7 @@ export default function App() {
           {/* 5. Coach View */}
           {activeTab === 'coach' && (
             isSubscriptionExpired ? (
-              <div className="max-w-xl mx-auto my-12 p-8 rounded-3xl bg-white dark:bg-[#161817] border border-amber-500/30 text-center space-y-4 shadow-xl animate-in zoom-in-95">
+              <div className="max-w-xl mx-auto my-12 p-8 rounded-3xl bg-white dark:bg-[#111111] border border-amber-500/30 text-center space-y-4 shadow-xl animate-in zoom-in-95">
                 <div className="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center">
                   <Bot className="w-7 h-7" />
                 </div>
@@ -1289,7 +1289,7 @@ export default function App() {
                 <div className="pt-2">
                   <button
                     onClick={() => setIsPaywallOpen(true)}
-                    className="px-6 py-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs font-bold shadow-md cursor-pointer transition-colors inline-flex items-center gap-2"
+                    className="px-6 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs font-bold shadow-md cursor-pointer transition-colors inline-flex items-center gap-2"
                   >
                     <span>Upgrade to Pro — ₹89/mo</span>
                   </button>

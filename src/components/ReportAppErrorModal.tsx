@@ -108,8 +108,8 @@ export const ReportAppErrorModal: React.FC<ReportAppErrorModalProps> = ({
           {/* Submission Result / AI Diagnostic View */}
           {submittedReport ? (
             <div className="p-6 space-y-4">
-              <div className="flex items-center gap-3 p-4 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-2xl text-emerald-800 dark:text-emerald-300">
-                <CheckCircle2 className="w-6 h-6 shrink-0 text-emerald-600 dark:text-emerald-400" />
+              <div className="flex items-center gap-3 p-4 bg-[#FFFBF0] dark:bg-[#2A2416]/30 border border-[#E6D7A8] dark:border-[#2A2416]/50 rounded-2xl text-[#8E701C] dark:text-[#F0D060]">
+                <CheckCircle2 className="w-6 h-6 shrink-0 text-[#B8922A] dark:text-[#F0D060]" />
                 <div className="text-xs leading-relaxed">
                   <div className="font-bold text-sm">Issue Recorded Successfully</div>
                   <div>Report ID: <span className="font-mono">{submittedReport.id}</span></div>
@@ -135,7 +135,7 @@ export const ReportAppErrorModal: React.FC<ReportAppErrorModalProps> = ({
                   </p>
 
                   <div className="p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200/80 dark:border-slate-800 text-[11px] text-slate-700 dark:text-slate-300">
-                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">Recommended Action: </span>
+                    <span className="font-semibold text-[#B8922A] dark:text-[#F0D060]">Recommended Action: </span>
                     {submittedReport.aiAnalysisVerdict.recommendedCorrection}
                   </div>
                 </div>
@@ -232,7 +232,7 @@ export const ReportAppErrorModal: React.FC<ReportAppErrorModalProps> = ({
               {/* Client Diagnostic Badge */}
               <div className="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-700/60 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
                 <span className="flex items-center gap-1.5 font-medium">
-                  <Activity className="w-3.5 h-3.5 text-emerald-500" />
+                  <Activity className="w-3.5 h-3.5 text-[#D4AF37]" />
                   Auto Diagnostics: {syncState.isOnline ? 'Online' : 'Offline'} • IndexedDB: Active • Queue: {syncState.pendingCount}
                 </span>
                 <span className="text-[10px] text-slate-400">Snapshot auto-attached</span>

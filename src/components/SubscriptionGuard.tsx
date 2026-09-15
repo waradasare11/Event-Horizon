@@ -156,7 +156,7 @@ export const SubscriptionGuard: React.FC<SubscriptionGuardProps> = ({
           </div>
           <button
             onClick={() => setIsPaywallOpen(true)}
-            className="ml-3 shrink-0 px-3 py-1 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs shadow-xs transition-colors cursor-pointer whitespace-nowrap"
+            className="ml-3 shrink-0 px-3 py-1 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-xs shadow-xs transition-colors cursor-pointer whitespace-nowrap"
           >
             Upgrade — ₹89/mo
           </button>

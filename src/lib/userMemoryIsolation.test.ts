@@ -19,6 +19,7 @@ import {
   clearStoredSmartShoppingList
 } from './storage';
 import { MealLog, UserProfile } from '../types';
+import { INITIAL_USER_PROFILE } from './sample-data';
 
 // Mock localStorage for node environment
 const localStorageMock = (() => {
@@ -58,14 +59,17 @@ describe('Per-Gmail Memory Isolation & Verification Test', () => {
 
     const paneerMeal: MealLog = {
       id: 'meal_paneer_1',
-      name: 'Paneer Bhurji & Roti',
+      date: '2026-09-15',
+      mealTitle: 'Paneer Bhurji & Roti',
       calories: 450,
-      protein: 28,
-      carbs: 35,
-      fats: 22,
+      proteinG: 28,
+      carbsG: 35,
+      fatG: 22,
+      fiberG: 4,
       time: '12:30 PM',
-      mealType: 'lunch',
-      verifiedByScience: true,
+      mealType: 'Lunch',
+      isEstimated: false,
+      items: [],
       notes: '200g low-fat paneer with turmeric'
     };
 
@@ -75,7 +79,7 @@ describe('Per-Gmail Memory Isolation & Verification Test', () => {
     // Verify User A sees paneer
     const userAMeals = getStoredMealLogs(userAEmail);
     expect(userAMeals.length).toBe(1);
-    expect(userAMeals[0].name).toBe('Paneer Bhurji & Roti');
+    expect(userAMeals[0].mealTitle).toBe('Paneer Bhurji & Roti');
 
     // Step 2: User A signs out
     setCurrentActiveEmail('');
@@ -93,7 +97,7 @@ describe('Per-Gmail Memory Isolation & Verification Test', () => {
     // Paneer returns for User A
     const restoredUserAMeals = getStoredMealLogs(userAEmail);
     expect(restoredUserAMeals.length).toBe(1);
-    expect(restoredUserAMeals[0].name).toBe('Paneer Bhurji & Roti');
+    expect(restoredUserAMeals[0].mealTitle).toBe('Paneer Bhurji & Roti');
   });
 
   it('TEST 2: Strict email check - If restored snapshot.email !== auth email, discard', async () => {
@@ -103,7 +107,7 @@ describe('Per-Gmail Memory Isolation & Verification Test', () => {
       savedAt: new Date().toISOString(),
       email: 'user.a@gmail.com', // Mismatched email!
       profile: { email: 'user.a@gmail.com', name: 'User A' } as any,
-      mealLogs: [{ id: 'm1', name: 'Paneer' }] as any,
+      mealLogs: [{ id: 'm1', mealTitle: 'Paneer' }] as any,
       workoutLogs: [],
     };
 
@@ -119,40 +123,45 @@ describe('Per-Gmail Memory Isolation & Verification Test', () => {
     expect(USER_MEMORY_FILE_NAME).toBe('AROH_UserMemory.json');
 
     const profileA: UserProfile = {
+      ...INITIAL_USER_PROFILE,
+      id: 'athlete_a',
       name: 'Athlete A',
-      email: 'athlete.a@gmail.com',
       age: 28,
-      gender: 'male',
+      sex: 'male',
       heightCm: 178,
       weightKg: 78,
       targetWeightKg: 75,
+      targetDate: '2026-12-31',
       goal: 'lose_fat',
       dietType: 'vegetarian',
-      dailyCalories: 2100,
-      dailyProtein: 160,
-      dailyCarbs: 210,
-      dailyFat: 65,
-      injuries: [],
-      trainingFrequency: 5,
-      isProfileComplete: true
+      experienceLevel: 'intermediate',
+      trainingDaysPerWeek: 5,
+      selectedDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+      sessionDurationMin: 45,
+      preferredTime: 'evening',
+      musclePriority: 'chest',
+      injuries: []
     };
 
     const paneerMeal: MealLog = {
       id: 'meal_p1',
-      name: 'Tawa Paneer Tikka',
+      date: '2026-09-15',
+      mealTitle: 'Tawa Paneer Tikka',
       calories: 520,
-      protein: 34,
-      carbs: 18,
-      fats: 32,
+      proteinG: 34,
+      carbsG: 18,
+      fatG: 32,
+      fiberG: 3,
       time: '1:00 PM',
-      mealType: 'lunch',
-      verifiedByScience: true
+      mealType: 'Lunch',
+      isEstimated: false,
+      items: []
     };
 
     const snapshot = buildUserMemorySnapshot('athlete.a@gmail.com', profileA, [paneerMeal], []);
     expect(snapshot.email).toBe('athlete.a@gmail.com');
     expect(snapshot.mealLogs.length).toBe(1);
-    expect(snapshot.mealLogs[0].name).toBe('Tawa Paneer Tikka');
+    expect(snapshot.mealLogs[0].mealTitle).toBe('Tawa Paneer Tikka');
 
     const sanitized = sanitizeSnapshotForDrive(snapshot);
     const serialized = JSON.stringify(sanitized);
@@ -172,6 +181,7 @@ describe('Per-Gmail Memory Isolation & Verification Test', () => {
       id: 'sl1',
       name: 'Paneer Diet',
       daysMultiplier: 7,
+      lastCompiledAt: new Date().toISOString(),
       items: [{ id: 'i1', name: 'Low-Fat Paneer', category: 'Lean Protein', amount: '1kg', isPurchased: false }]
     }, userAEmail);
 

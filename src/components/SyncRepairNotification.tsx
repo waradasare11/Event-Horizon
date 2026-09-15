@@ -168,13 +168,13 @@ export const SyncRepairNotification: React.FC = () => {
       onMouseLeave={() => setIsPaused(false)}
       className="fixed bottom-6 right-6 z-40 max-w-md w-full transition-all duration-500 ease-out animate-in fade-in slide-in-from-bottom-3"
     >
-      <div className="relative overflow-hidden p-4 rounded-2xl bg-white/95 dark:bg-[#151C2C]/95 backdrop-blur-md border border-emerald-500/30 dark:border-cyan-500/30 shadow-2xl text-left space-y-3">
+      <div className="relative overflow-hidden p-4 rounded-2xl bg-white/95 dark:bg-[#151C2C]/95 backdrop-blur-md border border-[#D4AF37]/30 dark:border-[#D4AF37]/30 shadow-2xl text-left space-y-3">
         
         {/* Subtle 5-second countdown progress bar */}
         {!isRepairing && !repairSuccess && !showQueueManager && !showDetails && (
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-slate-100 dark:bg-slate-800">
             <div
-              className="h-full bg-cyan-500 transition-all duration-1000 ease-linear"
+              className="h-full bg-[#D4AF37] transition-all duration-1000 ease-linear"
               style={{ width: `${(timeLeft / 5) * 100}%` }}
             />
           </div>
@@ -186,8 +186,8 @@ export const SyncRepairNotification: React.FC = () => {
               hasCaloricDeviations 
                 ? 'bg-amber-500/15 text-amber-500' 
                 : pendingCount > 0 
-                  ? 'bg-cyan-500/15 text-cyan-400' 
-                  : 'bg-emerald-500/15 text-emerald-400'
+                  ? 'bg-[#D4AF37]/15 text-[#D4AF37]' 
+                  : 'bg-[#D4AF37]/15 text-[#F0D060]'
             }`}>
               {hasCaloricDeviations ? <Scale className="w-4 h-4" /> : <Database className="w-4 h-4" />}
             </div>
@@ -197,7 +197,7 @@ export const SyncRepairNotification: React.FC = () => {
                   Sync & Local Storage Queue
                 </h4>
                 {pendingCount > 0 ? (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 border border-cyan-400/30">
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#B8922A] dark:text-[#F0D060] border border-[#D4AF37]/30">
                     {pendingCount} Pending
                   </span>
                 ) : (
@@ -243,7 +243,7 @@ export const SyncRepairNotification: React.FC = () => {
           <div className="space-y-2.5 p-3 bg-slate-50 dark:bg-[#111622] rounded-xl border border-slate-200 dark:border-[#232B3E] animate-in fade-in duration-200">
             <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
               <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900 dark:text-white">
-                <ListOrdered className="w-3.5 h-3.5 text-cyan-400" />
+                <ListOrdered className="w-3.5 h-3.5 text-[#D4AF37]" />
                 <span>Pending Sync Queue ({queueItems.length})</span>
               </div>
               <div className="flex items-center gap-2">
@@ -259,7 +259,7 @@ export const SyncRepairNotification: React.FC = () => {
                 <button
                   onClick={() => triggerSync()}
                   disabled={isSyncing}
-                  className="text-[10px] text-cyan-500 hover:text-cyan-400 font-bold flex items-center gap-1 disabled:opacity-50"
+                  className="text-[10px] text-[#D4AF37] hover:text-[#D4AF37] font-bold flex items-center gap-1 disabled:opacity-50"
                 >
                   <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
                   <span>Sync All</span>
@@ -291,7 +291,7 @@ export const SyncRepairNotification: React.FC = () => {
                           <span className="text-amber-500 font-medium">Retries: {job.retryCount}</span>
                         )}
                         {idx === 0 && (
-                          <span className="text-[9px] font-bold px-1 rounded bg-cyan-500/20 text-cyan-400">
+                          <span className="text-[9px] font-bold px-1 rounded bg-[#D4AF37]/20 text-[#D4AF37]">
                             NEXT
                           </span>
                         )}
@@ -302,7 +302,7 @@ export const SyncRepairNotification: React.FC = () => {
                       {idx > 0 && (
                         <button
                           onClick={() => handlePrioritize(job.id)}
-                          className="p-1 rounded bg-slate-100 dark:bg-slate-800 text-cyan-600 dark:text-cyan-300 hover:bg-cyan-500/20 text-[10px] font-bold flex items-center gap-0.5"
+                          className="p-1 rounded bg-slate-100 dark:bg-slate-800 text-[#B8922A] dark:text-[#F0D060] hover:bg-[#D4AF37]/20 text-[10px] font-bold flex items-center gap-0.5"
                           title="Prioritize to top of queue & sync immediately"
                         >
                           <ArrowUp className="w-3 h-3" />
@@ -325,8 +325,8 @@ export const SyncRepairNotification: React.FC = () => {
         )}
 
         {repairSuccess ? (
-          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold flex items-center gap-1.5">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+          <div className="p-2.5 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060] text-[11px] font-bold flex items-center gap-1.5">
+            <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />
             <span>State Harmonized & Synchronized!</span>
           </div>
         ) : (
@@ -334,7 +334,7 @@ export const SyncRepairNotification: React.FC = () => {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowQueueManager(!showQueueManager)}
-                className="text-[11px] text-cyan-600 dark:text-cyan-400 hover:underline font-bold flex items-center gap-1"
+                className="text-[11px] text-[#B8922A] dark:text-[#D4AF37] hover:underline font-bold flex items-center gap-1"
               >
                 <ListOrdered className="w-3.5 h-3.5" />
                 <span>{showQueueManager ? 'Hide Queue' : `Manage Queue (${queueItems.length})`}</span>
@@ -354,7 +354,7 @@ export const SyncRepairNotification: React.FC = () => {
               id="execute-sync-repair-btn"
               onClick={handleRunRepair}
               disabled={isRepairing}
-              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#0F6E5F] to-emerald-600 text-white text-[11px] font-bold hover:brightness-110 transition-all flex items-center gap-1.5 shadow-xs disabled:opacity-50"
+              className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#D4AF37] text-white text-[11px] font-bold hover:brightness-110 transition-all flex items-center gap-1.5 shadow-xs disabled:opacity-50"
             >
               {isRepairing ? (
                 <>

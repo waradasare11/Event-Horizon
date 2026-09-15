@@ -98,9 +98,9 @@ export const WorkoutNotificationBanner: React.FC<WorkoutNotificationBannerProps>
   return (
     <div className="text-left space-y-3">
       {/* Primary Notification Bar */}
-      <div className="bg-gradient-to-r from-[#0F6E5F]/10 via-[#0F6E5F]/5 to-emerald-500/10 dark:from-[#0F6E5F]/20 dark:via-[#161817] dark:to-emerald-950/30 border border-[#0F6E5F]/30 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+      <div className="bg-gradient-to-r from-[#D4AF37]/10 via-[#D4AF37]/5 to-[#F0D060]/10 dark:from-[#D4AF37]/20 dark:via-[#111111] dark:to-[#111111]/30 border border-[#D4AF37]/30 p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
         <div className="flex items-start sm:items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-[#0F6E5F] text-white shrink-0 shadow-2xs">
+          <div className="p-2.5 rounded-xl bg-[#D4AF37] text-white shrink-0 shadow-2xs">
             <BellRing className="w-5 h-5 animate-pulse" />
           </div>
           <div>
@@ -132,7 +132,7 @@ export const WorkoutNotificationBanner: React.FC<WorkoutNotificationBannerProps>
           {permission !== 'granted' ? (
             <button
               onClick={handleEnableNotifications}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0F6E5F] text-white text-xs font-bold hover:bg-[#0D5B4F] transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#D4AF37] text-white text-xs font-bold hover:bg-[#A68523] transition-all shadow-xs cursor-pointer"
             >
               <Bell className="w-3.5 h-3.5" />
               <span>Enable Browser Alerts</span>
@@ -140,16 +140,16 @@ export const WorkoutNotificationBanner: React.FC<WorkoutNotificationBannerProps>
           ) : (
             <button
               onClick={handleSendTestNotification}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs font-semibold hover:bg-gray-100 dark:hover:bg-[#282C2A] transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs font-semibold hover:bg-gray-100 dark:hover:bg-[#282C2A] transition-all cursor-pointer"
             >
-              <Play className="w-3 h-3 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+              <Play className="w-3 h-3 text-[#D4AF37] dark:text-[#F0D060]" />
               <span>{testSent ? 'Chime Sent!' : 'Test Alert & Audio'}</span>
             </button>
           )}
 
           <button
             onClick={() => setShowSettingsModal(true)}
-            className="p-2 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#282C2A] transition-all cursor-pointer"
+            className="p-2 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2416] text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#282C2A] transition-all cursor-pointer"
             title="Notification Settings"
           >
             <Settings className="w-4 h-4" />
@@ -160,10 +160,10 @@ export const WorkoutNotificationBanner: React.FC<WorkoutNotificationBannerProps>
       {/* Settings Modal */}
       {showSettingsModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
-          <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-2xl max-w-md w-full p-6 space-y-5 shadow-xl">
+          <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl max-w-md w-full p-6 space-y-5 shadow-xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Bell className="w-5 h-5 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+                <Bell className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060]" />
                 <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">
                   Workout Notification Settings
                 </h3>
@@ -178,7 +178,7 @@ export const WorkoutNotificationBanner: React.FC<WorkoutNotificationBannerProps>
 
             <div className="space-y-4 text-xs sm:text-sm">
               {/* Enable toggle */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
                 <div>
                   <div className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">Workout Day Reminders</div>
                   <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Notify on scheduled program days</div>
@@ -187,12 +187,12 @@ export const WorkoutNotificationBanner: React.FC<WorkoutNotificationBannerProps>
                   type="checkbox"
                   checked={currentSettings.enabled}
                   onChange={handleToggleEnabled}
-                  className="w-4 h-4 accent-[#0F6E5F] rounded cursor-pointer"
+                  className="w-4 h-4 accent-[#D4AF37] rounded cursor-pointer"
                 />
               </div>
 
               {/* Sound toggle */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
                 <div>
                   <div className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">Synthesized Harmonic Chime</div>
                   <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Play Web Audio tone with reminder</div>
@@ -201,8 +201,8 @@ export const WorkoutNotificationBanner: React.FC<WorkoutNotificationBannerProps>
                   onClick={handleToggleSound}
                   className={`p-2 rounded-lg border transition-all cursor-pointer ${
                     currentSettings.soundEnabled
-                      ? 'bg-[#0F6E5F]/10 border-[#0F6E5F] text-[#0F6E5F] dark:text-[#5FD1B8]'
-                      : 'bg-gray-100 dark:bg-[#242826] border-[#E5E7EB] dark:border-[#2A2E2C] text-[#9CA3AF]'
+                      ? 'bg-[#D4AF37]/10 border-[#D4AF37] text-[#D4AF37] dark:text-[#F0D060]'
+                      : 'bg-gray-100 dark:bg-[#2A2416] border-[#E5E7EB] dark:border-[#2A2416] text-[#9CA3AF]'
                   }`}
                 >
                   {currentSettings.soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -222,7 +222,7 @@ export const WorkoutNotificationBanner: React.FC<WorkoutNotificationBannerProps>
                       reminderLeadTimeMin: Number(e.target.value),
                     });
                   }}
-                  className="w-full px-3 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
                 >
                   <option value={15}>15 minutes before session</option>
                   <option value={30}>30 minutes before session (Recommended)</option>
@@ -243,10 +243,10 @@ export const WorkoutNotificationBanner: React.FC<WorkoutNotificationBannerProps>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#242826] flex items-center justify-end gap-3">
+            <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-end gap-3">
               <button
                 onClick={() => setShowSettingsModal(false)}
-                className="px-5 py-2 rounded-xl bg-[#0F6E5F] text-white text-xs font-bold hover:bg-[#0D5B4F] transition-all cursor-pointer"
+                className="px-5 py-2 rounded-xl bg-[#D4AF37] text-white text-xs font-bold hover:bg-[#A68523] transition-all cursor-pointer"
               >
                 Save & Close
               </button>

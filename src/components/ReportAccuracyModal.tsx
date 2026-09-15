@@ -141,7 +141,7 @@ export const ReportAccuracyModal: React.FC<ReportAccuracyModalProps> = ({
           {/* Success Notification */}
           {isSuccess ? (
             <div className="p-8 text-center space-y-3">
-              <div className="w-12 h-12 mx-auto rounded-full bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <div className="w-12 h-12 mx-auto rounded-full bg-[#FDF3D0] dark:bg-[#2A2416]/50 text-[#B8922A] dark:text-[#F0D060] flex items-center justify-center">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
               <h4 className="text-lg font-bold text-slate-900 dark:text-white">
@@ -161,7 +161,7 @@ export const ReportAccuracyModal: React.FC<ReportAccuracyModalProps> = ({
                 </div>
                 <div className="flex justify-between items-center text-slate-500 dark:text-slate-400">
                   <span>Model Consensus:</span>
-                  <span className="inline-flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400">
+                  <span className="inline-flex items-center gap-1 font-medium text-[#B8922A] dark:text-[#F0D060]">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     {modelConsensusRating || 'AI Estimate'}
                   </span>
@@ -177,7 +177,7 @@ export const ReportAccuracyModal: React.FC<ReportAccuracyModalProps> = ({
                   id="accuracy-issue-category-select"
                   value={issueCategory}
                   onChange={(e) => setIssueCategory(e.target.value as any)}
-                  className="w-full text-sm px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-800 dark:text-slate-100"
+                  className="w-full text-sm px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-[#D4AF37] focus:outline-none text-slate-800 dark:text-slate-100"
                 >
                   {feature === 'biomechanics' ? (
                     <>
@@ -213,7 +213,7 @@ export const ReportAccuracyModal: React.FC<ReportAccuracyModalProps> = ({
                       ? 'e.g. Squat depth was actually below parallel (105 degrees), but model flagged high hip hinge...'
                       : 'e.g. The plate had 150g Paneer Bhurji, but was identified as scrambled eggs or 80g...'
                   }
-                  className="w-full text-sm p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-800 dark:text-slate-100 placeholder-slate-400 resize-none"
+                  className="w-full text-sm p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-[#D4AF37] focus:outline-none text-slate-800 dark:text-slate-100 placeholder-slate-400 resize-none"
                 />
               </div>
 
@@ -222,7 +222,7 @@ export const ReportAccuracyModal: React.FC<ReportAccuracyModalProps> = ({
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                     <span>Suggested Correction / True Ingredients</span>
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-normal bg-emerald-500/10 px-1.5 py-0.5 rounded-full border border-emerald-500/20">
+                    <span className="text-[10px] text-[#B8922A] dark:text-[#F0D060] font-normal bg-[#D4AF37]/10 px-1.5 py-0.5 rounded-full border border-[#D4AF37]/20">
                       Supervised Fine-Tuning Queue
                     </span>
                   </label>
@@ -233,7 +233,7 @@ export const ReportAccuracyModal: React.FC<ReportAccuracyModalProps> = ({
                   value={suggestedCorrection}
                   onChange={(e) => setSuggestedCorrection(e.target.value)}
                   placeholder="e.g. 150g Cooked Low-Fat Paneer (260 kcal, 31g protein), 2 Whole Wheat Phulkas (140g, 240 kcal)"
-                  className="w-full text-sm p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-800 dark:text-slate-100 placeholder-slate-400 resize-none font-mono text-xs"
+                  className="w-full text-sm p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-[#D4AF37] focus:outline-none text-slate-800 dark:text-slate-100 placeholder-slate-400 resize-none font-mono text-xs"
                 />
                 <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
                   Stored as structured JSON in Firestore for continuous model supervision and calibration.
@@ -253,7 +253,7 @@ export const ReportAccuracyModal: React.FC<ReportAccuracyModalProps> = ({
                   id="submit-accuracy-report-btn"
                   type="submit"
                   disabled={isSubmitting || !userFeedback.trim()}
-                  className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 rounded-xl shadow-md shadow-emerald-600/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-[#A68523] to-[#A68523] hover:from-[#D4AF37] hover:to-[#D4AF37] rounded-xl shadow-md shadow-[#D4AF37]/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                   {isSubmitting ? (
                     <>

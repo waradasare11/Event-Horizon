@@ -31,21 +31,21 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
       <button
         type="button"
         onClick={toggleTheme}
-        className="p-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#1A1D1C] text-[#4B5563] dark:text-[#E8ECE9] hover:bg-[#F9FAFB] dark:hover:bg-[#232726] transition-all shadow-xs flex items-center justify-center relative group"
+        className="p-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#111111] text-[#4B5563] dark:text-[#E8ECE9] hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] transition-all shadow-xs flex items-center justify-center relative group"
         aria-label={`Switch to ${isDark ? 'light mode' : 'gym dark mode'}`}
         title={`Current: ${isDark ? 'Dark Gym Mode' : 'Light Mode'}. Click to switch.`}
       >
         {isDark ? (
-          <Sun className="w-4 h-4 text-amber-400 fill-amber-400/20 transition-transform group-hover:rotate-45" />
+          <Sun className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]/20 transition-transform group-hover:rotate-45" />
         ) : (
-          <Moon className="w-4 h-4 text-[#0F6E5F] fill-[#0F6E5F]/20 transition-transform group-hover:-rotate-12" />
+          <Moon className="w-4 h-4 text-[#B8922A] fill-[#B8922A]/20 transition-transform group-hover:-rotate-12" />
         )}
       </button>
     );
   }
 
   return (
-    <div className="inline-flex items-center p-1 rounded-xl bg-[#F3F4F6] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] shadow-2xs">
+    <div className="inline-flex items-center p-1 rounded-xl bg-[#F3F4F6] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] shadow-2xs">
       <button
         type="button"
         onClick={() => onThemeChange('light')}
@@ -66,7 +66,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
         onClick={() => onThemeChange('dark')}
         className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
           theme === 'dark'
-            ? 'bg-[#2A2E2C] text-white shadow-2xs'
+            ? 'bg-[#2A2416] text-white shadow-2xs'
             : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
         }`}
         aria-label="Dark gym mode"
@@ -81,7 +81,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
         onClick={() => onThemeChange('system')}
         className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
           theme === 'system'
-            ? 'bg-white dark:bg-[#2A2E2C] text-[#1A1D1B] dark:text-white shadow-2xs'
+            ? 'bg-white dark:bg-[#2A2416] text-[#1A1D1B] dark:text-white shadow-2xs'
             : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
         }`}
         aria-label="Auto system theme"

@@ -120,7 +120,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
       }
       return { text: 'Slow Gaining Pace • Small Calorie Bump Recommended', color: 'text-[#3B82F6] bg-[#3B82F6]/10 border-[#3B82F6]/20' };
     }
-    return { text: 'Body Recomposition Steady State', color: 'text-[#0F6E5F] bg-[#0F6E5F]/10 border-[#0F6E5F]/20' };
+    return { text: 'Body Recomposition Steady State', color: 'text-[#D4AF37] bg-[#D4AF37]/10 border-[#D4AF37]/20' };
   };
 
   const rateVerdict = getRateVerdict();
@@ -166,12 +166,12 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-[#161817] rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl border border-[#E5E7EB] dark:border-[#242826] animate-in zoom-in-95 duration-200 text-left my-auto space-y-5 transition-colors">
+      <div className="bg-white dark:bg-[#111111] rounded-3xl max-w-2xl w-full p-5 sm:p-7 shadow-2xl border border-[#E5E7EB] dark:border-[#2A2416] animate-in zoom-in-95 duration-200 text-left my-auto space-y-5 transition-colors">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#242826] pb-3.5">
+        <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#2A2416] pb-3.5">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center">
               <RefreshCw className="w-5 h-5" />
             </div>
             <div>
@@ -185,22 +185,22 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#9CA3AF] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white flex items-center justify-center transition-all text-xs cursor-pointer"
+            className="w-8 h-8 rounded-full bg-[#FAFAF8] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2416] text-[#9CA3AF] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white flex items-center justify-center transition-all text-xs cursor-pointer"
           >
             ✕
           </button>
         </div>
 
         {/* REAL-TIME PROGRESS TREND CHART */}
-        <div className="bg-[#FAFAF8] dark:bg-[#111312] p-4 sm:p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] space-y-3">
+        <div className="bg-[#FAFAF8] dark:bg-[#070707] p-4 sm:p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] uppercase tracking-wide flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                  <Activity className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
                   Live Progress Trend
                 </span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#0F6E5F] text-white animate-pulse">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#D4AF37] text-white animate-pulse">
                   Updates in Real-Time
                 </span>
               </div>
@@ -210,13 +210,13 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
             </div>
 
             {/* Toggle Metric */}
-            <div className="flex items-center gap-1 bg-white dark:bg-[#161817] p-1 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] self-start sm:self-auto">
+            <div className="flex items-center gap-1 bg-white dark:bg-[#111111] p-1 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] self-start sm:self-auto">
               <button
                 type="button"
                 onClick={() => setActiveChartMetric('weight')}
                 className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${
                   activeChartMetric === 'weight'
-                    ? 'bg-[#0F6E5F] text-white'
+                    ? 'bg-[#D4AF37] text-white'
                     : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
                 }`}
               >
@@ -227,7 +227,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
                 onClick={() => setActiveChartMetric('bodyFat')}
                 className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all cursor-pointer ${
                   activeChartMetric === 'bodyFat'
-                    ? 'bg-[#0F6E5F] text-white'
+                    ? 'bg-[#D4AF37] text-white'
                     : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
                 }`}
               >
@@ -238,11 +238,11 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
 
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-3 gap-2 pt-1 text-center">
-            <div className="p-2 rounded-xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+            <div className="p-2 rounded-xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
               <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] block">Live Weight</span>
               <span className="text-sm font-extrabold text-[#1A1D1B] dark:text-[#E8ECE9]">{currentWeight} kg</span>
             </div>
-            <div className="p-2 rounded-xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+            <div className="p-2 rounded-xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
               <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] block">Weekly Delta</span>
               <span className={`text-sm font-extrabold flex items-center justify-center gap-0.5 ${
                 weightDelta < 0 ? 'text-[#16A34A] dark:text-[#4ADE80]' : weightDelta > 0 ? 'text-[#E8912D]' : 'text-[#6B7280] dark:text-[#9EA8A2]'
@@ -251,9 +251,9 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
                 {weightDelta >= 0 ? `+${weightDelta}` : weightDelta} kg
               </span>
             </div>
-            <div className="p-2 rounded-xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+            <div className="p-2 rounded-xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
               <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] block">To Target Goal</span>
-              <span className="text-sm font-extrabold text-[#0F6E5F] dark:text-[#2DD4BF]">
+              <span className="text-sm font-extrabold text-[#D4AF37] dark:text-[#F0D060]">
                 {goalDistance === 0 ? 'Goal Hit! 🎯' : `${Math.abs(goalDistance)} kg ${goalDistance > 0 ? 'to drop' : 'to gain'}`}
               </span>
             </div>
@@ -272,8 +272,8 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
                 <AreaChart data={chartData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="checkInWeightGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#0F6E5F" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="#0F6E5F" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" strokeOpacity={0.4} />
@@ -298,7 +298,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
                             <div className="font-bold flex items-center gap-1">
                               <span>{data.date}</span>
                               {data.isLive && (
-                                <span className="text-[9px] bg-[#0F6E5F] text-white px-1.5 py-0.2 rounded">Live Input</span>
+                                <span className="text-[9px] bg-[#D4AF37] text-white px-1.5 py-0.2 rounded">Live Input</span>
                               )}
                             </div>
                             <div className="text-[#E8912D] font-extrabold">{data.weightKg} kg</div>
@@ -327,7 +327,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
                   <Area
                     type="monotone"
                     dataKey="weightKg"
-                    stroke="#0F6E5F"
+                    stroke="#D4AF37"
                     strokeWidth={2.5}
                     fillOpacity={1}
                     fill="url(#checkInWeightGrad)"
@@ -336,12 +336,12 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
                       if (payload.isLive) {
                         return (
                           <g key={`dot-live`}>
-                            <circle cx={cx} cy={cy} r={7} fill="#0F6E5F" opacity={0.3} className="animate-ping" />
-                            <circle cx={cx} cy={cy} r={5} fill="#0F6E5F" stroke="#ffffff" strokeWidth={2} />
+                            <circle cx={cx} cy={cy} r={7} fill="#D4AF37" opacity={0.3} className="animate-ping" />
+                            <circle cx={cx} cy={cy} r={5} fill="#D4AF37" stroke="#ffffff" strokeWidth={2} />
                           </g>
                         );
                       }
-                      return <circle key={`dot-${cx}-${cy}`} cx={cx} cy={cy} r={3} fill="#0F6E5F" />;
+                      return <circle key={`dot-${cx}-${cy}`} cx={cx} cy={cy} r={3} fill="#D4AF37" />;
                     }}
                   />
                 </AreaChart>
@@ -414,10 +414,10 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
         {/* INPUT FORM */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div className="p-3 rounded-2xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] hover:border-[#0F6E5F] dark:hover:border-[#2DD4BF] transition-all">
+            <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37] dark:hover:border-[#F0D060] transition-all">
               <label className="block text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1 flex items-center justify-between">
                 <span>Current Weight (kg)</span>
-                <span className="text-[10px] text-[#0F6E5F] dark:text-[#2DD4BF] font-bold">Interactive</span>
+                <span className="text-[10px] text-[#D4AF37] dark:text-[#F0D060] font-bold">Interactive</span>
               </label>
               <input
                 type="number"
@@ -427,7 +427,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
                 value={currentWeight}
                 onChange={(e) => handleNumChange(e.target.value, setCurrentWeight)}
                 placeholder="e.g. 70.5"
-                className="w-full text-base font-extrabold text-[#1A1D1B] dark:text-[#E8ECE9] p-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312] focus:outline-none focus:ring-2 focus:ring-[#0F6E5F]"
+                className="w-full text-base font-extrabold text-[#1A1D1B] dark:text-[#E8ECE9] p-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
                 required
               />
               <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] mt-1 block">
@@ -435,7 +435,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
               </span>
             </div>
 
-            <div className="p-3 rounded-2xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] hover:border-[#0F6E5F] dark:hover:border-[#2DD4BF] transition-all">
+            <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37] dark:hover:border-[#F0D060] transition-all">
               <label className="block text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1 flex items-center justify-between">
                 <span>Body Fat % (Optional)</span>
                 <span className="text-[10px] text-[#3B82F6] font-bold">Interactive</span>
@@ -448,7 +448,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
                 value={currentBodyFat}
                 onChange={(e) => handleNumChange(e.target.value, setCurrentBodyFat)}
                 placeholder="e.g. 15.5"
-                className="w-full text-base font-extrabold text-[#1A1D1B] dark:text-[#E8ECE9] p-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312] focus:outline-none focus:ring-2 focus:ring-[#0F6E5F]"
+                className="w-full text-base font-extrabold text-[#1A1D1B] dark:text-[#E8ECE9] p-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
               />
               <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] mt-1 block">
                 Previous: {userProfile.bodyFatPct || 18}%
@@ -469,8 +469,8 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
                     onClick={() => setAdherenceScore(score)}
                     className={`flex-1 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
                       adherenceScore === score
-                        ? 'bg-[#0F6E5F] text-white border-[#0F6E5F]'
-                        : 'bg-[#FAFAF8] dark:bg-[#111312] border-[#E5E7EB] dark:border-[#2A2E2C] text-[#6B7280] dark:text-[#9EA8A2]'
+                        ? 'bg-[#D4AF37] text-white border-[#D4AF37]'
+                        : 'bg-[#FAFAF8] dark:bg-[#070707] border-[#E5E7EB] dark:border-[#2A2416] text-[#6B7280] dark:text-[#9EA8A2]'
                     }`}
                   >
                     {score}★
@@ -492,7 +492,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
                     className={`flex-1 py-1.5 rounded-lg text-xs font-bold border transition-all cursor-pointer ${
                       energyLevel === score
                         ? 'bg-[#E8912D] text-white border-[#E8912D]'
-                        : 'bg-[#FAFAF8] dark:bg-[#111312] border-[#E5E7EB] dark:border-[#2A2E2C] text-[#6B7280] dark:text-[#9EA8A2]'
+                        : 'bg-[#FAFAF8] dark:bg-[#070707] border-[#E5E7EB] dark:border-[#2A2416] text-[#6B7280] dark:text-[#9EA8A2]'
                     }`}
                   >
                     {score}⚡
@@ -511,11 +511,11 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
               placeholder="e.g. Hit all protein targets, strength increased on barbell bench press"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+              className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E5E7EB] dark:border-[#242826]">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2416]">
             <button
               type="button"
               onClick={onClose}
@@ -526,7 +526,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
             <button
               type="submit"
               disabled={isProcessing}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-bold hover:bg-[#0D5B4F] shadow-sm transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs font-bold hover:bg-[#A68523] shadow-sm transition-all cursor-pointer"
             >
               {isProcessing ? (
                 <>

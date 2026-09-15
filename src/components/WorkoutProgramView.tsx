@@ -555,7 +555,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
               particleCount: 80,
               spread: 60,
               origin: { y: 0.6 },
-              colors: ['#0F6E5F', '#E8912D', '#16A34A'],
+              colors: ['#D4AF37', '#E8912D', '#16A34A'],
             });
           } catch (e) {}
         }
@@ -672,7 +672,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#0F6E5F', '#E8912D', '#16A34A'],
+        colors: ['#D4AF37', '#E8912D', '#16A34A'],
       });
     } catch (e) {}
   };
@@ -697,10 +697,10 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
   return (
     <div className="space-y-8 animate-in fade-in duration-300 text-left">
       {/* Top Banner */}
-      <div className="bg-white dark:bg-[#161817] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
+      <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
         <div className="flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF]">
+            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]">
               {currentProgram.splitType.toUpperCase()} SPLIT
             </span>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-400">
@@ -728,8 +728,8 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                   onClick={() => handleSelectProgram(p.id)}
                   className={`text-xs font-bold px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-[#0F6E5F] text-white border-[#0F6E5F] shadow-2xs'
-                      : 'bg-[#FAFAF8] dark:bg-[#1E2220] border-[#E5E7EB] dark:border-[#2A2E2C] text-[#4B5563] dark:text-[#9EA8A2] hover:bg-gray-100 dark:hover:bg-[#252A28]'
+                      ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-2xs'
+                      : 'bg-[#FAFAF8] dark:bg-[#1E2220] border-[#E5E7EB] dark:border-[#2A2416] text-[#4B5563] dark:text-[#9EA8A2] hover:bg-gray-100 dark:hover:bg-[#252A28]'
                   }`}
                 >
                   {p.title.split('(')[0].trim()}
@@ -747,13 +747,13 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
               setActiveRestExerciseName('Inter-Set Rest');
               setIsRestTimerActive(true);
             }}
-            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#0F6E5F]/40 dark:border-[#2DD4BF]/40 text-[#0F6E5F] dark:text-[#2DD4BF] text-xs font-bold hover:bg-[#0F6E5F]/5 dark:hover:bg-[#0F6E5F]/15 shadow-2xs transition-all cursor-pointer"
+            className="inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#D4AF37]/40 dark:border-[#F0D060]/40 text-[#D4AF37] dark:text-[#F0D060] text-xs font-bold hover:bg-[#D4AF37]/5 dark:hover:bg-[#D4AF37]/15 shadow-2xs transition-all cursor-pointer"
           >
-            <Timer className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+            <Timer className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
             <span>{isRestTimerActive ? 'Rest Timer Active' : 'Start Rest Timer'}</span>
           </button>
 
-          <div className="bg-[#FAFAF8] dark:bg-[#1A1D1C] p-2.5 sm:p-3 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] flex items-center gap-3 shrink-0 justify-between">
+          <div className="bg-[#FAFAF8] dark:bg-[#111111] p-2.5 sm:p-3 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] flex items-center gap-3 shrink-0 justify-between">
             <div className="flex items-center gap-2">
               <ShieldAlert className={`w-4 h-4 sm:w-5 sm:h-5 ${activeInjuryMode ? 'text-[#E8912D]' : 'text-[#9CA3AF] dark:text-[#6B7280]'}`} />
               <div>
@@ -767,7 +767,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
               type="checkbox"
               checked={activeInjuryMode}
               onChange={(e) => setActiveInjuryMode(e.target.checked)}
-              className="w-4 h-4 accent-[#0F6E5F] rounded cursor-pointer ml-1"
+              className="w-4 h-4 accent-[#D4AF37] rounded cursor-pointer ml-1"
             />
           </div>
         </div>
@@ -781,7 +781,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
             setActiveRestExerciseName('Inter-Set Recovery');
             setIsRestTimerActive(true);
           }}
-          className="fixed bottom-6 right-6 z-40 px-4 py-3 rounded-2xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs shadow-2xl flex items-center gap-2.5 transition-all hover:scale-105 cursor-pointer border-2 border-white/20 animate-in fade-in"
+          className="fixed bottom-6 right-6 z-40 px-4 py-3 rounded-2xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-xs shadow-2xl flex items-center gap-2.5 transition-all hover:scale-105 cursor-pointer border-2 border-white/20 animate-in fade-in"
           title="Open Floating Rest Timer"
         >
           <Timer className="w-4 h-4 animate-pulse" />
@@ -803,14 +803,14 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
       {/* Recent Swap Toast Banner */}
       {recentSwapBanner && (
-        <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-300 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300 flex items-center justify-between gap-3 animate-in slide-in-from-top-2">
+        <div className="p-4 rounded-2xl bg-[#FFFBF0] dark:bg-[#2A2416]/50 border border-[#D4AF37]/50 dark:border-[#2A2416] text-xs text-[#8E701C] dark:text-[#F0D060] flex items-center justify-between gap-3 animate-in slide-in-from-top-2">
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+            <Zap className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060] shrink-0" />
             <span className="font-semibold">{recentSwapBanner}</span>
           </div>
           <button
             onClick={() => setRecentSwapBanner(null)}
-            className="text-emerald-700 dark:text-emerald-400 font-bold hover:underline cursor-pointer"
+            className="text-[#A68523] dark:text-[#F0D060] font-bold hover:underline cursor-pointer"
           >
             Dismiss
           </button>
@@ -825,13 +825,13 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
       />
 
       {/* Sub-view Selector Tabs: Program Schedule vs 150+ Exercise Library */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[#E5E7EB] dark:border-[#242826] pb-3">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-3">
         <div className="flex items-center gap-2 overflow-x-auto">
           <button
             onClick={() => setActiveTab('schedule')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'schedule'
-                ? 'bg-[#0F6E5F] text-white shadow-xs'
+                ? 'bg-[#D4AF37] text-white shadow-xs'
                 : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
             }`}
           >
@@ -843,7 +843,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
             onClick={() => setActiveTab('library')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'library'
-                ? 'bg-[#0F6E5F] text-white shadow-xs'
+                ? 'bg-[#D4AF37] text-white shadow-xs'
                 : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9] hover:bg-gray-100 dark:hover:bg-[#1E201F]'
             }`}
           >
@@ -855,13 +855,13 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
         {/* Equipment & Split Preset Selector */}
         <div className="flex items-center gap-2">
           <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2] font-semibold flex items-center gap-1">
-            <Dumbbell className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+            <Dumbbell className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
             <span>Gear Mode:</span>
           </span>
           <select
             value={currentEquipment}
             onChange={(e) => handleEquipmentChange(e.target.value as EquipmentType)}
-            className="text-xs font-bold px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#1C1F1E] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:ring-1 focus:ring-[#0F6E5F] cursor-pointer"
+            className="text-xs font-bold px-3 py-1.5 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#1C1F1E] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:ring-1 focus:ring-[#D4AF37] cursor-pointer"
           >
             <option value="full_gym">🏋️ Full Commercial Gym (Barbell, Cable, Machine)</option>
             <option value="dumbbells_bench">🏡 Home Dumbbells & Bench</option>
@@ -888,7 +888,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
           {/* Action Toolbar: Google Keep Sync, Batch Delete & Manage Workout History */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] flex-wrap">
+            <div className="flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] flex-wrap">
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">Workout History & Sync:</span>
                 <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">({workoutLogs.length} logged sessions)</span>
@@ -900,7 +900,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                     <button
                       type="button"
                       onClick={() => setShowManageHistory(!showManageHistory)}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-[#232726] dark:hover:bg-[#2A2E2C] text-[#374151] dark:text-[#D1D5DB] text-xs font-semibold transition-all cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-[#1A1A1A] dark:hover:bg-[#2A2416] text-[#374151] dark:text-[#D1D5DB] text-xs font-semibold transition-all cursor-pointer"
                     >
                       <span>{showManageHistory ? 'Hide Sessions' : 'Manage Logs'}</span>
                     </button>
@@ -908,7 +908,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                     <button
                       type="button"
                       onClick={handleSelectAllWorkouts}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-[#232726] dark:hover:bg-[#2A2E2C] text-[#374151] dark:text-[#D1D5DB] text-xs font-semibold transition-all cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-[#1A1A1A] dark:hover:bg-[#2A2416] text-[#374151] dark:text-[#D1D5DB] text-xs font-semibold transition-all cursor-pointer"
                     >
                       <span>{selectedWorkoutIds.length === workoutLogs.length ? 'Deselect All' : 'Select All'}</span>
                     </button>
@@ -953,7 +953,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
             {/* Expandable Workout Logs Batch Manager */}
             {showManageHistory && workoutLogs.length > 0 && (
-              <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] space-y-2.5 animate-in fade-in duration-200">
+              <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] space-y-2.5 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-1">
                   <span>Select logs to batch delete or review details:</span>
                   <span>{selectedWorkoutIds.length} of {workoutLogs.length} selected</span>
@@ -970,7 +970,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                         className={`p-3 rounded-xl border flex items-center justify-between gap-2.5 transition-colors ${
                           isSelected
                             ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-300 dark:border-rose-800'
-                            : 'bg-white dark:bg-[#1C1F1E] border-[#E5E7EB] dark:border-[#2A2E2C]'
+                            : 'bg-white dark:bg-[#1C1F1E] border-[#E5E7EB] dark:border-[#2A2416]'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -978,7 +978,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleSelectWorkout(logIdentifier)}
-                            className="w-4 h-4 rounded text-[#0F6E5F] focus:ring-[#0F6E5F] border-gray-300 dark:border-zinc-700 cursor-pointer"
+                            className="w-4 h-4 rounded text-[#D4AF37] focus:ring-[#D4AF37] border-gray-300 dark:border-zinc-700 cursor-pointer"
                             title={isSelected ? 'Deselect workout' : 'Select workout for batch action'}
                           />
                           <div>
@@ -999,7 +999,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
                             {/* Performance Reflection Notes */}
                             {log.notes && editingLogId !== logIdentifier && (
-                              <div className="mt-1.5 p-2 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/50 dark:border-emerald-800/40 text-[11px] text-emerald-900 dark:text-emerald-200 flex items-start justify-between gap-2">
+                              <div className="mt-1.5 p-2 rounded-lg bg-[#FFFBF0]/70 dark:bg-[#2A2416]/30 border border-[#E6D7A8]/50 dark:border-[#2A2416]/40 text-[11px] text-[#6A5312] dark:text-[#F0D060] flex items-start justify-between gap-2">
                                 <div className="italic flex-1 break-words">
                                   "{log.notes}"
                                 </div>
@@ -1009,7 +1009,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                                     setEditingLogId(logIdentifier);
                                     setEditingLogNotes(log.notes || '');
                                   }}
-                                  className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold hover:underline shrink-0 cursor-pointer"
+                                  className="text-[10px] text-[#A68523] dark:text-[#F0D060] font-semibold hover:underline shrink-0 cursor-pointer"
                                 >
                                   Edit
                                 </button>
@@ -1023,7 +1023,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                                   onChange={(e) => setEditingLogNotes(e.target.value)}
                                   placeholder="Update reflection..."
                                   rows={2}
-                                  className="w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#111312] text-gray-900 dark:text-white"
+                                  className="w-full text-xs p-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#070707] text-gray-900 dark:text-white"
                                 />
                                 <div className="flex gap-2 justify-end">
                                   <button
@@ -1041,7 +1041,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                                       }
                                       setEditingLogId(null);
                                     }}
-                                    className="px-2.5 py-1 text-[11px] font-semibold rounded bg-[#0F6E5F] text-white"
+                                    className="px-2.5 py-1 text-[11px] font-semibold rounded bg-[#D4AF37] text-white"
                                   >
                                     Save Note
                                   </button>
@@ -1056,7 +1056,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                                   setEditingLogId(logIdentifier);
                                   setEditingLogNotes('');
                                 }}
-                                className="mt-1 text-[11px] text-[#0F6E5F] dark:text-[#2DD4BF] hover:underline cursor-pointer flex items-center gap-1"
+                                className="mt-1 text-[11px] text-[#D4AF37] dark:text-[#F0D060] hover:underline cursor-pointer flex items-center gap-1"
                               >
                                 + Add reflections / notes
                               </button>
@@ -1095,13 +1095,13 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                   onClick={() => setSelectedDayIndex(idx)}
                   className={`p-4 rounded-xl border text-left min-w-[200px] transition-all flex flex-col justify-between cursor-pointer ${
                     isSelected
-                      ? 'bg-white dark:bg-[#1A1D1C] border-[#0F6E5F] dark:border-[#2DD4BF] ring-1 ring-[#0F6E5F] dark:ring-[#2DD4BF] shadow-xs'
-                      : 'bg-[#FAFAF8] dark:bg-[#161817] border-[#E5E7EB] dark:border-[#242826] hover:bg-white dark:hover:bg-[#1E2220] text-[#6B7280] dark:text-[#9EA8A2]'
+                      ? 'bg-white dark:bg-[#111111] border-[#D4AF37] dark:border-[#F0D060] ring-1 ring-[#D4AF37] dark:ring-[#F0D060] shadow-xs'
+                      : 'bg-[#FAFAF8] dark:bg-[#111111] border-[#E5E7EB] dark:border-[#2A2416] hover:bg-white dark:hover:bg-[#1E2220] text-[#6B7280] dark:text-[#9EA8A2]'
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className={`font-semibold ${isSelected ? 'text-[#0F6E5F] dark:text-[#2DD4BF]' : 'text-[#6B7280] dark:text-[#9EA8A2]'}`}>
+                      <span className={`font-semibold ${isSelected ? 'text-[#D4AF37] dark:text-[#F0D060]' : 'text-[#6B7280] dark:text-[#9EA8A2]'}`}>
                         {day.dayOfWeek}
                       </span>
                       {isAllDone && (
@@ -1118,7 +1118,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
                   <div className="mt-3 flex items-center justify-between text-[11px]">
                     <span className="text-[#6B7280] dark:text-[#9EA8A2]">{day.exercises.length} movements</span>
-                    <span className="font-semibold text-[#0F6E5F] dark:text-[#2DD4BF]">
+                    <span className="font-semibold text-[#D4AF37] dark:text-[#F0D060]">
                       {completedCount}/{day.exercises.length} completed
                     </span>
                   </div>
@@ -1129,19 +1129,19 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
       {/* Active Workout Day View */}
       {activeDay && (
-        <div className="bg-white dark:bg-[#161817] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-6 transition-colors">
+        <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-6 transition-colors">
           {/* Day Progress Header & Biomechanical Arrangement Actions */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#242826] pb-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-4">
             <div>
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF]">
+                <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]">
                   {activeDay.dayOfWeek} Session
                 </span>
                 <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2] flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
                   ~{activeDay.durationMin} minutes
                 </span>
-                <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                <span className="text-xs font-bold text-[#A68523] dark:text-[#F0D060] bg-[#D4AF37]/10 px-2 py-0.5 rounded border border-[#D4AF37]/20">
                   Biomechanical Hierarchy
                 </span>
               </div>
@@ -1157,7 +1157,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                 {/* ⚡ One-Click Auto Re-Order Compound -> Isolation */}
                 <button
                   onClick={handleAutoSortBiomechanics}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold shadow-2xs transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#A68523] to-[#A68523] hover:from-[#8E701C] hover:to-[#8E701C] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer"
                   title="Automatically arrange exercises: Heavy Compounds → Secondary Multi-Joint → Isolations → Core"
                 >
                   <Zap className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
@@ -1166,7 +1166,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
                 <button
                   onClick={() => setIsAddMovementModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs font-bold shadow-2xs transition-all cursor-pointer"
                   title="Add any movement from the 150+ exercise library to this day"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -1186,10 +1186,10 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                 <button
                   onClick={handleRunFullAudit}
                   disabled={isAuditing}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-bold border border-purple-500/30 transition-all cursor-pointer shadow-2xs disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-purple-700 dark:text-[#F0D060] text-xs font-bold border border-[#D4AF37]/30 transition-all cursor-pointer shadow-2xs disabled:opacity-50"
                   title="Audit all workout splits against authoritative ExerciseRegistry & refresh YouTube tutorial URLs"
                 >
-                  <ShieldCheck className={`w-3.5 h-3.5 text-purple-600 dark:text-purple-400 ${isAuditing ? 'animate-spin' : ''}`} />
+                  <ShieldCheck className={`w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060] ${isAuditing ? 'animate-spin' : ''}`} />
                   <span>{isAuditing ? 'Auditing...' : 'Audit YouTube Links'}</span>
                 </button>
               </div>
@@ -1201,9 +1201,9 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                     {dayCompletedCount}/{totalDayExercises} ({dayProgressPercent}%)
                   </div>
                 </div>
-                <div className="w-14 bg-[#F3F4F6] dark:bg-[#2A2E2C] rounded-full h-2.5 overflow-hidden">
+                <div className="w-14 bg-[#F3F4F6] dark:bg-[#2A2416] rounded-full h-2.5 overflow-hidden">
                   <div
-                    className="bg-[#0F6E5F] dark:bg-[#2DD4BF] h-2.5 rounded-full transition-all duration-300"
+                    className="bg-[#D4AF37] dark:bg-[#F0D060] h-2.5 rounded-full transition-all duration-300"
                     style={{ width: `${dayProgressPercent}%` }}
                   />
                 </div>
@@ -1227,8 +1227,8 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                   key={exercise.id}
                   className={`p-4 sm:p-5 rounded-xl border transition-all ${
                     isCompleted
-                      ? 'bg-[#FAFAF8] dark:bg-[#1A1D1C]/60 border-[#E5E7EB] dark:border-[#242826] opacity-75'
-                      : 'bg-white dark:bg-[#1A1D1C] border-[#E5E7EB] dark:border-[#2A2E2C] hover:border-[#0F6E5F]/50 dark:hover:border-[#2DD4BF]/50 shadow-xs'
+                      ? 'bg-[#FAFAF8] dark:bg-[#111111]/60 border-[#E5E7EB] dark:border-[#2A2416] opacity-75'
+                      : 'bg-white dark:bg-[#111111] border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37]/50 dark:hover:border-[#F0D060]/50 shadow-xs'
                   }`}
                 >
                   <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -1242,7 +1242,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                           className={`p-1 rounded-md transition-colors ${
                             isFirst
                               ? 'text-gray-300 dark:text-gray-700 cursor-not-allowed'
-                              : 'text-gray-500 hover:text-[#0F6E5F] dark:text-gray-400 dark:hover:text-[#2DD4BF] hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer'
+                              : 'text-gray-500 hover:text-[#D4AF37] dark:text-gray-400 dark:hover:text-[#F0D060] hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer'
                           }`}
                           title="Move earlier in workout session"
                         >
@@ -1254,7 +1254,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                           className={`p-1 rounded-md transition-colors ${
                             isLast
                               ? 'text-gray-300 dark:text-gray-700 cursor-not-allowed'
-                              : 'text-gray-500 hover:text-[#0F6E5F] dark:text-gray-400 dark:hover:text-[#2DD4BF] hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer'
+                              : 'text-gray-500 hover:text-[#D4AF37] dark:text-gray-400 dark:hover:text-[#F0D060] hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer'
                           }`}
                           title="Move later in workout session"
                         >
@@ -1264,7 +1264,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
                       <button
                         onClick={() => toggleExerciseComplete(exercise.id, exercise.name, exercise.restSeconds)}
-                        className="mt-1 text-[#0F6E5F] dark:text-[#2DD4BF] hover:scale-110 transition-transform shrink-0 cursor-pointer"
+                        className="mt-1 text-[#D4AF37] dark:text-[#F0D060] hover:scale-110 transition-transform shrink-0 cursor-pointer"
                         title={isCompleted ? "Mark Incomplete" : "Mark Set Complete & Auto-Trigger Rest Timer"}
                       >
                         {isCompleted ? (
@@ -1294,7 +1294,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                       <div className="flex-1 min-w-0">
                         {/* Biomechanical Hierarchy Pill & Meta */}
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF]">
+                          <span className="text-[11px] font-bold px-2 py-0.5 rounded bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]">
                             #{idx + 1}
                           </span>
                           
@@ -1305,10 +1305,10 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
                           {/* Authoritative ExerciseRegistry Verified Checkmark Badge */}
                           <span 
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold border border-emerald-500/30 shadow-2xs"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060] text-[11px] font-bold border border-[#D4AF37]/30 shadow-2xs"
                             title="Cross-referenced & verified with ExerciseRegistry. YouTube search URL guaranteed 100% precision."
                           >
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060]" />
                             <span>Verified</span>
                           </span>
 
@@ -1337,8 +1337,8 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                             >
                               {isCopied ? (
                                 <>
-                                  <Check className="w-3 h-3 text-emerald-500" />
-                                  <span className="text-emerald-600 dark:text-emerald-400">Copied!</span>
+                                  <Check className="w-3 h-3 text-[#D4AF37]" />
+                                  <span className="text-[#B8922A] dark:text-[#F0D060]">Copied!</span>
                                 </>
                               ) : (
                                 <>
@@ -1350,7 +1350,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
                             <button
                               onClick={() => handleOpenSmartSwap(exercise)}
-                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-[#0F6E5F]/10 hover:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] text-[11px] font-bold transition-all cursor-pointer"
+                              className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] text-[11px] font-bold transition-all cursor-pointer"
                               title="Swap with an equivalent movement"
                             >
                               <ArrowRightLeft className="w-3 h-3" />
@@ -1374,7 +1374,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
                         {/* Movement Pattern Cue */}
                         <div className="mt-1 flex items-center gap-2 text-xs text-[#6B7280] dark:text-[#9EA8A2]">
-                          <span className="font-semibold text-[#0F6E5F] dark:text-[#2DD4BF]">{bioClass.movementPattern}</span>
+                          <span className="font-semibold text-[#D4AF37] dark:text-[#F0D060]">{bioClass.movementPattern}</span>
                           <span>•</span>
                           <span>{bioClass.jointType}</span>
                         </div>
@@ -1392,7 +1392,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                     </div>
 
                     {/* Prescribed Sets / Reps / Target RPE / Rest & Timer Action */}
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-[#FAFAF8] dark:bg-[#111312] p-3 rounded-xl border border-[#E5E7EB] dark:border-[#242826] shrink-0 justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-[#FAFAF8] dark:bg-[#070707] p-3 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] shrink-0 justify-between">
                       <div className="flex items-center gap-3 justify-between sm:justify-start">
                         <div className="text-center px-1.5">
                           <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] uppercase tracking-wider font-semibold">
@@ -1403,7 +1403,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                           </div>
                         </div>
 
-                        <div className="h-6 w-[1px] bg-[#E5E7EB] dark:bg-[#242826]" />
+                        <div className="h-6 w-[1px] bg-[#E5E7EB] dark:bg-[#2A2416]" />
 
                         <div className="text-center px-1.5">
                           <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] uppercase tracking-wider font-semibold">
@@ -1414,7 +1414,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                           </div>
                         </div>
 
-                        <div className="h-6 w-[1px] bg-[#E5E7EB] dark:bg-[#242826]" />
+                        <div className="h-6 w-[1px] bg-[#E5E7EB] dark:bg-[#2A2416]" />
 
                         {/* Interactive Rate of Perceived Exertion (RPE) Input */}
                         <div className="text-center px-1.5">
@@ -1442,7 +1442,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                           </div>
                         </div>
 
-                        <div className="h-6 w-[1px] bg-[#E5E7EB] dark:bg-[#242826]" />
+                        <div className="h-6 w-[1px] bg-[#E5E7EB] dark:bg-[#2A2416]" />
 
                         {/* Working Load (kg) Input */}
                         <div className="text-center px-1.5">
@@ -1456,12 +1456,12 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                             placeholder="kg"
                             value={loggedExerciseWeights[exercise.id] ?? ''}
                             onChange={(e) => handleUpdateWeight(exercise.id, parseFloat(e.target.value) || 0)}
-                            className="w-14 text-center text-xs sm:text-sm font-bold bg-white dark:bg-[#1A1D1C] border border-gray-200 dark:border-gray-700 rounded-lg p-1 text-gray-900 dark:text-white"
+                            className="w-14 text-center text-xs sm:text-sm font-bold bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-700 rounded-lg p-1 text-gray-900 dark:text-white"
                           />
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 justify-between sm:justify-start pt-2 sm:pt-0 sm:border-l sm:border-[#E5E7EB] sm:dark:border-[#242826] sm:pl-3">
+                      <div className="flex items-center gap-2 justify-between sm:justify-start pt-2 sm:pt-0 sm:border-l sm:border-[#E5E7EB] sm:dark:border-[#2A2416] sm:pl-3">
                         {/* RIR Interpretation Cue */}
                         <div className="text-[10px] text-gray-500 dark:text-gray-400 font-medium">
                           {(() => {
@@ -1476,7 +1476,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
                         <button
                           onClick={() => startRestForExercise(exercise.name, exercise.restSeconds)}
-                          className="px-2.5 py-1 rounded-lg bg-[#0F6E5F]/10 hover:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] text-xs font-bold transition-opacity cursor-pointer group flex items-center gap-1"
+                          className="px-2.5 py-1 rounded-lg bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] text-xs font-bold transition-opacity cursor-pointer group flex items-center gap-1"
                           title="Click to start automated rest countdown for this exercise"
                         >
                           <Play className="w-2.5 h-2.5 fill-current" />
@@ -1491,7 +1491,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
           </div>
 
           {/* Session Complete Bottom CTA */}
-          <div className="p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826] space-y-4 mt-6">
+          <div className="p-5 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] space-y-4 mt-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <div className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -1504,7 +1504,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
 
               <button
                 onClick={handleLogActiveDayToStreak}
-                className="px-5 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-bold hover:bg-[#0D5B4F] transition-all flex items-center justify-center gap-2 shadow-sm shrink-0 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs sm:text-sm font-bold hover:bg-[#A68523] transition-all flex items-center justify-center gap-2 shadow-sm shrink-0 cursor-pointer"
               >
                 <Flame className="w-4 h-4 text-amber-300 fill-amber-300" />
                 <span>Lock In Session & Boost Streak</span>
@@ -1512,7 +1512,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
             </div>
 
             {/* Optional Post-Workout Notes Reflection Field */}
-            <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#242826]">
+            <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#2A2416]">
               <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
                 Post-Workout Performance Reflections & Notes (Optional)
               </label>
@@ -1521,7 +1521,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                 onChange={(e) => setActivePostWorkoutNotes(e.target.value)}
                 placeholder="Jot down notes (e.g., Felt strong on squats, new PR on bench press, minor hamstring tightness, great pump)..."
                 rows={2}
-                className="w-full p-2.5 text-xs rounded-xl border border-[#E5E7EB] dark:border-[#242826] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:ring-2 focus:ring-[#0F6E5F] placeholder-gray-400 dark:placeholder-gray-600 resize-none"
+                className="w-full p-2.5 text-xs rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-hidden focus:ring-2 focus:ring-[#D4AF37] placeholder-gray-400 dark:placeholder-gray-600 resize-none"
               />
             </div>
           </div>
@@ -1566,12 +1566,12 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
       {/* Quick Add Movement Modal */}
       {isAddMovementModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in">
-          <div className="bg-white dark:bg-[#1A1D1C] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95">
+          <div className="bg-white dark:bg-[#111111] rounded-2xl border border-gray-200 dark:border-gray-800 shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95">
             {/* Header */}
             <div className="p-4 sm:p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Plus className="w-5 h-5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                  <Plus className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060]" />
                   <span>Add Exercise to {activeDay?.dayName}</span>
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -1587,13 +1587,13 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
             </div>
 
             {/* Search & Category Filter */}
-            <div className="p-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#141615] space-y-3">
+            <div className="p-4 border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#111111] space-y-3">
               <input
                 type="text"
                 value={addMovementSearch}
                 onChange={(e) => setAddMovementSearch(e.target.value)}
                 placeholder="Search exercise name (e.g., Incline Dumbbell Press, Pull-Up, Bicep Curl)..."
-                className="w-full px-3.5 py-2 rounded-xl text-xs sm:text-sm bg-white dark:bg-[#1E2220] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#0F6E5F]"
+                className="w-full px-3.5 py-2 rounded-xl text-xs sm:text-sm bg-white dark:bg-[#1E2220] border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-[#D4AF37]"
               />
 
               <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
@@ -1603,7 +1603,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                     onClick={() => setAddMovementCategory(cat)}
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                       addMovementCategory === cat
-                        ? 'bg-[#0F6E5F] text-white'
+                        ? 'bg-[#D4AF37] text-white'
                         : 'bg-white dark:bg-[#1E2220] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-100'
                     }`}
                   >
@@ -1639,7 +1639,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                             <span className="font-bold text-xs sm:text-sm text-gray-900 dark:text-white truncate">
                               {item.name}
                             </span>
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] font-semibold">
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] font-semibold">
                               {item.category}
                             </span>
                           </div>
@@ -1666,7 +1666,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                             emgFocus: `${item.hypertrophyRank} Hypertrophy (${item.hypertrophyScore}/10) • ${item.muscleBuildingQuality.slice(0, 50)}...`,
                           });
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs font-bold shrink-0 transition-colors flex items-center gap-1 cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs font-bold shrink-0 transition-colors flex items-center gap-1 cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add</span>

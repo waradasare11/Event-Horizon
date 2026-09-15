@@ -54,7 +54,7 @@ export const Footer: React.FC<FooterProps> = ({
               id="report-issue-footer-btn"
               type="button"
               onClick={onOpenReportError}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 font-semibold text-[11px] transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-purple-700 dark:text-[#F0D060] border border-[#D4AF37]/30 font-semibold text-[11px] transition-all cursor-pointer"
               title="Report a bug, calculation discrepancy, or suggest an enhancement"
             >
               <span>Report Issue / Feedback</span>
@@ -67,7 +67,7 @@ export const Footer: React.FC<FooterProps> = ({
                   <button
                     onClick={onTriggerAudit}
                     disabled={isAuditing}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30 font-semibold text-[11px] transition-all cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-purple-700 dark:text-[#F0D060] border border-[#D4AF37]/30 font-semibold text-[11px] transition-all cursor-pointer disabled:opacity-50"
                     title="Audit workout programs against ExerciseRegistry"
                   >
                     <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
@@ -82,12 +82,12 @@ export const Footer: React.FC<FooterProps> = ({
                     onClick={onTogglePrecisionStatus}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all cursor-pointer shadow-2xs ${
                       precisionStatus === 'active'
-                        ? 'bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
-                        : 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
+                        ? 'bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/20'
+                        : 'bg-gray-500/10 dark:bg-gray-500/20 text-gray-600 dark:text-gray-400 border-gray-500/30 hover:bg-gray-500/20'
                     }`}
                   >
                     <span className={`w-2 h-2 rounded-full ${
-                      precisionStatus === 'active' ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+                      precisionStatus === 'active' ? 'bg-amber-500 animate-pulse' : 'bg-gray-400'
                     }`} />
                     <span>Consensus: {precisionStatus === 'active' ? 'Active' : 'Standby'}</span>
                   </button>

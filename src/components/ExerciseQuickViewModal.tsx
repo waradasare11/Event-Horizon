@@ -157,18 +157,18 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-xs animate-fadeIn overflow-y-auto">
       <div 
-        className="relative w-full max-w-2xl bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#262A28] rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[94vh] flex flex-col text-left"
+        className="relative w-full max-w-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#262A28] rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[94vh] flex flex-col text-left"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-5 border-b border-[#E5E7EB] dark:border-[#242826] bg-[#FAFAF8] dark:bg-[#1B1E1D] flex items-start justify-between gap-3 shrink-0">
+        <div className="p-5 border-b border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#1B1E1D] flex items-start justify-between gap-3 shrink-0">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1.5">
               {/* Hypertrophy Rank Badge */}
               <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
                 hypertrophyRank === 'S-Tier'
                   ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
-                  : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                  : 'bg-[#D4AF37]/15 text-[#B8922A] dark:text-[#F0D060] border border-[#D4AF37]/30'
               }`}>
                 <Award className="w-3.5 h-3.5" />
                 {hypertrophyRank} • Hypertrophy Rating: {hypertrophyScore}/10
@@ -180,7 +180,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
               </span>
 
               {/* Category */}
-              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8]">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
                 {hindiCategory}
               </span>
 
@@ -194,7 +194,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
               <h2 className="text-xl font-extrabold text-[#1A1D1B] dark:text-[#E8ECE9] leading-snug">
                 {exercise.name}
               </h2>
-              <span className="px-2 py-0.5 rounded-md bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#5FD1B8] font-bold text-xs">
+              <span className="px-2 py-0.5 rounded-md bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] font-bold text-xs">
                 Easy Name: {photoData.simplifiedName}
               </span>
             </div>
@@ -258,8 +258,8 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
             >
               {isCopied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-500" />
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">Copied!</span>
+                  <Check className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <span className="text-[#B8922A] dark:text-[#F0D060] font-bold">Copied!</span>
                 </>
               ) : (
                 <>
@@ -274,7 +274,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
         {/* Scrollable Content Body */}
         <div className="p-5 overflow-y-auto space-y-4 text-xs">
           {/* Visual Mode Selector & Multi-Step Interactive Gallery */}
-          <div className="rounded-2xl overflow-hidden border border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#1A1D1C] shadow-xs">
+          <div className="rounded-2xl overflow-hidden border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#111111] shadow-xs">
             {/* View Mode Toggle Bar */}
             <div className="flex items-center justify-between p-2 border-b border-[#E5E7EB] dark:border-[#262A28] bg-gray-50 dark:bg-[#181B1A] gap-2 flex-wrap">
               <div className="flex items-center gap-1 bg-gray-200/70 dark:bg-black/40 p-1 rounded-xl">
@@ -282,7 +282,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
                   onClick={() => setVisualMode('biomechanics')}
                   className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                     visualMode === 'biomechanics'
-                      ? 'bg-[#0F6E5F] text-white shadow-xs'
+                      ? 'bg-[#D4AF37] text-white shadow-xs'
                       : 'text-[#4B5563] dark:text-[#9EA8A2] hover:text-[#1A1D1B]'
                   }`}
                 >
@@ -293,7 +293,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
                   onClick={() => setVisualMode('photo')}
                   className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                     visualMode === 'photo'
-                      ? 'bg-[#0F6E5F] text-white shadow-xs'
+                      ? 'bg-[#D4AF37] text-white shadow-xs'
                       : 'text-[#4B5563] dark:text-[#9EA8A2] hover:text-[#1A1D1B]'
                   }`}
                 >
@@ -302,7 +302,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
                 </button>
               </div>
 
-              <span className="text-[11px] font-semibold text-[#0F6E5F] dark:text-[#5FD1B8] flex items-center gap-1">
+              <span className="text-[11px] font-semibold text-[#D4AF37] dark:text-[#F0D060] flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-amber-400" />
                 <span>1000% Movement Precision</span>
               </span>
@@ -310,14 +310,14 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
 
             {/* Step Selection Tabs */}
             {steps.length > 1 && (
-              <div className="flex border-b border-[#E5E7EB] dark:border-[#262A28] bg-gray-100/90 dark:bg-[#141615] p-1.5 gap-1.5">
+              <div className="flex border-b border-[#E5E7EB] dark:border-[#262A28] bg-gray-100/90 dark:bg-[#111111] p-1.5 gap-1.5">
                 {steps.map((st, idx) => (
                   <button
                     key={idx}
                     onClick={() => setActiveStepIndex(idx)}
                     className={`flex-1 py-1.5 px-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                       activeStepIndex === idx
-                        ? 'bg-[#0F6E5F] text-white shadow-xs'
+                        ? 'bg-[#D4AF37] text-white shadow-xs'
                         : 'text-[#4B5563] dark:text-[#9EA8A2] hover:bg-black/5 dark:hover:bg-white/5'
                     }`}
                   >
@@ -357,7 +357,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
                     <span>{photoData.visualAngle}</span>
                   </span>
 
-                  <span className="px-2.5 py-1 rounded-lg bg-[#0F6E5F]/90 backdrop-blur-md text-white text-[11px] font-bold border border-white/20">
+                  <span className="px-2.5 py-1 rounded-lg bg-[#D4AF37]/90 backdrop-blur-md text-white text-[11px] font-bold border border-white/20">
                     🎯 {photoData.targetFocus}
                   </span>
                 </div>
@@ -377,7 +377,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
             {/* Active Step Key Cue & Phase Instruction */}
             <div className="p-3 bg-gray-50 dark:bg-[#181B1A] border-t border-[#E5E7EB] dark:border-[#262A28] grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
               <div className="flex items-start gap-1.5">
-                <span className="font-bold text-[#0F6E5F] dark:text-[#5FD1B8] shrink-0">Phase Guide:</span>
+                <span className="font-bold text-[#D4AF37] dark:text-[#F0D060] shrink-0">Phase Guide:</span>
                 <span className="text-[#4B5563] dark:text-[#D1D5DB] leading-tight">
                   {currentStep?.actionDescription || photoData.setupSummary}
                 </span>
@@ -392,16 +392,16 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
           </div>
 
           {/* Real-time Google Search Grounding for Latest Biomechanical Form Evidence */}
-          <div className="p-3.5 rounded-xl bg-teal-500/10 border border-teal-500/20 text-[#1A1D1B] dark:text-[#E8ECE9]">
+          <div className="p-3.5 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#1A1D1B] dark:text-[#E8ECE9]">
             <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
-              <div className="flex items-center gap-1.5 font-bold text-[#0F6E5F] dark:text-[#5FD1B8] text-xs">
+              <div className="flex items-center gap-1.5 font-bold text-[#D4AF37] dark:text-[#F0D060] text-xs">
                 <Search className="w-4 h-4" />
                 <span>Google Search Grounded Biomechanics & EMG Analysis</span>
               </div>
               <button
                 onClick={handleFetchGrounding}
                 disabled={isSearchingGrounding}
-                className="px-3 py-1 rounded-lg bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-[11px] flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
+                className="px-3 py-1 rounded-lg bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-[11px] flex items-center gap-1.5 transition-colors cursor-pointer disabled:opacity-50"
               >
                 {isSearchingGrounding ? (
                   <>
@@ -422,13 +422,13 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
             )}
 
             {groundingData ? (
-              <div className="space-y-2 mt-2 pt-2 border-t border-teal-500/20">
+              <div className="space-y-2 mt-2 pt-2 border-t border-[#D4AF37]/20">
                 <p className="text-xs text-[#374151] dark:text-[#D1D5DB] leading-relaxed whitespace-pre-line">
                   {groundingData.groundedAnalysis}
                 </p>
                 {groundingData.webSources && groundingData.webSources.length > 0 && (
                   <div className="pt-2">
-                    <span className="font-bold text-[10px] text-[#0F6E5F] dark:text-[#5FD1B8] block mb-1">
+                    <span className="font-bold text-[10px] text-[#D4AF37] dark:text-[#F0D060] block mb-1">
                       🌐 Grounded Verification Sources:
                     </span>
                     <div className="flex flex-wrap gap-2">
@@ -438,7 +438,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
                           href={src.uri}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[10px] text-[#0F6E5F] dark:text-[#5FD1B8] hover:underline font-medium bg-teal-500/10 px-2 py-0.5 rounded-md"
+                          className="inline-flex items-center gap-1 text-[10px] text-[#D4AF37] dark:text-[#F0D060] hover:underline font-medium bg-[#D4AF37]/10 px-2 py-0.5 rounded-md"
                         >
                           <span>{src.title}</span>
                           <ExternalLink className="w-2.5 h-2.5" />
@@ -490,7 +490,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
           <div className="space-y-3 p-4 rounded-xl bg-white dark:bg-[#1C1F1E] border border-[#E5E7EB] dark:border-[#282C2A] shadow-2xs">
             <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#282C2A] pb-2">
               <div className="flex items-center gap-2">
-                <CheckSquare className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+                <CheckSquare className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
                 <h3 className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
                   Gym Setup Checklist (Shuru Karne Se Pehle Check Karein)
                 </h3>
@@ -507,13 +507,13 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
                   onClick={() => toggleFormCheck(idx)}
                   className={`flex items-start gap-2.5 p-2 rounded-lg transition-all cursor-pointer select-none border ${
                     checkedFormItems[idx]
-                      ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-800 dark:text-emerald-300'
+                      ? 'bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#8E701C] dark:text-[#F0D060]'
                       : 'bg-gray-50 dark:bg-[#181A19] border-transparent hover:border-gray-300 dark:hover:border-gray-700 text-[#4B5563] dark:text-[#D1D5DB]'
                   }`}
                 >
-                  <button className="mt-0.5 shrink-0 text-[#0F6E5F] dark:text-[#5FD1B8]">
+                  <button className="mt-0.5 shrink-0 text-[#D4AF37] dark:text-[#F0D060]">
                     {checkedFormItems[idx] ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                      <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />
                     ) : (
                       <Square className="w-4 h-4 text-gray-400" />
                     )}
@@ -527,7 +527,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
           {/* Step-by-Step Simple Hindi & English Guide */}
           <div className="space-y-3.5 p-4 rounded-xl bg-white dark:bg-[#1C1F1E] border border-[#E5E7EB] dark:border-[#282C2A] shadow-2xs">
             <div className="flex items-center gap-2 border-b border-[#E5E7EB] dark:border-[#282C2A] pb-2">
-              <BookOpen className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+              <BookOpen className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
               <h3 className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
                 Step-by-Step Execution Guide (Kaise Karein - Saral Bhasha Mein)
               </h3>
@@ -535,7 +535,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
 
             {/* Overview */}
             <div>
-              <span className="font-bold text-[#0F6E5F] dark:text-[#5FD1B8] block mb-1">
+              <span className="font-bold text-[#D4AF37] dark:text-[#F0D060] block mb-1">
                 🌟 Exercise Overview (Iska Fayda):
               </span>
               <p className="text-xs text-[#4B5563] dark:text-[#D1D5DB] leading-relaxed">
@@ -559,15 +559,15 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
             </div>
 
             {/* 2. Breathing & Tempo */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 rounded-xl bg-teal-500/5 dark:bg-teal-950/20 border border-teal-500/20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 p-3 rounded-xl bg-[#D4AF37]/5 dark:bg-[#2A2416]/20 border border-[#D4AF37]/20">
               <div>
-                <span className="font-bold text-[11px] text-[#0F6E5F] dark:text-[#5FD1B8] block mb-0.5">
+                <span className="font-bold text-[11px] text-[#D4AF37] dark:text-[#F0D060] block mb-0.5">
                   💨 Saans Lene Ka Tarika (Breathing):
                 </span>
                 <p className="text-[11px] text-[#374151] dark:text-[#D1D5DB]">{guide.breathing}</p>
               </div>
               <div>
-                <span className="font-bold text-[11px] text-[#0F6E5F] dark:text-[#5FD1B8] block mb-0.5">
+                <span className="font-bold text-[11px] text-[#D4AF37] dark:text-[#F0D060] block mb-0.5">
                   ⏱️ Speed aur Tempo (Raftaar):
                 </span>
                 <p className="text-[11px] text-[#374151] dark:text-[#D1D5DB]">{guide.tempo}</p>
@@ -593,8 +593,8 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
 
           {/* Injury Alternative If Any */}
           {exercise.injuryAlternative && (
-            <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs">
-              <span className="font-bold text-emerald-800 dark:text-emerald-300 block mb-0.5">
+            <div className="p-3 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-xs">
+              <span className="font-bold text-[#8E701C] dark:text-[#F0D060] block mb-0.5">
                 🛡️ Joint-Friendly Alternative: {exercise.injuryAlternative.substitute}
               </span>
               <p className="text-xs text-[#4B5563] dark:text-[#D1D5DB]">{exercise.injuryAlternative.reason}</p>
@@ -635,7 +635,7 @@ export const ExerciseQuickViewModal: React.FC<ExerciseQuickViewModalProps> = ({
               className={`px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs ${
                 isAdded
                   ? 'bg-[#16A34A] text-white'
-                  : 'bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white'
+                  : 'bg-[#D4AF37] hover:bg-[#A68523] text-white'
               }`}
             >
               {isAdded ? (

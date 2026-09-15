@@ -374,8 +374,8 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     if (record.isLifetime) {
       return {
         status: 'Active',
-        badgeClass: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
-        dotClass: 'bg-emerald-500',
+        badgeClass: 'bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border-[#D4AF37]/30',
+        dotClass: 'bg-[#D4AF37]',
         icon: CheckCircle2,
         label: 'Active (Lifetime VIP)',
         isExpiringSoon: false,
@@ -416,8 +416,8 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
       return {
         status: 'Active',
-        badgeClass: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
-        dotClass: 'bg-emerald-500',
+        badgeClass: 'bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border-[#D4AF37]/30',
+        dotClass: 'bg-[#D4AF37]',
         icon: CheckCircle2,
         label: `Active (${days}d left)`,
         isExpiringSoon: false,
@@ -439,8 +439,8 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
     return {
       status: 'Active',
-      badgeClass: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
-      dotClass: 'bg-emerald-500',
+      badgeClass: 'bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border-[#D4AF37]/30',
+      dotClass: 'bg-[#D4AF37]',
       icon: CheckCircle2,
       label: 'Active',
       isExpiringSoon: false,
@@ -1081,7 +1081,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     return (
       <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
         <div className="bg-white dark:bg-[#121413] rounded-3xl max-w-md w-full p-8 border border-gray-200 dark:border-gray-800 text-center space-y-4 shadow-2xl">
-          <div className="w-10 h-10 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="w-10 h-10 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-sm font-bold text-gray-800 dark:text-gray-200">Verifying Host Authorization...</p>
         </div>
       </div>
@@ -1117,7 +1117,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     return (
       <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
         <div className="bg-white dark:bg-[#121413] rounded-3xl max-w-md w-full p-8 border border-gray-200 dark:border-gray-800 text-center space-y-5 shadow-2xl">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/15 text-[#B8922A] dark:text-[#F0D060] mx-auto flex items-center justify-center">
             <KeyRound className="w-6 h-6" />
           </div>
           <div className="space-y-1.5">
@@ -1140,7 +1140,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 }}
                 placeholder="Enter Host PIN"
                 autoFocus
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
               />
               {gatePinError && (
                 <p className="text-xs text-rose-500 font-medium mt-1.5">{gatePinError}</p>
@@ -1157,7 +1157,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               <button
                 type="submit"
                 disabled={isVerifyingGatePin || !gatePinInput.trim()}
-                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold disabled:opacity-50 cursor-pointer shadow-xs transition-all"
+                className="flex-1 py-2.5 rounded-xl bg-[#A68523] hover:bg-[#8E701C] text-white text-xs font-bold disabled:opacity-50 cursor-pointer shadow-xs transition-all"
               >
                 {isVerifyingGatePin ? 'Verifying...' : 'Unlock Portal'}
               </button>
@@ -1173,9 +1173,9 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
       <div className="bg-white dark:bg-[#121413] rounded-3xl max-w-4xl w-full shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden text-left my-6 flex flex-col max-h-[92vh]">
         
         {/* Modal Header */}
-        <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-emerald-500/10 via-teal-500/5 to-transparent shrink-0">
+        <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-[#D4AF37]/10 via-[#D4AF37]/5 to-transparent shrink-0">
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-xs">
+            <div className="w-11 h-11 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#B8922A] dark:text-[#F0D060] shadow-xs">
               <Crown className="w-6 h-6" />
             </div>
             <div>
@@ -1183,7 +1183,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 <h2 className="text-lg font-black text-gray-900 dark:text-white tracking-tight">
                   Host Admin Portal & VIP Ledger
                 </h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30">
                   Host Master
                 </span>
               </div>
@@ -1200,7 +1200,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               className="p-2 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
               title="Host PIN Security Settings"
             >
-              <KeyRound className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <KeyRound className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
               <span className="hidden sm:inline">Security PIN</span>
             </button>
 
@@ -1215,19 +1215,19 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
         </div>
 
         {/* Tab Navigation Bar */}
-        <div className="px-6 pt-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-[#161817] flex items-center gap-2 shrink-0 overflow-x-auto">
+        <div className="px-6 pt-3 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-[#111111] flex items-center gap-2 shrink-0 overflow-x-auto">
           <button
             type="button"
             onClick={() => setActiveTab('ledger')}
             className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
               activeTab === 'ledger'
-                ? 'bg-white dark:bg-[#121413] text-emerald-600 dark:text-emerald-400 border-emerald-500 shadow-xs'
+                ? 'bg-white dark:bg-[#121413] text-[#B8922A] dark:text-[#F0D060] border-[#D4AF37] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
             <Crown className="w-4 h-4" />
             <span>VIP Access & Ledger</span>
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-extrabold">
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] font-extrabold">
               {grantedList.length}
             </span>
           </button>
@@ -1237,13 +1237,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
             onClick={() => setActiveTab('athlete_logins')}
             className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
               activeTab === 'athlete_logins'
-                ? 'bg-white dark:bg-[#121413] text-emerald-600 dark:text-emerald-400 border-emerald-500 shadow-xs'
+                ? 'bg-white dark:bg-[#121413] text-[#B8922A] dark:text-[#F0D060] border-[#D4AF37] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <Activity className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
             <span>Athlete Logins & Profiles</span>
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 font-extrabold">
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] font-extrabold">
               100% Tracked
             </span>
           </button>
@@ -1253,11 +1253,11 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
             onClick={() => setActiveTab('valuation')}
             className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
               activeTab === 'valuation'
-                ? 'bg-white dark:bg-[#121413] text-teal-600 dark:text-teal-400 border-teal-500 shadow-xs'
+                ? 'bg-white dark:bg-[#121413] text-[#B8922A] dark:text-[#F0D060] border-[#D4AF37] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <BarChart3 className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+            <BarChart3 className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
             <span>Revenue & Valuation</span>
           </button>
 
@@ -1288,13 +1288,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
             }}
             className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
               activeTab === 'persistent_grants'
-                ? 'bg-white dark:bg-[#121413] text-emerald-600 dark:text-emerald-400 border-emerald-500 shadow-xs'
+                ? 'bg-white dark:bg-[#121413] text-[#B8922A] dark:text-[#F0D060] border-[#D4AF37] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <Database className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <Database className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
             <span>Persistent Cloud Grants</span>
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-purple-500/15 text-purple-700 dark:text-purple-400 font-extrabold">
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#D4AF37]/15 text-purple-700 dark:text-[#F0D060] font-extrabold">
               {persistentGrants.length}
             </span>
           </button>
@@ -1308,13 +1308,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
             }}
             className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
               activeTab === 'verification_logs'
-                ? 'bg-white dark:bg-[#121413] text-teal-600 dark:text-teal-400 border-teal-500 shadow-xs'
+                ? 'bg-white dark:bg-[#121413] text-[#B8922A] dark:text-[#F0D060] border-[#D4AF37] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+            <ShieldCheck className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
             <span>Authentication Audit</span>
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-teal-500/15 text-teal-700 dark:text-teal-400 font-extrabold">
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] font-extrabold">
               {filteredVerificationLogs.length} Verified
             </span>
           </button>
@@ -1327,13 +1327,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
             }}
             className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
               activeTab === 'activity_log'
-                ? 'bg-white dark:bg-[#121413] text-emerald-600 dark:text-emerald-400 border-emerald-500 shadow-xs'
+                ? 'bg-white dark:bg-[#121413] text-[#B8922A] dark:text-[#F0D060] border-[#D4AF37] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <History className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+            <History className="w-4 h-4 text-[#B8922A] dark:text-[#D4AF37]" />
             <span>Activity Log</span>
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-cyan-500/15 text-cyan-700 dark:text-cyan-400 font-extrabold">
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#D4AF37]/15 text-[#A68523] dark:text-[#D4AF37] font-extrabold">
               Last {Math.min(10, activityLogs.length)}
             </span>
           </button>
@@ -1383,7 +1383,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 </button>
               </form>
 
-              {pinChangeMsg && <p className="text-emerald-600 font-semibold">{pinChangeMsg}</p>}
+              {pinChangeMsg && <p className="text-[#B8922A] font-semibold">{pinChangeMsg}</p>}
               {pinChangeError && <p className="text-rose-600 font-semibold">{pinChangeError}</p>}
             </div>
           )}
@@ -1395,10 +1395,10 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
             <div className="space-y-6 animate-in fade-in">
               
               {/* SECTION 1: SINGLE UNIFIED GRANT ACCESS FORM */}
-              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#FAFAF8] to-emerald-50/30 dark:from-[#161817] dark:to-emerald-950/10 border-2 border-emerald-500/30 shadow-sm space-y-5">
+              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#FAFAF8] to-[#FAF3E0]/30 dark:from-[#111111] dark:to-[#111111]/10 border-2 border-[#D4AF37]/30 shadow-sm space-y-5">
                 <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-black shadow-xs">
+                    <div className="w-8 h-8 rounded-xl bg-[#D4AF37] text-white flex items-center justify-center font-black shadow-xs">
                       <Sparkles className="w-4 h-4" />
                     </div>
                     <div>
@@ -1410,7 +1410,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       </p>
                     </div>
                   </div>
-                  <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                  <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30">
                     1-Step Instant Grant
                   </span>
                 </div>
@@ -1422,7 +1422,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     {/* 1. ATHLETE GMAIL ID */}
                     <div className="space-y-1.5">
                       <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                        <Mail className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <Mail className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060]" />
                         <span>Athlete Gmail ID <span className="text-rose-500">*</span></span>
                       </label>
                       <input
@@ -1431,7 +1431,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                         placeholder="e.g. athlete@gmail.com"
                         value={targetEmail}
                         onChange={(e) => setTargetEmail(e.target.value)}
-                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono text-xs focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-hidden transition-all"
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono text-xs focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-hidden transition-all"
                       />
                       <span className="text-[10px] text-gray-500 dark:text-gray-400 block">
                         The athlete's Google / Gmail login ID
@@ -1441,13 +1441,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     {/* 2. TIME / SUBSCRIPTION DURATION */}
                     <div className="space-y-1.5">
                       <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <Clock className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060]" />
                         <span>Subscription Duration / Time <span className="text-rose-500">*</span></span>
                       </label>
                       <select
                         value={durationOption}
                         onChange={(e) => setDurationOption(e.target.value)}
-                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-hidden transition-all cursor-pointer"
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-hidden transition-all cursor-pointer"
                       >
                         {DURATION_PRESETS.map((preset) => (
                           <option key={preset.id} value={preset.id}>
@@ -1455,7 +1455,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                           </option>
                         ))}
                       </select>
-                      <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold block">
+                      <span className="text-[10px] text-[#B8922A] dark:text-[#F0D060] font-semibold block">
                         {durationOption === 'lifetime' ? 'Lifetime VIP access with zero expiration' : 'Expires automatically after selected period'}
                       </span>
                     </div>
@@ -1463,7 +1463,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     {/* 3. HOST VERIFICATION PASSWORD */}
                     <div className="space-y-1.5">
                       <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                        <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <Lock className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060]" />
                         <span>Host Verification Password <span className="text-rose-500">*</span></span>
                       </label>
                       <div className="relative">
@@ -1473,7 +1473,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                           placeholder="Host PIN"
                           value={hostPassword}
                           onChange={(e) => setHostPassword(e.target.value)}
-                          className="w-full p-3 pr-10 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono text-xs focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-hidden transition-all"
+                          className="w-full p-3 pr-10 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono text-xs focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent outline-hidden transition-all"
                         />
                         <button
                           type="button"
@@ -1503,7 +1503,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0"
+                      className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-[#A68523] hover:bg-[#8E701C] text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0"
                     >
                       {isSubmitting ? (
                         <>
@@ -1521,8 +1521,8 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                   {/* Feedback Notifications */}
                   {grantSuccessMsg && (
-                    <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-900 dark:text-emerald-200 flex items-start gap-2.5 animate-in fade-in">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                    <div className="p-4 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#6A5312] dark:text-[#F0D060] flex items-start gap-2.5 animate-in fade-in">
+                      <CheckCircle2 className="w-5 h-5 text-[#B8922A] dark:text-[#F0D060] shrink-0 mt-0.5" />
                       <div className="space-y-1">
                         <div className="font-black text-xs">VIP Subscription Activated Successfully!</div>
                         <div className="text-[11px] leading-relaxed">{grantSuccessMsg}</div>
@@ -1550,7 +1550,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
                   <div>
                     <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                      <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <Users className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
                       <span>Host Access Ledger & Granted Accounts ({grantedList.length})</span>
                     </h3>
                     <p className="text-[11px] text-gray-500 dark:text-gray-400">
@@ -1565,7 +1565,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       disabled={isLoadingLedger}
                       className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs"
                     >
-                      <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLedger ? 'animate-spin text-emerald-600' : ''}`} />
+                      <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLedger ? 'animate-spin text-[#B8922A]' : ''}`} />
                       <span>Refresh</span>
                     </button>
 
@@ -1599,7 +1599,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       type="button"
                       onClick={handleNotifyAll}
                       disabled={isNotifyingAll || totalActiveCount === 0}
-                      className="px-3 py-1.5 rounded-xl bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold flex items-center gap-1.5 cursor-pointer text-xs shadow-xs disabled:opacity-50"
+                      className="px-3 py-1.5 rounded-xl bg-linear-to-r from-[#A68523] to-[#A68523] hover:from-[#D4AF37] hover:to-[#D4AF37] text-white font-bold flex items-center gap-1.5 cursor-pointer text-xs shadow-xs disabled:opacity-50"
                       title="Send automated email notification to all active subscribers about remaining access time"
                     >
                       {isNotifyingAll ? (
@@ -1613,13 +1613,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 </div>
 
                 {/* SUMMARY DASHBOARD PANEL & DISTRIBUTION VISUALIZATION */}
-                <div className="p-4 rounded-3xl bg-gray-50/70 dark:bg-[#161817] border border-gray-200 dark:border-gray-800 space-y-4">
+                <div className="p-4 rounded-3xl bg-gray-50/70 dark:bg-[#111111] border border-gray-200 dark:border-gray-800 space-y-4">
                   
                   {/* Top Row: Metrics Cards */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800 shadow-2xs">
                       <div className="text-[10px] uppercase font-black text-gray-500">Total Grants</div>
-                      <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-baseline justify-between">
+                      <div className="text-xl font-black text-[#B8922A] dark:text-[#F0D060] mt-0.5 flex items-baseline justify-between">
                         <span>{grantedList.length}</span>
                         <span className="text-[10px] font-bold text-gray-400">100% stored</span>
                       </div>
@@ -1627,7 +1627,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                     <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800 shadow-2xs">
                       <div className="text-[10px] uppercase font-black text-gray-500">Active VIPs</div>
-                      <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5 flex items-baseline justify-between">
+                      <div className="text-xl font-black text-[#B8922A] dark:text-[#F0D060] mt-0.5 flex items-baseline justify-between">
                         <span>{totalActiveCount}</span>
                         <span className="text-[10px] font-bold text-amber-500">{totalLifetimeCount} lifetime</span>
                       </div>
@@ -1662,7 +1662,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     <div className="space-y-1.5 pt-1 border-t border-gray-200/60 dark:border-gray-800/60">
                       <div className="flex items-center justify-between text-[11px] font-bold text-gray-600 dark:text-gray-400">
                         <span className="flex items-center gap-1.5">
-                          <BarChart3 className="w-3.5 h-3.5 text-emerald-600" />
+                          <BarChart3 className="w-3.5 h-3.5 text-[#B8922A]" />
                           <span>Subscription Distribution Breakdown</span>
                         </span>
                         <span>{grantedList.length} Total Registered Records</span>
@@ -1674,7 +1674,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                         {totalActiveCount - totalExpiringCount > 0 && (
                           <div 
                             style={{ width: `${((totalActiveCount - totalExpiringCount) / grantedList.length) * 100}%` }}
-                            className="h-full bg-emerald-500 transition-all"
+                            className="h-full bg-[#D4AF37] transition-all"
                             title={`Active: ${totalActiveCount - totalExpiringCount}`}
                           />
                         )}
@@ -1707,7 +1707,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       {/* Bar Legend */}
                       <div className="flex items-center gap-4 text-[10px] font-bold text-gray-500 dark:text-gray-400 pt-0.5 flex-wrap">
                         <span className="flex items-center gap-1">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                          <span className="w-2 h-2 rounded-full bg-[#D4AF37]" />
                           <span>Active VIP ({totalActiveCount - totalExpiringCount})</span>
                         </span>
                         <span className="flex items-center gap-1">
@@ -1738,7 +1738,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       placeholder="Filter ledger by Gmail address, athlete name, or plan..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-emerald-500"
+                      className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-[#D4AF37]"
                     />
                     {searchQuery && (
                       <button
@@ -1766,14 +1766,14 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                         onClick={() => setStatusFilter(st.id as FilterStatusType)}
                         className={`px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
                           statusFilter === st.id
-                            ? 'bg-white dark:bg-[#121413] text-emerald-600 dark:text-emerald-400 shadow-xs'
+                            ? 'bg-white dark:bg-[#121413] text-[#B8922A] dark:text-[#F0D060] shadow-xs'
                             : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
                         }`}
                       >
                         <span>{st.label}</span>
                         <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-black ${
                           statusFilter === st.id
-                            ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300'
+                            ? 'bg-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060]'
                             : 'bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                         }`}>
                           {st.count}
@@ -1784,13 +1784,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 </div>
 
                 {/* Bulk Operations Selection Toolbar */}
-                <div className="p-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-950/20 flex flex-wrap items-center justify-between gap-3">
+                <div className="p-3.5 rounded-2xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 dark:bg-[#2A2416]/20 flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-bold text-xs text-gray-900 dark:text-white flex items-center gap-1.5">
-                      <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <Layers className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
                       <span>Bulk Operations:</span>
                     </span>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-white font-extrabold text-[10px]">
+                    <span className="px-2 py-0.5 rounded-full bg-[#D4AF37] text-white font-extrabold text-[10px]">
                       {selectedEmails.length} Selected
                     </span>
 
@@ -1806,7 +1806,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleSelectByStatus('active')}
-                        className="px-2 py-1 rounded-lg border border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-semibold cursor-pointer"
+                        className="px-2 py-1 rounded-lg border border-[#D4AF37]/30 hover:bg-[#D4AF37]/10 text-[#A68523] dark:text-[#F0D060] font-semibold cursor-pointer"
                       >
                         Select Active
                       </button>
@@ -1846,7 +1846,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                         type="button"
                         onClick={() => handleExecuteBulkAction('extend_duration', 30)}
                         disabled={isExecutingBulkOp}
-                        className="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                        className="px-2.5 py-1.5 rounded-xl bg-[#A68523] hover:bg-[#8E701C] text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
                       >
                         <CalendarPlus className="w-3 h-3" />
                         <span>+30 Days</span>
@@ -1857,7 +1857,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                         type="button"
                         onClick={() => handleExecuteBulkAction('extend_duration', 90)}
                         disabled={isExecutingBulkOp}
-                        className="px-2.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs hidden sm:flex"
+                        className="px-2.5 py-1.5 rounded-xl bg-[#A68523] hover:bg-[#8E701C] text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs hidden sm:flex"
                       >
                         <CalendarPlus className="w-3 h-3" />
                         <span>+90 Days</span>
@@ -1889,7 +1889,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 </div>
 
                 {bulkOpMsg && (
-                  <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 font-semibold text-xs flex items-center justify-between">
+                  <div className="p-3 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#8E701C] dark:text-[#F0D060] font-semibold text-xs flex items-center justify-between">
                     <span>{bulkOpMsg}</span>
                     <button type="button" onClick={() => setBulkOpMsg(null)} className="cursor-pointer">
                       <X className="w-3.5 h-3.5" />
@@ -1898,7 +1898,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 )}
 
                 {/* Ledger Table Container */}
-                <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-[#161817]">
+                <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-[#111111]">
                   {filteredLedger.length === 0 ? (
                     <div className="p-8 text-center space-y-2 text-gray-500">
                       <div className="w-12 h-12 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto text-gray-400">
@@ -1920,19 +1920,19 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                 type="checkbox"
                                 checked={selectedEmails.length === filteredLedger.length && filteredLedger.length > 0}
                                 onChange={handleSelectAllVisible}
-                                className="w-4 h-4 rounded-md text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                className="w-4 h-4 rounded-md text-[#B8922A] focus:ring-[#D4AF37] cursor-pointer"
                               />
                             </th>
 
                             {/* Athlete Gmail ID - Sortable */}
                             <th 
-                              className="p-3.5 cursor-pointer hover:text-emerald-600 transition-colors"
+                              className="p-3.5 cursor-pointer hover:text-[#B8922A] transition-colors"
                               onClick={() => handleSort('email')}
                             >
                               <div className="flex items-center gap-1.5">
                                 <span>Athlete Gmail ID</span>
                                 {sortField === 'email' ? (
-                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-emerald-600" /> : <ArrowDown className="w-3 h-3 text-emerald-600" />
+                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-[#B8922A]" /> : <ArrowDown className="w-3 h-3 text-[#B8922A]" />
                                 ) : (
                                   <ArrowUpDown className="w-3 h-3 text-gray-300 dark:text-gray-600" />
                                 )}
@@ -1941,13 +1941,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                             {/* Status Badge - Sortable */}
                             <th 
-                              className="p-3.5 cursor-pointer hover:text-emerald-600 transition-colors"
+                              className="p-3.5 cursor-pointer hover:text-[#B8922A] transition-colors"
                               onClick={() => handleSort('status')}
                             >
                               <div className="flex items-center gap-1.5">
                                 <span>Status Badge</span>
                                 {sortField === 'status' ? (
-                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-emerald-600" /> : <ArrowDown className="w-3 h-3 text-emerald-600" />
+                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-[#B8922A]" /> : <ArrowDown className="w-3 h-3 text-[#B8922A]" />
                                 ) : (
                                   <ArrowUpDown className="w-3 h-3 text-gray-300 dark:text-gray-600" />
                                 )}
@@ -1956,13 +1956,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                             {/* Duration / Plan - Sortable */}
                             <th 
-                              className="p-3.5 cursor-pointer hover:text-emerald-600 transition-colors"
+                              className="p-3.5 cursor-pointer hover:text-[#B8922A] transition-colors"
                               onClick={() => handleSort('plan')}
                             >
                               <div className="flex items-center gap-1.5">
                                 <span>Duration / Plan</span>
                                 {sortField === 'plan' ? (
-                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-emerald-600" /> : <ArrowDown className="w-3 h-3 text-emerald-600" />
+                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-[#B8922A]" /> : <ArrowDown className="w-3 h-3 text-[#B8922A]" />
                                 ) : (
                                   <ArrowUpDown className="w-3 h-3 text-gray-300 dark:text-gray-600" />
                                 )}
@@ -1971,13 +1971,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                             {/* Date Granted - Sortable */}
                             <th 
-                              className="p-3.5 cursor-pointer hover:text-emerald-600 transition-colors"
+                              className="p-3.5 cursor-pointer hover:text-[#B8922A] transition-colors"
                               onClick={() => handleSort('grantedAt')}
                             >
                               <div className="flex items-center gap-1.5">
                                 <span>Date Granted</span>
                                 {sortField === 'grantedAt' ? (
-                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-emerald-600" /> : <ArrowDown className="w-3 h-3 text-emerald-600" />
+                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-[#B8922A]" /> : <ArrowDown className="w-3 h-3 text-[#B8922A]" />
                                 ) : (
                                   <ArrowUpDown className="w-3 h-3 text-gray-300 dark:text-gray-600" />
                                 )}
@@ -1986,13 +1986,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                             {/* Expiration - Sortable */}
                             <th 
-                              className="p-3.5 cursor-pointer hover:text-emerald-600 transition-colors"
+                              className="p-3.5 cursor-pointer hover:text-[#B8922A] transition-colors"
                               onClick={() => handleSort('expiresAt')}
                             >
                               <div className="flex items-center gap-1.5">
                                 <span>Expiration</span>
                                 {sortField === 'expiresAt' ? (
-                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-emerald-600" /> : <ArrowDown className="w-3 h-3 text-emerald-600" />
+                                  sortDirection === 'asc' ? <ArrowUp className="w-3 h-3 text-[#B8922A]" /> : <ArrowDown className="w-3 h-3 text-[#B8922A]" />
                                 ) : (
                                   <ArrowUpDown className="w-3 h-3 text-gray-300 dark:text-gray-600" />
                                 )}
@@ -2030,7 +2030,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                 key={record.id || record.email} 
                                 className={`transition-colors ${
                                   isSelected
-                                    ? 'bg-emerald-500/10 dark:bg-emerald-950/30'
+                                    ? 'bg-[#D4AF37]/10 dark:bg-[#2A2416]/30'
                                     : statusInfo.isExpiringSoon 
                                     ? 'bg-amber-500/10 dark:bg-amber-950/20 border-l-4 border-l-amber-500 hover:bg-amber-500/15' 
                                     : 'hover:bg-gray-50/50 dark:hover:bg-gray-800/30'
@@ -2042,7 +2042,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                     type="checkbox"
                                     checked={isSelected}
                                     onChange={() => handleToggleSelectEmail(record.email)}
-                                    className="w-4 h-4 rounded-md text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                                    className="w-4 h-4 rounded-md text-[#B8922A] focus:ring-[#D4AF37] cursor-pointer"
                                   />
                                 </td>
                                 
@@ -2055,11 +2055,11 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                     <button
                                       type="button"
                                       onClick={() => handleCopyEmail(record.email)}
-                                      className="p-1 rounded-md text-gray-400 hover:text-emerald-600 transition-colors cursor-pointer"
+                                      className="p-1 rounded-md text-gray-400 hover:text-[#B8922A] transition-colors cursor-pointer"
                                       title="Copy Email"
                                     >
                                       {copiedEmail === record.email ? (
-                                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                        <Check className="w-3.5 h-3.5 text-[#B8922A]" />
                                       ) : (
                                         <Copy className="w-3.5 h-3.5" />
                                       )}
@@ -2086,7 +2086,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                   <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase ${
                                     isLifetime
                                       ? 'bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30'
-                                      : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30'
+                                      : 'bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30'
                                   }`}>
                                     {isLifetime && <Crown className="w-3 h-3" />}
                                     <span>{record.planName || (isLifetime ? 'Lifetime VIP' : 'Pro Plan')}</span>
@@ -2102,7 +2102,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                 <td className="p-3.5 whitespace-nowrap font-semibold">
                                   <span className={
                                     isLifetime 
-                                      ? 'text-emerald-600 dark:text-emerald-400' 
+                                      ? 'text-[#B8922A] dark:text-[#F0D060]' 
                                       : statusInfo.isExpiringSoon 
                                       ? 'text-amber-600 dark:text-amber-400 font-black flex items-center gap-1' 
                                       : 'text-gray-600 dark:text-gray-400'
@@ -2114,7 +2114,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                                 {/* Host Seal */}
                                 <td className="p-3.5 whitespace-nowrap">
-                                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#B8922A] dark:text-[#F0D060]">
                                     <ShieldCheck className="w-3.5 h-3.5" />
                                     <span>Host Admin</span>
                                   </span>
@@ -2146,7 +2146,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                       <button
                                         type="button"
                                         onClick={() => setSelectedTimelineEmail(record.email)}
-                                        className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-emerald-500/10 text-gray-600 dark:text-gray-400 hover:text-emerald-600 transition-colors cursor-pointer"
+                                        className="p-1.5 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-[#D4AF37]/10 text-gray-600 dark:text-gray-400 hover:text-[#B8922A] transition-colors cursor-pointer"
                                         title="View Vertical Grant Timeline & History"
                                       >
                                         <History className="w-3.5 h-3.5" />
@@ -2161,7 +2161,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                           className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
                                             statusInfo.isExpiringSoon
                                               ? 'text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-950/40 bg-amber-500/10'
-                                              : 'text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30'
+                                              : 'text-gray-400 hover:text-[#B8922A] hover:bg-[#FFFBF0] dark:hover:bg-[#2A2416]/30'
                                           }`}
                                           title={`Send individual reminder notice to ${record.email}`}
                                         >
@@ -2235,11 +2235,11 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
                 <div>
                   <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                    <Database className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <Database className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
                     <span>Persistent Cloud Grants Storage ({persistentGrants.length})</span>
                   </h3>
                   <p className="text-[11px] text-gray-500 dark:text-gray-400">
-                    Direct live connection to the <code className="font-mono text-purple-600">persistent_host_grants</code> Firestore collection. Grants stored here are permanently immutable across app updates and device switches.
+                    Direct live connection to the <code className="font-mono text-[#B8922A]">persistent_host_grants</code> Firestore collection. Grants stored here are permanently immutable across app updates and device switches.
                   </p>
                 </div>
 
@@ -2250,7 +2250,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     disabled={isLoadingPersistent}
                     className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingPersistent ? 'animate-spin text-purple-600' : ''}`} />
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingPersistent ? 'animate-spin text-[#B8922A]' : ''}`} />
                     <span>Sync Cloud</span>
                   </button>
                 </div>
@@ -2264,7 +2264,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                   placeholder="Search persistent storage records by Gmail address..."
                   value={persistentSearchQuery}
                   onChange={(e) => setPersistentSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-purple-500"
+                  className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-purple-500"
                 />
                 {persistentSearchQuery && (
                   <button
@@ -2278,7 +2278,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               </div>
 
               {/* Persistent Grants Table */}
-              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-[#161817]">
+              <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-[#111111]">
                 {persistentGrants.length === 0 ? (
                   <div className="p-8 text-center space-y-2 text-gray-500">
                     <Database className="w-10 h-10 text-gray-400 mx-auto" />
@@ -2308,8 +2308,8 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                 {grant.email}
                               </td>
                               <td className="p-3.5">
-                                <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-700 dark:text-purple-400 border border-purple-500/30">
-                                  <ShieldCheck className="w-3 h-3 text-purple-600" />
+                                <span className="inline-flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-[#D4AF37]/15 text-purple-700 dark:text-[#F0D060] border border-[#D4AF37]/30">
+                                  <ShieldCheck className="w-3 h-3 text-[#B8922A]" />
                                   <span>Triple-Tier Persisted</span>
                                 </span>
                               </td>
@@ -2320,7 +2320,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                               </td>
                               <td className="p-3.5 font-semibold text-gray-600 dark:text-gray-400">
                                 {grant.isLifetime ? (
-                                  <span className="text-emerald-600 font-bold">Never (Lifetime)</span>
+                                  <span className="text-[#B8922A] font-bold">Never (Lifetime)</span>
                                 ) : (
                                   grant.expiresAt ? new Date(grant.expiresAt).toLocaleDateString() : 'Active'
                                 )}
@@ -2358,7 +2358,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
             <div className="space-y-6 animate-in fade-in">
               
               {/* SECTION: CREATE NEW COUPON CODE FORM */}
-              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#FAFAF8] to-amber-50/30 dark:from-[#161817] dark:to-amber-950/10 border-2 border-amber-500/30 shadow-sm space-y-5">
+              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#FAFAF8] to-amber-50/30 dark:from-[#111111] dark:to-amber-950/10 border-2 border-amber-500/30 shadow-sm space-y-5">
                 <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black shadow-xs">
@@ -2544,8 +2544,8 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                   {/* Feedback Messages */}
                   {couponSuccessMsg && (
-                    <div className="p-4 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-900 dark:text-emerald-200 flex items-start gap-2.5 animate-in fade-in">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                    <div className="p-4 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#6A5312] dark:text-[#F0D060] flex items-start gap-2.5 animate-in fade-in">
+                      <CheckCircle2 className="w-5 h-5 text-[#B8922A] dark:text-[#F0D060] shrink-0 mt-0.5" />
                       <div className="space-y-1">
                         <div className="font-black text-xs">Coupon Code Ready for Distribution!</div>
                         <div className="text-[11px] leading-relaxed">{couponSuccessMsg}</div>
@@ -2599,7 +2599,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     placeholder="Search coupons by code name or plan..."
                     value={couponsSearchQuery}
                     onChange={(e) => setCouponsSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-amber-500"
+                    className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-amber-500"
                   />
                   {couponsSearchQuery && (
                     <button
@@ -2613,7 +2613,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 </div>
 
                 {/* Coupons Table */}
-                <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-[#161817]">
+                <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden bg-white dark:bg-[#111111]">
                   {couponsList.length === 0 ? (
                     <div className="p-8 text-center space-y-2 text-gray-500">
                       <Ticket className="w-10 h-10 text-gray-400 mx-auto" />
@@ -2664,7 +2664,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                         title="Copy Coupon Code"
                                       >
                                         {copiedCouponCode === coupon.code ? (
-                                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                          <Check className="w-3.5 h-3.5 text-[#B8922A]" />
                                         ) : (
                                           <Copy className="w-3.5 h-3.5" />
                                         )}
@@ -2679,7 +2679,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                                   {/* Unlocked Plan & Duration */}
                                   <td className="p-3.5">
-                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30">
                                       {coupon.isLifetime ? <Crown className="w-3 h-3 text-amber-500" /> : <Clock className="w-3 h-3" />}
                                       <span>{coupon.planName || (coupon.isLifetime ? 'Lifetime VIP' : 'Pro Plan')}</span>
                                     </span>
@@ -2717,7 +2717,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                         Fully Claimed
                                       </span>
                                     ) : (
-                                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+                                      <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30">
                                         Active
                                       </span>
                                     )}
@@ -2779,10 +2779,10 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                      <ShieldCheck className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
                       <span>Authentication Audit & Grant Verification Log</span>
                     </h3>
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-teal-500/15 text-teal-700 dark:text-teal-400 border border-teal-500/30">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30">
                       Host-PIN Authenticated
                     </span>
                   </div>
@@ -2800,7 +2800,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     disabled={isLoadingLogs || isLoadingVerificationLogs}
                     className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLogs || isLoadingVerificationLogs ? 'animate-spin text-teal-600' : ''}`} />
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLogs || isLoadingVerificationLogs ? 'animate-spin text-[#B8922A]' : ''}`} />
                     <span>Sync Verifications</span>
                   </button>
 
@@ -2808,7 +2808,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     type="button"
                     onClick={handleExportVerificationCSV}
                     disabled={filteredVerificationLogs.length === 0}
-                    className="px-3 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold flex items-center gap-1.5 cursor-pointer text-xs shadow-2xs disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-xl bg-[#A68523] hover:bg-[#8E701C] text-white font-bold flex items-center gap-1.5 cursor-pointer text-xs shadow-2xs disabled:opacity-50"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Export Audit CSV</span>
@@ -2818,23 +2818,23 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
               {/* Authentication Metrics Row */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="p-3 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs">
+                <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-2xs">
                   <div className="text-[10px] uppercase font-black text-gray-500">Total Verifications</div>
-                  <div className="text-xl font-black text-teal-600 dark:text-teal-400 mt-0.5">
+                  <div className="text-xl font-black text-[#B8922A] dark:text-[#F0D060] mt-0.5">
                     {filteredVerificationLogs.length}
                   </div>
                   <div className="text-[10px] text-gray-400 font-medium">Recorded events</div>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs">
+                <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-2xs">
                   <div className="text-[10px] uppercase font-black text-gray-500">Host PIN Auth</div>
-                  <div className="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">
+                  <div className="text-xl font-black text-[#B8922A] dark:text-[#F0D060] mt-0.5">
                     100%
                   </div>
-                  <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">PIN Verified</div>
+                  <div className="text-[10px] text-[#B8922A] dark:text-[#F0D060] font-semibold">PIN Verified</div>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs">
+                <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-2xs">
                   <div className="text-[10px] uppercase font-black text-gray-500">Coupon Validations</div>
                   <div className="text-xl font-black text-amber-600 dark:text-amber-400 mt-0.5">
                     {filteredVerificationLogs.filter(l => l.authMethod === 'COUPON_CODE_AUTHENTICATED' || l.action.toLowerCase().includes('coupon')).length}
@@ -2842,12 +2842,12 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                   <div className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">Authenticated redemptions</div>
                 </div>
 
-                <div className="p-3 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs">
+                <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-2xs">
                   <div className="text-[10px] uppercase font-black text-gray-500">Integrity Status</div>
-                  <div className="text-xl font-black text-purple-600 dark:text-purple-400 mt-0.5">
+                  <div className="text-xl font-black text-[#B8922A] dark:text-[#F0D060] mt-0.5">
                     SHA-256
                   </div>
-                  <div className="text-[10px] text-purple-600 dark:text-purple-400 font-medium">100% Cryptographic</div>
+                  <div className="text-[10px] text-[#B8922A] dark:text-[#F0D060] font-medium">100% Cryptographic</div>
                 </div>
               </div>
 
@@ -2860,7 +2860,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     placeholder="Search audit trail by athlete Gmail, action, host, or SHA hash..."
                     value={verificationSearchQuery}
                     onChange={(e) => setVerificationSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-9 py-2 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-teal-500"
+                    className="w-full pl-10 pr-9 py-2 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-[#D4AF37]"
                   />
                   {verificationSearchQuery && (
                     <button
@@ -2886,7 +2886,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       onClick={() => setVerificationFilter(tab.id as any)}
                       className={`px-3 py-1 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
                         verificationFilter === tab.id
-                          ? 'bg-white dark:bg-[#121413] text-teal-600 dark:text-teal-400 shadow-xs'
+                          ? 'bg-white dark:bg-[#121413] text-[#B8922A] dark:text-[#F0D060] shadow-xs'
                           : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
                       }`}
                     >
@@ -2899,7 +2899,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               {/* Verification Cards List */}
               <div className="space-y-3">
                 {filteredVerificationLogs.length === 0 ? (
-                  <div className="p-8 text-center rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] space-y-2 text-gray-500">
+                  <div className="p-8 text-center rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] space-y-2 text-gray-500">
                     <ShieldCheck className="w-8 h-8 mx-auto text-gray-400" />
                     <div className="font-bold text-gray-700 dark:text-gray-300">No Authentication Audit Records Found</div>
                     <p className="text-xs text-gray-400">
@@ -2916,14 +2916,14 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     return (
                       <div
                         key={log.id || `verif_${index}`}
-                        className="p-4 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs hover:border-teal-500/40 transition-all space-y-2.5"
+                        className="p-4 rounded-2xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-2xs hover:border-[#D4AF37]/40 transition-all space-y-2.5"
                       >
                         <div className="flex items-start justify-between gap-2 flex-wrap">
                           <div className="flex items-center gap-2.5">
                             <div className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${
                               isCoupon
                                 ? 'border-amber-500/30 bg-amber-500/15 text-amber-600'
-                                : 'border-teal-500/30 bg-teal-500/15 text-teal-600'
+                                : 'border-[#D4AF37]/30 bg-[#D4AF37]/15 text-[#B8922A]'
                             }`}>
                               {isCoupon ? <Ticket className="w-4 h-4" /> : <ShieldCheck className="w-4 h-4" />}
                             </div>
@@ -2933,7 +2933,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                 <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${
                                   isCoupon
                                     ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-500/30'
-                                    : 'bg-teal-500/15 text-teal-800 dark:text-teal-300 border-teal-500/30'
+                                    : 'bg-[#D4AF37]/15 text-[#8E701C] dark:text-[#F0D060] border-[#D4AF37]/30'
                                 }`}>
                                   {log.authenticated ? 'AUTHENTICATED' : 'FAILED'} • {isCoupon ? 'COUPON VERIFIED' : 'PIN VERIFIED'}
                                 </span>
@@ -2954,7 +2954,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                               <button
                                 type="button"
                                 onClick={() => setSelectedTimelineEmail(log.targetEmail)}
-                                className="px-2.5 py-1 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-emerald-500/10 text-gray-600 dark:text-gray-400 hover:text-emerald-600 text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                                className="px-2.5 py-1 rounded-lg border border-gray-200 dark:border-gray-800 hover:bg-[#D4AF37]/10 text-gray-600 dark:text-gray-400 hover:text-[#B8922A] text-[10px] font-bold flex items-center gap-1 cursor-pointer transition-colors"
                                 title="View Vertical Grant Timeline"
                               >
                                 <History className="w-3 h-3" />
@@ -2972,14 +2972,14 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                           <div className="flex items-center gap-3 flex-wrap">
                             <span>Actor: <strong className="text-gray-800 dark:text-gray-200">{log.actor}</strong></span>
                             {log.planId && (
-                              <span>Plan: <strong className="text-emerald-600 dark:text-emerald-400">{log.planId}</strong></span>
+                              <span>Plan: <strong className="text-[#B8922A] dark:text-[#F0D060]">{log.planId}</strong></span>
                             )}
                             {log.clientFingerprint && (
                               <span className="font-mono text-gray-400">FP: {log.clientFingerprint}</span>
                             )}
                           </div>
 
-                          <span className="font-mono text-teal-600 dark:text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded-md">
+                          <span className="font-mono text-[#B8922A] dark:text-[#F0D060] bg-[#D4AF37]/10 px-2 py-0.5 rounded-md">
                             SHA: {log.integrityHash.slice(0, 24)}...
                           </span>
                         </div>
@@ -3002,7 +3002,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
                 <div>
                   <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                    <Activity className="w-4 h-4 text-[#B8922A] dark:text-[#D4AF37]" />
                     <span>Host Master Activity Log (Last 10 Actions)</span>
                   </h3>
                   <p className="text-[11px] text-gray-500 dark:text-gray-400">
@@ -3017,7 +3017,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     disabled={isLoadingLogs}
                     className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLogs ? 'animate-spin text-cyan-600' : ''}`} />
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingLogs ? 'animate-spin text-[#B8922A]' : ''}`} />
                     <span>Refresh Logs</span>
                   </button>
 
@@ -3051,7 +3051,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                   placeholder="Filter activity by action, recipient Gmail ID, or keyword..."
                   value={logsSearchQuery}
                   onChange={(e) => setLogsSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-cyan-500"
+                  className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-[#D4AF37]"
                 />
                 {logsSearchQuery && (
                   <button
@@ -3067,7 +3067,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               {/* Activity List Cards */}
               <div className="space-y-3">
                 {recentActivityLogs.length === 0 ? (
-                  <div className="p-8 text-center rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] space-y-2 text-gray-500">
+                  <div className="p-8 text-center rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] space-y-2 text-gray-500">
                     <History className="w-8 h-8 mx-auto text-gray-400" />
                     <div className="font-bold text-gray-700 dark:text-gray-300">No Recent Host Actions</div>
                     <p className="text-xs text-gray-400">
@@ -3085,7 +3085,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     });
 
                     // Icon and color by action type
-                    let iconBg = 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30';
+                    let iconBg = 'bg-[#D4AF37]/15 text-[#B8922A] border-[#D4AF37]/30';
                     let IconComponent = Crown;
                     let actionBadge = 'VIP Grant';
 
@@ -3102,11 +3102,11 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       IconComponent = Download;
                       actionBadge = 'CSV Export';
                     } else if (log.actionType === 'notification_sent') {
-                      iconBg = 'bg-teal-500/15 text-teal-600 border-teal-500/30';
+                      iconBg = 'bg-[#D4AF37]/15 text-[#B8922A] border-[#D4AF37]/30';
                       IconComponent = MailCheck;
                       actionBadge = 'Broadcast Alert';
                     } else if (log.actionType === 'ledger_cleared') {
-                      iconBg = 'bg-purple-500/15 text-purple-600 border-purple-500/30';
+                      iconBg = 'bg-[#D4AF37]/15 text-[#B8922A] border-[#D4AF37]/30';
                       IconComponent = History;
                       actionBadge = 'Archive Reset';
                     }
@@ -3114,7 +3114,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     return (
                       <div
                         key={log.id || `log_${index}`}
-                        className="p-4 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-2xs hover:border-emerald-500/40 transition-all flex items-start gap-3.5"
+                        className="p-4 rounded-2xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-2xs hover:border-[#D4AF37]/40 transition-all flex items-start gap-3.5"
                       >
                         {/* Number Index & Action Icon */}
                         <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${iconBg}`}>
@@ -3142,7 +3142,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                             <span>Actor: <strong className="text-gray-800 dark:text-gray-200">{log.actor}</strong></span>
                             {log.targetEmail && (
                               <span>
-                                Target: <strong className="text-emerald-600 dark:text-emerald-400 font-mono">{log.targetEmail}</strong>
+                                Target: <strong className="text-[#B8922A] dark:text-[#F0D060] font-mono">{log.targetEmail}</strong>
                               </span>
                             )}
                             <span className="text-[10px] font-mono text-gray-400">
@@ -3195,7 +3195,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
         {/* Modal Footer */}
         <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-[#121413] flex items-center justify-between shrink-0 text-xs text-gray-500">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <ShieldCheck className="w-4 h-4 text-[#B8922A]" />
             <span>Cryptographically Verified Host Ledger System • Host Admin</span>
           </div>
           <button
@@ -3221,7 +3221,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
       {/* Bulk Email Broadcast Modal */}
       {showBulkEmailModal && (
         <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white dark:bg-[#1A1D1C] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl max-w-lg w-full p-6 space-y-4 animate-in zoom-in-95">
+          <div className="bg-white dark:bg-[#111111] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl max-w-lg w-full p-6 space-y-4 animate-in zoom-in-95">
             <div className="flex items-start justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-blue-500/20 text-blue-600 flex items-center justify-center font-black">
@@ -3254,7 +3254,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                   type="text"
                   value={bulkEmailSubject}
                   onChange={(e) => setBulkEmailSubject(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white font-medium"
+                  className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] text-gray-900 dark:text-white font-medium"
                 />
               </div>
 
@@ -3266,7 +3266,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                   rows={4}
                   value={bulkEmailBody}
                   onChange={(e) => setBulkEmailBody(e.target.value)}
-                  className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] text-gray-900 dark:text-white font-medium resize-none"
+                  className="w-full p-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] text-gray-900 dark:text-white font-medium resize-none"
                 />
               </div>
 
@@ -3318,10 +3318,10 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
       {/* Automated Notification Confirmation & Details Dialog */}
       {showNotifyModal && notifyResult && (
         <div className="fixed inset-0 z-60 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white dark:bg-[#1A1D1C] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl max-w-lg w-full p-6 space-y-4 animate-in zoom-in-95">
+          <div className="bg-white dark:bg-[#111111] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl max-w-lg w-full p-6 space-y-4 animate-in zoom-in-95">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-2xl bg-[#D4AF37]/20 text-[#B8922A] flex items-center justify-center">
                   <MailCheck className="w-6 h-6" />
                 </div>
                 <div>
@@ -3342,7 +3342,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               </button>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-900 dark:text-emerald-200">
+            <div className="p-3.5 rounded-2xl bg-[#FFFBF0] dark:bg-[#2A2416]/30 border border-[#E6D7A8] dark:border-[#2A2416] text-xs text-[#6A5312] dark:text-[#F0D060]">
               <span className="font-bold">Summary: </span>
               {notifyResult.message}
             </div>
@@ -3364,7 +3364,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       {n.plan} • {n.remainingDays}
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 shrink-0">
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#FDF3D0] dark:bg-[#2A2416]/50 text-[#A68523] dark:text-[#F0D060] shrink-0">
                     Delivered
                   </span>
                 </div>
@@ -3375,7 +3375,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowNotifyModal(false)}
-                className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs cursor-pointer transition-colors shadow-xs"
+                className="w-full py-2.5 rounded-xl bg-[#A68523] hover:bg-[#8E701C] text-white font-bold text-xs cursor-pointer transition-colors shadow-xs"
               >
                 Close & Return to Ledger
               </button>

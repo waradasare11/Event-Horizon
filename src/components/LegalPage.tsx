@@ -91,9 +91,9 @@ export const LegalPage: React.FC<LegalPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] font-sans flex flex-col selection:bg-[#0F6E5F]/20 selection:text-[#0F6E5F] transition-colors duration-200">
+    <div className="min-h-screen bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] font-sans flex flex-col selection:bg-[#D4AF37]/20 selection:text-[#D4AF37] transition-colors duration-200">
       {/* Top Application Bar */}
-      <header className="border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-[#161817]/90 backdrop-blur-md sticky top-0 z-40">
+      <header className="border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <a
@@ -147,7 +147,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                 e.preventDefault();
                 onNavigate('/');
               }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
             >
               <Home className="w-3.5 h-3.5" />
               <span>Go to App</span>
@@ -159,7 +159,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
       {/* Main Container */}
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {/* Page Title & Operator Overview Card */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-6 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5 text-amber-500" />
@@ -192,7 +192,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             onClick={(e) => handleTabClick('privacy', e)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'privacy'
-                ? 'bg-white dark:bg-[#161817] text-amber-600 dark:text-amber-400 shadow-xs'
+                ? 'bg-white dark:bg-[#111111] text-amber-600 dark:text-amber-400 shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -205,7 +205,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             onClick={(e) => handleTabClick('terms', e)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'terms'
-                ? 'bg-white dark:bg-[#161817] text-amber-600 dark:text-amber-400 shadow-xs'
+                ? 'bg-white dark:bg-[#111111] text-amber-600 dark:text-amber-400 shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -218,7 +218,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             onClick={(e) => handleTabClick('disclaimer', e)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'disclaimer'
-                ? 'bg-white dark:bg-[#161817] text-amber-600 dark:text-amber-400 shadow-xs'
+                ? 'bg-white dark:bg-[#111111] text-amber-600 dark:text-amber-400 shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -231,7 +231,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             onClick={(e) => handleTabClick('refund', e)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'refund'
-                ? 'bg-white dark:bg-[#161817] text-amber-600 dark:text-amber-400 shadow-xs'
+                ? 'bg-white dark:bg-[#111111] text-amber-600 dark:text-amber-400 shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -244,7 +244,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             onClick={(e) => handleTabClick('cookies', e)}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'cookies'
-                ? 'bg-white dark:bg-[#161817] text-amber-600 dark:text-amber-400 shadow-xs'
+                ? 'bg-white dark:bg-[#111111] text-amber-600 dark:text-amber-400 shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -267,7 +267,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
         </nav>
 
         {/* Tab Content Display */}
-        <div className="bg-white dark:bg-[#161817] p-6 sm:p-10 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm leading-relaxed">
+        <div className="bg-white dark:bg-[#111111] p-6 sm:p-10 rounded-3xl border border-gray-200 dark:border-gray-800 shadow-sm leading-relaxed">
           {/* TAB 1: PRIVACY POLICY */}
           {activeTab === 'privacy' && (
             <div className="space-y-6 animate-in fade-in duration-150">
@@ -622,7 +622,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                     <button
                       type="button"
                       onClick={onSignIn}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer"
                     >
                       <LogIn className="w-4 h-4" />
                       <span>Sign In with Google to Delete Data</span>
@@ -634,7 +634,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                         e.preventDefault();
                         onNavigate('/');
                       }}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer"
                     >
                       <LogIn className="w-4 h-4" />
                       <span>Open App to Sign In</span>
@@ -689,7 +689,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                       value={deleteConfirmText}
                       onChange={(e) => setDeleteConfirmText(e.target.value)}
                       placeholder="Type DELETE"
-                      className="w-full text-sm p-3.5 rounded-xl border border-red-300 dark:border-red-900/60 bg-white dark:bg-[#111312] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 font-mono"
+                      className="w-full text-sm p-3.5 rounded-xl border border-red-300 dark:border-red-900/60 bg-white dark:bg-[#070707] text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 font-mono"
                     />
 
                     <button
@@ -710,7 +710,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#161817] py-8 mt-auto text-xs text-gray-500">
+      <footer className="border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] py-8 mt-auto text-xs text-gray-500">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div className="flex items-center gap-2">
             <MapPin className="w-3.5 h-3.5 text-amber-500" />

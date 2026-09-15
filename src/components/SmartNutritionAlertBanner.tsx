@@ -79,8 +79,8 @@ export const SmartNutritionAlertBanner: React.FC<SmartNutritionAlertBannerProps>
     // Show notification permission banner if not yet granted
     if (notifPermission !== 'granted') {
       return (
-        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-[#0F6E5F]/10 to-teal-500/10 border border-[#0F6E5F]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-left">
-          <div className="flex items-center gap-2 text-[#0F6E5F] dark:text-[#5FD1B8]">
+        <div className="p-3.5 rounded-2xl bg-gradient-to-r from-[#D4AF37]/10 to-[#D4AF37]/10 border border-[#D4AF37]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-left">
+          <div className="flex items-center gap-2 text-[#D4AF37] dark:text-[#F0D060]">
             <BellRing className="w-4 h-4 shrink-0" />
             <span>
               <strong>Smart Nutrition Alerts:</strong> Enable browser notifications to get real-time off-target warnings (e.g. low protein warnings during deficit cuts).
@@ -88,7 +88,7 @@ export const SmartNutritionAlertBanner: React.FC<SmartNutritionAlertBannerProps>
           </div>
           <button
             onClick={handleEnableNotifications}
-            className="px-3.5 py-1.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs shrink-0 transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-xs shrink-0 transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1.5"
           >
             <Bell className="w-3.5 h-3.5" />
             <span>Enable Push Alerts</span>
@@ -106,13 +106,13 @@ export const SmartNutritionAlertBanner: React.FC<SmartNutritionAlertBannerProps>
   const containerClasses = isCritical || isWarning
     ? 'bg-amber-500/10 border-amber-500/30 text-amber-950 dark:text-amber-200'
     : isSuccess
-    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-950 dark:text-emerald-200'
+    ? 'bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#16120A] dark:text-[#F0D060]'
     : 'bg-sky-500/10 border-sky-500/30 text-sky-950 dark:text-sky-200';
 
   const badgeClasses = isCritical || isWarning
     ? 'bg-amber-500 text-white'
     : isSuccess
-    ? 'bg-[#0F6E5F] text-white'
+    ? 'bg-[#D4AF37] text-white'
     : 'bg-sky-600 text-white';
 
   return (
@@ -122,7 +122,7 @@ export const SmartNutritionAlertBanner: React.FC<SmartNutritionAlertBannerProps>
           {isWarning || isCritical ? (
             <AlertTriangle className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           ) : isSuccess ? (
-            <CheckCircle2 className="w-5 h-5 text-[#0F6E5F] dark:text-[#5FD1B8] shrink-0 mt-0.5" />
+            <CheckCircle2 className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060] shrink-0 mt-0.5" />
           ) : (
             <Info className="w-5 h-5 text-sky-600 dark:text-sky-400 shrink-0 mt-0.5" />
           )}
@@ -162,7 +162,7 @@ export const SmartNutritionAlertBanner: React.FC<SmartNutritionAlertBannerProps>
 
       {/* Actionable Coach Directive */}
       <div className="p-3 rounded-xl bg-white/80 dark:bg-black/25 border border-current/10 text-xs flex items-start gap-2">
-        <Sparkles className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8] shrink-0 mt-0.5" />
+        <Sparkles className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060] shrink-0 mt-0.5" />
         <div>
           <span className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">Actionable Solution: </span>
           <span className="text-[#374151] dark:text-[#E5E7EB]">{alert.actionableTip}</span>

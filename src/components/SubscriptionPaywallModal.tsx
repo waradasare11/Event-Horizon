@@ -144,7 +144,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
           email: userProfile.email || '',
         },
         theme: {
-          color: '#0F6E5F',
+          color: '#D4AF37',
         },
         handler: async (response: any) => {
           try {
@@ -231,18 +231,18 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#161817] rounded-3xl max-w-3xl w-full shadow-2xl border border-[#E5E7EB] dark:border-[#242826] overflow-hidden text-left my-6 transition-colors relative">
+      <div className="bg-white dark:bg-[#111111] rounded-3xl max-w-3xl w-full shadow-2xl border border-[#E5E7EB] dark:border-[#2A2416] overflow-hidden text-left my-6 transition-colors relative">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[#0F6E5F] via-[#0D5B4F] to-[#0A473D] p-6 sm:p-7 text-white flex items-start justify-between relative overflow-hidden">
+        <div className="bg-gradient-to-r from-[#D4AF37] via-[#A68523] to-[#0A473D] p-6 sm:p-7 text-white flex items-start justify-between relative overflow-hidden">
           <div className="space-y-1 relative z-10">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-emerald-200 border border-white/20">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-[#F0D060] border border-white/20">
               <Crown className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
               <span>Official AROH Pro Membership</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
               Unlock Unlimited Master Coaching
             </h2>
-            <p className="text-xs sm:text-sm text-emerald-100/90 max-w-xl">
+            <p className="text-xs sm:text-sm text-[#F4EBD0]/90 max-w-xl">
               Personalized workout logs, precision nutrition tracking, and biochemical AI analysis
             </p>
           </div>
@@ -258,12 +258,12 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
         {verificationSuccess ? (
           /* Payment Verified Success State */
           <div className="p-8 text-center space-y-6 animate-in zoom-in-95 duration-300">
-            <div className="w-20 h-20 mx-auto rounded-full bg-emerald-500/10 border-2 border-emerald-500 flex items-center justify-center text-emerald-500 shadow-lg">
+            <div className="w-20 h-20 mx-auto rounded-full bg-[#D4AF37]/10 border-2 border-[#D4AF37] flex items-center justify-center text-[#D4AF37] shadow-lg">
               <CheckCircle2 className="w-10 h-10" />
             </div>
 
             <div className="space-y-2">
-              <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+              <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30">
                 Verified &amp; Authenticated
               </span>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
@@ -274,24 +274,24 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
               </p>
             </div>
 
-            <div className="bg-[#FAFAF8] dark:bg-[#1A1D1C] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 max-w-md mx-auto text-xs text-left space-y-2">
+            <div className="bg-[#FAFAF8] dark:bg-[#111111] p-4 rounded-2xl border border-gray-200 dark:border-gray-800 max-w-md mx-auto text-xs text-left space-y-2">
               <div className="flex justify-between">
                 <span className="text-gray-500">Plan Duration:</span>
                 <span className="font-bold text-gray-800 dark:text-gray-200">{selectedPlan.durationLabel}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Status:</span>
-                <span className="font-bold text-emerald-600 dark:text-emerald-400">Active</span>
+                <span className="font-bold text-[#B8922A] dark:text-[#F0D060]">Active</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-500">Amount:</span>
-                <span className="font-bold text-[#0F6E5F] dark:text-[#2DD4BF] text-sm">₹{selectedPlan.priceINR}</span>
+                <span className="font-bold text-[#D4AF37] dark:text-[#F0D060] text-sm">₹{selectedPlan.priceINR}</span>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="px-8 py-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-sm shadow-md transition-all cursor-pointer"
+              className="px-8 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-sm shadow-md transition-all cursor-pointer"
             >
               Continue to AROH Pro
             </button>
@@ -306,7 +306,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                   1. Select Your Subscription Tier
                 </label>
                 {hasHostGrant && (
-                  <span className="text-xs font-black text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                  <span className="text-xs font-black text-[#B8922A] dark:text-[#F0D060] flex items-center gap-1">
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>VIP Free Pass Available</span>
                   </span>
@@ -327,13 +327,13 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                       className={`p-4 rounded-2xl border-2 transition-all cursor-pointer relative flex flex-col justify-between ${
                         isSelected
                           ? isFree 
-                            ? 'border-emerald-500 bg-emerald-500/10 shadow-sm'
-                            : 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/5 dark:bg-[#2DD4BF]/10 shadow-sm'
-                          : 'border-gray-200 dark:border-[#242826] bg-white dark:bg-[#1A1D1C] hover:border-gray-300 dark:hover:border-gray-700'
+                            ? 'border-[#D4AF37] bg-[#D4AF37]/10 shadow-sm'
+                            : 'border-[#D4AF37] dark:border-[#F0D060] bg-[#D4AF37]/5 dark:bg-[#F0D060]/10 shadow-sm'
+                          : 'border-gray-200 dark:border-[#2A2416] bg-white dark:bg-[#111111] hover:border-gray-300 dark:hover:border-gray-700'
                       }`}
                     >
                       {isFree && (
-                        <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase shadow-xs">
+                        <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-[#A68523] text-white text-[10px] font-black uppercase shadow-xs">
                           100% Free
                         </span>
                       )}
@@ -343,7 +343,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                         </span>
                       )}
                       {!isFree && plan.popular && !plan.bestValue && (
-                        <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-[#0F6E5F] text-white text-[10px] font-extrabold uppercase shadow-xs">
+                        <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full bg-[#D4AF37] text-white text-[10px] font-extrabold uppercase shadow-xs">
                           Most Popular
                         </span>
                       )}
@@ -359,7 +359,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
 
                       <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800 flex items-baseline justify-between">
                         <div>
-                          <span className={`text-xl font-black ${isFree ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-900 dark:text-white'}`}>
+                          <span className={`text-xl font-black ${isFree ? 'text-[#B8922A] dark:text-[#F0D060]' : 'text-gray-900 dark:text-white'}`}>
                             {isFree ? '₹0 FREE' : `₹${plan.priceINR}`}
                           </span>
                           {!isFree && (
@@ -369,7 +369,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                           )}
                         </div>
                         {plan.monthlyEquivalentINR && !isFree && (
-                          <span className="text-[11px] font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">
+                          <span className="text-[11px] font-bold text-[#D4AF37] dark:text-[#F0D060]">
                             ~₹{Math.round(plan.monthlyEquivalentINR)}/mo
                           </span>
                         )}
@@ -382,12 +382,12 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
 
             {/* Free VIP Access Box if Price is ₹0 or hasHostGrant */}
             {(selectedPlan.priceINR === 0 || hasHostGrant) && (
-              <div className="bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-emerald-500/15 p-6 rounded-2xl border-2 border-emerald-500/40 dark:border-emerald-500/20 text-center space-y-4 shadow-sm">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center mx-auto shadow-md">
+              <div className="bg-gradient-to-br from-[#D4AF37]/15 via-[#D4AF37]/10 to-[#F0D060]/15 p-6 rounded-2xl border-2 border-[#D4AF37]/40 dark:border-[#D4AF37]/20 text-center space-y-4 shadow-sm">
+                <div className="w-12 h-12 rounded-2xl bg-[#A68523] text-white flex items-center justify-center mx-auto shadow-md">
                   <Crown className="w-6 h-6 text-amber-300 fill-amber-300" />
                 </div>
                 <div className="space-y-1">
-                  <span className="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-500/20 px-2.5 py-1 rounded-md">
+                  <span className="text-xs font-black uppercase tracking-wider text-[#B8922A] dark:text-[#F0D060] bg-[#D4AF37]/20 px-2.5 py-1 rounded-md">
                     Host VIP Free Access Unlocked
                   </span>
                   <h4 className="text-lg font-black text-gray-900 dark:text-white">
@@ -423,7 +423,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                     setVerificationSuccess(true);
                     onSubscriptionUpdated(fallbackSub);
                   }}
-                  className="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3.5 px-6 rounded-xl bg-[#A68523] hover:bg-[#D4AF37] text-white font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-amber-300" />
                   <span>Activate Complimentary VIP Pro Access Now</span>
@@ -463,7 +463,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                             setCouponCodeInput(e.target.value.toUpperCase());
                             setCouponError(null);
                           }}
-                          className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1A1D1C] text-xs font-mono font-bold text-gray-900 dark:text-white uppercase outline-hidden focus:ring-2 focus:ring-amber-500"
+                          className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#111111] text-xs font-mono font-bold text-gray-900 dark:text-white uppercase outline-hidden focus:ring-2 focus:ring-amber-500"
                         />
                       </div>
                       <button
@@ -490,8 +490,8 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                     )}
 
                     {couponSuccess && (
-                      <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-emerald-600" />
+                      <div className="p-2.5 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#A68523] dark:text-[#F0D060] text-xs flex items-center gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0 text-[#B8922A]" />
                         <span>{couponSuccess}</span>
                       </div>
                     )}
@@ -505,25 +505,25 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
               <div className="space-y-4">
                 {razorpayConfig.isLive ? (
                   /* Razorpay Live Checkout View */
-                  <div className="bg-[#FAFAF8] dark:bg-[#1A1D1C] p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-4">
+                  <div className="bg-[#FAFAF8] dark:bg-[#111111] p-5 sm:p-6 rounded-2xl border border-gray-200 dark:border-gray-800 space-y-4">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-bold uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                        <CreditCard className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                        <CreditCard className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
                         <span>2. Complete Checkout via Razorpay</span>
                       </label>
-                      <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                      <span className="text-[11px] font-bold text-[#B8922A] dark:text-[#F0D060] bg-[#D4AF37]/10 px-2 py-0.5 rounded">
                         Encrypted 256-Bit SSL
                       </span>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-700 space-y-2 text-xs">
+                    <div className="p-4 rounded-xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-700 space-y-2 text-xs">
                       <div className="flex justify-between">
                         <span className="text-gray-500">Selected Plan:</span>
                         <span className="font-bold text-gray-900 dark:text-white">{selectedPlan.name} ({selectedPlan.durationLabel})</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Amount Due:</span>
-                        <span className="font-bold text-[#0F6E5F] dark:text-[#2DD4BF] text-sm">₹{selectedPlan.priceINR}</span>
+                        <span className="font-bold text-[#D4AF37] dark:text-[#F0D060] text-sm">₹{selectedPlan.priceINR}</span>
                       </div>
                       <div className="flex justify-between text-gray-500">
                         <span>Payment Methods:</span>
@@ -541,9 +541,9 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                     <button
                       onClick={handleRazorpayCheckout}
                       disabled={isProcessingPayment}
-                      className="w-full py-3.5 px-4 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
+                      className="w-full py-3.5 px-4 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
                     >
-                      <ShieldCheck className="w-4 h-4 text-emerald-300" />
+                      <ShieldCheck className="w-4 h-4 text-[#F0D060]" />
                       <span>
                         {isProcessingPayment ? 'Connecting to Razorpay...' : `Pay ₹${selectedPlan.priceINR} via Razorpay`}
                       </span>
@@ -551,12 +551,12 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                   </div>
                 ) : (
                   /* Payments Coming Soon Banner (Razorpay not configured) */
-                  <div className="bg-gradient-to-br from-teal-500/10 via-emerald-500/5 to-teal-500/10 p-6 rounded-2xl border border-teal-500/20 text-center space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-teal-600/20 text-teal-600 dark:text-teal-400 flex items-center justify-center mx-auto">
+                  <div className="bg-gradient-to-br from-[#D4AF37]/10 via-[#D4AF37]/5 to-[#D4AF37]/10 p-6 rounded-2xl border border-[#D4AF37]/20 text-center space-y-4">
+                    <div className="w-12 h-12 rounded-2xl bg-[#A68523]/20 text-[#B8922A] dark:text-[#F0D060] flex items-center justify-center mx-auto">
                       <ShieldCheck className="w-6 h-6" />
                     </div>
                     <div className="space-y-1.5">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-teal-700 dark:text-teal-300 bg-teal-500/20 px-2.5 py-1 rounded-md">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#A68523] dark:text-[#F0D060] bg-[#D4AF37]/20 px-2.5 py-1 rounded-md">
                         Payments coming soon — your 7-day trial is active
                       </span>
                       <h4 className="text-base font-bold text-gray-900 dark:text-white pt-1">
@@ -570,7 +570,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                     <button
                       type="button"
                       onClick={onClose}
-                      className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs shadow-md transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-xs shadow-md transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>Continue with 7-Day Free Access</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -583,9 +583,9 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
         )}
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-[#FAFAF8] dark:bg-[#111312] border-t border-[#E5E7EB] dark:border-[#242826] text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex items-center justify-between">
+        <div className="px-6 py-4 bg-[#FAFAF8] dark:bg-[#070707] border-t border-[#E5E7EB] dark:border-[#2A2416] text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex items-center justify-between">
           <span className="flex items-center gap-1.5">
-            <Lock className="w-3.5 h-3.5 text-emerald-500" />
+            <Lock className="w-3.5 h-3.5 text-[#D4AF37]" />
             <span>AROH Pro • Encrypted 256-Bit SSL Checkout</span>
           </span>
           <span>7-Day Risk-Free Guarantee</span>

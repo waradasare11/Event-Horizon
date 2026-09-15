@@ -122,11 +122,11 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-      <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#2A2E2C] rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
+      <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl overflow-y-auto max-h-[90vh]">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 mb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-[#0F6E5F]/15 dark:bg-[#0F6E5F]/30 text-[#0F6E5F] dark:text-[#4ade80] flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/15 dark:bg-[#D4AF37]/30 text-[#D4AF37] dark:text-[#4ade80] flex items-center justify-center shrink-0">
               <RefreshCw className="w-6 h-6 animate-spin-slow" />
             </div>
             <div>
@@ -134,7 +134,7 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
                 <h2 className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                   Quarterly Metabolic & Fitness Calibration
                 </h2>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#4ade80] font-semibold">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#4ade80] font-semibold">
                   60-90 Day Review
                 </span>
               </div>
@@ -152,15 +152,15 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
         </div>
 
         {notice && (
-          <div className="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 flex items-center gap-2 text-sm font-medium">
-            <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+          <div className="mb-6 p-4 rounded-xl bg-[#FFFBF0] dark:bg-[#2A2416]/40 border border-[#E6D7A8] dark:border-[#2A2416] text-[#8E701C] dark:text-[#F0D060] flex items-center gap-2 text-sm font-medium">
+            <CheckCircle2 className="w-5 h-5 text-[#B8922A] shrink-0" />
             {notice}
           </div>
         )}
 
         {/* Info callout */}
-        <div className="mb-6 p-4 rounded-xl bg-[#F0FDF4] dark:bg-[#064e3b]/20 border border-emerald-200 dark:border-emerald-900/50 flex items-start gap-3 text-xs text-emerald-900 dark:text-emerald-300">
-          <ShieldCheck className="w-4 h-4 shrink-0 text-[#0F6E5F] mt-0.5" />
+        <div className="mb-6 p-4 rounded-xl bg-[#F0FDF4] dark:bg-[#064e3b]/20 border border-[#E6D7A8] dark:border-[#2A2416]/50 flex items-start gap-3 text-xs text-[#6A5312] dark:text-[#F0D060]">
+          <ShieldCheck className="w-4 h-4 shrink-0 text-[#D4AF37] mt-0.5" />
           <div>
             <strong>100% Data Preservation Guarantee:</strong> We never reset your logs or force you to re-enter your details. This check-in ensures your metabolic calculations stay aligned with your latest body composition.
           </div>
@@ -180,7 +180,7 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
                   placeholder="e.g. 75"
                   value={weightInput}
                   onChange={(e) => setWeightInput(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E211F] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0F6E5F]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#D4AF37]"
                 />
                 <span className="absolute right-3.5 top-2.5 text-xs text-gray-400">kg</span>
               </div>
@@ -197,7 +197,7 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
                   placeholder="e.g. 70"
                   value={targetWeightInput}
                   onChange={(e) => setTargetWeightInput(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E211F] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0F6E5F]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#D4AF37]"
                 />
                 <span className="absolute right-3.5 top-2.5 text-xs text-gray-400">kg</span>
               </div>
@@ -210,7 +210,7 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
               <select
                 value={goal}
                 onChange={(e) => setGoal(e.target.value as GoalType)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E211F] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0F6E5F]"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#D4AF37]"
               >
                 <option value="lose_fat">Fat Loss & Leanness</option>
                 <option value="build_muscle">Muscle Hypertrophy</option>
@@ -225,7 +225,7 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
               <select
                 value={trainingDaysPerWeek}
                 onChange={(e) => setTrainingDaysPerWeek(parseInt(e.target.value) || 4)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E211F] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0F6E5F]"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#D4AF37]"
               >
                 <option value={2}>2 Days / Week</option>
                 <option value={3}>3 Days / Week</option>
@@ -246,7 +246,7 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
                   placeholder="e.g. 18"
                   value={bodyFatInput}
                   onChange={(e) => setBodyFatInput(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E211F] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0F6E5F]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#D4AF37]"
                 />
                 <span className="absolute right-3.5 top-2.5 text-xs text-gray-400">%</span>
               </div>
@@ -263,7 +263,7 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
                   placeholder="e.g. 8000"
                   value={stepInput}
                   onChange={(e) => setStepInput(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1E211F] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#0F6E5F]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1A1A1A] text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-[#D4AF37]"
                 />
                 <span className="absolute right-3.5 top-2.5 text-xs text-gray-400">steps</span>
               </div>
@@ -278,14 +278,14 @@ export const QuarterlyProfileCalibrationModal: React.FC<QuarterlyProfileCalibrat
             onClick={handleKeepAsIs}
             className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/60 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm font-semibold transition-colors flex items-center justify-center gap-2"
           >
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <CheckCircle2 className="w-4 h-4 text-[#B8922A]" />
             Keep Existing Info As Is
           </button>
 
           <button
             type="button"
             onClick={handleSaveUpdated}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-sm font-semibold shadow-sm transition-colors flex items-center justify-center gap-2"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-sm font-semibold shadow-sm transition-colors flex items-center justify-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-amber-300" />
             Save Calibrated Profile

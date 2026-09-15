@@ -54,8 +54,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
       }
 
       return (
-        <div className="min-h-screen bg-[#FAFAF8] dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-white dark:bg-[#161817] rounded-2xl p-6 sm:p-8 border border-[#E5E7EB] dark:border-[#242826] shadow-xl text-center space-y-5">
+        <div className="min-h-screen bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center justify-center p-4">
+          <div className="max-w-md w-full bg-white dark:bg-[#111111] rounded-2xl p-6 sm:p-8 border border-[#E5E7EB] dark:border-[#2A2416] shadow-xl text-center space-y-5">
             <div className="w-12 h-12 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center">
               <AlertTriangle className="w-6 h-6" />
             </div>
@@ -70,7 +70,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
             </div>
 
             {this.state.error && (
-              <div className="p-3 rounded-xl bg-gray-50 dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2E2C] text-left">
+              <div className="p-3 rounded-xl bg-gray-50 dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2416] text-left">
                 <div className="text-[11px] font-mono text-red-600 dark:text-red-400 break-words line-clamp-3">
                   {this.state.error.toString()}
                 </div>
@@ -80,7 +80,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
             <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
               <button
                 onClick={this.handleReset}
-                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-bold hover:bg-[#0D5B4F] shadow-sm transition-all cursor-pointer"
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs font-bold hover:bg-[#A68523] shadow-sm transition-all cursor-pointer"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span>Reload Application</span>
@@ -88,7 +88,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
 
               <button
                 onClick={this.handleClearCacheAndReset}
-                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs font-semibold hover:bg-[#F9FAFB] dark:hover:bg-[#242826] transition-all cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs font-semibold hover:bg-[#F9FAFB] dark:hover:bg-[#2A2416] transition-all cursor-pointer"
               >
                 <span>Reset Cache</span>
               </button>

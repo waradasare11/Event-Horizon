@@ -124,14 +124,14 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Header Banner */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+            <Trophy className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060]" />
             <h1 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
               Personal Athletic Scoreboard
             </h1>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-500/10 text-teal-700 dark:text-teal-300 border border-teal-500/20">
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/20">
               Verified Data Only
             </span>
           </div>
@@ -141,7 +141,7 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
         </div>
 
         <div className="flex items-center gap-2 text-xs font-semibold text-gray-600 dark:text-gray-400">
-          <ShieldCheck className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+          <ShieldCheck className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
           <span>Zero Fabricated Social Proof</span>
         </div>
       </div>
@@ -164,7 +164,7 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
       {/* Real Personal Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Personal Workout Streak */}
-        <div className="p-5 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
+        <div className="p-5 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Workout Streak
@@ -187,12 +187,12 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
         </div>
 
         {/* Card 2: Personal Volume This Week */}
-        <div className="p-5 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
+        <div className="p-5 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Volume This Week
             </span>
-            <div className="w-8 h-8 rounded-xl bg-teal-500/10 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center">
               <Dumbbell className="w-4 h-4" />
             </div>
           </div>
@@ -208,7 +208,7 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
         </div>
 
         {/* Card 3: Total Workouts Logged */}
-        <div className="p-5 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
+        <div className="p-5 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               Total Sessions
@@ -231,12 +231,12 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
         </div>
 
         {/* Card 4: All-Time Cumulative Volume */}
-        <div className="p-5 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
+        <div className="p-5 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
               All-Time Volume
             </span>
-            <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-[#D4AF37]/10 text-[#B8922A] dark:text-[#F0D060] flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
@@ -255,10 +255,10 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
       {/* Two Columns: Personal Milestones & Recent Sessions */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column: Personal Milestone Badges */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-4">
+        <div className="p-6 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+              <Sparkles className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
               <h2 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
                 Personal Milestones
               </h2>
@@ -274,7 +274,7 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
                 key={milestone.id}
                 className={`p-4 rounded-2xl border transition-all flex items-center justify-between gap-3 ${
                   milestone.unlocked
-                    ? 'bg-teal-500/5 dark:bg-teal-500/10 border-teal-500/30'
+                    ? 'bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 border-[#D4AF37]/30'
                     : 'bg-gray-50 dark:bg-gray-800/40 border-gray-200 dark:border-gray-800 opacity-70'
                 }`}
               >
@@ -290,14 +290,14 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
                   <p className="text-[11px] text-gray-500 dark:text-gray-400">
                     {milestone.desc}
                   </p>
-                  <div className="text-[10px] font-mono text-teal-600 dark:text-teal-400 font-semibold pt-0.5">
+                  <div className="text-[10px] font-mono text-[#B8922A] dark:text-[#F0D060] font-semibold pt-0.5">
                     {milestone.progress}
                   </div>
                 </div>
 
                 <div className="shrink-0">
                   {milestone.unlocked ? (
-                    <div className="w-7 h-7 rounded-full bg-teal-600 text-white flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-full bg-[#A68523] text-white flex items-center justify-center">
                       <CheckCircle2 className="w-4 h-4" />
                     </div>
                   ) : (
@@ -312,10 +312,10 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
         </div>
 
         {/* Right Column: Recent Verified Workouts */}
-        <div className="p-6 rounded-3xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs space-y-4">
+        <div className="p-6 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+              <Calendar className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
               <h2 className="text-sm sm:text-base font-bold text-gray-900 dark:text-white">
                 Recent Training Sessions
               </h2>
@@ -349,7 +349,7 @@ export const CommunityChallenges: React.FC<CommunityChallengesProps> = ({
                   </div>
 
                   <div className="text-right">
-                    <div className="text-xs font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">
+                    <div className="text-xs font-bold text-[#D4AF37] dark:text-[#F0D060]">
                       {(session.totalVolumeKg || 0).toLocaleString()} kg
                     </div>
                     <div className="text-[10px] text-gray-400">

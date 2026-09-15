@@ -109,10 +109,10 @@ export const PerformanceMonitoringDashboard: React.FC<PerformanceMonitoringDashb
   return (
     <div className="space-y-6 text-left">
       {/* High Precision Mode Indicator & System Health Banner */}
-      <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-blue-500/10 border border-emerald-500/20 space-y-3">
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-[#D4AF37]/10 via-[#D4AF37]/10 to-blue-500/10 border border-[#D4AF37]/20 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-emerald-500 text-white shadow-md">
+            <div className="p-2.5 rounded-xl bg-[#D4AF37] text-white shadow-md">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
@@ -120,7 +120,7 @@ export const PerformanceMonitoringDashboard: React.FC<PerformanceMonitoringDashb
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                   High Precision Mode: Active
                 </h3>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white shadow-xs animate-pulse">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#D4AF37] text-white shadow-xs animate-pulse">
                   ● 3-Model Consensus Live
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-600 dark:text-blue-400">
@@ -139,7 +139,7 @@ export const PerformanceMonitoringDashboard: React.FC<PerformanceMonitoringDashb
               type="button"
               onClick={handleRunSyntheticBenchmark}
               disabled={isBenchmarking}
-              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all disabled:opacity-50 cursor-pointer"
+              className="px-3.5 py-2 rounded-xl bg-[#A68523] hover:bg-[#8E701C] text-white text-xs font-semibold flex items-center gap-1.5 shadow-sm transition-all disabled:opacity-50 cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isBenchmarking ? 'animate-spin' : ''}`} />
               <span>{isBenchmarking ? 'Benchmarking...' : 'Run Live Latency Probe'}</span>
@@ -160,7 +160,7 @@ export const PerformanceMonitoringDashboard: React.FC<PerformanceMonitoringDashb
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
           <div className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800 text-[11px] space-y-1">
             <div className="font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-              <Cpu className="w-3.5 h-3.5 text-emerald-500" />
+              <Cpu className="w-3.5 h-3.5 text-[#D4AF37]" />
               1. Volumetric 3D Model
             </div>
             <div className="text-slate-500 dark:text-slate-400 text-[10px]">
@@ -207,7 +207,7 @@ export const PerformanceMonitoringDashboard: React.FC<PerformanceMonitoringDashb
           <div className="text-xl font-black text-[#1A1D1B] dark:text-[#E8ECE9]">
             {summary.overallAvgDurationMs} <span className="text-xs font-normal text-gray-500">ms</span>
           </div>
-          <div className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-0.5 font-medium flex items-center gap-0.5">
+          <div className="text-[10px] text-[#B8922A] dark:text-[#F0D060] mt-0.5 font-medium flex items-center gap-0.5">
             <TrendingDown className="w-3 h-3" /> Sub-second optimal
           </div>
         </div>
@@ -228,7 +228,7 @@ export const PerformanceMonitoringDashboard: React.FC<PerformanceMonitoringDashb
         <div className="p-3.5 rounded-2xl bg-[#F9FAFB] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A302D]">
           <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-1">
             <span>P99 Edge</span>
-            <AlertTriangle className="w-3.5 h-3.5 text-purple-500" />
+            <AlertTriangle className="w-3.5 h-3.5 text-[#D4AF37]" />
           </div>
           <div className="text-xl font-black text-[#1A1D1B] dark:text-[#E8ECE9]">
             {summary.p99DurationMs} <span className="text-xs font-normal text-gray-500">ms</span>
@@ -241,9 +241,9 @@ export const PerformanceMonitoringDashboard: React.FC<PerformanceMonitoringDashb
         <div className="p-3.5 rounded-2xl bg-[#F9FAFB] dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A302D]">
           <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-1">
             <span>Success Rate</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#D4AF37]" />
           </div>
-          <div className="text-xl font-black text-emerald-600 dark:text-emerald-400">
+          <div className="text-xl font-black text-[#B8922A] dark:text-[#F0D060]">
             {summary.overallSuccessRatePct}%
           </div>
           <div className="text-[10px] text-gray-500 mt-0.5">
@@ -313,7 +313,7 @@ export const PerformanceMonitoringDashboard: React.FC<PerformanceMonitoringDashb
                     <td className="py-2.5 text-center">
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                         f.successRatePct >= 95 
-                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
+                          ? 'bg-[#D4AF37]/10 text-[#B8922A] dark:text-[#F0D060]' 
                           : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                       }`}>
                         {f.successRatePct}%
@@ -322,7 +322,7 @@ export const PerformanceMonitoringDashboard: React.FC<PerformanceMonitoringDashb
                     <td className="py-2.5 text-right">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold ${
                         isFast 
-                          ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300' 
+                          ? 'bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060]' 
                           : isModerate 
                           ? 'bg-blue-500/15 text-blue-700 dark:text-blue-300' 
                           : 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
@@ -342,7 +342,7 @@ export const PerformanceMonitoringDashboard: React.FC<PerformanceMonitoringDashb
       <div className="p-4 rounded-2xl bg-white dark:bg-[#1A1D1B] border border-[#E5E7EB] dark:border-[#2E3330] shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <h4 className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
-            <Server className="w-4 h-4 text-emerald-500" />
+            <Server className="w-4 h-4 text-[#D4AF37]" />
             Live Execution Stream ({filteredMetrics.length} events)
           </h4>
 
@@ -398,7 +398,7 @@ export const PerformanceMonitoringDashboard: React.FC<PerformanceMonitoringDashb
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className={`p-1.5 rounded-lg ${
                     m.status === 'success' 
-                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
+                      ? 'bg-[#D4AF37]/10 text-[#B8922A] dark:text-[#F0D060]' 
                       : m.status === 'fallback' 
                       ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400' 
                       : 'bg-red-500/10 text-red-600 dark:text-red-400'

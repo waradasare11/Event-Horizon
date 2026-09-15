@@ -61,8 +61,8 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
 
   if (isLoading) {
     return (
-      <div className="p-8 rounded-3xl bg-gray-50/60 dark:bg-[#161817] border border-gray-200 dark:border-gray-800 text-center space-y-3">
-        <RefreshCw className="w-6 h-6 animate-spin text-emerald-600 mx-auto" />
+      <div className="p-8 rounded-3xl bg-gray-50/60 dark:bg-[#111111] border border-gray-200 dark:border-gray-800 text-center space-y-3">
+        <RefreshCw className="w-6 h-6 animate-spin text-[#B8922A] mx-auto" />
         <div className="text-xs font-bold text-gray-500">Calculating Host Free Subscription Program ROI & Market Value...</div>
       </div>
     );
@@ -88,12 +88,12 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
   );
 
   return (
-    <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#FAFAF8] via-white to-emerald-50/20 dark:from-[#161817] dark:via-[#121413] dark:to-emerald-950/10 border-2 border-emerald-500/20 shadow-sm space-y-6 animate-in fade-in">
+    <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#FAFAF8] via-white to-[#FAF3E0]/20 dark:from-[#111111] dark:via-[#121413] dark:to-[#111111]/10 border-2 border-[#D4AF37]/20 shadow-sm space-y-6 animate-in fade-in">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-200/80 dark:border-gray-800 pb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-md">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#A68523] to-[#D4AF37] text-white flex items-center justify-center shadow-md">
             <TrendingUp className="w-5 h-5" />
           </div>
           <div>
@@ -101,7 +101,7 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
               <h3 className="font-black text-sm sm:text-base text-gray-900 dark:text-white">
                 Host Free Subscription Valuation & Revenue Mini-Dashboard
               </h3>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30">
                 Live Valuation
               </span>
             </div>
@@ -145,22 +145,22 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
         </div>
 
         {/* 2. Projected Potential Revenue */}
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/30 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-emerald-900 dark:text-emerald-300">
+        <div className="p-4 rounded-2xl bg-gradient-to-br from-[#D4AF37]/10 to-transparent border border-[#D4AF37]/30 shadow-2xs space-y-2">
+          <div className="flex items-center justify-between text-[#6A5312] dark:text-[#F0D060]">
             <span className="text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
-              <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+              <TrendingUp className="w-3.5 h-3.5 text-[#B8922A]" />
               <span>Projected 12M Revenue</span>
             </span>
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-800 dark:text-emerald-300">
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#D4AF37]/20 text-[#8E701C] dark:text-[#F0D060]">
               Forward Outlook
             </span>
           </div>
-          <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 tracking-tight">
+          <div className="text-2xl font-black text-[#B8922A] dark:text-[#F0D060] tracking-tight">
             ₹{valuation.projectedPotentialRevenueINR.toLocaleString('en-IN')}
           </div>
-          <div className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center justify-between pt-1 border-t border-emerald-500/20">
+          <div className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center justify-between pt-1 border-t border-[#D4AF37]/20">
             <span>Active VIP Community</span>
-            <span className="font-bold text-emerald-600">{valuation.totalActiveVIPs} Active Accounts</span>
+            <span className="font-bold text-[#B8922A]">{valuation.totalActiveVIPs} Active Accounts</span>
           </div>
         </div>
 
@@ -190,7 +190,7 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
       <div className="space-y-3 p-4 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800">
         <div className="flex items-center justify-between text-xs font-black text-gray-700 dark:text-gray-300">
           <span className="flex items-center gap-1.5">
-            <BarChart3 className="w-4 h-4 text-emerald-600" />
+            <BarChart3 className="w-4 h-4 text-[#B8922A]" />
             <span>Market Valuation Comparative Analysis</span>
           </span>
           <span className="text-gray-400 text-[11px]">Calculated INR Values</span>
@@ -220,8 +220,8 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
           {/* Bar 2: Projected Potential */}
           <div className="space-y-1">
             <div className="flex justify-between text-[11px]">
-              <span className="font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="font-bold text-[#A68523] dark:text-[#F0D060] flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-[#D4AF37]" />
                 <span>Projected 12-Month Forward Revenue Potential</span>
               </span>
               <span className="font-mono font-bold text-gray-900 dark:text-white">
@@ -231,7 +231,7 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
             <div className="w-full h-3 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
               <div
                 style={{ width: `${Math.min(100, (valuation.projectedPotentialRevenueINR / totalCalculatedScale) * 100)}%` }}
-                className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-700"
+                className="h-full bg-gradient-to-r from-[#D4AF37] to-[#F0D060] rounded-full transition-all duration-700"
               />
             </div>
           </div>
@@ -250,7 +250,7 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
             <div className="w-full h-3 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
               <div
                 style={{ width: `${Math.max(2, Math.min(100, (valuation.verifiedCashCollectedINR / totalCalculatedScale) * 100))}%` }}
-                className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-700"
+                className="h-full bg-gradient-to-r from-blue-500 to-[#F0D060] rounded-full transition-all duration-700"
               />
             </div>
           </div>
@@ -261,7 +261,7 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
         <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800">
           <div className="text-[10px] font-black uppercase text-gray-400 flex items-center gap-1">
-            <Calendar className="w-3 h-3 text-emerald-600" />
+            <Calendar className="w-3 h-3 text-[#B8922A]" />
             <span>Training Gifted</span>
           </div>
           <div className="text-base font-black text-gray-900 dark:text-white mt-1">
@@ -281,20 +281,20 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
 
         <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800">
           <div className="text-[10px] font-black uppercase text-gray-400 flex items-center gap-1">
-            <Users className="w-3 h-3 text-emerald-600" />
+            <Users className="w-3 h-3 text-[#B8922A]" />
             <span>Active VIP Pool</span>
           </div>
-          <div className="text-base font-black text-emerald-600 dark:text-emerald-400 mt-1">
+          <div className="text-base font-black text-[#B8922A] dark:text-[#F0D060] mt-1">
             {valuation.totalActiveVIPs} Active
           </div>
         </div>
 
         <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800">
           <div className="text-[10px] font-black uppercase text-gray-400 flex items-center gap-1">
-            <Award className="w-3 h-3 text-teal-600" />
+            <Award className="w-3 h-3 text-[#B8922A]" />
             <span>Host Verified</span>
           </div>
-          <div className="text-base font-black text-teal-600 dark:text-teal-400 mt-1">
+          <div className="text-base font-black text-[#B8922A] dark:text-[#F0D060] mt-1">
             100% Cryptographic
           </div>
         </div>

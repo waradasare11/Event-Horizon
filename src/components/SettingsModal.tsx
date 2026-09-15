@@ -97,7 +97,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-150">
       <div 
-        className="relative w-full max-w-xl max-h-[90vh] bg-white dark:bg-[#161817] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden flex flex-col"
+        className="relative w-full max-w-xl max-h-[90vh] bg-white dark:bg-[#111111] rounded-3xl border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -302,7 +302,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 className="w-full p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center justify-between"
               >
                 <div className="flex items-center gap-2.5">
-                  <CheckSquare className="w-4 h-4 text-purple-500" />
+                  <CheckSquare className="w-4 h-4 text-[#D4AF37]" />
                   <div>
                     <div className="text-xs font-bold text-gray-900 dark:text-white">Google Keep Sync</div>
                     <div className="text-[11px] text-gray-500">Sync workout checklists & grocery lists</div>
@@ -402,7 +402,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Footer with Sign Out */}
-        <div className="p-4 bg-gray-50 dark:bg-[#111312] border-t border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
+        <div className="p-4 bg-gray-50 dark:bg-[#070707] border-t border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0">
           <div className="text-[11px] text-gray-500">
             AROH v2.4 • Evidence-Based Coaching
           </div>

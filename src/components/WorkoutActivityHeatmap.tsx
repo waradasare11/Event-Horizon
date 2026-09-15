@@ -378,25 +378,25 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
         baseBg = 'bg-[#ECEEEB] dark:bg-[#202422] hover:bg-[#DEE2DF] dark:hover:bg-[#2C312E]';
         break;
       case 1:
-        // Recovery / Mobility (cyan-teal tint)
+        // Recovery / Mobility (gold tint)
         baseBg = 'bg-[#7DD3FC]/40 dark:bg-[#0284C7]/30 text-[#0369A1] hover:bg-[#7DD3FC]/60';
         break;
       case 2:
         // Light resistance (<40m)
-        baseBg = 'bg-[#5FD1B8]/60 dark:bg-[#0F6E5F]/50 hover:bg-[#5FD1B8]/80';
+        baseBg = 'bg-[#F0D060]/60 dark:bg-[#D4AF37]/50 hover:bg-[#F0D060]/80';
         break;
       case 3:
         // Standard Solid resistance (45-60m)
-        baseBg = 'bg-[#0F6E5F] text-white hover:bg-[#0D5B4F] shadow-xs';
+        baseBg = 'bg-[#D4AF37] text-white hover:bg-[#A68523] shadow-xs';
         break;
       case 4:
         // Beast / Intense (>60m or High RPE)
-        baseBg = 'bg-[#064E3B] dark:bg-[#34D399] dark:text-[#064E3B] text-emerald-100 hover:brightness-110 shadow-xs ring-1 ring-emerald-400/40';
+        baseBg = 'bg-[#2A2416] dark:bg-[#F0D060] dark:text-[#D4AF37] text-[#F4EBD0] hover:brightness-110 shadow-xs ring-1 ring-[#D4AF37]/40';
         break;
     }
 
-    const todayRing = isToday ? 'ring-2 ring-[#E8912D] ring-offset-1 dark:ring-offset-[#161817]' : '';
-    const selectedRing = isSelected ? 'ring-2 ring-white dark:ring-[#5FD1B8] scale-115 z-10' : '';
+    const todayRing = isToday ? 'ring-2 ring-[#E8912D] ring-offset-1 dark:ring-offset-[#111111]' : '';
+    const selectedRing = isSelected ? 'ring-2 ring-white dark:ring-[#F0D060] scale-115 z-10' : '';
 
     return `${baseBg} ${todayRing} ${selectedRing} transition-all duration-150`;
   };
@@ -436,12 +436,12 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-[#161817] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-6 transition-colors text-left">
+    <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-6 transition-colors text-left">
       {/* Header & Filter Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#242826] pb-5">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8] flex items-center gap-1.5">
+            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] flex items-center gap-1.5">
               <CalendarIcon className="w-3.5 h-3.5" />
               52-Week Training Consistency
             </span>
@@ -459,12 +459,12 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
         {/* Action Controls & Filters */}
         <div className="flex flex-wrap items-center gap-2.5">
           {/* Filter Pills */}
-          <div className="bg-[#F3F4F6] dark:bg-[#1E201F] p-1 rounded-xl flex items-center gap-1 border border-[#E5E7EB] dark:border-[#2A2E2C] text-xs">
+          <div className="bg-[#F3F4F6] dark:bg-[#1E201F] p-1 rounded-xl flex items-center gap-1 border border-[#E5E7EB] dark:border-[#2A2416] text-xs">
             <button
               onClick={() => setFilterType('all')}
               className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                 filterType === 'all'
-                  ? 'bg-white dark:bg-[#0F6E5F] text-[#1A1D1B] dark:text-white shadow-xs'
+                  ? 'bg-white dark:bg-[#D4AF37] text-[#1A1D1B] dark:text-white shadow-xs'
                   : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
               }`}
             >
@@ -474,7 +474,7 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
               onClick={() => setFilterType('resistance')}
               className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                 filterType === 'resistance'
-                  ? 'bg-white dark:bg-[#0F6E5F] text-[#1A1D1B] dark:text-white shadow-xs'
+                  ? 'bg-white dark:bg-[#D4AF37] text-[#1A1D1B] dark:text-white shadow-xs'
                   : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
               }`}
             >
@@ -484,7 +484,7 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
               onClick={() => setFilterType('recovery')}
               className={`px-3 py-1.5 rounded-lg font-semibold transition-all cursor-pointer ${
                 filterType === 'recovery'
-                  ? 'bg-white dark:bg-[#0F6E5F] text-[#1A1D1B] dark:text-white shadow-xs'
+                  ? 'bg-white dark:bg-[#D4AF37] text-[#1A1D1B] dark:text-white shadow-xs'
                   : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
               }`}
             >
@@ -496,8 +496,8 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
 
       {/* 4-Stat Consistency Scoreboard */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <div className="p-4 rounded-xl border border-[#0F6E5F]/30 bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/10 space-y-1">
-          <div className="flex items-center justify-between text-xs font-semibold text-[#0F6E5F] dark:text-[#5FD1B8]">
+        <div className="p-4 rounded-xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 space-y-1">
+          <div className="flex items-center justify-between text-xs font-semibold text-[#D4AF37] dark:text-[#F0D060]">
             <span className="flex items-center gap-1.5">
               <Dumbbell className="w-4 h-4" />
               Yearly Workouts
@@ -565,7 +565,7 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
       <div className="space-y-3">
         <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2]">
           <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
-            <Activity className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+            <Activity className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
             52-Week Rolling Matrix
           </span>
           <div className="flex items-center gap-1">
@@ -576,7 +576,7 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
                   scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
                 }
               }}
-              className="text-[11px] font-semibold text-[#0F6E5F] dark:text-[#5FD1B8] hover:underline cursor-pointer ml-2"
+              className="text-[11px] font-semibold text-[#D4AF37] dark:text-[#F0D060] hover:underline cursor-pointer ml-2"
             >
               Jump to Today →
             </button>
@@ -641,23 +641,23 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
         </div>
 
         {/* Legend and Legend Controls */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#6B7280] dark:text-[#9EA8A2] pt-2 border-t border-[#E5E7EB] dark:border-[#242826]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#6B7280] dark:text-[#9EA8A2] pt-2 border-t border-[#E5E7EB] dark:border-[#2A2416]">
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-[11px] font-semibold">Intensity Level:</span>
             <div className="flex items-center gap-1.5">
               <span className="text-[10px]">Rest</span>
               <span className="w-3 h-3 rounded-[3px] bg-[#ECEEEB] dark:bg-[#202422]" />
               <span className="w-3 h-3 rounded-[3px] bg-[#7DD3FC]/40 dark:bg-[#0284C7]/30" title="Active Recovery" />
-              <span className="w-3 h-3 rounded-[3px] bg-[#5FD1B8]/60 dark:bg-[#0F6E5F]/50" title="Light (<40m)" />
-              <span className="w-3 h-3 rounded-[3px] bg-[#0F6E5F]" title="Solid (45-60m)" />
-              <span className="w-3 h-3 rounded-[3px] bg-[#064E3B] dark:bg-[#34D399]" title="High Intensity (60m+)" />
+              <span className="w-3 h-3 rounded-[3px] bg-[#F0D060]/60 dark:bg-[#D4AF37]/50" title="Light (<40m)" />
+              <span className="w-3 h-3 rounded-[3px] bg-[#D4AF37]" title="Solid (45-60m)" />
+              <span className="w-3 h-3 rounded-[3px] bg-[#2A2416] dark:bg-[#F0D060]" title="High Intensity (60m+)" />
               <span className="text-[10px]">Beast</span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-[3px] border border-[#E8912D] bg-[#0F6E5F]" />
+              <span className="w-3 h-3 rounded-[3px] border border-[#E8912D] bg-[#D4AF37]" />
               <span className="text-[11px]">Today</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -670,11 +670,11 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
 
       {/* SELECTED DAY INSPECTION DRAWER / CARD */}
       {selectedDay ? (
-        <div className="p-5 rounded-2xl border border-[#0F6E5F]/30 bg-gradient-to-br from-[#0F6E5F]/5 via-transparent to-[#E8912D]/5 dark:from-[#0F6E5F]/15 dark:to-transparent animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div className="p-5 rounded-2xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#D4AF37]/5 via-transparent to-[#E8912D]/5 dark:from-[#D4AF37]/15 dark:to-transparent animate-in fade-in slide-in-from-bottom-2 duration-200">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#0F6E5F] text-white">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#D4AF37] text-white">
                   {selectedDay.date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
                 {selectedDay.isToday && (
@@ -683,7 +683,7 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
                   </span>
                 )}
                 {selectedDay.intensityLevel > 0 ? (
-                  <span className="text-xs font-semibold text-[#0F6E5F] dark:text-[#5FD1B8] flex items-center gap-1">
+                  <span className="text-xs font-semibold text-[#D4AF37] dark:text-[#F0D060] flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                     {selectedDay.intensityLevel === 1 ? 'Active Recovery Logged' : 'Workout Completed'}
                   </span>
@@ -717,7 +717,7 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
                   className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5 ${
                     selectedDay.log
                       ? 'bg-red-500/10 text-red-600 hover:bg-red-500/20 border border-red-500/30'
-                      : 'bg-[#0F6E5F] text-white hover:bg-[#0D5B4F]'
+                      : 'bg-[#D4AF37] text-white hover:bg-[#A68523]'
                   }`}
                 >
                   {selectedDay.log ? (
@@ -726,7 +726,7 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-4 h-4 text-[#5FD1B8]" />
+                      <CheckCircle2 className="w-4 h-4 text-[#F0D060]" />
                       <span>Mark Day Completed</span>
                     </>
                   )}
@@ -743,8 +743,8 @@ export const WorkoutActivityHeatmap: React.FC<WorkoutActivityHeatmapProps> = ({
           </div>
         </div>
       ) : (
-        <div className="p-4 rounded-xl border border-dashed border-[#E5E7EB] dark:border-[#242826] text-center text-xs text-[#6B7280] dark:text-[#9EA8A2] flex items-center justify-center gap-2">
-          <Info className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+        <div className="p-4 rounded-xl border border-dashed border-[#E5E7EB] dark:border-[#2A2416] text-center text-xs text-[#6B7280] dark:text-[#9EA8A2] flex items-center justify-center gap-2">
+          <Info className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
           <span>Click on any square in the 52-week calendar above to inspect session metrics or log a workout.</span>
         </div>
       )}

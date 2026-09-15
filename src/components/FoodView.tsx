@@ -36,13 +36,13 @@ export const FoodView: React.FC<FoodViewProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
       {/* Sub-Panel Navigation Control */}
-      <div className="flex items-center justify-between flex-wrap gap-3 p-2 rounded-2xl bg-white dark:bg-[#161817] border border-gray-200 dark:border-gray-800 shadow-xs">
+      <div className="flex items-center justify-between flex-wrap gap-3 p-2 rounded-2xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs">
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/60 w-full sm:w-auto">
           <button
             onClick={() => setSubTab('scanner')}
             className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
               subTab === 'scanner'
-                ? 'bg-white dark:bg-[#1A1D1B] text-[#0F6E5F] dark:text-[#2DD4BF] shadow-xs'
+                ? 'bg-white dark:bg-[#1A1D1B] text-[#D4AF37] dark:text-[#F0D060] shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -54,7 +54,7 @@ export const FoodView: React.FC<FoodViewProps> = ({
             onClick={() => setSubTab('log')}
             className={`flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
               subTab === 'log'
-                ? 'bg-white dark:bg-[#1A1D1B] text-[#0F6E5F] dark:text-[#2DD4BF] shadow-xs'
+                ? 'bg-white dark:bg-[#1A1D1B] text-[#D4AF37] dark:text-[#F0D060] shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
             }`}
           >
@@ -71,7 +71,7 @@ export const FoodView: React.FC<FoodViewProps> = ({
       {/* Render Sub-View */}
       {subTab === 'scanner' ? (
         isSubscriptionExpired ? (
-          <div className="max-w-xl mx-auto my-8 p-8 rounded-3xl bg-white dark:bg-[#161817] border border-amber-500/30 text-center space-y-4 shadow-xl animate-in zoom-in-95">
+          <div className="max-w-xl mx-auto my-8 p-8 rounded-3xl bg-white dark:bg-[#111111] border border-amber-500/30 text-center space-y-4 shadow-xl animate-in zoom-in-95">
             <div className="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center">
               <Camera className="w-7 h-7" />
             </div>
@@ -89,7 +89,7 @@ export const FoodView: React.FC<FoodViewProps> = ({
             <div className="pt-2">
               <button
                 onClick={onOpenPaywall}
-                className="px-6 py-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white text-xs font-bold shadow-md cursor-pointer transition-colors inline-flex items-center gap-2"
+                className="px-6 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs font-bold shadow-md cursor-pointer transition-colors inline-flex items-center gap-2"
               >
                 <span>Upgrade to Pro — ₹89/mo</span>
               </button>

@@ -148,7 +148,7 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
     );
 
     let ratingVerdict = 'Outstanding Execution';
-    let ratingBadgeColor = 'text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 border-emerald-300 dark:border-emerald-800';
+    let ratingBadgeColor = 'text-[#A68523] dark:text-[#F0D060] bg-[#FDF3D0] dark:bg-[#2A2416]/60 border-[#D4AF37]/50 dark:border-[#2A2416]';
     if (compositeScore < 70) {
       ratingVerdict = 'Needs Calibration';
       ratingBadgeColor = 'text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950/60 border-rose-300 dark:border-rose-800';
@@ -221,9 +221,9 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
   return (
     <div className="space-y-6 text-left">
       {/* Top Controls Bar */}
-      <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+      <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#5FD1B8] flex items-center justify-center font-bold">
+          <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center font-bold">
             <Award className="w-5 h-5" />
           </div>
           <div>
@@ -240,18 +240,18 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setWeekOffset((prev) => prev + 1)}
-            className="p-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] hover:bg-gray-50 dark:hover:bg-[#1F2220] text-[#4B5563] dark:text-[#D1D5DB] transition-all cursor-pointer"
+            className="p-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] hover:bg-gray-50 dark:hover:bg-[#1F2220] text-[#4B5563] dark:text-[#D1D5DB] transition-all cursor-pointer"
             title="Previous Week"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-[#1F2220] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#1A1D1B] dark:text-[#E8ECE9]">
+          <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-50 dark:bg-[#1F2220] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9]">
             {weekLabel}
           </span>
           <button
             onClick={() => setWeekOffset((prev) => Math.max(0, prev - 1))}
             disabled={weekOffset === 0}
-            className="p-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2E2C] hover:bg-gray-50 dark:hover:bg-[#1F2220] disabled:opacity-40 text-[#4B5563] dark:text-[#D1D5DB] transition-all cursor-pointer"
+            className="p-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] hover:bg-gray-50 dark:hover:bg-[#1F2220] disabled:opacity-40 text-[#4B5563] dark:text-[#D1D5DB] transition-all cursor-pointer"
             title="Next Week"
           >
             <ChevronRight className="w-4 h-4" />
@@ -260,15 +260,15 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
       </div>
 
       {/* Hero Master Score Banner */}
-      <div className="bg-gradient-to-br from-[#0F6E5F]/10 via-[#0F6E5F]/5 to-transparent border border-[#0F6E5F]/20 rounded-3xl p-6 sm:p-8">
+      <div className="bg-gradient-to-br from-[#D4AF37]/10 via-[#D4AF37]/5 to-transparent border border-[#D4AF37]/20 rounded-3xl p-6 sm:p-8">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           {/* Adherence Score Gauge */}
-          <div className="md:col-span-4 flex flex-col items-center sm:items-start text-center sm:text-left space-y-2 border-b md:border-b-0 md:border-r border-[#E5E7EB] dark:border-[#242826] pb-6 md:pb-0 md:pr-6">
+          <div className="md:col-span-4 flex flex-col items-center sm:items-start text-center sm:text-left space-y-2 border-b md:border-b-0 md:border-r border-[#E5E7EB] dark:border-[#2A2416] pb-6 md:pb-0 md:pr-6">
             <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280] dark:text-[#9EA8A2]">
               Master Weekly Score
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl sm:text-5xl font-extrabold text-[#0F6E5F] dark:text-[#5FD1B8]">
+              <span className="text-4xl sm:text-5xl font-extrabold text-[#D4AF37] dark:text-[#F0D060]">
                 {stats.compositeScore}
               </span>
               <span className="text-sm font-semibold text-[#6B7280] dark:text-[#9EA8A2]">/ 100</span>
@@ -284,18 +284,18 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
           {/* Core KPI Triple Cards */}
           <div className="md:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
             {/* 1. Training KPI */}
-            <div className="bg-white dark:bg-[#161817] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-2xs space-y-2">
+            <div className="bg-white dark:bg-[#111111] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-2xs space-y-2">
               <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2]">
                 <span className="font-semibold uppercase tracking-wider text-[10px]">Training</span>
-                <Dumbbell className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+                <Dumbbell className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
               </div>
               <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                 {stats.completedWorkouts} / {stats.targetWorkouts}
                 <span className="text-xs font-normal text-[#6B7280] dark:text-[#9EA8A2] ml-1">sessions</span>
               </div>
-              <div className="w-full bg-gray-100 dark:bg-[#242826] rounded-full h-1.5 overflow-hidden">
+              <div className="w-full bg-gray-100 dark:bg-[#2A2416] rounded-full h-1.5 overflow-hidden">
                 <div 
-                  className="bg-[#0F6E5F] dark:bg-[#5FD1B8] h-1.5 rounded-full" 
+                  className="bg-[#D4AF37] dark:bg-[#F0D060] h-1.5 rounded-full" 
                   style={{ width: `${stats.workoutAdherencePct}%` }}
                 />
               </div>
@@ -306,7 +306,7 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
             </div>
 
             {/* 2. Nutrition KPI */}
-            <div className="bg-white dark:bg-[#161817] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-2xs space-y-2">
+            <div className="bg-white dark:bg-[#111111] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-2xs space-y-2">
               <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2]">
                 <span className="font-semibold uppercase tracking-wider text-[10px]">Avg Calories</span>
                 <Utensils className="w-4 h-4 text-[#E8912D]" />
@@ -319,7 +319,7 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
                 {stats.calDeltaFromTarget > 0 ? (
                   <span className="text-amber-600 dark:text-amber-400">+{stats.calDeltaFromTarget} kcal vs goal</span>
                 ) : (
-                  <span className="text-emerald-600 dark:text-emerald-400">{stats.calDeltaFromTarget} kcal vs goal</span>
+                  <span className="text-[#B8922A] dark:text-[#F0D060]">{stats.calDeltaFromTarget} kcal vs goal</span>
                 )}
               </div>
               <div className="text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex justify-between">
@@ -329,7 +329,7 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
             </div>
 
             {/* 3. Weight Delta KPI */}
-            <div className="bg-white dark:bg-[#161817] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-2xs space-y-2">
+            <div className="bg-white dark:bg-[#111111] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-2xs space-y-2">
               <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2]">
                 <span className="font-semibold uppercase tracking-wider text-[10px]">Scale Trend</span>
                 <Scale className="w-4 h-4 text-sky-500" />
@@ -343,7 +343,7 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
               </div>
               <div className="text-[11px] flex items-center gap-1">
                 {stats.weightDeltaMatchesGoal ? (
-                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-0.5">
+                  <span className="text-[#B8922A] dark:text-[#F0D060] font-semibold flex items-center gap-0.5">
                     <CheckCircle2 className="w-3 h-3" /> On Track
                   </span>
                 ) : (
@@ -360,15 +360,15 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
       {/* Detailed Breakdown: 3 Columns for Training, Nutrition, and Weight */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Card 1: Workout Adherence Breakdown */}
-        <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs">
-          <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#242826]">
+        <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#2A2416]">
             <div className="flex items-center gap-2">
-              <Dumbbell className="w-4 h-4 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+              <Dumbbell className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
               <h3 className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
                 Training Execution
               </h3>
             </div>
-            <span className="text-xs font-bold text-[#0F6E5F] dark:text-[#5FD1B8]">
+            <span className="text-xs font-bold text-[#D4AF37] dark:text-[#F0D060]">
               {stats.workoutAdherencePct}% Adherence
             </span>
           </div>
@@ -380,7 +380,7 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
             </div>
             <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-[#202322]">
               <span className="text-[#6B7280] dark:text-[#9EA8A2]">Completed Sessions</span>
-              <span className="font-semibold text-[#0F6E5F] dark:text-[#5FD1B8]">{stats.completedWorkouts} days</span>
+              <span className="font-semibold text-[#D4AF37] dark:text-[#F0D060]">{stats.completedWorkouts} days</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-[#202322]">
               <span className="text-[#6B7280] dark:text-[#9EA8A2]">Active Recovery / Rest</span>
@@ -398,7 +398,7 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
 
           <div className="p-3 rounded-xl bg-gray-50 dark:bg-[#1E201F] text-[11px] text-[#525B56] dark:text-[#9EA8A2] leading-relaxed">
             {stats.completedWorkouts >= stats.targetWorkouts ? (
-              <span className="text-emerald-700 dark:text-emerald-300 font-medium">
+              <span className="text-[#A68523] dark:text-[#F0D060] font-medium">
                 ✓ Full training stimulus achieved. Progressive overload targets on compound movements stimulated hypertrophy.
               </span>
             ) : (
@@ -410,8 +410,8 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
         </div>
 
         {/* Card 2: Nutrition Adherence Breakdown */}
-        <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs">
-          <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#242826]">
+        <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#2A2416]">
             <div className="flex items-center gap-2">
               <Utensils className="w-4 h-4 text-[#E8912D]" />
               <h3 className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -442,13 +442,13 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
             </div>
             <div className="flex justify-between py-1.5">
               <span className="text-[#6B7280] dark:text-[#9EA8A2]">Days Logged with Vision</span>
-              <span className="font-semibold text-[#0F6E5F] dark:text-[#5FD1B8]">{stats.numLoggedDays} / 7 days</span>
+              <span className="font-semibold text-[#D4AF37] dark:text-[#F0D060]">{stats.numLoggedDays} / 7 days</span>
             </div>
           </div>
 
           <div className="p-3 rounded-xl bg-gray-50 dark:bg-[#1E201F] text-[11px] text-[#525B56] dark:text-[#9EA8A2] leading-relaxed">
             {Math.abs(stats.calDeltaFromTarget) <= 150 ? (
-              <span className="text-emerald-700 dark:text-emerald-300 font-medium">
+              <span className="text-[#A68523] dark:text-[#F0D060] font-medium">
                 ✓ Energy balance is tightly controlled within ±{Math.abs(stats.calDeltaFromTarget)} kcal of prescribed target.
               </span>
             ) : (
@@ -460,8 +460,8 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
         </div>
 
         {/* Card 3: Body Composition & Rate of Change */}
-        <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs">
-          <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#242826]">
+        <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] dark:border-[#2A2416]">
             <div className="flex items-center gap-2">
               <Scale className="w-4 h-4 text-sky-500" />
               <h3 className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -488,7 +488,7 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
             </div>
             <div className="flex justify-between py-1.5 border-b border-gray-100 dark:border-[#202322]">
               <span className="text-[#6B7280] dark:text-[#9EA8A2]">Distance to Ultimate Goal</span>
-              <span className="font-semibold text-[#0F6E5F] dark:text-[#5FD1B8]">
+              <span className="font-semibold text-[#D4AF37] dark:text-[#F0D060]">
                 {Math.abs(Number((stats.endWeight - (userProfile.targetWeightKg || 75)).toFixed(1)))} kg remaining
               </span>
             </div>
@@ -509,10 +509,10 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
       </div>
 
       {/* AI Weekly Synthesis & Scientific Action Plan */}
-      <div className="bg-white dark:bg-[#161817] border border-[#E5E7EB] dark:border-[#242826] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E5E7EB] dark:border-[#242826]">
+      <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E5E7EB] dark:border-[#2A2416]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#0F6E5F] text-white flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-[#D4AF37] text-white flex items-center justify-center">
               <Sparkles className="w-4 h-4 text-[#E8912D]" />
             </div>
             <div>
@@ -528,7 +528,7 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
           <button
             onClick={handleGenerateAiWeeklyAudit}
             disabled={isGeneratingAiInsight}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0F6E5F] hover:bg-[#0C584C] disabled:bg-gray-400 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#D4AF37] hover:bg-[#0C584C] disabled:bg-gray-400 text-white text-xs font-semibold shadow-xs transition-all cursor-pointer"
           >
             {isGeneratingAiInsight ? (
               <>
@@ -547,14 +547,14 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
         {structuredAiSummary ? (
           <div className="space-y-4 animate-in fade-in">
             {/* Header & Recovery Score */}
-            <div className="p-5 rounded-2xl bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/10 border border-[#0F6E5F]/20 space-y-3">
+            <div className="p-5 rounded-2xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 border border-[#D4AF37]/20 space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <h4 className="font-bold text-base text-[#0F6E5F] dark:text-[#5FD1B8]">
+                <h4 className="font-bold text-base text-[#D4AF37] dark:text-[#F0D060]">
                   {structuredAiSummary.headline}
                 </h4>
                 <div className="flex items-center gap-2 self-start sm:self-auto">
                   <span className="text-xs font-semibold text-[#6B7280] dark:text-[#9EA8A2]">Recovery & Adaptation:</span>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#0F6E5F] text-white">
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#D4AF37] text-white">
                     {structuredAiSummary.recoveryScore}/100
                   </span>
                 </div>
@@ -568,7 +568,7 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
               <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#282C2A] space-y-1.5">
                 <div className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+                  <Activity className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
                   <span>Physiological & Weight Trajectory</span>
                 </div>
                 <p className="text-[#4B5563] dark:text-[#D1D5DB] leading-relaxed">
@@ -590,15 +590,15 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
             {/* Strengths & Action Plan */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 text-xs">
               {/* Key Strengths */}
-              <div className="p-4 rounded-xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 space-y-2">
-                <div className="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+              <div className="p-4 rounded-xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 border border-[#D4AF37]/20 space-y-2">
+                <div className="font-bold text-[#8E701C] dark:text-[#F0D060] flex items-center gap-1.5">
                   <Check className="w-3.5 h-3.5" />
                   <span>Standout Execution Strengths</span>
                 </div>
                 <ul className="space-y-1.5 text-[#374151] dark:text-[#D1D5DB]">
                   {structuredAiSummary.keyStrengths.map((st, i) => (
                     <li key={i} className="flex items-start gap-1.5">
-                      <span className="text-emerald-600 dark:text-emerald-400 font-bold shrink-0">•</span>
+                      <span className="text-[#B8922A] dark:text-[#F0D060] font-bold shrink-0">•</span>
                       <span>{st}</span>
                     </li>
                   ))}
@@ -632,11 +632,11 @@ export const WeeklyProgressReport: React.FC<WeeklyProgressReportProps> = ({
             </div>
           </div>
         ) : customAiInsight ? (
-          <div className="p-5 rounded-2xl bg-[#0F6E5F]/5 dark:bg-[#0F6E5F]/10 border border-[#0F6E5F]/20 text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9] leading-relaxed whitespace-pre-wrap">
+          <div className="p-5 rounded-2xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9] leading-relaxed whitespace-pre-wrap">
             {customAiInsight}
           </div>
         ) : (
-          <div className="p-5 rounded-2xl bg-gray-50 dark:bg-[#1F2220] border border-[#E5E7EB] dark:border-[#242826] text-xs text-[#525B56] dark:text-[#9EA8A2] space-y-2">
+          <div className="p-5 rounded-2xl bg-gray-50 dark:bg-[#1F2220] border border-[#E5E7EB] dark:border-[#2A2416] text-xs text-[#525B56] dark:text-[#9EA8A2] space-y-2">
             <div className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">
               Weekly Automated Summary:
             </div>

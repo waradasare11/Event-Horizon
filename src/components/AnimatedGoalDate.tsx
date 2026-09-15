@@ -81,8 +81,8 @@ export const AnimatedGoalDate: React.FC<AnimatedGoalDateProps> = ({
           <span>Milestone Horizon</span>
         </span>
         {isDone && (
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-300 animate-in fade-in">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#F0D060] animate-in fade-in">
+            <Sparkles className="w-3.5 h-3.5 text-[#F0D060]" />
             <span>100% Calculated</span>
           </span>
         )}
@@ -98,14 +98,14 @@ export const AnimatedGoalDate: React.FC<AnimatedGoalDateProps> = ({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 pt-1 text-xs sm:text-sm text-emerald-100/90">
+      <div className="flex flex-wrap items-center gap-3 pt-1 text-xs sm:text-sm text-[#F4EBD0]/90">
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15">
-          <Clock className="w-4 h-4 text-emerald-300" />
+          <Clock className="w-4 h-4 text-[#F0D060]" />
           <span className="font-extrabold text-white">{displayedWeeks} Weeks</span>
-          <span className="text-emerald-200">({displayedDays} Days from Today)</span>
+          <span className="text-[#F0D060]">({displayedDays} Days from Today)</span>
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 text-[11px] text-emerald-200">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-white/10 backdrop-blur-xs border border-white/15 text-[11px] text-[#F0D060]">
           <Calendar className="w-3.5 h-3.5 text-amber-300" />
           <span>Zero-Guesswork Timeline</span>
         </div>

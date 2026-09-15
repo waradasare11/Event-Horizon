@@ -175,13 +175,13 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
   return (
     <div
       id="thirty-day-weight-deficit-chart"
-      className="bg-white dark:bg-[#161817] p-6 sm:p-8 rounded-3xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs space-y-6 text-left transition-colors"
+      className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-3xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-6 text-left transition-colors"
     >
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#242826] pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF]">
+            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
               Dual-Axis Telemetry
             </span>
             <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">
@@ -189,7 +189,7 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
             </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-1.5 flex items-center gap-2.5">
-            <Scale className="w-6 h-6 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+            <Scale className="w-6 h-6 text-[#D4AF37] dark:text-[#F0D060]" />
             <span>Weight Loss Trend & Calorie Deficit Overlay</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
@@ -198,12 +198,12 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
         </div>
 
         {/* Time Range Selector */}
-        <div className="flex items-center gap-1.5 bg-[#FAFAF8] dark:bg-[#1A1D1C] p-1 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] self-start md:self-auto">
+        <div className="flex items-center gap-1.5 bg-[#FAFAF8] dark:bg-[#111111] p-1 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] self-start md:self-auto">
           <button
             onClick={() => setTimeRange('7')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               timeRange === '7'
-                ? 'bg-[#0F6E5F] text-white shadow-xs'
+                ? 'bg-[#D4AF37] text-white shadow-xs'
                 : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
             }`}
           >
@@ -213,7 +213,7 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
             onClick={() => setTimeRange('14')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               timeRange === '14'
-                ? 'bg-[#0F6E5F] text-white shadow-xs'
+                ? 'bg-[#D4AF37] text-white shadow-xs'
                 : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
             }`}
           >
@@ -223,7 +223,7 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
             onClick={() => setTimeRange('30')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               timeRange === '30'
-                ? 'bg-[#0F6E5F] text-white shadow-xs'
+                ? 'bg-[#D4AF37] text-white shadow-xs'
                 : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
             }`}
           >
@@ -234,21 +234,21 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
 
       {/* KPI Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-        <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826]">
+        <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
           <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-1">
             <span>{timeRange}-Day Weight Change</span>
-            <TrendingDown className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+            <TrendingDown className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
           </div>
           <div className="text-xl sm:text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
             {stats.deltaWeight <= 0 ? `${stats.deltaWeight}` : `+${stats.deltaWeight}`}
             <span className="text-xs font-normal text-[#6B7280] ml-1">kg</span>
           </div>
-          <div className="text-[10px] text-[#0F6E5F] dark:text-[#2DD4BF] font-semibold mt-1">
+          <div className="text-[10px] text-[#D4AF37] dark:text-[#F0D060] font-semibold mt-1">
             {stats.startWeight} kg → {stats.endWeight} kg
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826]">
+        <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
           <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-1">
             <span>Avg Daily Deficit</span>
             <Flame className="w-4 h-4 text-[#E8912D]" />
@@ -262,7 +262,7 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826]">
+        <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
           <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-1">
             <span>Cumulative Deficit</span>
             <Zap className="w-4 h-4 text-blue-500" />
@@ -276,16 +276,16 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826]">
+        <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
           <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-1">
             <span>Fat Loss Yield</span>
-            <Activity className="w-4 h-4 text-purple-500" />
+            <Activity className="w-4 h-4 text-[#D4AF37]" />
           </div>
           <div className="text-xl sm:text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
             ~{stats.fatLossKg}
             <span className="text-xs font-normal text-[#6B7280] ml-1">kg fat</span>
           </div>
-          <div className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold mt-1">
+          <div className="text-[10px] text-[#B8922A] dark:text-[#F0D060] font-semibold mt-1">
             7,700 kcal / kg benchmark
           </div>
         </div>
@@ -296,7 +296,7 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-semibold px-2">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-[#0F6E5F] dark:bg-[#2DD4BF]" />
+              <span className="w-3 h-3 rounded-full bg-[#D4AF37] dark:bg-[#F0D060]" />
               <span className="text-[#1A1D1B] dark:text-[#E8ECE9]">Weight Trend (kg, Left Axis)</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -328,7 +328,7 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
               {/* Left Y Axis: Weight in kg */}
               <YAxis
                 yAxisId="weight"
-                stroke="#0F6E5F"
+                stroke="#D4AF37"
                 fontSize={11}
                 tickLine={false}
                 domain={['dataMin - 1', 'dataMax + 1']}
@@ -351,15 +351,15 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
-                      <div className="bg-[#1E201F] text-white text-xs p-3.5 rounded-2xl shadow-xl border border-[#2A2E2C] space-y-2">
+                      <div className="bg-[#1E201F] text-white text-xs p-3.5 rounded-2xl shadow-xl border border-[#2A2416] space-y-2">
                         <div className="font-bold text-gray-200 border-b border-gray-700 pb-1 flex items-center justify-between gap-4">
                           <span>{label}</span>
                           <span className="text-[10px] text-gray-400 font-normal">{data.dateKey}</span>
                         </div>
                         <div className="space-y-1">
-                          <div className="flex items-center justify-between gap-4 text-[#2DD4BF] font-semibold">
+                          <div className="flex items-center justify-between gap-4 text-[#F0D060] font-semibold">
                             <span className="flex items-center gap-1">
-                              <span className="w-2 h-2 rounded-full bg-[#2DD4BF]" />
+                              <span className="w-2 h-2 rounded-full bg-[#F0D060]" />
                               Weight:
                             </span>
                             <span>{data.weight} kg</span>
@@ -377,7 +377,7 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
                           </div>
                         </div>
                         {data.hasActualWeighIn && (
-                          <div className="pt-1 text-[10px] text-emerald-400 font-medium flex items-center gap-1">
+                          <div className="pt-1 text-[10px] text-[#F0D060] font-medium flex items-center gap-1">
                             <CheckCircle2 className="w-3 h-3" />
                             Verified scale weigh-in
                           </div>
@@ -412,7 +412,7 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
                 type="monotone"
                 dataKey="weight"
                 name="Weight (kg)"
-                stroke="#0F6E5F"
+                stroke="#D4AF37"
                 strokeWidth={3}
                 dot={(props: any) => {
                   const { cx, cy, payload } = props;
@@ -423,7 +423,7 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
                         cx={cx}
                         cy={cy}
                         r={5}
-                        fill="#0F6E5F"
+                        fill="#D4AF37"
                         stroke="#ffffff"
                         strokeWidth={2}
                       />
@@ -435,12 +435,12 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
                       cx={cx}
                       cy={cy}
                       r={2.5}
-                      fill="#0F6E5F"
+                      fill="#D4AF37"
                       opacity={0.6}
                     />
                   );
                 }}
-                activeDot={{ r: 6, fill: '#0F6E5F', stroke: '#ffffff', strokeWidth: 2 }}
+                activeDot={{ r: 6, fill: '#D4AF37', stroke: '#ffffff', strokeWidth: 2 }}
               />
 
               {/* Calorie Deficit Line */}
@@ -460,8 +460,8 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
       </div>
 
       {/* Physiological Insights Footer */}
-      <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826] flex items-start gap-3">
-        <div className="w-8 h-8 rounded-xl bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center shrink-0 mt-0.5">
+      <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] flex items-start gap-3">
+        <div className="w-8 h-8 rounded-xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center shrink-0 mt-0.5">
           <Info className="w-4 h-4" />
         </div>
         <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2] space-y-1">
@@ -471,7 +471,7 @@ export const ThirtyDayWeightDeficitChart: React.FC<ThirtyDayWeightDeficitChartPr
           <p>
             When daily caloric deficit consistently meets or exceeds the target (+{targetDeficit} kcal/day), 
             actual weight demonstrates a smooth monotonic decay with minimal water-retention plateauing. 
-            Solid teal circles indicate verified weigh-ins; amber points illustrate your sustained metabolic deficit.
+            Solid gold circles indicate verified weigh-ins; amber points illustrate your sustained metabolic deficit.
           </p>
         </div>
       </div>

@@ -47,11 +47,11 @@ export const NutritionMacroProgressRing: React.FC<NutritionMacroProgressRingProp
   };
 
   return (
-    <div className="bg-white dark:bg-[#161817] p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs text-left">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] dark:border-[#242826] pb-3 mb-5">
+    <div className="bg-white dark:bg-[#111111] p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs text-left">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-3 mb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#D4AF37]/10 text-[#B8922A] dark:text-[#F0D060] border border-[#D4AF37]/20">
               Live Macro Ring
             </span>
             <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -65,7 +65,7 @@ export const NutritionMacroProgressRing: React.FC<NutritionMacroProgressRingProp
 
         <div className="flex items-center gap-2">
           <span className="text-xs font-bold text-gray-500 dark:text-gray-400">Total Completion:</span>
-          <span className="px-3 py-1 rounded-xl bg-[#0F6E5F] text-white text-xs font-black shadow-2xs">
+          <span className="px-3 py-1 rounded-xl bg-[#D4AF37] text-white text-xs font-black shadow-2xs">
             {overallAvgPct}%
           </span>
         </div>
@@ -84,7 +84,7 @@ export const NutritionMacroProgressRing: React.FC<NutritionMacroProgressRingProp
                 stroke="#E5E7EB"
                 strokeWidth={strokeWidth}
                 fill="transparent"
-                className="dark:stroke-[#242826]"
+                className="dark:stroke-[#2A2416]"
               />
               <circle
                 cx={center}
@@ -93,7 +93,7 @@ export const NutritionMacroProgressRing: React.FC<NutritionMacroProgressRingProp
                 stroke="#E5E7EB"
                 strokeWidth={strokeWidth}
                 fill="transparent"
-                className="dark:stroke-[#242826]"
+                className="dark:stroke-[#2A2416]"
               />
               <circle
                 cx={center}
@@ -102,7 +102,7 @@ export const NutritionMacroProgressRing: React.FC<NutritionMacroProgressRingProp
                 stroke="#E5E7EB"
                 strokeWidth={strokeWidth}
                 fill="transparent"
-                className="dark:stroke-[#242826]"
+                className="dark:stroke-[#2A2416]"
               />
               <circle
                 cx={center}
@@ -111,7 +111,7 @@ export const NutritionMacroProgressRing: React.FC<NutritionMacroProgressRingProp
                 stroke="#E5E7EB"
                 strokeWidth={strokeWidth}
                 fill="transparent"
-                className="dark:stroke-[#242826]"
+                className="dark:stroke-[#2A2416]"
               />
 
               {/* Foreground Animated Rings */}
@@ -134,7 +134,7 @@ export const NutritionMacroProgressRing: React.FC<NutritionMacroProgressRingProp
                 cx={center}
                 cy={center}
                 r={rProtein}
-                stroke="#10B981"
+                stroke="#D4AF37"
                 strokeWidth={strokeWidth}
                 fill="transparent"
                 strokeDasharray={getCircumference(rProtein)}
@@ -188,7 +188,7 @@ export const NutritionMacroProgressRing: React.FC<NutritionMacroProgressRingProp
               <span className="w-2.5 h-2.5 rounded-full bg-[#F97316]" /> Cals
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#10B981]" /> Protein
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]" /> Protein
             </span>
             <span className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded-full bg-[#06B6D4]" /> Carbs
@@ -223,13 +223,13 @@ export const NutritionMacroProgressRing: React.FC<NutritionMacroProgressRingProp
           </div>
 
           {/* Protein Card */}
-          <div className="p-3.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/50">
+          <div className="p-3.5 rounded-xl bg-[#FFFBF0]/60 dark:bg-[#2A2416]/20 border border-[#E6D7A8] dark:border-[#2A2416]/50">
             <div className="flex items-center justify-between text-xs mb-1.5">
-              <span className="font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
-                <Dumbbell className="w-4 h-4 text-emerald-600" />
+              <span className="font-bold text-[#8E701C] dark:text-[#F0D060] flex items-center gap-1.5">
+                <Dumbbell className="w-4 h-4 text-[#B8922A]" />
                 <span>Protein</span>
               </span>
-              <span className="font-black text-emerald-700 dark:text-emerald-400 text-xs">
+              <span className="font-black text-[#A68523] dark:text-[#F0D060] text-xs">
                 {proteinPct}%
               </span>
             </div>
@@ -244,13 +244,13 @@ export const NutritionMacroProgressRing: React.FC<NutritionMacroProgressRingProp
           </div>
 
           {/* Carbs Card */}
-          <div className="p-3.5 rounded-xl bg-cyan-50/60 dark:bg-cyan-950/20 border border-cyan-200 dark:border-cyan-900/50">
+          <div className="p-3.5 rounded-xl bg-[#FFFBF0]/60 dark:bg-[#2A2416]/20 border border-[#E6D7A8] dark:border-[#2A2416]/50">
             <div className="flex items-center justify-between text-xs mb-1.5">
-              <span className="font-bold text-cyan-800 dark:text-cyan-300 flex items-center gap-1.5">
-                <Wheat className="w-4 h-4 text-cyan-600" />
+              <span className="font-bold text-[#8E701C] dark:text-[#F0D060] flex items-center gap-1.5">
+                <Wheat className="w-4 h-4 text-[#B8922A]" />
                 <span>Carbohydrates</span>
               </span>
-              <span className="font-black text-cyan-700 dark:text-cyan-400 text-xs">
+              <span className="font-black text-[#A68523] dark:text-[#D4AF37] text-xs">
                 {carbsPct}%
               </span>
             </div>

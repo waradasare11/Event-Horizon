@@ -738,7 +738,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           email: userProfile.email || '',
         },
         theme: {
-          color: '#0F6E5F',
+          color: '#D4AF37',
         },
         handler: async (response: any) => {
           try {
@@ -785,12 +785,12 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-[#161817] rounded-3xl max-w-3xl w-full shadow-2xl border border-[#E5E7EB] dark:border-[#242826] overflow-hidden animate-in zoom-in-95 duration-200 text-left my-6 transition-colors flex flex-col max-h-[92vh]">
+      <div className="bg-white dark:bg-[#111111] rounded-3xl max-w-3xl w-full shadow-2xl border border-[#E5E7EB] dark:border-[#2A2416] overflow-hidden animate-in zoom-in-95 duration-200 text-left my-6 transition-colors flex flex-col max-h-[92vh]">
         {/* Top Progress Bar */}
-        <div className="p-5 sm:p-6 border-b border-[#E5E7EB] dark:border-[#242826] bg-[#FAFAF8] dark:bg-[#111312] shrink-0">
+        <div className="p-5 sm:p-6 border-b border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] shrink-0">
           <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-2 font-bold">
             <span>Step {step} of {totalSteps}</span>
-            <span className="text-[#0F6E5F] dark:text-[#2DD4BF] font-extrabold">
+            <span className="text-[#D4AF37] dark:text-[#F0D060] font-extrabold">
               {step === 1 && '1. Athlete Identity & Measurements'}
               {step === 2 && '2. Metabolic Lifestyle & Energy Kinetics'}
               {step === 3 && '3. Training Biomechanics & Split'}
@@ -799,9 +799,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               {step === 6 && '6. Plan Choice & 1-Week Free Trial'}
             </span>
           </div>
-          <div className="w-full bg-[#E5E7EB] dark:bg-[#2A2E2C] rounded-full h-2 overflow-hidden">
+          <div className="w-full bg-[#E5E7EB] dark:bg-[#2A2416] rounded-full h-2 overflow-hidden">
             <div
-              className="bg-[#0F6E5F] dark:bg-[#2DD4BF] h-2 rounded-full transition-all duration-300"
+              className="bg-[#D4AF37] dark:bg-[#F0D060] h-2 rounded-full transition-all duration-300"
               style={{ width: `${(step / totalSteps) * 100}%` }}
             />
           </div>
@@ -814,7 +814,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           {step === 1 && (
             <div className="space-y-5">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] text-[11px] font-bold uppercase tracking-wider mb-1.5">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Personalized Physiological Blueprint</span>
                 </div>
@@ -827,9 +827,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </div>
 
               {/* NAME INPUT FIRST */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#0F6E5F]/10 via-[#0F6E5F]/5 to-transparent border border-[#0F6E5F]/30 space-y-2">
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#D4AF37]/10 via-[#D4AF37]/5 to-transparent border border-[#D4AF37]/30 space-y-2">
                 <label className="block text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
-                  <User className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                  <User className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
                   <span>What is your full name? *</span>
                 </label>
                 <input
@@ -838,7 +838,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   placeholder="e.g. Alex Mercer"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full text-sm font-semibold p-3.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-2 focus:ring-[#0F6E5F] outline-none"
+                  className="w-full text-sm font-semibold p-3.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-2 focus:ring-[#D4AF37] outline-none"
                 />
               </div>
 
@@ -859,13 +859,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       onClick={() => setGoal(item.id as GoalType)}
                       className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                         goal === item.id
-                          ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 ring-1 ring-[#0F6E5F] dark:ring-[#2DD4BF]'
-                          : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#191B1A] hover:bg-[#FAFAF8] dark:hover:bg-[#202422]'
+                          ? 'border-[#D4AF37] dark:border-[#F0D060] bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 ring-1 ring-[#D4AF37] dark:ring-[#F0D060]'
+                          : 'border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#191B1A] hover:bg-[#FAFAF8] dark:hover:bg-[#202422]'
                       }`}
                     >
                       <div className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center justify-between">
                         <span>{item.label}</span>
-                        {goal === item.id && <Check className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#2DD4BF]" />}
+                        {goal === item.id && <Check className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />}
                       </div>
                       <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] mt-1 leading-normal">{item.desc}</div>
                     </button>
@@ -880,7 +880,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <select
                     value={sex}
                     onChange={(e) => setSex(e.target.value as 'male' | 'female')}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value="male">Male</option>
                     <option value="female">Female</option>
@@ -894,7 +894,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     value={age}
                     onChange={(e) => handleNumberChange(e.target.value, setAge)}
                     placeholder="e.g. 25"
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                     min={14}
                     max={90}
                   />
@@ -907,7 +907,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     value={heightCm}
                     onChange={(e) => handleNumberChange(e.target.value, setHeightCm)}
                     placeholder="e.g. 175"
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                     min={120}
                     max={230}
                   />
@@ -920,7 +920,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     value={weightKg}
                     onChange={(e) => handleNumberChange(e.target.value, setWeightKg)}
                     placeholder="e.g. 70"
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                     min={35}
                     max={250}
                     step="any"
@@ -934,7 +934,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     value={targetWeightKg}
                     onChange={(e) => handleNumberChange(e.target.value, setTargetWeightKg)}
                     placeholder="e.g. 65"
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                     min={35}
                     max={250}
                     step="any"
@@ -948,7 +948,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     value={bodyFatPct}
                     onChange={(e) => handleNumberChange(e.target.value, setBodyFatPct)}
                     placeholder="e.g. 18"
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#0F6E5F]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
                     min={5}
                     max={50}
                     step="any"
@@ -981,7 +981,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         value={parentGuardianName}
                         onChange={(e) => setParentGuardianName(e.target.value)}
                         placeholder="e.g. Rajesh Asare"
-                        className="w-full text-xs p-2.5 rounded-xl border border-amber-300 dark:border-amber-800/60 bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-amber-500"
+                        className="w-full text-xs p-2.5 rounded-xl border border-amber-300 dark:border-amber-800/60 bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-amber-500"
                       />
                     </div>
                     <div className="flex items-start gap-2 sm:pt-6">
@@ -990,7 +990,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         id="parent-guardian-consent-check"
                         checked={parentGuardianConsent}
                         onChange={(e) => setParentGuardianConsent(e.target.checked)}
-                        className="w-4 h-4 mt-0.5 rounded text-[#0F6E5F] focus:ring-[#0F6E5F] accent-[#0F6E5F] cursor-pointer shrink-0"
+                        className="w-4 h-4 mt-0.5 rounded text-[#D4AF37] focus:ring-[#D4AF37] accent-[#D4AF37] cursor-pointer shrink-0"
                       />
                       <label htmlFor="parent-guardian-consent-check" className="text-xs font-semibold text-amber-950 dark:text-amber-100 cursor-pointer">
                         I confirm that my parent/guardian has reviewed and consented to my use of AROH.
@@ -1001,13 +1001,13 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               )}
 
               {/* TIMELINE HORIZON & TARGET DATE QUESTION */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-3">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2416] space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF]" />
+                    <Calendar className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
                     <span>Till when would you like to achieve your target physique?</span>
                   </label>
-                  <span className="text-[11px] font-mono font-bold text-[#0F6E5F] dark:text-[#2DD4BF]">
+                  <span className="text-[11px] font-mono font-bold text-[#D4AF37] dark:text-[#F0D060]">
                     Δ {deltaWeightKg} kg
                   </span>
                 </div>
@@ -1027,8 +1027,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       onClick={() => setTimelinePreset(preset.id as any)}
                       className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                         timelinePreset === preset.id
-                          ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 ring-1 ring-[#0F6E5F]'
-                          : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312]'
+                          ? 'border-[#D4AF37] dark:border-[#F0D060] bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 ring-1 ring-[#D4AF37]'
+                          : 'border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707]'
                       }`}
                     >
                       <div className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">{preset.label}</div>
@@ -1047,7 +1047,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       value={customTargetDate}
                       min={new Date().toISOString().split('T')[0]}
                       onChange={(e) => setCustomTargetDate(e.target.value)}
-                      className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9] font-mono"
+                      className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] font-mono"
                     />
                   </div>
                 )}
@@ -1055,11 +1055,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 {/* Instant Feasibility Status Indicator */}
                 <div className={`p-3 rounded-xl border text-xs flex items-center justify-between gap-2 ${
                   isTimelineFeasible
-                    ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800 dark:text-emerald-300'
+                    ? 'bg-[#D4AF37]/10 border-[#D4AF37]/20 text-[#8E701C] dark:text-[#F0D060]'
                     : 'bg-amber-500/10 border-amber-500/20 text-amber-800 dark:text-amber-300'
                 }`}>
                   <div className="flex items-center gap-2">
-                    {isTimelineFeasible ? <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" /> : <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500" />}
+                    {isTimelineFeasible ? <CheckCircle2 className="w-4 h-4 shrink-0 text-[#D4AF37]" /> : <AlertTriangle className="w-4 h-4 shrink-0 text-amber-500" />}
                     <span>
                       {isTimelineFeasible
                         ? `Required pace: ${reqWeeklyRate} kg/week (biologically safe & achievable pace)`
@@ -1071,14 +1071,14 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </div>
 
               {/* CREATIVE FEATURE SPOTLIGHT 1: Visual Transformation Projector */}
-              <div className="p-4 rounded-2xl bg-purple-500/5 dark:bg-purple-500/10 border border-purple-500/20 flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+              <div className="p-4 rounded-2xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/15 text-[#B8922A] dark:text-[#F0D060] flex items-center justify-center shrink-0">
                   <TrendingUp className="w-5 h-5" />
                 </div>
                 <div className="space-y-0.5 text-xs">
-                  <div className="font-extrabold text-purple-900 dark:text-purple-300 flex items-center gap-1.5">
+                  <div className="font-extrabold text-purple-900 dark:text-[#F0D060] flex items-center gap-1.5">
                     <span>Feature Spotlight: Visual Transformation Time-Lapse Projector</span>
-                    <span className="px-1.5 py-0.2 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-300 text-[9px] uppercase font-bold">AI Engine</span>
+                    <span className="px-1.5 py-0.2 rounded-full bg-[#D4AF37]/20 text-purple-700 dark:text-[#F0D060] text-[9px] uppercase font-bold">AI Engine</span>
                   </div>
                   <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                     AROH models your biological timeline to render realistic photorealistic visual time-lapses of how your deltoids, waist, and abdominals evolve at 4, 8, 12, and 16 weeks.
@@ -1087,7 +1087,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </div>
 
               {/* Mandatory Medical Disclaimer (Onboarding) */}
-              <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-3">
+              <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2416] space-y-3">
                 <div className="flex items-center gap-2 text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                   <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
                   <span>Mandatory Medical &amp; Health Disclaimer</span>
@@ -1101,7 +1101,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     id="onboarding-medical-consent-check"
                     checked={agreedToMedicalDisclaimer}
                     onChange={(e) => setAgreedToMedicalDisclaimer(e.target.checked)}
-                    className="w-4 h-4 mt-0.5 rounded text-[#0F6E5F] focus:ring-[#0F6E5F] accent-[#0F6E5F] cursor-pointer shrink-0"
+                    className="w-4 h-4 mt-0.5 rounded text-[#D4AF37] focus:ring-[#D4AF37] accent-[#D4AF37] cursor-pointer shrink-0"
                   />
                   <label htmlFor="onboarding-medical-consent-check" className="text-xs text-[#1A1D1B] dark:text-[#E8ECE9] cursor-pointer font-medium">
                     I acknowledge and agree to this Medical Disclaimer, and accept the Terms of Service and Privacy Policy under the DPDP Act, 2023.
@@ -1115,7 +1115,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           {step === 2 && (
             <div className="space-y-5">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] text-[11px] font-bold uppercase tracking-wider mb-1.5">
                   <Activity className="w-3.5 h-3.5" />
                   <span>Non-Exercise Activity & Circadian Fueling</span>
                 </div>
@@ -1136,7 +1136,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <select
                     value={occupationStyle}
                     onChange={(e) => setOccupationStyle(e.target.value as any)}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value="sedentary">Desk Job / Seated 7-9 hours</option>
                     <option value="lightly_active">Active Standing / Teacher / Clinical</option>
@@ -1152,7 +1152,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <select
                     value={sittingHoursPerDay}
                     onChange={(e) => setSittingHoursPerDay(e.target.value)}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value="2-4 hours/day">2 - 4 hours / day (High natural mobility)</option>
                     <option value="4-6 hours/day">4 - 6 hours / day (Moderate sitting)</option>
@@ -1168,7 +1168,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <select
                     value={dailyStressLevel}
                     onChange={(e) => setDailyStressLevel(e.target.value as any)}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value="low">Low (Calm / Balanced recovery)</option>
                     <option value="moderate">Moderate (Standard work pace)</option>
@@ -1186,7 +1186,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <select
                     value={dailySleepDurationHours}
                     onChange={(e) => setDailySleepDurationHours(Number(e.target.value))}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value={5.5}>5.5 - 6 Hours (Elevated Cortisol risk)</option>
                     <option value={6.5}>6.5 - 7 Hours (Moderate Recovery)</option>
@@ -1202,7 +1202,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <select
                     value={sleepQuality}
                     onChange={(e) => setSleepQuality(e.target.value as any)}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value="restful">Restful (Deep slow-wave sleep, wake energized)</option>
                     <option value="average">Average (Occasional waking)</option>
@@ -1217,7 +1217,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <select
                     value={mealCadence}
                     onChange={(e) => setMealCadence(e.target.value)}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value="3 Meals + 1-2 High-Protein Snacks">3 Meals + 1-2 High-Protein Snacks (Optimal for MPS)</option>
                     <option value="3 Solid Balanced Meals">3 Solid Balanced Meals</option>
@@ -1232,17 +1232,17 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               {/* 100% ACCURATE AI PRESCRIBED TARGET CARDS (NOT MANUAL USER GUESSWORK) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                 {/* Card 1: AI Recommended Step Target (Tudor-Locke Biomechanical Model) */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border-2 border-emerald-500/30 space-y-2.5">
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#D4AF37]/10 via-[#D4AF37]/5 to-transparent border-2 border-[#D4AF37]/30 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                      <div className="w-8 h-8 rounded-lg bg-[#D4AF37]/20 text-[#B8922A] dark:text-[#F0D060] flex items-center justify-center font-bold">
                         <Footprints className="w-4 h-4" />
                       </div>
-                      <span className="text-xs font-black uppercase tracking-wider text-emerald-900 dark:text-emerald-300">
+                      <span className="text-xs font-black uppercase tracking-wider text-[#6A5312] dark:text-[#F0D060]">
                         AI Biomechanical Step Target
                       </span>
                     </div>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[10px] font-extrabold uppercase">
+                    <span className="px-2 py-0.5 rounded-full bg-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060] text-[10px] font-extrabold uppercase">
                       Personalized Target
                     </span>
                   </div>
@@ -1251,7 +1251,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     <span className="text-2xl font-black text-gray-900 dark:text-white">
                       {effectiveDailySteps.toLocaleString()}
                     </span>
-                    <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                    <span className="text-xs font-bold text-[#B8922A] dark:text-[#F0D060]">
                       steps / day (~{precisionStepData?.dailyKcalBurn || aiStepsData.kcalBurn} kcal NEAT burn)
                     </span>
                   </div>
@@ -1261,17 +1261,17 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   </p>
 
                   {precisionStepData?.dailyDistribution && (
-                    <div className="pt-2 border-t border-emerald-500/20 grid grid-cols-3 gap-1.5 text-[10px] text-gray-700 dark:text-gray-300">
-                      <div className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-emerald-500/15">
-                        <div className="font-bold text-emerald-700 dark:text-emerald-300">🌅 Morning</div>
+                    <div className="pt-2 border-t border-[#D4AF37]/20 grid grid-cols-3 gap-1.5 text-[10px] text-gray-700 dark:text-gray-300">
+                      <div className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-[#D4AF37]/15">
+                        <div className="font-bold text-[#A68523] dark:text-[#F0D060]">🌅 Morning</div>
                         <div>{precisionStepData.dailyDistribution.morningAwakening.toLocaleString()} steps</div>
                       </div>
-                      <div className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-emerald-500/15">
-                        <div className="font-bold text-emerald-700 dark:text-emerald-300">🥗 Post-Meal</div>
+                      <div className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-[#D4AF37]/15">
+                        <div className="font-bold text-[#A68523] dark:text-[#F0D060]">🥗 Post-Meal</div>
                         <div>{precisionStepData.dailyDistribution.postMealGlucoseDisposal.toLocaleString()} steps</div>
                       </div>
-                      <div className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-emerald-500/15">
-                        <div className="font-bold text-emerald-700 dark:text-emerald-300">🌙 Evening</div>
+                      <div className="p-1.5 rounded-lg bg-white/60 dark:bg-black/20 border border-[#D4AF37]/15">
+                        <div className="font-bold text-[#A68523] dark:text-[#F0D060]">🌙 Evening</div>
                         <div>{precisionStepData.dailyDistribution.eveningWindDown.toLocaleString()} steps</div>
                       </div>
                     </div>
@@ -1279,7 +1279,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </div>
 
                 {/* Card 2: AI Recommended Hydration Target */}
-                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-transparent border-2 border-blue-500/30 space-y-2.5">
+                <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-blue-500/10 via-[#D4AF37]/5 to-transparent border-2 border-blue-500/30 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-lg bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
@@ -1310,7 +1310,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </div>
 
               {/* TARGET COMMITMENT & FEASIBILITY CHECK */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-2.5">
+              <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2416] space-y-2.5">
                 <label className="block text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                   Is this recommended daily step & hydration target achievable for your daily schedule?
                 </label>
@@ -1338,8 +1338,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       onClick={() => setTargetFeasibilityAgreement(opt.id as any)}
                       className={`w-full p-3 rounded-xl border text-left transition-all cursor-pointer ${
                         targetFeasibilityAgreement === opt.id
-                          ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 ring-1 ring-[#0F6E5F]'
-                          : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-[#FAFAF8] dark:bg-[#111312]'
+                          ? 'border-[#D4AF37] dark:border-[#F0D060] bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 ring-1 ring-[#D4AF37]'
+                          : 'border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707]'
                       }`}
                     >
                       <div className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">{opt.label}</div>
@@ -1350,14 +1350,14 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </div>
 
               {/* CREATIVE FEATURE SPOTLIGHT 2: Real-Time Camera Scanner */}
-              <div className="p-4 rounded-2xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <div className="p-4 rounded-2xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex items-start gap-3.5">
+                <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/15 text-[#B8922A] dark:text-[#F0D060] flex items-center justify-center shrink-0">
                   <Camera className="w-5 h-5" />
                 </div>
                 <div className="space-y-0.5 text-xs">
-                  <div className="font-extrabold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+                  <div className="font-extrabold text-[#6A5312] dark:text-[#F0D060] flex items-center gap-1.5">
                     <span>Feature Spotlight: AI Camera Scanner & Macro Vision</span>
-                    <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[9px] uppercase font-bold">Zero Guesswork</span>
+                    <span className="px-1.5 py-0.2 rounded-full bg-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060] text-[9px] uppercase font-bold">Zero Guesswork</span>
                   </div>
                   <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                     Say goodbye to manual calorie logging. Snap a picture of any home cooked dish or restaurant meal; our vision AI estimates weights, macro distributions, and micro-nutrients in seconds.
@@ -1371,7 +1371,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           {step === 3 && (
             <div className="space-y-5">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] text-[11px] font-bold uppercase tracking-wider mb-1.5">
                   <Dumbbell className="w-3.5 h-3.5" />
                   <span>Periodization & Biomechanical Load</span>
                 </div>
@@ -1391,8 +1391,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     onClick={() => setTrainingDaysPerWeek(days)}
                     className={`p-3 rounded-2xl border text-center font-bold text-xs sm:text-sm transition-all cursor-pointer ${
                       trainingDaysPerWeek === days
-                        ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F] text-white shadow-xs'
-                        : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#191B1A] text-[#1A1D1B] dark:text-[#E8ECE9] hover:bg-[#FAFAF8] dark:hover:bg-[#202422]'
+                        ? 'border-[#D4AF37] dark:border-[#F0D060] bg-[#D4AF37] text-white shadow-xs'
+                        : 'border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#191B1A] text-[#1A1D1B] dark:text-[#E8ECE9] hover:bg-[#FAFAF8] dark:hover:bg-[#202422]'
                     }`}
                   >
                     {days} Days / Week
@@ -1414,8 +1414,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         onClick={() => toggleDay(day)}
                         className={`p-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-[#0F6E5F] text-white shadow-xs'
-                            : 'bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#2A2E2C] text-[#6B7280] dark:text-[#9EA8A2]'
+                            ? 'bg-[#D4AF37] text-white shadow-xs'
+                            : 'bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-[#6B7280] dark:text-[#9EA8A2]'
                         }`}
                       >
                         {day}
@@ -1433,7 +1433,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <select
                     value={experienceLevel}
                     onChange={(e) => setExperienceLevel(e.target.value as ExperienceLevel)}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value="beginner">Beginner (&lt; 1 Year)</option>
                     <option value="intermediate">Intermediate (1 - 3 Years)</option>
@@ -1448,7 +1448,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <select
                     value={sessionDurationMin}
                     onChange={(e) => setSessionDurationMin(Number(e.target.value))}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value={45}>45 Minutes (High Density)</option>
                     <option value={55}>55 Minutes (Standard Hypertrophy)</option>
@@ -1463,7 +1463,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <select
                     value={musclePriority}
                     onChange={(e) => setMusclePriority(e.target.value as MusclePriority)}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value="balanced">Balanced Full-Body Aesthetics</option>
                     <option value="chest_back">Upper Body V-Taper (Chest & Back)</option>
@@ -1495,7 +1495,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
           {step === 4 && (
             <div className="space-y-5">
               <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#2DD4BF] text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] text-[11px] font-bold uppercase tracking-wider mb-1.5">
                   <Utensils className="w-3.5 h-3.5" />
                   <span>Injury Screening & Nutrition Intelligence</span>
                 </div>
@@ -1530,7 +1530,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         className={`p-2.5 rounded-xl border text-left text-xs font-semibold transition-all flex items-center justify-between cursor-pointer ${
                           isChecked
                             ? 'border-[#E8912D] bg-[#E8912D]/10 text-[#1A1D1B] dark:text-[#E8ECE9]'
-                            : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#191B1A] text-[#6B7280] dark:text-[#9EA8A2]'
+                            : 'border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#191B1A] text-[#6B7280] dark:text-[#9EA8A2]'
                         }`}
                       >
                         <span>{item}</span>
@@ -1560,8 +1560,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       onClick={() => setDietType(item.id as DietType)}
                       className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                         dietType === item.id
-                          ? 'border-[#0F6E5F] dark:border-[#2DD4BF] bg-[#0F6E5F]/10 dark:bg-[#0F6E5F]/20 ring-1 ring-[#0F6E5F] dark:ring-[#2DD4BF]'
-                          : 'border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#191B1A]'
+                          ? 'border-[#D4AF37] dark:border-[#F0D060] bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 ring-1 ring-[#D4AF37] dark:ring-[#F0D060]'
+                          : 'border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#191B1A]'
                       }`}
                     >
                       <div className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">{item.label}</div>
@@ -1579,7 +1579,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <select
                     value={cuisinePreference}
                     onChange={(e) => setCuisinePreference(e.target.value)}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   >
                     <option value="High-Protein Global & Mediterranean">High-Protein Global & Mediterranean</option>
                     <option value="High-Protein Indian (Dal, Paneer, Chicken Curries)">High-Protein Indian (North & South)</option>
@@ -1596,20 +1596,20 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     placeholder="e.g. Peanut allergy, lactose sensitive, no seafood"
                     value={foodAllergies}
                     onChange={(e) => setFoodAllergies(e.target.value)}
-                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2E2C] bg-white dark:bg-[#111312] text-[#1A1D1B] dark:text-[#E8ECE9]"
+                    className="w-full text-xs p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9]"
                   />
                 </div>
               </div>
 
               {/* ONE-TIME SENSOR CALIBRATION MODULE (Camera focal length & distortion profile) */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent border-2 border-emerald-500/30 space-y-3">
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[#D4AF37]/10 via-[#D4AF37]/5 to-transparent border-2 border-[#D4AF37]/30 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 rounded-lg bg-[#D4AF37]/20 text-[#B8922A] dark:text-[#F0D060] flex items-center justify-center font-bold">
                       <Camera className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-xs font-black uppercase tracking-wider text-emerald-900 dark:text-emerald-300">
+                      <span className="text-xs font-black uppercase tracking-wider text-[#6A5312] dark:text-[#F0D060]">
                         Camera Sensor & Focal Calibration
                       </span>
                       <p className="text-[11px] text-gray-500">
@@ -1617,16 +1617,16 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       </p>
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-[10px] font-extrabold uppercase">
+                  <span className="px-2 py-0.5 rounded-full bg-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060] text-[10px] font-extrabold uppercase">
                     {cameraCalibration.depthAccuracyPct}% Precision
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                  <div className="p-2.5 rounded-xl bg-white/70 dark:bg-black/30 border border-emerald-500/15">
+                  <div className="p-2.5 rounded-xl bg-white/70 dark:bg-black/30 border border-[#D4AF37]/15">
                     <div className="text-[10px] text-gray-500 uppercase font-semibold">Autonomous Reference Model</div>
-                    <div className="text-xs font-black text-emerald-800 dark:text-emerald-300 mt-1 flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <div className="text-xs font-black text-[#8E701C] dark:text-[#F0D060] mt-1 flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060] shrink-0" />
                       <span>Deep Reasoning Vision</span>
                     </div>
                     <div className="text-[10px] text-gray-500 mt-0.5 leading-tight">
@@ -1634,21 +1634,21 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     </div>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-white/70 dark:bg-black/30 border border-emerald-500/15">
+                  <div className="p-2.5 rounded-xl bg-white/70 dark:bg-black/30 border border-[#D4AF37]/15">
                     <div className="text-[10px] text-gray-500 uppercase font-semibold">Focal Length (mm)</div>
                     <div className="text-sm font-black text-gray-900 dark:text-white mt-1">
                       {cameraCalibration.focalLengthMm} mm
                     </div>
-                    <div className="text-[10px] text-emerald-600 font-medium">Stereoscopic Calibrated</div>
+                    <div className="text-[10px] text-[#B8922A] font-medium">Stereoscopic Calibrated</div>
                   </div>
 
-                  <div className="p-2.5 rounded-xl bg-white/70 dark:bg-black/30 border border-emerald-500/15 flex flex-col justify-between">
+                  <div className="p-2.5 rounded-xl bg-white/70 dark:bg-black/30 border border-[#D4AF37]/15 flex flex-col justify-between">
                     <div className="text-[10px] text-gray-500 uppercase font-semibold">Sensor Distortion Matrix</div>
                     <button
                       type="button"
                       onClick={handleCalibrateSensor}
                       disabled={isCalibratingSensor}
-                      className="w-full mt-1 py-1.5 px-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      className="w-full mt-1 py-1.5 px-2 rounded-lg bg-[#A68523] hover:bg-[#8E701C] text-white font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                     >
                       {isCalibratingSensor ? (
                         <>
@@ -1666,8 +1666,8 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </div>
 
                 {sensorCalibratedSuccess && (
-                  <div className="p-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-1.5 animate-in fade-in">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div className="p-2 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#8E701C] dark:text-[#F0D060] text-xs font-semibold flex items-center gap-1.5 animate-in fade-in">
+                    <CheckCircle2 className="w-4 h-4 text-[#B8922A] shrink-0" />
                     <span>Phone camera sensor calibrated with permission & hardware parameters!</span>
                   </div>
                 )}
@@ -1696,7 +1696,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <div className="space-y-5">
               {isPredicting ? (
                 <div className="p-12 text-center space-y-4">
-                  <div className="w-16 h-16 rounded-full bg-[#0F6E5F]/10 border-2 border-[#0F6E5F] flex items-center justify-center mx-auto text-[#0F6E5F] dark:text-[#2DD4BF] animate-spin">
+                  <div className="w-16 h-16 rounded-full bg-[#D4AF37]/10 border-2 border-[#D4AF37] flex items-center justify-center mx-auto text-[#D4AF37] dark:text-[#F0D060] animate-spin">
                     <Loader2 className="w-8 h-8" />
                   </div>
                   <div className="space-y-1">
@@ -1713,14 +1713,14 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   {/* FEASIBILITY VERDICT & SCIENTIFIC EVALUATION CARD */}
                   <div className={`p-5 rounded-3xl border-2 space-y-3.5 ${
                     isTimelineFeasible
-                      ? 'bg-emerald-500/10 border-emerald-500/40 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-100'
+                      ? 'bg-[#D4AF37]/10 border-[#D4AF37]/40 dark:bg-[#2A2416]/20 text-[#6A5312] dark:text-[#F4EBD0]'
                       : 'bg-amber-500/10 border-amber-500/40 dark:bg-amber-950/20 text-amber-900 dark:text-amber-100'
                   }`}>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <span className={`px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider ${
                           isTimelineFeasible
-                            ? 'bg-emerald-600 text-white'
+                            ? 'bg-[#A68523] text-white'
                             : 'bg-amber-600 text-white'
                         }`}>
                           {isTimelineFeasible ? '✓ FEASIBLE & BIOLOGICALLY REALISTIC' : '⚠️ TIMELINE TOO AGGRESSIVE / BIOLOGICALLY UNSAFE'}
@@ -1741,14 +1741,14 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                           <p className="leading-relaxed font-medium">
                             Attempting to reach <strong>{numTargetWeight} kg</strong> in only <strong>{weeksAvailable} weeks</strong> requires an aggressive rate of <strong>{reqWeeklyRate} kg/week</strong> (an unsustainable daily deficit of ~{Math.round(reqWeeklyRate * 1100)} kcal). This exceeds biological safety thresholds and would trigger severe lean tissue loss, thyroid downregulation (T3 suppression), and rebound fat gain.
                           </p>
-                          <div className="p-3 rounded-2xl bg-white dark:bg-[#111312] border border-amber-500/30 flex items-center justify-between gap-3">
+                          <div className="p-3 rounded-2xl bg-white dark:bg-[#070707] border border-amber-500/30 flex items-center justify-between gap-3">
                             <div>
                               <div className="text-[10px] font-bold text-amber-600 uppercase">AI Recommended Earliest Realistic & Safe Date:</div>
                               <div className="text-sm font-black text-gray-900 dark:text-white">
                                 {earliestSafeDateFormatted} ({earliestSafeWeeks} Weeks)
                               </div>
                             </div>
-                            <span className="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                            <span className="text-[11px] font-mono font-bold text-[#B8922A] dark:text-[#F0D060]">
                               Safe Rate: {maxSafeRate} kg/wk
                             </span>
                           </div>
@@ -1758,10 +1758,10 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   </div>
 
                   {/* THE STRICT PLAN YOU MUST FOLLOW */}
-                  <div className="p-5 rounded-3xl bg-white dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2E2C] space-y-4">
+                  <div className="p-5 rounded-3xl bg-white dark:bg-[#191B1A] border border-[#E5E7EB] dark:border-[#2A2416] space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-xl bg-[#0F6E5F]/15 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center font-black text-xs">
+                        <div className="w-8 h-8 rounded-xl bg-[#D4AF37]/15 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center font-black text-xs">
                           AI
                         </div>
                         <div>
@@ -1776,7 +1776,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
+                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-center">
                         <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] uppercase font-bold">Strict Daily Calories</div>
                         <div className="text-base font-black text-[#1A1D1B] dark:text-[#E8ECE9] mt-0.5">
                           {macroResults.dailyCalories} <span className="text-xs font-normal">kcal</span>
@@ -1784,23 +1784,23 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         <div className="text-[9px] text-gray-400 mt-0.5">TDEE: {calculatedTDEE} kcal</div>
                       </div>
 
-                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
-                        <div className="text-[10px] text-[#0F6E5F] dark:text-[#2DD4BF] uppercase font-bold">Daily Protein ({numWeight > 0 ? (macroResults.proteinG / numWeight).toFixed(1) : '2.0'}g/kg)</div>
-                        <div className="text-base font-black text-[#0F6E5F] dark:text-[#2DD4BF] mt-0.5">
+                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-center">
+                        <div className="text-[10px] text-[#D4AF37] dark:text-[#F0D060] uppercase font-bold">Daily Protein ({numWeight > 0 ? (macroResults.proteinG / numWeight).toFixed(1) : '2.0'}g/kg)</div>
+                        <div className="text-base font-black text-[#D4AF37] dark:text-[#F0D060] mt-0.5">
                           {macroResults.proteinG} <span className="text-xs font-normal">g</span>
                         </div>
                         <div className="text-[9px] text-gray-400 mt-0.5">High Muscle Retention</div>
                       </div>
 
-                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
-                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase font-bold">Strict Step Target</div>
-                        <div className="text-base font-black text-emerald-700 dark:text-emerald-300 mt-0.5">
+                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-center">
+                        <div className="text-[10px] text-[#B8922A] dark:text-[#F0D060] uppercase font-bold">Strict Step Target</div>
+                        <div className="text-base font-black text-[#A68523] dark:text-[#F0D060] mt-0.5">
                           {effectiveDailySteps.toLocaleString()}
                         </div>
                         <div className="text-[9px] text-gray-400 mt-0.5">~{effectiveNeatKcalBurn} kcal NEAT</div>
                       </div>
 
-                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111312] border border-[#E5E7EB] dark:border-[#242826] text-center">
+                      <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-center">
                         <div className="text-[10px] text-blue-600 dark:text-blue-400 uppercase font-bold">Strict Hydration</div>
                         <div className="text-base font-black text-blue-700 dark:text-blue-300 mt-0.5">
                           {aiRecommendedHydration} <span className="text-xs font-normal">L</span>
@@ -1810,11 +1810,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
-                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#111312] border border-gray-200 dark:border-gray-800 flex items-center gap-2">
-                        <Dumbbell className="w-4 h-4 text-[#0F6E5F] dark:text-[#2DD4BF] shrink-0" />
+                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#070707] border border-gray-200 dark:border-gray-800 flex items-center gap-2">
+                        <Dumbbell className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060] shrink-0" />
                         <span><strong>Training Frequency:</strong> {trainingDaysPerWeek} sessions/wk ({sortedSelectedDays.join(', ')})</span>
                       </div>
-                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#111312] border border-gray-200 dark:border-gray-800 flex items-center gap-2">
+                      <div className="p-2.5 rounded-xl bg-gray-50 dark:bg-[#070707] border border-gray-200 dark:border-gray-800 flex items-center gap-2">
                         <Moon className="w-4 h-4 text-blue-500 shrink-0" />
                         <span><strong>Sleep & Recovery:</strong> {dailySleepDurationHours} hrs / night (Anabolic Growth & CNS Restoration Window)</span>
                       </div>
@@ -1858,7 +1858,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     id="onboarding-submit-medical-check"
                     checked={agreedToMedicalDisclaimer}
                     onChange={(e) => setAgreedToMedicalDisclaimer(e.target.checked)}
-                    className="w-4 h-4 mt-0.5 rounded text-[#0F6E5F] focus:ring-[#0F6E5F] accent-[#0F6E5F] cursor-pointer shrink-0"
+                    className="w-4 h-4 mt-0.5 rounded text-[#D4AF37] focus:ring-[#D4AF37] accent-[#D4AF37] cursor-pointer shrink-0"
                   />
                   <span className="text-xs font-bold text-gray-900 dark:text-white">
                     I understand that AROH provides general fitness and nutrition information, not medical advice, and agree to the Medical Disclaimer.
@@ -1867,7 +1867,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               </div>
               {isUserHost ? (
                 /* HOST PRIVILEGE BANNER */
-                <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#1A1D1B] via-[#0F6E5F] to-[#083D34] text-white space-y-4 text-center">
+                <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#1A1D1B] via-[#D4AF37] to-[#083D34] text-white space-y-4 text-center">
                   <div className="w-16 h-16 rounded-full bg-amber-400/20 border-2 border-amber-400 flex items-center justify-center mx-auto text-amber-300">
                     <Crown className="w-8 h-8" />
                   </div>
@@ -1878,7 +1878,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                     <h3 className="text-2xl sm:text-3xl font-black">
                       Welcome, Host Administrator!
                     </h3>
-                    <p className="text-xs sm:text-sm text-emerald-100/90 max-w-md mx-auto">
+                    <p className="text-xs sm:text-sm text-[#F4EBD0]/90 max-w-md mx-auto">
                       As the administrator of AROH, you have <strong>Permanent 100% Lifetime Access</strong>. You are never asked to select a payment plan.
                     </p>
                   </div>
@@ -1893,12 +1893,12 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 </div>
               ) : hostGrant ? (
                 /* HOST VIP GRANT USER DETECTED */
-                <div className="p-8 rounded-3xl bg-gradient-to-br from-emerald-500/20 via-teal-500/15 to-emerald-950/20 border-2 border-emerald-500 text-center space-y-5 shadow-2xl">
-                  <div className="w-16 h-16 rounded-3xl bg-emerald-500 text-white flex items-center justify-center mx-auto shadow-lg">
+                <div className="p-8 rounded-3xl bg-gradient-to-br from-[#D4AF37]/20 via-[#D4AF37]/15 to-[#111111]/20 border-2 border-[#D4AF37] text-center space-y-5 shadow-2xl">
+                  <div className="w-16 h-16 rounded-3xl bg-[#D4AF37] text-white flex items-center justify-center mx-auto shadow-lg">
                     <Crown className="w-9 h-9" />
                   </div>
                   <div className="space-y-2">
-                    <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500 text-white shadow-sm">
+                    <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#D4AF37] text-white shadow-sm">
                       🌟 VIP Pro Pass Granted by Host
                     </span>
                     <h3 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white">
@@ -1912,7 +1912,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                   <button
                     type="button"
                     onClick={() => handleApplyProfileAndFinish(createGrantedUserSubscription(hostGrant))}
-                    className="py-4 px-10 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-sm shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2 mx-auto"
+                    className="py-4 px-10 rounded-2xl bg-[#A68523] hover:bg-[#D4AF37] text-white font-black text-sm shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2 mx-auto"
                   >
                     <Sparkles className="w-4 h-4 text-amber-300" />
                     <span>Launch AROH Pro with VIP Pass →</span>
@@ -1922,12 +1922,12 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 /* REGULAR USER FREE TRIAL & PLAN CHOICE */
                 <div className="space-y-5">
                   {/* 1-Week Free Subscription Notice */}
-                  <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-500/15 via-emerald-500/10 to-transparent border-2 border-emerald-500/30 text-left space-y-2">
+                  <div className="p-5 rounded-3xl bg-gradient-to-r from-[#D4AF37]/15 via-[#D4AF37]/10 to-transparent border-2 border-[#D4AF37]/30 text-left space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-black uppercase">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#A68523] text-white text-[10px] font-black uppercase">
                         1-Week Free Subscription Included
                       </span>
-                      <h3 className="text-sm font-extrabold text-emerald-900 dark:text-emerald-200">
+                      <h3 className="text-sm font-extrabold text-[#6A5312] dark:text-[#F0D060]">
                         Your 7-Day Free Subscription Is Active!
                       </h3>
                     </div>
@@ -1943,20 +1943,20 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleApplyProfileAndFinish()}
-                        className="p-5 rounded-3xl border-2 border-emerald-500 bg-white dark:bg-[#191B1A] hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 text-left space-y-3 transition-all cursor-pointer shadow-sm group"
+                        className="p-5 rounded-3xl border-2 border-[#D4AF37] bg-white dark:bg-[#191B1A] hover:bg-[#FFFBF0]/40 dark:hover:bg-[#2A2416]/20 text-left space-y-3 transition-all cursor-pointer shadow-sm group"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
+                        <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/15 text-[#B8922A] dark:text-[#F0D060] flex items-center justify-center font-bold">
                           <Sparkles className="w-5 h-5" />
                         </div>
                         <div className="space-y-1">
-                          <div className="font-extrabold text-sm text-gray-900 dark:text-white group-hover:text-emerald-600 transition-colors">
+                          <div className="font-extrabold text-sm text-gray-900 dark:text-white group-hover:text-[#B8922A] transition-colors">
                             Option A: Start 1-Week Free Trial
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                             Experience full AI coaching, meal scanner, and workout programs for 7 days. Select a subscription plan later when your trial concludes.
                           </div>
                         </div>
-                        <div className="pt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                        <div className="pt-2 text-xs font-bold text-[#B8922A] dark:text-[#F0D060] flex items-center gap-1">
                           <span>Start 7 Days Free Access</span>
                           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                         </div>
@@ -1966,20 +1966,20 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                       <button
                         type="button"
                         onClick={() => setShowDirectPayment(true)}
-                        className="p-5 rounded-3xl border border-gray-200 dark:border-gray-800 bg-[#FAFAF8] dark:bg-[#111312] hover:border-[#0F6E5F] text-left space-y-3 transition-all cursor-pointer shadow-sm group"
+                        className="p-5 rounded-3xl border border-gray-200 dark:border-gray-800 bg-[#FAFAF8] dark:bg-[#070707] hover:border-[#D4AF37] text-left space-y-3 transition-all cursor-pointer shadow-sm group"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-[#0F6E5F]/15 text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center justify-center font-bold">
+                        <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/15 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center font-bold">
                           <Crown className="w-5 h-5" />
                         </div>
                         <div className="space-y-1">
-                          <div className="font-extrabold text-sm text-gray-900 dark:text-white group-hover:text-[#0F6E5F] transition-colors">
+                          <div className="font-extrabold text-sm text-gray-900 dark:text-white group-hover:text-[#D4AF37] transition-colors">
                             Option B: Lock In Plan Now
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
                             Upgrade immediately via host QR code to lock in guaranteed promotional rates (starting at only ₹89/mo).
                           </div>
                         </div>
-                        <div className="pt-2 text-xs font-bold text-[#0F6E5F] dark:text-[#2DD4BF] flex items-center gap-1">
+                        <div className="pt-2 text-xs font-bold text-[#D4AF37] dark:text-[#F0D060] flex items-center gap-1">
                           <span>View Plans & Scan QR</span>
                           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                         </div>
@@ -1995,7 +1995,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                         <button
                           type="button"
                           onClick={() => setShowDirectPayment(false)}
-                          className="text-xs font-semibold text-[#0F6E5F] dark:text-[#2DD4BF] hover:underline cursor-pointer"
+                          className="text-xs font-semibold text-[#D4AF37] dark:text-[#F0D060] hover:underline cursor-pointer"
                         >
                           ← Back to trial options
                         </button>
@@ -2014,19 +2014,19 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                               onClick={() => setSelectedPlan(plan)}
                               className={`p-3 rounded-2xl border text-left transition-all cursor-pointer relative ${
                                 isSelected
-                                  ? 'border-[#0F6E5F] bg-[#0F6E5F]/10 ring-2 ring-[#0F6E5F]'
+                                  ? 'border-[#D4AF37] bg-[#D4AF37]/10 ring-2 ring-[#D4AF37]'
                                   : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-[#191B1A]'
                               }`}
                             >
                               {plan.savingsBadge && (
-                                <span className="absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.5 rounded-full bg-[#0F6E5F] text-white">
+                                <span className="absolute top-2 right-2 text-[9px] font-black px-1.5 py-0.5 rounded-full bg-[#D4AF37] text-white">
                                   {plan.savingsBadge}
                                 </span>
                               )}
                               <div className="text-xs font-extrabold text-gray-900 dark:text-white mt-1">
                                 {plan.durationLabel}
                               </div>
-                              <div className="text-lg font-black text-[#0F6E5F] dark:text-[#2DD4BF] mt-1">
+                              <div className="text-lg font-black text-[#D4AF37] dark:text-[#F0D060] mt-1">
                                 ₹{plan.priceINR}
                               </div>
                               <div className="text-[10px] text-gray-500">
@@ -2039,7 +2039,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
 
                       {/* Selected Plan Details & Razorpay Checkout */}
                       {selectedPlan && (
-                        <div className="p-5 rounded-2xl bg-gray-50 dark:bg-[#111312] border border-gray-200 dark:border-gray-800 space-y-3">
+                        <div className="p-5 rounded-2xl bg-gray-50 dark:bg-[#070707] border border-gray-200 dark:border-gray-800 space-y-3">
                           <div className="flex items-center justify-between">
                             <div>
                               <div className="text-xs font-bold text-gray-900 dark:text-white">
@@ -2049,7 +2049,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                                 Total: ₹{selectedPlan.priceINR}
                               </div>
                             </div>
-                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                            <span className="text-[10px] font-bold text-[#B8922A] dark:text-[#F0D060] bg-[#D4AF37]/10 px-2 py-0.5 rounded">
                               Encrypted Checkout
                             </span>
                           </div>
@@ -2060,7 +2060,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                                 type="button"
                                 disabled={isVerifyingPayment}
                                 onClick={handleRazorpayCheckout}
-                                className="w-full py-3 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs cursor-pointer shadow-xs disabled:opacity-50 flex items-center justify-center gap-2"
+                                className="w-full py-3 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-xs cursor-pointer shadow-xs disabled:opacity-50 flex items-center justify-center gap-2"
                               >
                                 <ShieldCheck className="w-4 h-4" />
                                 <span>{isVerifyingPayment ? 'Connecting...' : `Pay ₹${selectedPlan.priceINR} via Razorpay`}</span>
@@ -2069,15 +2069,15 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                                 <p className="text-xs text-red-600 font-semibold">{paymentError}</p>
                               )}
                               {paymentSuccess && (
-                                <p className="text-xs text-emerald-600 font-bold flex items-center gap-1">
+                                <p className="text-xs text-[#B8922A] font-bold flex items-center gap-1">
                                   <CheckCircle2 className="w-4 h-4" />
                                   Payment verified successfully! Loading your program...
                                 </p>
                               )}
                             </div>
                           ) : (
-                            <div className="p-3.5 rounded-xl bg-teal-500/10 border border-teal-500/20 text-center space-y-2">
-                              <div className="text-xs font-bold text-teal-800 dark:text-teal-300">
+                            <div className="p-3.5 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-center space-y-2">
+                              <div className="text-xs font-bold text-[#8E701C] dark:text-[#F0D060]">
                                 Payments coming soon — your 7-day trial is active
                               </div>
                               <p className="text-[11px] text-gray-600 dark:text-gray-400">
@@ -2089,7 +2089,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                                   const trialSub = createInitialTrialSubscription();
                                   handleApplyProfileAndFinish(trialSub);
                                 }}
-                                className="w-full py-2.5 rounded-xl bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white font-bold text-xs cursor-pointer shadow-xs"
+                                className="w-full py-2.5 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-xs cursor-pointer shadow-xs"
                               >
                                 Activate 7-Day Free Trial & Start Training
                               </button>
@@ -2107,7 +2107,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
         </div>
 
         {/* Footer Navigation Controls */}
-        <div className="p-5 sm:p-6 border-t border-[#E5E7EB] dark:border-[#242826] bg-[#FAFAF8] dark:bg-[#111312] flex items-center justify-between shrink-0">
+        <div className="p-5 sm:p-6 border-t border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] flex items-center justify-between shrink-0">
           {step > 1 ? (
             <button
               type="button"
@@ -2145,7 +2145,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
                 }
                 setStep(2);
               }}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-semibold hover:bg-[#0D5B4F] transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs font-semibold hover:bg-[#A68523] transition-all shadow-xs cursor-pointer"
             >
               <span>Continue</span>
               <ChevronRight className="w-4 h-4" />
@@ -2156,7 +2156,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <button
               type="button"
               onClick={() => setStep(step + 1)}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-semibold hover:bg-[#0D5B4F] transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs font-semibold hover:bg-[#A68523] transition-all shadow-xs cursor-pointer"
             >
               <span>Continue</span>
               <ChevronRight className="w-4 h-4" />
@@ -2167,7 +2167,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
             <button
               type="button"
               onClick={handleNextToStep5}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-bold hover:bg-[#0D5B4F] transition-all shadow-md cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs font-bold hover:bg-[#A68523] transition-all shadow-md cursor-pointer"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
               <span>Predict the timeline</span>
@@ -2180,7 +2180,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               type="button"
               disabled={isPredicting}
               onClick={handleNextToStep6}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-bold hover:bg-[#0D5B4F] transition-all shadow-md cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs font-bold hover:bg-[#A68523] transition-all shadow-md cursor-pointer disabled:opacity-50"
             >
               <span>Continue to Free Trial & Plans</span>
               <ChevronRight className="w-4 h-4" />
@@ -2192,7 +2192,7 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
               type="button"
               disabled={!agreedToMedicalDisclaimer}
               onClick={() => handleApplyProfileAndFinish()}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-bold hover:bg-[#0D5B4F] transition-all shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs sm:text-sm font-bold hover:bg-[#A68523] transition-all shadow-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Check className="w-4 h-4 text-amber-300" />
               <span>Start AROH Pro</span>

@@ -54,7 +54,7 @@ const RESEARCH_PILLARS = [
   {
     category: 'Muscle Building & Hypertrophy',
     icon: Dumbbell,
-    color: 'text-[#0F6E5F] bg-[#0F6E5F]/10 border-[#0F6E5F]/20',
+    color: 'text-[#D4AF37] bg-[#D4AF37]/10 border-[#D4AF37]/20',
     topics: [
       {
         title: 'Optimal Weekly Volume & RPE/RIR',
@@ -134,7 +134,7 @@ export const ScientificResearchHub: React.FC<ScientificResearchHubProps> = ({ us
       {/* Banner / Hero */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#E5E7EB] shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="space-y-2 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] text-xs font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] text-xs font-bold uppercase tracking-wider">
             <Globe className="w-3.5 h-3.5" />
             <span>Google Search Grounded • Peer-Reviewed Fitness Engine</span>
           </div>
@@ -150,7 +150,7 @@ export const ScientificResearchHub: React.FC<ScientificResearchHubProps> = ({ us
           <div className="text-[11px] text-[#6B7280] uppercase tracking-wider font-bold mb-1">
             Active Research Focus
           </div>
-          <div className="text-sm font-extrabold text-[#0F6E5F] flex items-center gap-1.5">
+          <div className="text-sm font-extrabold text-[#D4AF37] flex items-center gap-1.5">
             <Activity className="w-4 h-4 text-[#E8912D]" />
             <span>{userProfile.goal === 'lose_fat' ? 'Evidence-Based Fat Loss' : userProfile.goal === 'build_muscle' ? 'Hypertrophy & MPS Science' : 'Body Recomposition'}</span>
           </div>
@@ -177,13 +177,13 @@ export const ScientificResearchHub: React.FC<ScientificResearchHubProps> = ({ us
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               disabled={isSearching}
-              className="w-full text-xs sm:text-sm pl-11 pr-4 py-3.5 rounded-2xl border border-[#E5E7EB] bg-[#FAFAF8] focus:outline-none focus:ring-2 focus:ring-[#0F6E5F]"
+              className="w-full text-xs sm:text-sm pl-11 pr-4 py-3.5 rounded-2xl border border-[#E5E7EB] bg-[#FAFAF8] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
             />
           </div>
           <button
             type="submit"
             disabled={isSearching || !searchQuery.trim()}
-            className="px-6 py-3.5 rounded-2xl bg-[#0F6E5F] text-white text-xs sm:text-sm font-bold hover:bg-[#0D5B4F] disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-xs shrink-0"
+            className="px-6 py-3.5 rounded-2xl bg-[#D4AF37] text-white text-xs sm:text-sm font-bold hover:bg-[#A68523] disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-xs shrink-0"
           >
             {isSearching ? (
               <>
@@ -208,11 +208,11 @@ export const ScientificResearchHub: React.FC<ScientificResearchHubProps> = ({ us
 
       {/* ACTIVE RESEARCH RESULTS VIEW */}
       {activeResearch && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-[#0F6E5F]/30 shadow-md space-y-6 animate-in slide-in-from-bottom-3 duration-300">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border-2 border-[#D4AF37]/30 shadow-md space-y-6 animate-in slide-in-from-bottom-3 duration-300">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E7EB] pb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F] text-white">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37] text-white">
                   Synthesized Evidence
                 </span>
                 <span className="text-xs text-[#6B7280]">
@@ -240,7 +240,7 @@ export const ScientificResearchHub: React.FC<ScientificResearchHubProps> = ({ us
           {activeResearch.citations && activeResearch.citations.length > 0 && (
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-2 text-xs font-bold text-[#1A1D1B] uppercase tracking-wider">
-                <Globe className="w-4 h-4 text-[#0F6E5F]" />
+                <Globe className="w-4 h-4 text-[#D4AF37]" />
                 <span>Live Grounded Scientific Sources & Citations ({activeResearch.citations.length})</span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
@@ -250,17 +250,17 @@ export const ScientificResearchHub: React.FC<ScientificResearchHubProps> = ({ us
                     href={cite.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 rounded-xl bg-white border border-[#E5E7EB] hover:border-[#0F6E5F] hover:shadow-xs transition-all flex items-start justify-between gap-2 group"
+                    className="p-3 rounded-xl bg-white border border-[#E5E7EB] hover:border-[#D4AF37] hover:shadow-xs transition-all flex items-start justify-between gap-2 group"
                   >
                     <div className="overflow-hidden">
-                      <div className="text-xs font-bold text-[#1A1D1B] truncate group-hover:text-[#0F6E5F]">
+                      <div className="text-xs font-bold text-[#1A1D1B] truncate group-hover:text-[#D4AF37]">
                         {cite.title || 'Peer-Reviewed Source'}
                       </div>
                       <div className="text-[10px] text-[#6B7280] truncate mt-0.5">
                         {cite.domain || cite.url}
                       </div>
                     </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#9CA3AF] group-hover:text-[#0F6E5F] shrink-0 mt-0.5" />
+                    <ExternalLink className="w-3.5 h-3.5 text-[#9CA3AF] group-hover:text-[#D4AF37] shrink-0 mt-0.5" />
                   </a>
                 ))}
               </div>
@@ -273,7 +273,7 @@ export const ScientificResearchHub: React.FC<ScientificResearchHubProps> = ({ us
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-[#0F6E5F]" />
+            <BookOpen className="w-5 h-5 text-[#D4AF37]" />
             <h2 className="text-lg font-bold text-[#1A1D1B]">
               Core Scientific Pillars & Literature Reviews
             </h2>
@@ -307,17 +307,17 @@ export const ScientificResearchHub: React.FC<ScientificResearchHubProps> = ({ us
                         key={tIdx}
                         onClick={() => handleExecuteResearch(topic.query, pillar.category)}
                         disabled={isSearching}
-                        className="w-full text-left p-3 rounded-2xl bg-[#FAFAF8] border border-[#E5E7EB] hover:border-[#0F6E5F] hover:bg-[#0F6E5F]/5 transition-all group flex items-center justify-between gap-2"
+                        className="w-full text-left p-3 rounded-2xl bg-[#FAFAF8] border border-[#E5E7EB] hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 transition-all group flex items-center justify-between gap-2"
                       >
                         <div>
-                          <div className="text-xs font-bold text-[#1A1D1B] group-hover:text-[#0F6E5F]">
+                          <div className="text-xs font-bold text-[#1A1D1B] group-hover:text-[#D4AF37]">
                             {topic.title}
                           </div>
                           <div className="text-[11px] text-[#6B7280] line-clamp-1 mt-0.5">
                             {topic.query}
                           </div>
                         </div>
-                        <ArrowRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#0F6E5F] group-hover:translate-x-0.5 transition-all shrink-0" />
+                        <ArrowRight className="w-4 h-4 text-[#9CA3AF] group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all shrink-0" />
                       </button>
                     ))}
                   </div>
@@ -325,7 +325,7 @@ export const ScientificResearchHub: React.FC<ScientificResearchHubProps> = ({ us
 
                 <div className="pt-2 border-t border-[#E5E7EB]/60 flex items-center justify-between text-[11px] text-[#6B7280]">
                   <span>Grounding: PubMed / ISSN / ACSM</span>
-                  <span className="font-semibold text-[#0F6E5F]">Live Ready</span>
+                  <span className="font-semibold text-[#D4AF37]">Live Ready</span>
                 </div>
               </div>
             );

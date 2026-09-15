@@ -123,15 +123,15 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
   return (
     <div className="space-y-6 text-left">
       {/* Top Banner */}
-      <div className="bg-white dark:bg-[#161817] p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] shadow-xs">
+      <div className="bg-white dark:bg-[#111111] p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8]">
+              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
                 100+ Anabolic & Muscle Building Recipes
               </span>
               {isVegetarianUser && (
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 flex items-center gap-1">
+                <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#FDF3D0] dark:bg-[#2A2416]/40 text-[#8E701C] dark:text-[#F0D060] flex items-center gap-1">
                   <Leaf className="w-3 h-3" />
                   Vegetarian Filter Applied
                 </span>
@@ -151,8 +151,8 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
               onClick={() => setDietFilter('all')}
               className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                 dietFilter === 'all'
-                  ? 'bg-[#0F6E5F] text-white border-[#0F6E5F]'
-                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#2A2E2C]'
+                  ? 'bg-[#D4AF37] text-white border-[#D4AF37]'
+                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#2A2416]'
               }`}
             >
               All (100)
@@ -162,7 +162,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
               className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
                 dietFilter === 'vegetarian'
                   ? 'bg-[#16A34A] text-white border-[#16A34A]'
-                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-emerald-800 dark:text-emerald-300 border-[#E5E7EB] dark:border-[#2A2E2C]'
+                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#8E701C] dark:text-[#F0D060] border-[#E5E7EB] dark:border-[#2A2416]'
               }`}
             >
               <Leaf className="w-3.5 h-3.5" />
@@ -172,8 +172,8 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
               onClick={() => setDietFilter('non_vegetarian')}
               className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                 dietFilter === 'non_vegetarian'
-                  ? 'bg-[#0F6E5F] text-white border-[#0F6E5F]'
-                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#2A2E2C]'
+                  ? 'bg-[#D4AF37] text-white border-[#D4AF37]'
+                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#2A2416]'
               }`}
             >
               Omnivore (50)
@@ -182,7 +182,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
         </div>
 
         {/* Search and Meal Type Filter */}
-        <div className="mt-5 pt-4 border-t border-[#E5E7EB] dark:border-[#242826] space-y-3">
+        <div className="mt-5 pt-4 border-t border-[#E5E7EB] dark:border-[#2A2416] space-y-3">
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-[#9CA3AF] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -191,7 +191,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                 placeholder="Search recipes by name, ingredient (paneer, tofu, lentils, whey, chicken, eggs), or cuisine..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9] placeholder-[#9CA3AF] focus:outline-none focus:border-[#0F6E5F]"
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9] placeholder-[#9CA3AF] focus:outline-none focus:border-[#D4AF37]"
               />
               {searchQuery && (
                 <button
@@ -210,7 +210,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                 <select
                   value={tierFilter}
                   onChange={(e) => setTierFilter(e.target.value)}
-                  className="px-2.5 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
+                  className="px-2.5 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
                 >
                   <option value="All">All Tiers</option>
                   <option value="S-Tier">S-Tier (Top MPS Bioavailability)</option>
@@ -223,7 +223,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="px-2.5 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#2A2E2C] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
+                  className="px-2.5 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
                 >
                   <option value="protein_efficiency">🎯 Protein-to-Calorie Ratio (Top Rated)</option>
                   <option value="anabolic">⚡ Anabolic Score (Highest First)</option>
@@ -243,7 +243,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                 onClick={() => setSelectedMealType(type)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   selectedMealType === type
-                    ? 'bg-[#0F6E5F] text-white shadow-2xs'
+                    ? 'bg-[#D4AF37] text-white shadow-2xs'
                     : 'bg-[#F3F4F6] dark:bg-[#1F2221] text-[#6B7280] dark:text-[#9EA8A2] hover:bg-gray-200 dark:hover:bg-[#282C2A]'
                 }`}
               >
@@ -257,7 +257,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
       {/* Recipes count */}
       <div className="flex items-center justify-between text-xs text-[#6B7280] dark:text-[#9EA8A2]">
         <div>
-          Showing <span className="font-bold text-[#0F6E5F] dark:text-[#5FD1B8]">{filteredRecipes.length}</span> curated recipes
+          Showing <span className="font-bold text-[#D4AF37] dark:text-[#F0D060]">{filteredRecipes.length}</span> curated recipes
         </div>
         <div>
           Database: <span className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">{RECIPES_DATABASE.length} Total</span>
@@ -275,7 +275,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
           return (
             <div
               key={recipe.id}
-              className="bg-white dark:bg-[#161817] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#242826] hover:border-[#0F6E5F]/50 transition-all shadow-xs flex flex-col justify-between"
+              className="bg-white dark:bg-[#111111] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37]/50 transition-all shadow-xs flex flex-col justify-between"
             >
               <div>
                 {/* Header tags */}
@@ -285,7 +285,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
                       rank === 'S-Tier'
                         ? 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'
-                        : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                        : 'bg-[#D4AF37]/15 text-[#B8922A] dark:text-[#F0D060] border border-[#D4AF37]/30'
                     }`}>
                       <Award className="w-3 h-3" />
                       {rank} • {score}/10
@@ -293,14 +293,14 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
 
                     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${
                       isVeg
-                        ? 'bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300'
+                        ? 'bg-[#FDF3D0] dark:bg-[#2A2416]/40 text-[#8E701C] dark:text-[#F0D060]'
                         : 'bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300'
                     }`}>
                       {isVeg ? '🌱 Vegetarian' : '🍗 Omnivore'}
                     </span>
 
                     {/* Protein-to-Calorie Ratio Badge */}
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-teal-500/10 text-[#0F6E5F] dark:text-[#5FD1B8] border border-teal-500/20">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] border border-[#D4AF37]/20">
                       🎯 {Math.round((recipe.proteinG * 4 / recipe.totalCalories) * 100)}% Protein Cal
                     </span>
                   </div>
@@ -330,7 +330,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                 )}
 
                 {/* Key Ingredients */}
-                <div className="mt-2.5 p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#1A1D1C] border border-[#E5E7EB] dark:border-[#242826] text-[11px] text-[#4B5563] dark:text-[#9CA3AF]">
+                <div className="mt-2.5 p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-[11px] text-[#4B5563] dark:text-[#9CA3AF]">
                   <div className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">Key Ingredients:</div>
                   <div className="line-clamp-2">
                     {recipe.ingredients.map((i) => `${i.item} (${i.amount})`).join(' • ')}
@@ -339,7 +339,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
 
                 {/* Nutrition Cues */}
                 {recipe.chefScienceTip && (
-                  <div className="mt-2 text-[11px] text-[#0F6E5F] dark:text-[#5FD1B8] font-medium flex items-center gap-1">
+                  <div className="mt-2 text-[11px] text-[#D4AF37] dark:text-[#F0D060] font-medium flex items-center gap-1">
                     <Sparkles className="w-3 h-3 shrink-0 text-[#E8912D]" />
                     <span className="line-clamp-1">{recipe.chefScienceTip}</span>
                   </div>
@@ -347,7 +347,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
               </div>
 
               {/* Macros & Actions */}
-              <div className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#242826]">
+              <div className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2416]">
                 <div className="grid grid-cols-4 text-center text-xs pb-3">
                   <div>
                     <div className="text-[10px] text-[#6B7280] uppercase">Cal</div>
@@ -355,7 +355,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                   </div>
                   <div>
                     <div className="text-[10px] text-[#6B7280] uppercase">Prot</div>
-                    <div className="font-bold text-[#0F6E5F] dark:text-[#5FD1B8]">{recipe.proteinG}g</div>
+                    <div className="font-bold text-[#D4AF37] dark:text-[#F0D060]">{recipe.proteinG}g</div>
                   </div>
                   <div>
                     <div className="text-[10px] text-[#6B7280] uppercase">Carb</div>
@@ -372,7 +372,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                     onClick={() => setSelectedRecipeForDetails(recipe)}
                     className="px-3 py-2 rounded-xl text-xs font-bold bg-gray-100 dark:bg-[#1F2221] hover:bg-gray-200 dark:hover:bg-[#282C2A] text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center justify-center gap-1 transition-all cursor-pointer"
                   >
-                    <BookOpen className="w-3.5 h-3.5 text-[#0F6E5F] dark:text-[#5FD1B8]" />
+                    <BookOpen className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
                     <span>Guide</span>
                   </button>
 
@@ -381,7 +381,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                     className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs ${
                       isLogged
                         ? 'bg-[#16A34A] text-white'
-                        : 'bg-[#0F6E5F] text-white hover:bg-[#0D5B4F]'
+                        : 'bg-[#D4AF37] text-white hover:bg-[#A68523]'
                     }`}
                   >
                     {isLogged ? (
@@ -407,7 +407,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
       {selectedRecipeForDetails && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-xs animate-fadeIn overflow-y-auto">
           <div 
-            className="relative w-full max-w-xl bg-white dark:bg-[#181B1A] border border-[#E5E7EB] dark:border-[#2A2E2C] rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[90vh] flex flex-col text-left"
+            className="relative w-full max-w-xl bg-white dark:bg-[#181B1A] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl shadow-2xl overflow-hidden my-auto max-h-[90vh] flex flex-col text-left"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-5 border-b border-[#E5E7EB] dark:border-[#262A28] bg-[#FAFAF8] dark:bg-[#1E2220] flex items-start justify-between gap-3 shrink-0">
@@ -416,7 +416,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                   <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
                     {selectedRecipeForDetails.proteinQualityRank || 'S-Tier'} • Rating: {selectedRecipeForDetails.anabolicScore || 9.7}/10
                   </span>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8]">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
                     {selectedRecipeForDetails.cuisine}
                   </span>
                 </div>
@@ -442,7 +442,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                 </div>
                 <div>
                   <span className="text-[10px] text-[#6B7280] block">Protein</span>
-                  <span className="text-sm font-bold text-[#0F6E5F] dark:text-[#5FD1B8]">{selectedRecipeForDetails.proteinG}g</span>
+                  <span className="text-sm font-bold text-[#D4AF37] dark:text-[#F0D060]">{selectedRecipeForDetails.proteinG}g</span>
                 </div>
                 <div>
                   <span className="text-[10px] text-[#6B7280] block">Carbs</span>
@@ -457,12 +457,12 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
               {/* Ingredients List */}
               <div className="space-y-2">
                 <h4 className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
-                  <Utensils className="w-4 h-4 text-[#0F6E5F]" />
+                  <Utensils className="w-4 h-4 text-[#D4AF37]" />
                   <span>Exact Ingredients & Macros Contribution:</span>
                 </h4>
                 <div className="space-y-1.5 pl-1">
                   {selectedRecipeForDetails.ingredients.map((ing, idx) => (
-                    <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-[#202422] border border-[#E5E7EB] dark:border-[#2A2E2C]">
+                    <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-gray-50 dark:bg-[#202422] border border-[#E5E7EB] dark:border-[#2A2416]">
                       <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">{ing.item}</span>
                       <span className="text-[#6B7280] dark:text-[#9EA8A2] font-mono">{ing.amount} ({ing.macrosContribution})</span>
                     </div>
@@ -473,13 +473,13 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
               {/* Step by Step Cooking Instructions */}
               <div className="space-y-2">
                 <h4 className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
-                  <BookOpen className="w-4 h-4 text-[#0F6E5F]" />
+                  <BookOpen className="w-4 h-4 text-[#D4AF37]" />
                   <span>Step-by-Step Preparation Guide:</span>
                 </h4>
                 <ol className="space-y-2 pl-1">
                   {selectedRecipeForDetails.stepByStepInstructions.map((step, idx) => (
                     <li key={idx} className="flex items-start gap-2 text-[#4B5563] dark:text-[#D1D5DB] leading-relaxed">
-                      <span className="w-5 h-5 rounded-full bg-[#0F6E5F]/15 text-[#0F6E5F] dark:text-[#5FD1B8] font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="w-5 h-5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] dark:text-[#F0D060] font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
                         {idx + 1}
                       </span>
                       <span>{step}</span>
@@ -489,8 +489,8 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
               </div>
 
               {/* Science & Body Comp Benefit */}
-              <div className="p-3.5 rounded-xl bg-teal-500/10 border border-teal-500/20 text-[#1A1D1B] dark:text-[#E8ECE9] space-y-1.5">
-                <div className="font-bold text-[#0F6E5F] dark:text-[#5FD1B8] flex items-center gap-1">
+              <div className="p-3.5 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#1A1D1B] dark:text-[#E8ECE9] space-y-1.5">
+                <div className="font-bold text-[#D4AF37] dark:text-[#F0D060] flex items-center gap-1">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Anabolic Science & Muscle Benefit:</span>
                 </div>
@@ -513,7 +513,7 @@ export const RecipeLibraryExplorer: React.FC<RecipeLibraryExplorerProps> = ({
                   handleLogRecipe(selectedRecipeForDetails);
                   setSelectedRecipeForDetails(null);
                 }}
-                className="px-5 py-2 rounded-xl text-xs font-bold bg-[#0F6E5F] hover:bg-[#0D5B4F] text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-[#D4AF37] hover:bg-[#A68523] text-white flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
               >
                 <Plus className="w-4 h-4" />
                 <span>Log to Meal Tracker</span>

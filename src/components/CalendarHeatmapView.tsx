@@ -262,35 +262,35 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
   // Color coding helper for intensity tiers
   const getIntensityColorClass = (day: CalendarDayData): string => {
     if (!day.isCurrentMonth) {
-      return 'bg-gray-100/40 dark:bg-[#161817]/40 text-gray-300 dark:text-gray-700 border-transparent opacity-40';
+      return 'bg-gray-100/40 dark:bg-[#111111]/40 text-gray-300 dark:text-gray-700 border-transparent opacity-40';
     }
 
     if (day.intensityLevel === 0) {
-      return 'bg-gray-50 dark:bg-[#1C1F1D] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-800 hover:border-emerald-500/50';
+      return 'bg-gray-50 dark:bg-[#1C1F1D] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-800 hover:border-[#D4AF37]/50';
     }
     if (day.intensityLevel === 1) {
-      return 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-800 hover:ring-2 hover:ring-emerald-400';
+      return 'bg-[#FDF3D0] dark:bg-[#2A2416]/50 text-[#6A5312] dark:text-[#F0D060] border-[#D4AF37]/50 dark:border-[#2A2416] hover:ring-2 hover:ring-[#D4AF37]';
     }
     if (day.intensityLevel === 2) {
-      return 'bg-emerald-300 dark:bg-emerald-800 text-emerald-950 dark:text-white border-emerald-400 dark:border-emerald-700 font-bold hover:ring-2 hover:ring-emerald-400';
+      return 'bg-[#D4AF37]/60 dark:bg-[#A68523] text-[#16120A] dark:text-white border-[#D4AF37]/40 dark:border-[#D4AF37]/40 font-bold hover:ring-2 hover:ring-[#D4AF37]';
     }
     if (day.intensityLevel === 3) {
-      return 'bg-emerald-500 dark:bg-[#0F6E5F] text-white border-emerald-600 dark:border-[#0D5B4F] font-black shadow-xs hover:ring-2 hover:ring-emerald-400';
+      return 'bg-[#D4AF37] dark:bg-[#D4AF37] text-white border-[#A68523] dark:border-[#A68523] font-black shadow-xs hover:ring-2 hover:ring-[#D4AF37]';
     }
     // Tier 4: Peak PR
-    return 'bg-gradient-to-br from-[#0F6E5F] to-[#0A483E] text-white border-amber-400 dark:border-amber-400/80 font-black shadow-sm ring-1 ring-amber-400/50 hover:ring-2 hover:ring-amber-300';
+    return 'bg-gradient-to-br from-[#D4AF37] to-[#0A483E] text-white border-amber-400 dark:border-amber-400/80 font-black shadow-sm ring-1 ring-amber-400/50 hover:ring-2 hover:ring-amber-300';
   };
 
   return (
     <div className="space-y-6">
       {/* Top Banner & Control Bar */}
-      <div className="bg-white dark:bg-[#161817] p-5 sm:p-6 rounded-3xl border border-emerald-500/20 shadow-xs space-y-5">
+      <div className="bg-white dark:bg-[#111111] p-5 sm:p-6 rounded-3xl border border-[#D4AF37]/20 shadow-xs space-y-5">
         
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="p-1.5 rounded-xl bg-[#0F6E5F]/10 text-[#0F6E5F] dark:text-[#5FD1B8]">
+              <span className="p-1.5 rounded-xl bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
                 <CalendarIcon className="w-5 h-5" />
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-gray-900 dark:text-white tracking-tight">
@@ -309,7 +309,7 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
                 onClick={() => setTimeframe('single_month')}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   timeframe === 'single_month'
-                    ? 'bg-[#0F6E5F] text-white shadow-2xs'
+                    ? 'bg-[#D4AF37] text-white shadow-2xs'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
                 }`}
               >
@@ -319,7 +319,7 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
                 onClick={() => setTimeframe('three_months')}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   timeframe === 'three_months'
-                    ? 'bg-[#0F6E5F] text-white shadow-2xs'
+                    ? 'bg-[#D4AF37] text-white shadow-2xs'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
                 }`}
               >
@@ -329,7 +329,7 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
                 onClick={() => setTimeframe('year')}
                 className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   timeframe === 'year'
-                    ? 'bg-[#0F6E5F] text-white shadow-2xs'
+                    ? 'bg-[#D4AF37] text-white shadow-2xs'
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
                 }`}
               >
@@ -340,20 +340,20 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
             <div className="flex items-center gap-1 bg-gray-100 dark:bg-[#1F2220] p-1 rounded-xl border border-gray-200 dark:border-gray-800">
               <button
                 onClick={handlePrevMonth}
-                className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#2A2E2C] text-gray-700 dark:text-gray-300 transition-all cursor-pointer"
+                className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#2A2416] text-gray-700 dark:text-gray-300 transition-all cursor-pointer"
                 title="Previous Month"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={handleToday}
-                className="px-2.5 py-1 text-xs font-bold text-gray-800 dark:text-gray-200 hover:text-[#0F6E5F] transition-all cursor-pointer"
+                className="px-2.5 py-1 text-xs font-bold text-gray-800 dark:text-gray-200 hover:text-[#D4AF37] transition-all cursor-pointer"
               >
                 Today
               </button>
               <button
                 onClick={handleNextMonth}
-                className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#2A2E2C] text-gray-700 dark:text-gray-300 transition-all cursor-pointer"
+                className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-[#2A2416] text-gray-700 dark:text-gray-300 transition-all cursor-pointer"
                 title="Next Month"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -364,28 +364,28 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
 
         {/* 4 Stat Highlights */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-gray-100 dark:border-gray-800">
-          <div className="p-3.5 rounded-2xl bg-emerald-500/10 dark:bg-emerald-950/30 border border-emerald-500/20 flex items-center justify-between">
+          <div className="p-3.5 rounded-2xl bg-[#D4AF37]/10 dark:bg-[#2A2416]/30 border border-[#D4AF37]/20 flex items-center justify-between">
             <div>
-              <div className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wider">
+              <div className="text-[11px] font-bold text-[#8E701C] dark:text-[#F0D060] uppercase tracking-wider">
                 Current Streak
               </div>
-              <div className="text-xl sm:text-2xl font-black text-emerald-900 dark:text-emerald-100 mt-0.5">
+              <div className="text-xl sm:text-2xl font-black text-[#6A5312] dark:text-[#F4EBD0] mt-0.5">
                 {stats.currentStreak} Days
               </div>
             </div>
             <Flame className="w-6 h-6 text-amber-500 fill-amber-500 shrink-0" />
           </div>
 
-          <div className="p-3.5 rounded-2xl bg-teal-500/10 dark:bg-teal-950/30 border border-teal-500/20 flex items-center justify-between">
+          <div className="p-3.5 rounded-2xl bg-[#D4AF37]/10 dark:bg-[#2A2416]/30 border border-[#D4AF37]/20 flex items-center justify-between">
             <div>
-              <div className="text-[11px] font-bold text-teal-800 dark:text-teal-300 uppercase tracking-wider">
+              <div className="text-[11px] font-bold text-[#8E701C] dark:text-[#F0D060] uppercase tracking-wider">
                 30-Day Consistency
               </div>
-              <div className="text-xl sm:text-2xl font-black text-teal-900 dark:text-teal-100 mt-0.5">
+              <div className="text-xl sm:text-2xl font-black text-[#6A5312] dark:text-[#F4EBD0] mt-0.5">
                 {stats.consistencyPct}%
               </div>
             </div>
-            <TrendingUp className="w-6 h-6 text-teal-600 dark:text-teal-400 shrink-0" />
+            <TrendingUp className="w-6 h-6 text-[#B8922A] dark:text-[#F0D060] shrink-0" />
           </div>
 
           <div className="p-3.5 rounded-2xl bg-indigo-500/10 dark:bg-indigo-950/30 border border-indigo-500/20 flex items-center justify-between">
@@ -425,7 +425,7 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
         {calendarMonths.map((monthBlock) => (
           <div
             key={`${monthBlock.year}-${monthBlock.month}`}
-            className="bg-white dark:bg-[#161817] p-5 rounded-3xl border border-gray-200 dark:border-[#242826] shadow-xs space-y-4"
+            className="bg-white dark:bg-[#111111] p-5 rounded-3xl border border-gray-200 dark:border-[#2A2416] shadow-xs space-y-4"
           >
             {/* Month Name */}
             <div className="flex items-center justify-between">
@@ -461,7 +461,7 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
                     onClick={() => setSelectedDay(day)}
                     disabled={!day.isCurrentMonth}
                     className={`relative aspect-square rounded-xl p-1 flex flex-col items-center justify-between border transition-all cursor-pointer ${colorClass} ${
-                      isSelected ? 'ring-2 ring-[#0F6E5F] dark:ring-[#2DD4BF] scale-105 z-10' : ''
+                      isSelected ? 'ring-2 ring-[#D4AF37] dark:ring-[#F0D060] scale-105 z-10' : ''
                     } ${day.isToday ? 'ring-2 ring-amber-400' : ''}`}
                     title={`${day.dateStr}: ${day.workoutTitle} • ${day.volumeKg} kg volume`}
                   >
@@ -491,11 +491,11 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
 
       {/* Interactive Detail Drawer for Selected Day */}
       {selectedDay && selectedDay.isCurrentMonth && (
-        <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-transparent dark:from-emerald-950/40 dark:via-[#161817] dark:to-[#161817] border-2 border-emerald-500/30 shadow-md animate-in fade-in slide-in-from-top-2">
+        <div className="p-5 rounded-3xl bg-gradient-to-r from-[#D4AF37]/10 via-[#D4AF37]/10 to-transparent dark:from-[#111111]/40 dark:via-[#111111] dark:to-[#111111] border-2 border-[#D4AF37]/30 shadow-md animate-in fade-in slide-in-from-top-2">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#0F6E5F] text-white">
+                <span className="text-xs font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37] text-white">
                   {selectedDay.date.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
                 {selectedDay.isToday && (
@@ -505,7 +505,7 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
                 )}
               </div>
               <h4 className="text-lg font-black text-gray-900 dark:text-white flex items-center gap-2">
-                <Dumbbell className="w-5 h-5 text-[#0F6E5F]" />
+                <Dumbbell className="w-5 h-5 text-[#D4AF37]" />
                 <span>{selectedDay.workoutTitle}</span>
               </h4>
             </div>
@@ -513,11 +513,11 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
             {/* Quick Metrics */}
             <div className="flex items-center gap-4 text-xs font-bold text-gray-700 dark:text-gray-300">
               <div className="flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-[#0F6E5F]" />
+                <Clock className="w-4 h-4 text-[#D4AF37]" />
                 <span>{selectedDay.durationMin > 0 ? `${selectedDay.durationMin} mins` : 'No duration'}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Dumbbell className="w-4 h-4 text-emerald-600" />
+                <Dumbbell className="w-4 h-4 text-[#B8922A]" />
                 <span>{selectedDay.volumeKg > 0 ? `${selectedDay.volumeKg.toLocaleString()} kg Volume` : '0 kg'}</span>
               </div>
               {onToggleWorkoutLog && (
@@ -534,7 +534,7 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
                       Boolean(selectedDay.log && !selectedDay.log.isRestDay)
                     );
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-[#0F6E5F] text-white text-xs font-black hover:bg-[#0D5B4F] transition-all cursor-pointer shadow-xs"
+                  className="px-3 py-1.5 rounded-xl bg-[#D4AF37] text-white text-xs font-black hover:bg-[#A68523] transition-all cursor-pointer shadow-xs"
                 >
                   {selectedDay.log ? 'Toggle Status' : 'Log Workout'}
                 </button>
@@ -545,9 +545,9 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
       )}
 
       {/* Heatmap Legend Bar */}
-      <div className="bg-white dark:bg-[#161817] p-4 rounded-2xl border border-gray-200 dark:border-[#242826] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-gray-600 dark:text-gray-400">
+      <div className="bg-white dark:bg-[#111111] p-4 rounded-2xl border border-gray-200 dark:border-[#2A2416] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-gray-600 dark:text-gray-400">
         <div className="flex items-center gap-1.5 font-bold">
-          <Info className="w-4 h-4 text-[#0F6E5F]" />
+          <Info className="w-4 h-4 text-[#D4AF37]" />
           <span>Volume & Consistency Intensity Scale:</span>
         </div>
 
@@ -557,19 +557,19 @@ export const CalendarHeatmapView: React.FC<CalendarHeatmapViewProps> = ({
             <span>0 kg (Rest)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded-md bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 inline-block" />
+            <span className="w-3.5 h-3.5 rounded-md bg-[#FDF3D0] dark:bg-[#2A2416]/60 border border-[#D4AF37]/50 dark:border-[#2A2416] inline-block" />
             <span>&lt; 2k kg</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded-md bg-emerald-300 dark:bg-emerald-800 border border-emerald-400 dark:border-emerald-700 inline-block" />
+            <span className="w-3.5 h-3.5 rounded-md bg-[#D4AF37]/60 dark:bg-[#A68523] border border-[#D4AF37]/40 dark:border-[#D4AF37]/40 inline-block" />
             <span>2k - 4.5k kg</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded-md bg-emerald-500 dark:bg-[#0F6E5F] border border-emerald-600 inline-block" />
+            <span className="w-3.5 h-3.5 rounded-md bg-[#D4AF37] dark:bg-[#D4AF37] border border-[#A68523] inline-block" />
             <span>4.5k - 7.5k kg</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-3.5 h-3.5 rounded-md bg-gradient-to-br from-[#0F6E5F] to-[#0A483E] border border-amber-400 ring-1 ring-amber-400/50 inline-block" />
+            <span className="w-3.5 h-3.5 rounded-md bg-gradient-to-br from-[#D4AF37] to-[#0A483E] border border-amber-400 ring-1 ring-amber-400/50 inline-block" />
             <span className="font-bold text-gray-900 dark:text-white">&gt; 7.5k kg (Peak PR ★)</span>
           </div>
         </div>
