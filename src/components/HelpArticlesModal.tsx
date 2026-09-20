@@ -165,7 +165,7 @@ export const HelpArticlesModal: React.FC<HelpArticlesModalProps> = ({
         {/* Header */}
         <div className="p-5 sm:p-6 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between shrink-0 bg-gray-50/50 dark:bg-gray-900/30">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-[#3B82F6]/10 text-[#3B82F6] dark:text-[#60A5FA] flex items-center justify-center">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
@@ -190,7 +190,7 @@ export const HelpArticlesModal: React.FC<HelpArticlesModalProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search help articles (e.g. grams, scan, billing, Drive, delete)..."
-              className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121413] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+              className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121413] text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
             />
           </div>
         </div>
@@ -212,7 +212,7 @@ export const HelpArticlesModal: React.FC<HelpArticlesModalProps> = ({
                   key={article.id}
                   className={`rounded-2xl border transition-all overflow-hidden ${
                     isExpanded
-                      ? 'border-[#D4AF37]/40 bg-[#FFFBF0]/20 dark:bg-[#2A2416]/10'
+                      ? 'border-[#3B82F6]/40 bg-[#FFFBF0]/20 dark:bg-[#2A2416]/10'
                       : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121413] hover:border-gray-300 dark:hover:border-gray-700'
                   }`}
                 >
@@ -221,7 +221,7 @@ export const HelpArticlesModal: React.FC<HelpArticlesModalProps> = ({
                     className="w-full p-4 flex items-start justify-between text-left gap-3 cursor-pointer"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-xl bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center shrink-0 mt-0.5">
+                      <div className="w-8 h-8 rounded-xl bg-[#3B82F6]/10 text-[#3B82F6] dark:text-[#60A5FA] flex items-center justify-center shrink-0 mt-0.5">
                         <Icon className="w-4 h-4" />
                       </div>
                       <div>
@@ -244,10 +244,10 @@ export const HelpArticlesModal: React.FC<HelpArticlesModalProps> = ({
                   </button>
 
                   {isExpanded && (
-                    <div className="px-4 pb-4 pt-1 border-t border-[#D4AF37]/20 text-xs text-gray-700 dark:text-gray-300 space-y-2 leading-relaxed">
+                    <div className="px-4 pb-4 pt-1 border-t border-[#3B82F6]/20 text-xs text-gray-700 dark:text-gray-300 space-y-2 leading-relaxed">
                       {article.content.map((paragraph, idx) => (
                         <p key={idx} className="flex items-start gap-2">
-                          <span className="text-[#B8922A] dark:text-[#F0D060] font-bold">•</span>
+                          <span className="text-[#1D4ED8] dark:text-[#60A5FA] font-bold">•</span>
                           <span>{paragraph}</span>
                         </p>
                       ))}

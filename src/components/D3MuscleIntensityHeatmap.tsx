@@ -179,7 +179,7 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
       switch (status) {
         case 'neglected': return '#64748B'; // slate
         case 'maintenance': return '#0284C7'; // sky blue
-        case 'optimal': return '#D4AF37'; // Peak gold
+        case 'optimal': return '#00D4FF'; // Peak gold
         case 'high_fatigue': return '#E8912D'; // Amber
         case 'overtraining': return '#EF4444'; // Red
       }
@@ -191,7 +191,7 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
       .attr('y', 0)
       .attr('width', xScale(20) - xScale(10))
       .attr('height', filteredMuscles.length * 36)
-      .attr('fill', '#D4AF37')
+      .attr('fill', '#00D4FF')
       .attr('opacity', 0.08)
       .attr('rx', 4);
 
@@ -296,7 +296,7 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
       .attr('text-anchor', 'middle')
       .attr('font-size', '10px')
       .attr('font-weight', 'bold')
-      .attr('fill', '#D4AF37')
+      .attr('fill', '#00D4FF')
       .text('★ Hypertrophy Sweet Spot (10-20 sets/week)');
 
   }, [filteredMuscles]);
@@ -311,20 +311,20 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
   }, [muscleData]);
 
   return (
-    <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-6 text-left transition-colors">
+    <div className="bg-white dark:bg-[#0E1424] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B] shadow-xs space-y-6 text-left transition-colors">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#1E293B] pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:bg-[#D4AF37]/20 dark:text-[#F0D060]">
+            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#00D4FF]/10 text-[#00D4FF] dark:bg-[#00D4FF]/20 dark:text-[#38BDF8]">
               D3 Biomechanical Analytics
             </span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#A68523] dark:text-[#F0D060]">
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#00D4FF]/10 text-[#0369A1] dark:text-[#38BDF8]">
               Evidence-Based
             </span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-1.5 flex items-center gap-2">
-            <Activity className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060]" />
+            <Activity className="w-5 h-5 text-[#00D4FF] dark:text-[#38BDF8]" />
             <span>Muscle Volume & Recovery Heatmap</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#6B7280] dark:text-[#9EA8A2] mt-1">
@@ -334,7 +334,7 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
 
         {/* Quick Summary Badges */}
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060] text-xs font-bold">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#00D4FF]/10 border border-[#00D4FF]/20 text-[#0369A1] dark:text-[#38BDF8] text-xs font-bold">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>{stats.optimalCount} Optimal</span>
           </div>
@@ -345,7 +345,7 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
             </div>
           )}
           {stats.overtrainingCount > 0 && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-bold">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-amber-700 dark:text-amber-300 text-xs font-bold">
               <AlertTriangle className="w-3.5 h-3.5" />
               <span>{stats.overtrainingCount} High Fatigue</span>
             </div>
@@ -362,8 +362,8 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
             onClick={() => setCategoryFilter(cat)}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               categoryFilter === cat
-                ? 'bg-[#D4AF37] text-white shadow-2xs'
-                : 'bg-[#FAFAF8] dark:bg-[#1E2220] text-[#4B5563] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#2A2416] hover:bg-gray-100 dark:hover:bg-[#252A28]'
+                ? 'bg-[#00D4FF] text-white shadow-2xs'
+                : 'bg-[#FAFAF8] dark:bg-[#1E2220] text-[#4B5563] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#1E293B] hover:bg-gray-100 dark:hover:bg-[#252A28]'
             }`}
           >
             {cat}
@@ -374,17 +374,17 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
       {/* Main D3 Heatmap Stage & Interactive Details */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* D3 Canvas Container */}
-        <div ref={containerRef} className="lg:col-span-2 bg-[#FAFAF8] dark:bg-[#070707] p-4 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] overflow-x-auto">
+        <div ref={containerRef} className="lg:col-span-2 bg-[#FAFAF8] dark:bg-[#0B0F1E] p-4 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B] overflow-x-auto">
           <svg ref={svgRef} className="w-full" style={{ minWidth: '480px' }} />
 
           {/* Legend */}
-          <div className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between flex-wrap gap-2 text-[11px] text-[#6B7280] dark:text-[#9EA8A2]">
+          <div className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#1E293B] flex items-center justify-between flex-wrap gap-2 text-[11px] text-[#6B7280] dark:text-[#9EA8A2]">
             <div className="flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm bg-slate-500" />
               <span>Neglected (&lt;8 sets)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm bg-[#D4AF37]" />
+              <span className="w-3 h-3 rounded-sm bg-[#00D4FF]" />
               <span>Optimal Growth (10-20 sets)</span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -399,12 +399,12 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
         </div>
 
         {/* Selected Muscle Deep-Dive Inspector */}
-        <div className="bg-[#FAFAF8] dark:bg-[#111111] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] space-y-4">
+        <div className="bg-[#FAFAF8] dark:bg-[#0E1424] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B] space-y-4">
           {selectedMuscle ? (
             <>
-              <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#2A2416] pb-3">
+              <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#1E293B] pb-3">
                 <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#D4AF37] dark:text-[#F0D060]">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#00D4FF] dark:text-[#38BDF8]">
                     {selectedMuscle.category}
                   </span>
                   <h3 className="text-lg font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -412,10 +412,10 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
                   </h3>
                 </div>
                 <div className={`px-2.5 py-1 rounded-full text-xs font-bold capitalize ${
-                  selectedMuscle.status === 'optimal' ? 'bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060]' :
+                  selectedMuscle.status === 'optimal' ? 'bg-[#00D4FF]/15 text-[#0369A1] dark:text-[#38BDF8]' :
                   selectedMuscle.status === 'neglected' ? 'bg-slate-500/15 text-slate-700 dark:text-slate-300' :
                   selectedMuscle.status === 'overtraining' ? 'bg-red-500/15 text-red-700 dark:text-red-300' :
-                  'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                  'bg-cyan-500/15 text-amber-700 dark:text-amber-300'
                 }`}>
                   {selectedMuscle.status.replace('_', ' ')}
                 </div>
@@ -423,19 +423,19 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
 
               {/* Metric Breakdown */}
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="p-2.5 rounded-xl bg-white dark:bg-[#202422] border border-[#E5E7EB] dark:border-[#2A2416]">
+                <div className="p-2.5 rounded-xl bg-white dark:bg-[#202422] border border-[#E5E7EB] dark:border-[#1E293B]">
                   <span className="text-[#6B7280] dark:text-[#9EA8A2] block">Current Volume</span>
                   <span className="text-base font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">{selectedMuscle.currentWeeklySets} sets / wk</span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-white dark:bg-[#202422] border border-[#E5E7EB] dark:border-[#2A2416]">
+                <div className="p-2.5 rounded-xl bg-white dark:bg-[#202422] border border-[#E5E7EB] dark:border-[#1E293B]">
                   <span className="text-[#6B7280] dark:text-[#9EA8A2] block">Target Hypertrophy</span>
-                  <span className="text-base font-bold text-[#D4AF37] dark:text-[#F0D060]">{selectedMuscle.mavTargetMin} - {selectedMuscle.mavTargetMax} sets</span>
+                  <span className="text-base font-bold text-[#00D4FF] dark:text-[#38BDF8]">{selectedMuscle.mavTargetMin} - {selectedMuscle.mavTargetMax} sets</span>
                 </div>
               </div>
 
               {/* Coaching Recommendation */}
-              <div className="p-3.5 rounded-xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/15 border border-[#D4AF37]/20 space-y-1">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#D4AF37] dark:text-[#F0D060]">
+              <div className="p-3.5 rounded-xl bg-[#00D4FF]/5 dark:bg-[#00D4FF]/15 border border-[#00D4FF]/20 space-y-1">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#00D4FF] dark:text-[#38BDF8]">
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Coach Recommendation</span>
                 </div>
@@ -453,7 +453,7 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
                   {selectedMuscle.contributingExercises.map((ex, i) => (
                     <span
                       key={i}
-                      className="px-2 py-0.5 rounded-md bg-white dark:bg-[#202422] border border-[#E5E7EB] dark:border-[#2A2416] text-[11px] font-medium text-[#4B5563] dark:text-[#9EA8A2]"
+                      className="px-2 py-0.5 rounded-md bg-white dark:bg-[#202422] border border-[#E5E7EB] dark:border-[#1E293B] text-[11px] font-medium text-[#4B5563] dark:text-[#9EA8A2]"
                     >
                       {ex}
                     </span>
@@ -463,7 +463,7 @@ export const D3MuscleIntensityHeatmap: React.FC<D3MuscleIntensityHeatmapProps> =
             </>
           ) : (
             <div className="text-center py-12 text-[#6B7280] dark:text-[#9EA8A2] space-y-2">
-              <Activity className="w-8 h-8 mx-auto text-[#D4AF37] opacity-60" />
+              <Activity className="w-8 h-8 mx-auto text-[#00D4FF] opacity-60" />
               <p className="text-xs font-semibold">Hover or click any muscle group bar in the heatmap to inspect volume thresholds, hypertrophy zones, and coach advice.</p>
             </div>
           )}

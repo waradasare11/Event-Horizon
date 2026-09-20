@@ -42,12 +42,12 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-300">
-      <div className="bg-white dark:bg-[#111111] rounded-3xl max-w-xl w-full shadow-2xl border border-[#E5E7EB] dark:border-[#2A2416] overflow-hidden text-left my-6 transition-colors relative flex flex-col max-h-[92vh]">
+      <div className="bg-white dark:bg-[#0E1424] rounded-3xl max-w-xl w-full shadow-2xl border border-[#E5E7EB] dark:border-[#1E293B] overflow-hidden text-left my-6 transition-colors relative flex flex-col max-h-[92vh]">
         {/* Top Header Banner */}
-        <div className="bg-gradient-to-br from-[#D4AF37] via-[#A68523] to-[#083D34] p-6 sm:p-7 text-white relative overflow-hidden shrink-0">
+        <div className="bg-gradient-to-br from-[#00D4FF] via-[#0369A1] to-[#083D34] p-6 sm:p-7 text-white relative overflow-hidden shrink-0">
           <div className="absolute top-0 right-0 -mr-8 -mt-8 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none" />
           
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-[#F0D060] border border-white/20 mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-[#38BDF8] border border-white/20 mb-2">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>1-Week Free Subscription Included on Sign In</span>
           </div>
@@ -55,7 +55,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
             Welcome to AROH
           </h2>
-          <p className="text-xs sm:text-sm text-[#F4EBD0]/90 mt-1 leading-relaxed max-w-xl">
+          <p className="text-xs sm:text-sm text-[#F8FAFC]/90 mt-1 leading-relaxed max-w-xl">
             Sign in with your verified Google account to start your <strong>1-Week Free Trial</strong>. Complete your profile to calculate your personalized <strong>Goal Timeline Prediction</strong>, meal plans, and workout progression.
           </p>
         </div>
@@ -66,63 +66,63 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
               <label className="text-xs font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                <Crown className="w-4 h-4 text-amber-500" />
+                <Crown className="w-4 h-4 text-cyan-400" />
                 <span>Subscription Plans & Pricing (Post 1-Week Free Trial)</span>
               </label>
-              <span className="text-[11px] font-bold text-[#B8922A] dark:text-[#F0D060]">
+              <span className="text-[11px] font-bold text-[#0284C7] dark:text-[#38BDF8]">
                 1st Week: ₹0 Free
               </span>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
               {/* 1 Week Free */}
-              <div className="p-3 rounded-2xl bg-[#D4AF37]/10 border-2 border-[#D4AF37]/40 text-left relative space-y-1">
-                <div className="inline-block px-1.5 py-0.5 rounded-full bg-[#A68523] text-white text-[9px] font-black uppercase">
+              <div className="p-3 rounded-2xl bg-[#00D4FF]/10 border-2 border-[#00D4FF]/40 text-left relative space-y-1">
+                <div className="inline-block px-1.5 py-0.5 rounded-full bg-[#0369A1] text-white text-[9px] font-black uppercase">
                   Included Free
                 </div>
                 <div className="text-xs font-black text-gray-900 dark:text-white">1-Week Trial</div>
-                <div className="text-base font-extrabold text-[#B8922A] dark:text-[#F0D060]">₹0</div>
+                <div className="text-base font-extrabold text-[#0284C7] dark:text-[#38BDF8]">₹0</div>
                 <div className="text-[10px] text-gray-500">7 Days Full Access</div>
               </div>
 
               {/* 1 Month */}
-              <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-left space-y-1">
+              <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-left space-y-1">
                 <div className="text-xs font-bold text-gray-700 dark:text-gray-300">1 Month</div>
                 <div className="text-base font-black text-gray-900 dark:text-white">₹89</div>
                 <div className="text-[10px] text-gray-500">₹89 / month</div>
               </div>
 
               {/* 3 Months */}
-              <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-left space-y-1">
+              <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-left space-y-1">
                 <div className="text-xs font-bold text-gray-700 dark:text-gray-300">3 Months</div>
                 <div className="text-base font-black text-gray-900 dark:text-white">₹239</div>
-                <div className="text-[10px] text-[#B8922A] dark:text-[#F0D060] font-semibold">Save 11% (~₹79/mo)</div>
+                <div className="text-[10px] text-[#0284C7] dark:text-[#38BDF8] font-semibold">Save 11% (~₹79/mo)</div>
               </div>
 
               {/* 1 Year */}
-              <div className="p-3 rounded-2xl bg-[#D4AF37]/10 border-2 border-[#D4AF37]/40 text-left relative space-y-1">
-                <div className="inline-block px-1.5 py-0.5 rounded-full bg-[#D4AF37] text-white text-[9px] font-black uppercase">
+              <div className="p-3 rounded-2xl bg-[#00D4FF]/10 border-2 border-[#00D4FF]/40 text-left relative space-y-1">
+                <div className="inline-block px-1.5 py-0.5 rounded-full bg-[#00D4FF] text-white text-[9px] font-black uppercase">
                   Popular
                 </div>
                 <div className="text-xs font-black text-gray-900 dark:text-white">1 Year (12 Mo)</div>
-                <div className="text-base font-black text-[#D4AF37] dark:text-[#F0D060]">₹919</div>
-                <div className="text-[10px] text-[#B8922A] dark:text-[#F0D060] font-semibold">Save 14% (~₹76/mo)</div>
+                <div className="text-base font-black text-[#00D4FF] dark:text-[#38BDF8]">₹919</div>
+                <div className="text-[10px] text-[#0284C7] dark:text-[#38BDF8] font-semibold">Save 14% (~₹76/mo)</div>
               </div>
 
               {/* 2 Years */}
-              <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-left space-y-1">
+              <div className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-left space-y-1">
                 <div className="text-xs font-bold text-gray-700 dark:text-gray-300">2 Years (24 Mo)</div>
                 <div className="text-base font-black text-gray-900 dark:text-white">₹1820</div>
                 <div className="text-[10px] text-gray-500">₹75.8 / month</div>
               </div>
 
               {/* 3 Years */}
-              <div className="p-3 rounded-2xl bg-amber-500/10 border-2 border-amber-500/40 text-left relative space-y-1">
+              <div className="p-3 rounded-2xl bg-cyan-500/10 border-2 border-cyan-500/40 text-left relative space-y-1">
                 <div className="inline-block px-1.5 py-0.5 rounded-full bg-amber-600 text-white text-[9px] font-black uppercase">
                   Best Value
                 </div>
                 <div className="text-xs font-black text-gray-900 dark:text-white">3 Years (36 Mo)</div>
-                <div className="text-base font-black text-amber-600 dark:text-amber-400">₹2700</div>
+                <div className="text-base font-black text-amber-600 dark:text-cyan-400">₹2700</div>
                 <div className="text-[10px] text-amber-700 dark:text-amber-300 font-semibold">₹75.0 / month</div>
               </div>
             </div>
@@ -130,7 +130,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
 
           {/* Error Message if any */}
           {authError && (
-            <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2">
+            <div className="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{authError}</span>
             </div>
@@ -170,19 +170,19 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
         </div>
 
         {/* Security Footer & Compliance Links */}
-        <div className="px-6 py-3.5 bg-[#FAFAF8] dark:bg-[#070707] border-t border-[#E5E7EB] dark:border-[#2A2416] text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0">
+        <div className="px-6 py-3.5 bg-[#FAFAF8] dark:bg-[#0B0F1E] border-t border-[#E5E7EB] dark:border-[#1E293B] text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex flex-col sm:flex-row items-center justify-between gap-2 shrink-0">
           <span className="flex items-center gap-1.5">
-            <Lock className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <Lock className="w-3.5 h-3.5 text-[#00D4FF]" />
             <span>Encrypted Session • DPDP Act, 2023 Compliant</span>
           </span>
           <div className="flex items-center gap-2 font-medium">
-            <a href="/privacy" className="hover:text-[#D4AF37] dark:hover:text-[#F0D060] underline">Privacy</a>
+            <a href="/privacy" className="hover:text-[#00D4FF] dark:hover:text-[#38BDF8] underline">Privacy</a>
             <span>•</span>
-            <a href="/terms" className="hover:text-[#D4AF37] dark:hover:text-[#F0D060] underline">Terms</a>
+            <a href="/terms" className="hover:text-[#00D4FF] dark:hover:text-[#38BDF8] underline">Terms</a>
             <span>•</span>
-            <a href="/disclaimer" className="hover:text-amber-600 dark:hover:text-amber-400 underline">Disclaimer</a>
+            <a href="/disclaimer" className="hover:text-amber-600 dark:hover:text-cyan-400 underline">Disclaimer</a>
             <span>•</span>
-            <a href="/refund" className="hover:text-[#D4AF37] dark:hover:text-[#F0D060] underline">Refunds</a>
+            <a href="/refund" className="hover:text-[#00D4FF] dark:hover:text-[#38BDF8] underline">Refunds</a>
           </div>
         </div>
       </div>

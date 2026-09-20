@@ -24,7 +24,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { UserProfile, WorkoutCompletionLog, MealLog } from '../types';
-import { isHostAdmin, computeSubscriptionStatus, getPlanDisplayBadge } from '../lib/subscription';
+import { isHostAdmin, checkIsHostOnServer, computeSubscriptionStatus, getPlanDisplayBadge } from '../lib/subscription';
 import { HelpArticlesModal } from './HelpArticlesModal';
 import { subscribeDriveSyncStatus, getDriveStatus, DriveSyncStatus } from '../lib/userMemory';
 
@@ -36,6 +36,7 @@ interface SettingsModalProps {
   workoutLogs: WorkoutCompletionLog[];
   mealLogs: MealLog[];
   calculatedStreak: number;
+  isHostAdminUser?: boolean;
   onOpenOnboarding: () => void;
   onOpenCheckIn: () => void;
   onOpenCalibration: () => void;
@@ -59,6 +60,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   workoutLogs,
   mealLogs,
   calculatedStreak,
+  isHostAdminUser,
   onOpenOnboarding,
   onOpenCheckIn,
   onOpenCalibration,
@@ -78,6 +80,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
   const [defaultHelpArticleId, setDefaultHelpArticleId] = useState<string>('scan-meal');
   const [driveStatus, setDriveStatus] = useState<DriveSyncStatus>(() => getDriveStatus());
+  const [serverIsHost, setServerIsHost] = useState<boolean>(false);
 
   useEffect(() => {
     return subscribeDriveSyncStatus((status) => {
@@ -85,7 +88,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     });
   }, []);
 
-  const isHost = isHostAdmin(userProfile.email) || isHostAdmin(currentUser?.email);
+  useEffect(() => {
+    const em = userProfile?.email || currentUser?.email;
+    if (!em) {
+      setServerIsHost(false);
+      return;
+    }
+    let isMounted = true;
+    checkIsHostOnServer(em).then((val) => {
+      if (isMounted) setServerIsHost(val);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [userProfile?.email, currentUser?.email]);
+
+  const isHost = Boolean(isHostAdminUser ?? serverIsHost);
   const activeSub = computeSubscriptionStatus(userProfile.subscription, userProfile.email || currentUser?.email);
 
   // Calibration days since last update
@@ -302,7 +320,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 className="w-full p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center justify-between"
               >
                 <div className="flex items-center gap-2.5">
-                  <CheckSquare className="w-4 h-4 text-[#D4AF37]" />
+                  <CheckSquare className="w-4 h-4 text-[#3B82F6]" />
                   <div>
                     <div className="text-xs font-bold text-gray-900 dark:text-white">Google Keep Sync</div>
                     <div className="text-[11px] text-gray-500">Sync workout checklists & grocery lists</div>

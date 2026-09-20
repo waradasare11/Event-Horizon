@@ -142,13 +142,13 @@ export const IntermittentFastingCard: React.FC<IntermittentFastingCardProps> = (
   };
 
   return (
-    <div className="bg-white dark:bg-[#111111] p-5 sm:p-6 rounded-3xl border border-[#D4AF37]/20 shadow-xs space-y-5">
+    <div className="bg-white dark:bg-[#111111] p-5 sm:p-6 rounded-3xl border border-[#3B82F6]/20 shadow-xs space-y-5">
       {/* Header & Main Toggle */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <span className={`p-2.5 rounded-2xl transition-all ${
             settings.enabled 
-              ? 'bg-[#D4AF37] text-white shadow-xs' 
+              ? 'bg-[#3B82F6] text-white shadow-xs' 
               : 'bg-gray-100 dark:bg-[#252826] text-gray-500'
           }`}>
             <Clock className="w-5 h-5" />
@@ -159,7 +159,7 @@ export const IntermittentFastingCard: React.FC<IntermittentFastingCardProps> = (
                 Intermittent Fasting Schedule
               </h3>
               {settings.enabled && (
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] border border-[#D4AF37]/20">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#3B82F6]/10 text-[#3B82F6] dark:text-[#60A5FA] border border-[#3B82F6]/20">
                   {settings.protocol} Active
                 </span>
               )}
@@ -179,7 +179,7 @@ export const IntermittentFastingCard: React.FC<IntermittentFastingCardProps> = (
             type="button"
             onClick={handleToggleEnabled}
             className={`w-12 h-6.5 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-              settings.enabled ? 'bg-[#D4AF37]' : 'bg-gray-300 dark:bg-[#343836]'
+              settings.enabled ? 'bg-[#3B82F6]' : 'bg-gray-300 dark:bg-[#343836]'
             }`}
             aria-label="Toggle Intermittent Fasting"
           >
@@ -207,7 +207,7 @@ export const IntermittentFastingCard: React.FC<IntermittentFastingCardProps> = (
                 onClick={() => handleProtocolSelect(proto)}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   settings.protocol === proto
-                    ? 'bg-[#D4AF37] text-white shadow-xs'
+                    ? 'bg-[#3B82F6] text-white shadow-xs'
                     : 'bg-gray-100 dark:bg-[#252826] text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#2E3230]'
                 }`}
               >
@@ -218,7 +218,7 @@ export const IntermittentFastingCard: React.FC<IntermittentFastingCardProps> = (
             <button
               type="button"
               onClick={() => setIsEditingWindow(!isEditingWindow)}
-              className="ml-auto text-xs font-bold text-[#D4AF37] dark:text-[#F0D060] hover:underline flex items-center gap-1 cursor-pointer"
+              className="ml-auto text-xs font-bold text-[#3B82F6] dark:text-[#60A5FA] hover:underline flex items-center gap-1 cursor-pointer"
             >
               <Sliders className="w-3.5 h-3.5" />
               <span>{isEditingWindow ? 'Done' : 'Custom Window'}</span>
@@ -258,21 +258,21 @@ export const IntermittentFastingCard: React.FC<IntermittentFastingCardProps> = (
           <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
             isCurrentlyFasting
               ? 'bg-gradient-to-r from-amber-500/10 via-orange-500/5 to-transparent dark:from-amber-950/30 dark:via-[#111111] dark:to-[#111111] border-amber-500/30'
-              : 'bg-gradient-to-r from-[#D4AF37]/10 via-[#D4AF37]/5 to-transparent dark:from-[#111111]/30 dark:via-[#111111] dark:to-[#111111] border-[#D4AF37]/30'
+              : 'bg-gradient-to-r from-[#3B82F6]/10 via-[#3B82F6]/5 to-transparent dark:from-[#111111]/30 dark:via-[#111111] dark:to-[#111111] border-[#3B82F6]/30'
           }`}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <span className={`p-2.5 rounded-2xl ${
                   isCurrentlyFasting 
                     ? 'bg-amber-500 text-white shadow-xs' 
-                    : 'bg-[#D4AF37] text-white shadow-xs'
+                    : 'bg-[#3B82F6] text-white shadow-xs'
                 }`}>
                   {isCurrentlyFasting ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
                 </span>
                 <div>
                   <div className="flex items-center gap-2">
                     <span className={`text-xs font-black uppercase tracking-wider ${
-                      isCurrentlyFasting ? 'text-amber-800 dark:text-amber-300' : 'text-[#8E701C] dark:text-[#F0D060]'
+                      isCurrentlyFasting ? 'text-amber-800 dark:text-amber-300' : 'text-[#8E701C] dark:text-[#60A5FA]'
                     }`}>
                       {isCurrentlyFasting ? '⏳ Fasting Window Active' : '🍽️ Eating Window Open'}
                     </span>

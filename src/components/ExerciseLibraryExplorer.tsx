@@ -146,11 +146,11 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
   return (
     <div className="space-y-6 text-left">
       {/* Top Equipment Selection Banner */}
-      <div className="bg-white dark:bg-[#111111] p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs">
+      <div className="bg-white dark:bg-[#0E1424] p-5 sm:p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B] shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
+              <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#00D4FF]/10 text-[#00D4FF] dark:text-[#38BDF8]">
                 168 Biomechanical Movement Database
               </span>
               <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">Hypertrophy Quality & Effectiveness Ranked</span>
@@ -169,8 +169,8 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
               onClick={() => onEquipmentChange('full_gym')}
               className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
                 currentEquipment === 'full_gym'
-                  ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-xs'
-                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37]'
+                  ? 'bg-[#00D4FF] text-white border-[#00D4FF] shadow-xs'
+                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#1E293B] hover:border-[#00D4FF]'
               }`}
             >
               🏋️ Commercial Gym
@@ -180,8 +180,8 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
               onClick={() => onEquipmentChange('dumbbells_bench')}
               className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
                 currentEquipment === 'dumbbells_bench'
-                  ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-xs'
-                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37]'
+                  ? 'bg-[#00D4FF] text-white border-[#00D4FF] shadow-xs'
+                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#1E293B] hover:border-[#00D4FF]'
               }`}
             >
               🏠 DBs & Bench
@@ -191,8 +191,8 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
               onClick={() => onEquipmentChange('pullup_bands')}
               className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
                 currentEquipment === 'pullup_bands'
-                  ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-xs'
-                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37]'
+                  ? 'bg-[#00D4FF] text-white border-[#00D4FF] shadow-xs'
+                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#1E293B] hover:border-[#00D4FF]'
               }`}
             >
               🚪 Pull-Up & Bands
@@ -202,8 +202,8 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
               onClick={() => onEquipmentChange('bodyweight_only')}
               className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
                 currentEquipment === 'bodyweight_only'
-                  ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-xs'
-                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37]'
+                  ? 'bg-[#00D4FF] text-white border-[#00D4FF] shadow-xs'
+                  : 'bg-[#FAFAF8] dark:bg-[#1E201F] text-[#1A1D1B] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#1E293B] hover:border-[#00D4FF]'
               }`}
             >
               🤸 Pure Bodyweight
@@ -213,7 +213,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
 
         {/* Pure Bodyweight: Pull-Up Bar Access Toggle */}
         {currentEquipment === 'bodyweight_only' && (
-          <div className="mt-4 p-3.5 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
+          <div className="mt-4 p-3.5 rounded-xl bg-[#00D4FF]/10 border border-[#00D4FF]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3 animate-fadeIn">
             <div className="flex items-center gap-2.5">
               <span className="text-xl">🚪</span>
               <div>
@@ -234,8 +234,8 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                 onClick={() => setHasPullUpBar(true)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   hasPullUpBar
-                    ? 'bg-[#D4AF37] text-white shadow-2xs'
-                    : 'bg-white dark:bg-[#202422] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#2A2416]'
+                    ? 'bg-[#00D4FF] text-white shadow-2xs'
+                    : 'bg-white dark:bg-[#202422] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#1E293B]'
                 }`}
               >
                 ✓ Yes, I have a Bar
@@ -245,8 +245,8 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                 onClick={() => setHasPullUpBar(false)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   !hasPullUpBar
-                    ? 'bg-[#D4AF37] text-white shadow-2xs'
-                    : 'bg-white dark:bg-[#202422] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#2A2416]'
+                    ? 'bg-[#00D4FF] text-white shadow-2xs'
+                    : 'bg-white dark:bg-[#202422] text-[#6B7280] dark:text-[#9EA8A2] border border-[#E5E7EB] dark:border-[#1E293B]'
                 }`}
               >
                 ✕ No Bar (Pure Floor/Door)
@@ -256,7 +256,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
         )}
 
         {/* Filter Controls: Search, Category pills, Difficulty, Ranking */}
-        <div className="mt-5 pt-4 border-t border-[#E5E7EB] dark:border-[#2A2416] space-y-3">
+        <div className="mt-5 pt-4 border-t border-[#E5E7EB] dark:border-[#1E293B] space-y-3">
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
             <div className="relative flex-1">
               <Search className="w-4 h-4 text-[#9CA3AF] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -265,7 +265,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                 placeholder="Search exercise name, Hindi name, target muscle, or equipment..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9] placeholder-[#9CA3AF] focus:outline-none focus:border-[#D4AF37]"
+                className="w-full pl-9 pr-4 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9] placeholder-[#9CA3AF] focus:outline-none focus:border-[#00D4FF]"
               />
               {searchQuery && (
                 <button
@@ -283,7 +283,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                 <select
                   value={tierFilter}
                   onChange={(e) => setTierFilter(e.target.value)}
-                  className="px-2.5 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
+                  className="px-2.5 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
                 >
                   <option value="All">All Tiers</option>
                   <option value="S-Tier">S-Tier (Top Hypertrophy)</option>
@@ -297,7 +297,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="px-2.5 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
+                  className="px-2.5 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
                 >
                   <option value="effectiveness">⚡ Hypertrophy Effectiveness (Highest First)</option>
                   <option value="muscle_engagement">🎯 Muscle Activation / EMG (Highest First)</option>
@@ -310,7 +310,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                 <select
                   value={difficultyFilter}
                   onChange={(e) => setDifficultyFilter(e.target.value)}
-                  className="px-2.5 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
+                  className="px-2.5 py-1.5 rounded-xl bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none"
                 >
                   <option value="All">All Levels</option>
                   <option value="Beginner">Beginner</option>
@@ -329,7 +329,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-[#D4AF37] text-white shadow-2xs'
+                    ? 'bg-[#00D4FF] text-white shadow-2xs'
                     : 'bg-[#F3F4F6] dark:bg-[#1F2221] text-[#6B7280] dark:text-[#9EA8A2] hover:bg-gray-200 dark:hover:bg-[#282C2A]'
                 }`}
               >
@@ -343,7 +343,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
       {/* Exercises Count Header */}
       <div className="flex items-center justify-between">
         <div className="text-xs font-bold text-[#6B7280] dark:text-[#9EA8A2]">
-          Showing <span className="text-[#D4AF37] dark:text-[#F0D060]">{filteredExercises.length}</span> movements matched to your equipment setup
+          Showing <span className="text-[#00D4FF] dark:text-[#38BDF8]">{filteredExercises.length}</span> movements matched to your equipment setup
         </div>
         <div className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">
           Total Library: <span className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">{EXERCISE_LIBRARY.length} exercises</span>
@@ -353,7 +353,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-xl bg-[#1A1D1B] text-white text-xs font-semibold shadow-2xl flex items-center gap-2 border border-white/20 animate-in fade-in slide-in-from-bottom-3">
-          <CheckCircle2 className="w-4 h-4 text-[#F0D060]" />
+          <CheckCircle2 className="w-4 h-4 text-[#38BDF8]" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -386,7 +386,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
           return (
             <div
               key={item.id}
-              className="bg-white dark:bg-[#111111] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37]/50 transition-all shadow-xs flex flex-col justify-between overflow-hidden"
+              className="bg-white dark:bg-[#0E1424] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B] hover:border-[#00D4FF]/50 transition-all shadow-xs flex flex-col justify-between overflow-hidden"
             >
               <div>
                 {/* Visual Action Demonstration Image Preview with YouTube Launcher */}
@@ -409,7 +409,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-xs ${
                         rank === 'S-Tier'
                           ? 'bg-amber-500/90 text-white'
-                          : 'bg-[#A68523]/90 text-white'
+                          : 'bg-[#0369A1]/90 text-white'
                       }`}>
                         <Award className="w-3 h-3" />
                         {rank} • {score}/10
@@ -448,7 +448,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                   <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${bioClass.badgeColor}`}>
                     {bioClass.tierLabel}
                   </span>
-                  <span className="text-xs font-semibold text-[#D4AF37] dark:text-[#F0D060]">
+                  <span className="text-xs font-semibold text-[#00D4FF] dark:text-[#38BDF8]">
                     {item.targetMuscle}
                   </span>
                   <span className="text-xs text-[#9CA3AF] dark:text-[#6B7280]">
@@ -461,14 +461,14 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                   {item.name}
                 </h3>
                 {item.hindiTerminology && (
-                  <p className="text-[11px] font-medium text-amber-700 dark:text-amber-400 mt-0.5">
+                  <p className="text-[11px] font-medium text-amber-700 dark:text-cyan-400 mt-0.5">
                     🇮🇳 {item.hindiTerminology}
                   </p>
                 )}
 
                 {/* Movement Pattern & Biomechanical Classification */}
                 <div className="mt-1 flex items-center gap-2 text-xs text-[#6B7280] dark:text-[#9EA8A2]">
-                  <span className="font-semibold text-[#D4AF37] dark:text-[#F0D060]">{bioClass.movementPattern}</span>
+                  <span className="font-semibold text-[#00D4FF] dark:text-[#38BDF8]">{bioClass.movementPattern}</span>
                   <span>•</span>
                   <span>{bioClass.jointType}</span>
                 </div>
@@ -491,8 +491,8 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                   >
                     {isCopied ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-[#D4AF37]" />
-                        <span className="text-[#B8922A] dark:text-[#F0D060] font-bold">Copied!</span>
+                        <Check className="w-3.5 h-3.5 text-[#00D4FF]" />
+                        <span className="text-[#0284C7] dark:text-[#38BDF8] font-bold">Copied!</span>
                       </>
                     ) : (
                       <>
@@ -504,7 +504,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                 </div>
 
                 {/* Biomechanical Cue */}
-                <div className="mt-3 p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs text-[#4B5563] dark:text-[#9CA3AF] space-y-1">
+                <div className="mt-3 p-2.5 rounded-xl bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-xs text-[#4B5563] dark:text-[#9CA3AF] space-y-1">
                   <div className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-[#E8912D]" />
                     <span>Biomechanical Cue</span>
@@ -514,12 +514,12 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
               </div>
 
               {/* Action Buttons: Quick View & Add to Day */}
-              <div className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between gap-2">
+              <div className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#1E293B] flex items-center justify-between gap-2">
                 <button
                   onClick={() => setQuickViewExercise(item)}
                   className="flex-1 px-3 py-2 rounded-xl bg-gray-100 dark:bg-[#1F2221] hover:bg-gray-200 dark:hover:bg-[#282C2A] text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                 >
-                  <Eye className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
+                  <Eye className="w-3.5 h-3.5 text-[#00D4FF] dark:text-[#38BDF8]" />
                   <span>⚡ Detailed Form Guide</span>
                 </button>
 
@@ -529,7 +529,7 @@ export const ExerciseLibraryExplorer: React.FC<ExerciseLibraryExplorerProps> = (
                     className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-2xs ${
                       isRecentlyAdded
                         ? 'bg-[#16A34A] text-white'
-                        : 'bg-[#D4AF37] hover:bg-[#A68523] text-white'
+                        : 'bg-[#00D4FF] hover:bg-[#0369A1] text-white'
                     }`}
                   >
                     {isRecentlyAdded ? (

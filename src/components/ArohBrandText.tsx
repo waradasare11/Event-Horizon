@@ -36,7 +36,7 @@ export const ArohBrandText: React.FC<ArohBrandTextProps> = ({
         </span>
       )}
       {showBadge && (
-        <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-400/30 text-amber-400 tracking-wider font-['Space_Grotesk',sans-serif]">
+        <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-cyan-500/15 border border-amber-400/30 text-cyan-400 tracking-wider font-['Space_Grotesk',sans-serif]">
           SMART
         </span>
       )}

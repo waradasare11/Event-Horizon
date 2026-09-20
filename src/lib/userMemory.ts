@@ -22,7 +22,7 @@ import {
 } from '../types';
 import { ThemeMode } from './theme';
 import { getOrCreateArohFolder } from './googleWorkspace';
-import { getCurrentActiveEmail, setCurrentActiveEmail } from './storage';
+import { getCurrentActiveEmail, setCurrentActiveEmail, getStoredProfile } from './storage';
 import { auth, db } from './firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
@@ -575,16 +575,70 @@ function buildMetricsCsv(bodyMetrics: BodyMetric[]): string {
 }
 
 /**
- * Upserts AROH_UserMemory.json and human-readable CSVs directly into user's Drive
+ * Upserts AROH_UserMemory.json and human-readable CSVs directly into user's Drive.
+ * If user skips Drive, Firestore + scoped localStorage still persist with status: "Saved to AROH".
+ * Host ledger JSON is never uploaded or saved to user memory.
  */
 async function executeDriveSave(snapshot: UserMemorySnapshot): Promise<void> {
   const email = snapshot.email.trim().toLowerCase();
+
+  // Always persist to Firestore users/{uid} and users/{uid}/userData/main as durable cloud storage
+  if (snapshot.uid) {
+    try {
+      const userMainRef = doc(db, 'users', snapshot.uid, 'userData', 'main');
+      await setDoc(
+        userMainRef,
+        {
+          ...snapshot,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+
+      const userProfileRef = doc(db, 'users', snapshot.uid);
+      const prof = snapshot.userProfile || ({} as any);
+      await setDoc(
+        userProfileRef,
+        {
+          userId: snapshot.uid,
+          email: snapshot.email,
+          name: prof.name || 'Athlete',
+          goal: prof.goal || 'lose_fat',
+          weightKg: Number(prof.weightKg) || 0,
+          heightCm: Number(prof.heightCm) || 0,
+          targetWeightKg: Number(prof.targetWeightKg) || 0,
+          dailyCalories: Number(prof.dailyCalories) || 2000,
+          dailyProtein: Number(prof.dailyProtein) || 120,
+          dailyCarbs: Number(prof.dailyCarbs) || 200,
+          dailyFats: Number(prof.dailyFats) || 60,
+          dietaryPreference: prof.dietaryPreference || 'vegetarian',
+          injuries: prof.injuries || [],
+          isOnboarded: Boolean(prof.isOnboarded || (prof.goal && Number(prof.dailyCalories) > 0 && Number(prof.weightKg) > 0)),
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
+    } catch (fsErr) {
+      console.warn('Notice saving to Firestore persistence layer:', fsErr);
+    }
+  }
+
   const token = await getValidDriveAccessToken(email);
 
   if (!token) {
-    // If not connected or token expired, queue in IndexedDB
-    await queuePendingOfflineSync(snapshot);
-    notifyDriveStatus({ status: 'reconnect_needed' });
+    // If user previously connected Drive and token expired, queue offline and prompt reconnect
+    const authData = getStoredDriveAuth(email);
+    if (authData?.driveFolderId) {
+      await queuePendingOfflineSync(snapshot);
+      notifyDriveStatus({ status: 'reconnect_needed' });
+    } else {
+      // If user skips Drive: Firestore + scoped localStorage still persist. Status: 'Saved to AROH'
+      notifyDriveStatus({
+        status: 'synced',
+        lastSavedAt: 'Saved to AROH',
+        folderId: null,
+      });
+    }
     return;
   }
 
@@ -643,20 +697,6 @@ async function executeDriveSave(snapshot: UserMemorySnapshot): Promise<void> {
 
     // Clear any queued offline sync
     await clearPendingOfflineSync(email);
-
-    // Also mirror to Firestore users/{uid}/userData/main as secondary backup
-    if (snapshot.uid) {
-      try {
-        const userMainRef = doc(db, 'users', snapshot.uid, 'userData', 'main');
-        await setDoc(userMainRef, {
-          ...snapshot,
-          updatedAt: new Date().toISOString(),
-          source: 'drive-mirror',
-        }, { merge: true });
-      } catch (fsErr) {
-        console.warn('Notice mirroring to secondary Firestore backup:', fsErr);
-      }
-    }
 
     const nowIso = new Date().toISOString();
     if (authData) {
@@ -928,6 +968,26 @@ export async function restoreUserMemory(
           } as any);
         }
       }
+
+      // If userData/main not found, check doc(db, 'users', uid) directly
+      if (!firestoreSnapshot) {
+        const userProfileRef = doc(db, 'users', uid);
+        const profDoc = await getDoc(userProfileRef);
+        if (profDoc.exists()) {
+          const pData = profDoc.data();
+          if (pData && (!pData.email || pData.email.trim().toLowerCase() === cleanEmail)) {
+            if (pData.isOnboarded || (pData.goal && Number(pData.dailyCalories) > 0 && Number(pData.weightKg) > 0)) {
+              firestoreSnapshot = sanitizeSnapshotForDrive({
+                schemaVersion: 1,
+                email: cleanEmail,
+                uid,
+                savedAt: pData.updatedAt || new Date().toISOString(),
+                userProfile: pData as UserProfile,
+              });
+            }
+          }
+        }
+      }
     } catch (fsErr) {
       console.warn('Notice reading secondary Firestore snapshot on restore:', fsErr);
     }
@@ -986,9 +1046,27 @@ export async function restoreUserMemory(
     // IDENTITY RULE: If local snapshot email does not match active auth email -> DISCARD
     if (!localSnapshot.email || localSnapshot.email.trim().toLowerCase() !== cleanEmail) {
       console.warn('Discarded local snapshot with missing or mismatched email:', localSnapshot.email, '!=', cleanEmail);
-    } else if (localSnapshot.userProfile?.goal || (localSnapshot.mealLogs && localSnapshot.mealLogs.length > 0) || (localSnapshot.workoutLogs && localSnapshot.workoutLogs.length > 0)) {
-      return { snapshot: localSnapshot, isNewAthlete: false, source: 'local' };
+    } else {
+      const p = localSnapshot.userProfile;
+      const isConfigured = Boolean(
+        p?.isOnboarded ||
+        (p?.goal && Number(p?.dailyCalories) > 0 && Number(p?.weightKg) > 0)
+      );
+      if (isConfigured || (localSnapshot.mealLogs && localSnapshot.mealLogs.length > 0) || (localSnapshot.workoutLogs && localSnapshot.workoutLogs.length > 0)) {
+        return { snapshot: localSnapshot, isNewAthlete: false, source: 'local' };
+      }
     }
+  }
+
+  // Also check email-scoped getStoredProfile
+  const storedProfile = getStoredProfile(cleanEmail);
+  if (
+    storedProfile &&
+    (storedProfile.isOnboarded || (storedProfile.goal && Number(storedProfile.dailyCalories) > 0 && Number(storedProfile.weightKg) > 0))
+  ) {
+    const fallbackSnap = buildUserMemorySnapshot(cleanEmail, storedProfile, [], []);
+    saveUserMemoryToLocal(fallbackSnap);
+    return { snapshot: fallbackSnap, isNewAthlete: false, source: 'local' };
   }
 
   // Step 5: No previous data exists for this user anywhere -> NEW athlete

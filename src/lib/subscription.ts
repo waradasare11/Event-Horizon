@@ -667,21 +667,14 @@ export async function grantUserFreeSubscription(params: {
     expiresAt,
   };
 
-  // 1. Local storage caching for instant client-side lookup & UI responsiveness
+  // 1. Host grant persistence is server & firestore authoritative (Rule 4: client does not write host_ledger or grants to localStorage)
   try {
-    const cachedGrantsRaw = getStoredItemMigrated('aroh_host_grants_cache', 'peakform_host_grants_cache') || localStorage.getItem('peakform_host_grants_v2');
-    let cachedGrants: HostGrantedSubscription[] = cachedGrantsRaw ? JSON.parse(cachedGrantsRaw) : [];
-    cachedGrants = cachedGrants.filter((g) => g.email.toLowerCase() !== cleanTargetEmail);
-    cachedGrants.unshift(grantData);
-    localStorage.setItem('aroh_host_grants_cache', JSON.stringify(cachedGrants));
-    localStorage.setItem('aroh_host_grants_v2', JSON.stringify(cachedGrants));
-
-    // Also update host ledger records in localStorage
-    const ledgerRaw = getStoredItemMigrated('aroh_host_ledger', 'peakform_host_ledger');
-    let ledger: HostGrantedSubscription[] = ledgerRaw ? JSON.parse(ledgerRaw) : [];
-    ledger = ledger.filter((g) => g.email.toLowerCase() !== cleanTargetEmail);
-    ledger.unshift(grantData);
-    localStorage.setItem('aroh_host_ledger', JSON.stringify(ledger));
+    localStorage.removeItem('aroh_host_grants_cache');
+    localStorage.removeItem('aroh_host_grants_v2');
+    localStorage.removeItem('aroh_host_ledger');
+    localStorage.removeItem('peakform_host_ledger');
+    localStorage.removeItem('peakform_host_grants_cache');
+    localStorage.removeItem('peakform_host_grants_v2');
 
     // Update any cached user profile for this target email
     const profileKey = `aroh_user_profile_${cleanTargetEmail}`;
@@ -788,38 +781,23 @@ export async function grantUserFreeSubscription(params: {
 }
 
 /**
- * Fetch all host-granted subscriptions from server, Firestore & local persistent storage
+ * Fetch all host-granted subscriptions from server & Firestore (Server is authoritative)
  */
 export async function fetchHostGrantedSubscriptions(pin?: string, email?: string): Promise<HostGrantedSubscription[]> {
   const map = new Map<string, HostGrantedSubscription>();
 
-  // 1. Read local storage cache first for instant response
+  // Clean legacy host storage keys
   try {
     const rawKeys = [
       'aroh_host_ledger', 'aroh_host_grants_v2', 'aroh_host_grants_cache',
       'peakform_host_ledger', 'peakform_host_grants_v2', 'peakform_host_grants_cache'
     ];
-    for (const key of rawKeys) {
-      const raw = localStorage.getItem(key);
-      if (raw) {
-        const list: HostGrantedSubscription[] = JSON.parse(raw);
-        if (Array.isArray(list)) {
-          list.forEach((g) => {
-            if (g && g.email) {
-              const clean = g.email.trim().toLowerCase();
-              if (!map.has(clean)) {
-                map.set(clean, g);
-              }
-            }
-          });
-        }
-      }
-    }
-  } catch (e) {
-    // continue
-  }
+    rawKeys.forEach(k => {
+      try { localStorage.removeItem(k); } catch (e) {}
+    });
+  } catch (e) {}
 
-  // 2. Fetch from backend server
+  // 1. Fetch from backend server (Authoritative)
   try {
     const hostEmail = email || '';
     const hostPin = pin || '';
@@ -841,7 +819,7 @@ export async function fetchHostGrantedSubscriptions(pin?: string, email?: string
     console.warn('Server fetch grants fallback notice:', e);
   }
 
-  // 3. Fetch from Firestore collections
+  // 2. Fetch from Firestore collections
   try {
     const { fetchAllHostGrantedSubscriptions } = await import('./firestoreSync');
     const firestoreGrants = await fetchAllHostGrantedSubscriptions();
@@ -863,17 +841,6 @@ export async function fetchHostGrantedSubscriptions(pin?: string, email?: string
     return new Date(b.grantedAt || 0).getTime() - new Date(a.grantedAt || 0).getTime();
   });
 
-  // Keep local caches fully synced
-  try {
-    if (merged.length > 0) {
-      localStorage.setItem('aroh_host_ledger', JSON.stringify(merged));
-      localStorage.setItem('aroh_host_grants_v2', JSON.stringify(merged));
-      localStorage.setItem('aroh_host_grants_cache', JSON.stringify(merged));
-    }
-  } catch (e) {
-    // ignore
-  }
-
   return merged;
 }
 
@@ -889,16 +856,10 @@ export async function revokeHostGrantedSubscription(email: string, pin: string, 
       'aroh_host_ledger', 'aroh_host_grants_v2', 'aroh_host_grants_cache',
       'peakform_host_ledger', 'peakform_host_grants_v2', 'peakform_host_grants_cache'
     ];
-    for (const key of rawKeys) {
-      const raw = localStorage.getItem(key);
-      if (raw) {
-        let list: HostGrantedSubscription[] = JSON.parse(raw);
-        if (Array.isArray(list)) {
-          list = list.filter((g) => g.email.trim().toLowerCase() !== cleanEmail);
-          localStorage.setItem(key, JSON.stringify(list));
-        }
-      }
-    }
+    rawKeys.forEach(key => {
+      try { localStorage.removeItem(key); } catch (e) {}
+    });
+    try { localStorage.removeItem(`aroh_user_grant_${cleanEmail}`); } catch (e) {}
   } catch (e) {
     // ignore
   }
@@ -1759,9 +1720,8 @@ export async function notifyAllActiveSubscribers(
     }
     throw new Error(data.error || 'Failed to dispatch notifications');
   } catch (err: any) {
-    // Client-side fallback: calculate notifications from local cache
-    const rawLedger = getStoredItemMigrated('aroh_host_ledger', 'peakform_host_ledger') || getStoredItemMigrated('aroh_host_grants_cache', 'peakform_host_grants_cache');
-    const grants: HostGrantedSubscription[] = rawLedger ? JSON.parse(rawLedger) : [];
+    // Client-side fallback: calculate notifications from server/firestore grants
+    const grants = await fetchHostGrantedSubscriptions(pin, email);
     const now = Date.now();
     const activeGrants = grants.filter((g) => {
       if (g.status !== 'active') return false;
@@ -1807,8 +1767,7 @@ export async function notifyExpiringSubscribers(
   daysThreshold: number = 3,
   customMessage?: string
 ): Promise<{ success: boolean; message: string; totalNotified: number; notifications: any[] }> {
-  const rawLedger = getStoredItemMigrated('aroh_host_ledger', 'peakform_host_ledger') || getStoredItemMigrated('aroh_host_grants_cache', 'peakform_host_grants_cache');
-  const grants: HostGrantedSubscription[] = rawLedger ? JSON.parse(rawLedger) : [];
+  const grants = await fetchHostGrantedSubscriptions(pin, email);
   const now = Date.now();
 
   const expiringGrants = grants.filter((g) => {
@@ -1985,17 +1944,7 @@ export async function recordAthleteLoginSession(profile?: any): Promise<void> {
       notes: `Verified login session from ${timezone} on ${deviceFingerprint}`,
     };
 
-    // 1. Cache to local storage logins list
-    try {
-      const rawLocal = getStoredItemMigrated('aroh_athlete_logins_local', 'peakform_athlete_logins_local');
-      let localList: AthleteLoginRecord[] = rawLocal ? JSON.parse(rawLocal) : [];
-      localList.unshift(loginPayload);
-      localStorage.setItem('aroh_athlete_logins_local', JSON.stringify(localList.slice(0, 150)));
-    } catch (e) {
-      // ignore
-    }
-
-    // 2. Dual async persistence to server and Firestore
+    // Dual async persistence to server and Firestore (Server & Firestore are authoritative)
     fetch('/api/host/record-login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -2014,7 +1963,7 @@ export async function recordAthleteLoginSession(profile?: any): Promise<void> {
 
 /**
  * Fetch complete history of athlete logins and aggregated profile details
- * Merges server records, Firestore records, and local storage seamlessly.
+ * Merges server records and Firestore records seamlessly (Server is authoritative).
  */
 export async function fetchAthleteLogins(pin: string = '', email: string = ''): Promise<{
   success: boolean;
@@ -2026,18 +1975,13 @@ export async function fetchAthleteLogins(pin: string = '', email: string = ''): 
 }> {
   const loginMap = new Map<string, AthleteLoginRecord>();
 
-  // 1. Load local cache
+  // Clean any legacy athlete logins from localStorage
   try {
-    const rawLocal = getStoredItemMigrated('aroh_athlete_logins_local', 'peakform_athlete_logins_local');
-    if (rawLocal) {
-      const parsed: AthleteLoginRecord[] = JSON.parse(rawLocal);
-      parsed.forEach((l) => {
-        if (l && l.id) loginMap.set(l.id, l);
-      });
-    }
+    localStorage.removeItem('aroh_athlete_logins_local');
+    localStorage.removeItem('peakform_athlete_logins_local');
   } catch (e) {}
 
-  // 2. Load from server
+  // 1. Load from server (Authoritative)
   try {
     const res = await fetch('/api/host/athlete-logins', {
       headers: {
@@ -2057,7 +2001,7 @@ export async function fetchAthleteLogins(pin: string = '', email: string = ''): 
     console.warn('Server fetchAthleteLogins notice:', e);
   }
 
-  // 3. Load from Firestore
+  // 2. Load from Firestore
   try {
     const firestoreLogins = await fetchAthleteLoginsFromFirestore();
     firestoreLogins.forEach((l) => {
@@ -2141,20 +2085,6 @@ export async function executeBulkOperation(request: {
     });
     const data = await res.json();
     if (data && data.success) {
-      // Update local storage grants if returned
-      if (data.updatedGrants && Array.isArray(data.updatedGrants)) {
-        try {
-          const cachedRaw = getStoredItemMigrated('aroh_host_ledger', 'peakform_host_ledger');
-          let currentList: HostGrantedSubscription[] = cachedRaw ? JSON.parse(cachedRaw) : [];
-          const affectedSet = new Set(data.affectedEmails.map((e: string) => e.toLowerCase()));
-          currentList = currentList.filter((g) => !affectedSet.has(g.email.toLowerCase()));
-          currentList = [...data.updatedGrants, ...currentList];
-          localStorage.setItem('aroh_host_ledger', JSON.stringify(currentList));
-          localStorage.setItem('aroh_host_grants_cache', JSON.stringify(currentList));
-        } catch (err) {
-          // ignore
-        }
-      }
       return data;
     }
     return {

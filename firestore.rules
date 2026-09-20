@@ -77,6 +77,11 @@ service cloud.firestore {
       allow update: if isOwner(userId) && isValidUserProfile(incoming(), userId) && incoming().userId == existing().userId;
       allow delete: if isOwner(userId);
 
+      // User Memory Snapshot Subcollection
+      match /userData/{docId} {
+        allow read, write: if isOwner(userId);
+      }
+
       // Meal Logs Subcollection
       match /mealLogs/{mealLogId} {
         allow get, list: if isOwner(userId);

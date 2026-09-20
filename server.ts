@@ -5066,7 +5066,7 @@ app.post("/api/host/verify-pin", (req, res) => {
   }
 
   const cleanEmail = String(email || "").trim().toLowerCase();
-  if (HOST_EMAIL && cleanEmail && cleanEmail !== HOST_EMAIL) {
+  if (!HOST_EMAIL || !cleanEmail || cleanEmail !== HOST_EMAIL.toLowerCase()) {
     recordPinFailure(rateLimitKey);
     return res.status(403).json({ success: false, error: "Unauthorized. Host email required." });
   }
@@ -5966,17 +5966,16 @@ app.post("/api/host/clear-ledger", (req, res) => {
   });
 });
 
-// 14.6 View Verified Ledger
+// 14.6 View Verified Ledger (Host PIN + Host Email Protected)
 app.get("/api/subscription/ledger", (req, res) => {
-  const authEmail = req.headers["x-host-email"] || req.query.email;
-  const pin = req.headers["x-host-pin"];
+  const authEmail = (req.headers["x-host-email"] as string) || (req.query.email as string);
+  const pin = (req.headers["x-host-pin"] as string) || (req.query.pin as string);
 
-  // Host check
-  if (String(authEmail).toLowerCase() !== HOST_EMAIL.toLowerCase()) {
-    return res.json({
-      success: true,
-      totalVerified: serverLedger.filter((t) => t.status === "verified").length,
-      hostVpa: HOST_VPA,
+  // Strictly Host check with PIN
+  if (!HOST_EMAIL || !authEmail || String(authEmail).trim().toLowerCase() !== HOST_EMAIL.toLowerCase() || !verifyHostPin(pin)) {
+    return res.status(403).json({
+      success: false,
+      error: "Host Security PIN and host email verification required to access verified transaction ledger.",
     });
   }
 

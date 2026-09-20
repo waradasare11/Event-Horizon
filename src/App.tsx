@@ -73,9 +73,6 @@ import { HostAdminPortalModal } from './components/HostAdminPortalModal';
 import { ReportAppErrorModal } from './components/ReportAppErrorModal';
 import { PerformanceDashboardModal } from './components/PerformanceDashboardModal';
 import { GoogleKeepSyncModal } from './components/GoogleKeepSyncModal';
-import { MainDashboardControlHub } from './components/MainDashboardControlHub';
-import { SyncRepairNotification } from './components/SyncRepairNotification';
-import { DailyMotivationWidget } from './components/DailyMotivationWidget';
 import { GlobalSyncStatus } from './components/GlobalSyncStatus';
 import { CommunityChallenges } from './components/CommunityChallenges';
 import { QuarterlyProfileCalibrationModal } from './components/QuarterlyProfileCalibrationModal';
@@ -313,21 +310,42 @@ export default function App() {
 
         // Steps 1-4: Restore from Google Drive (Source of Truth) -> Firestore secondary cache -> Local fallback
         restoreUserMemory(email, user.uid).then((restored) => {
-          if (restored.snapshot) {
-            const snap = restored.snapshot;
+          if (!restored) return;
+
+          const snap = restored.snapshot;
+          // IDENTITY RULE: If snapshot.email !== auth email -> discard snapshot
+          if (snap && snap.email && snap.email.trim().toLowerCase() !== email) {
+            console.warn('Discarded snapshot with mismatched email:', snap.email, '!==', email);
+            setIsOnboardingOpen(true);
+            return;
+          }
+
+          const prof = snap?.userProfile;
+          const isReturning = Boolean(
+            prof && (
+              prof.isOnboarded ||
+              (prof.goal && Number(prof.dailyCalories) > 0 && Number(prof.weightKg) > 0)
+            )
+          );
+
+          if (isReturning && snap) {
             const mergedProfile: UserProfile = {
-              ...updatedInitial,
+              ...stored,
               ...snap.userProfile,
               email,
-              name: user.displayName || snap.userProfile?.name || updatedInitial.name,
-              isOnboarded: Boolean(snap.userProfile?.isOnboarded || (snap.userProfile?.goal && snap.userProfile?.dailyCalories > 0)),
+              name: user.displayName || snap.userProfile?.name || stored.name || 'Athlete',
+              isOnboarded: true,
+              subscription: isHost ? createHostLifetimeSubscription() : (snap.userProfile?.subscription || stored.subscription || createInitialTrialSubscription()),
             };
             if (isHost) {
               mergedProfile.subscription = createHostLifetimeSubscription();
             }
+
+            // Hydrate profile
             setUserProfile(mergedProfile);
             saveStoredProfile(mergedProfile);
 
+            // Hydrate meals, workouts, metrics, etc.
             if (snap.mealLogs && snap.mealLogs.length > 0) {
               setMealLogs(snap.mealLogs);
               saveStoredMealLogs(snap.mealLogs, email);
@@ -353,6 +371,19 @@ export default function App() {
               saveStoredAIMealPlan(snap.aiMealPlan);
             }
 
+            // SKIP OnboardingModal completely
+            setIsOnboardingOpen(false);
+
+            // Go to Today
+            setActiveTab('today');
+
+            // Toast: "Welcome back, {name}. Your plan is loaded."
+            triggerSyncToast(
+              `Welcome back, ${mergedProfile.name || 'Athlete'}.`,
+              'Your plan is loaded.',
+              restored.source === 'drive' ? 'drive' : 'firestore'
+            );
+
             // Step 6: saveUserMemory('login-hydrate')
             saveUserMemory('login-hydrate', {
               email,
@@ -365,20 +396,26 @@ export default function App() {
               workoutPrograms: snap.workoutPrograms,
               aiMealPlan: snap.aiMealPlan,
             });
+          } else {
+            // New Gmail only: empty logs [], open onboarding ONCE.
+            const initialBlankProfile: UserProfile = {
+              ...stored,
+              email,
+              name: user.displayName || stored.name || 'Athlete',
+              subscription: isHost ? createHostLifetimeSubscription() : createInitialTrialSubscription(),
+              isOnboarded: false,
+            };
+            setUserProfile(initialBlankProfile);
+            saveStoredProfile(initialBlankProfile);
 
-            triggerSyncToast(
-              `Welcome back, ${mergedProfile.name || 'Athlete'}`,
-              `Restored ${snap.mealLogs?.length || 0} meals and ${snap.workoutLogs?.length || 0} workouts from your Google Drive.`,
-              'drive'
-            );
-          } else if (restored.isNewAthlete) {
-            // Step 5: If no snapshot at all: NEW athlete: blank onboarding profile, mealLogs = [], workoutLogs = [], bodyMetrics = [], open OnboardingModal
+            setMealLogs([]);
+            setWorkoutLogs([]);
+            setBodyMetrics([]);
+            setFormAnalyses([]);
+            setWorkoutPrograms([]);
+            setAiMealPlan(null);
+
             setIsOnboardingOpen(true);
-            triggerSyncToast(
-              'Welcome to AROH',
-              'Your workouts and nutrition will be safely saved to your Google Drive folder AROH AI.',
-              'drive'
-            );
           }
         }).catch((err) => {
           console.warn('Memory restore error:', err);
@@ -991,83 +1028,86 @@ export default function App() {
     const cleanEmail = email.trim().toLowerCase();
     setCurrentActiveEmail(cleanEmail);
 
-    // 1. Check local storage first
-    const existing = getStoredProfile(cleanEmail);
-    const hasLocalValidProfile = Boolean(existing.isOnboarded && existing.goal && existing.dailyCalories > 0);
+    const isHost = isHostAdmin(cleanEmail);
 
-    // 2. Fetch all data directly from user's Google Drive
     try {
-      const driveData = await fetchUserDataFromGoogleDrive(cleanEmail);
-      if (driveData.success && driveData.userProfile) {
-        const restoredProfile: UserProfile = {
-          ...existing,
-          ...driveData.userProfile,
+      const restored = await restoreUserMemory(cleanEmail, currentUser?.uid);
+      const snap = restored?.snapshot;
+      const prof = snap?.userProfile;
+      const isReturning = Boolean(
+        prof && (
+          prof.isOnboarded ||
+          (prof.goal && Number(prof.dailyCalories) > 0 && Number(prof.weightKg) > 0)
+        )
+      );
+
+      if (isReturning && snap) {
+        const mergedProfile: UserProfile = {
+          ...getStoredProfile(cleanEmail),
+          ...snap.userProfile,
           email: cleanEmail,
-          name: name || driveData.userProfile.name || existing.name,
+          name: name || snap.userProfile?.name || 'Athlete',
           isOnboarded: true,
+          subscription: isHost ? createHostLifetimeSubscription() : (snap.userProfile?.subscription || createInitialTrialSubscription()),
         };
-        setUserProfile(restoredProfile);
-        saveStoredProfile(restoredProfile);
-        if (driveData.mealLogs && driveData.mealLogs.length > 0) {
-          setMealLogs(driveData.mealLogs);
-          saveStoredMealLogs(driveData.mealLogs, cleanEmail);
+        if (isHost) {
+          mergedProfile.subscription = createHostLifetimeSubscription();
         }
-        if (driveData.workoutLogs && driveData.workoutLogs.length > 0) {
-          setWorkoutLogs(driveData.workoutLogs);
-          saveStoredWorkoutLogs(driveData.workoutLogs, cleanEmail);
+
+        setUserProfile(mergedProfile);
+        saveStoredProfile(mergedProfile);
+
+        if (snap.mealLogs && snap.mealLogs.length > 0) {
+          setMealLogs(snap.mealLogs);
+          saveStoredMealLogs(snap.mealLogs, cleanEmail);
         }
-        if (driveData.bodyMetrics && driveData.bodyMetrics.length > 0) {
-          setBodyMetrics(driveData.bodyMetrics);
-          saveStoredBodyMetrics(driveData.bodyMetrics, cleanEmail);
+        if (snap.workoutLogs && snap.workoutLogs.length > 0) {
+          setWorkoutLogs(snap.workoutLogs);
+          saveStoredWorkoutLogs(snap.workoutLogs, cleanEmail);
         }
-        syncUserProfile(restoredProfile).catch(console.warn);
-        triggerSyncToast(
-          'Cloud Data Retrieved',
-          'Successfully retrieved your workout logs, nutrition history, and athletic profile from Google Drive.',
-          'drive'
-        );
+        if (snap.bodyMetrics && snap.bodyMetrics.length > 0) {
+          setBodyMetrics(snap.bodyMetrics);
+          saveStoredBodyMetrics(snap.bodyMetrics, cleanEmail);
+        }
+        if (snap.formAnalyses && snap.formAnalyses.length > 0) {
+          setFormAnalyses(snap.formAnalyses);
+          saveStoredFormAnalyses(snap.formAnalyses);
+        }
+        if (snap.workoutPrograms && snap.workoutPrograms.length > 0) {
+          setWorkoutPrograms(snap.workoutPrograms);
+          saveStoredWorkoutPrograms(snap.workoutPrograms);
+        }
+        if (snap.aiMealPlan) {
+          setAiMealPlan(snap.aiMealPlan);
+          saveStoredAIMealPlan(snap.aiMealPlan);
+        }
+
         setIsOnboardingOpen(false);
+        setActiveTab('today');
+        triggerSyncToast(
+          `Welcome back, ${mergedProfile.name || 'Athlete'}.`,
+          'Your plan is loaded.',
+          restored?.source === 'drive' ? 'drive' : 'firestore'
+        );
         return;
       }
     } catch (driveErr) {
-      console.warn('Google Drive instant restore error:', driveErr);
+      console.warn('Memory restore error in handleSuccessAuth:', driveErr);
     }
 
-    if (hasLocalValidProfile) {
-      const updated: UserProfile = {
-        ...existing,
-        email: cleanEmail,
-        name: name || existing.name,
-        isOnboarded: true,
-      };
-      setUserProfile(updated);
-      saveStoredProfile(updated);
-      setMealLogs(getStoredMealLogs(cleanEmail));
-      setBodyMetrics(getStoredBodyMetrics(cleanEmail));
-      setWorkoutLogs(getStoredWorkoutLogs(cleanEmail));
-      setIsOnboardingOpen(false);
-      return;
-    }
-
-    // Only if completely new user with no profile in Drive or local storage
+    // Only if brand new athlete
+    const existing = getStoredProfile(cleanEmail);
     const trialSub = existing.subscription || createInitialTrialSubscription();
     const newAthlete: UserProfile = {
       ...existing,
       email: cleanEmail,
-      name: name || existing.name,
-      subscription: trialSub,
+      name: name || existing.name || 'Athlete',
+      subscription: isHost ? createHostLifetimeSubscription() : trialSub,
       isOnboarded: false,
     };
     handleSaveProfile(newAthlete);
     setIsOnboardingOpen(true);
   };
-
-  // Launch onboarding only if user email is present, NOT onboarded, AND has no configured goals
-  useEffect(() => {
-    if (userProfile.email && !userProfile.isOnboarded && !userProfile.goal) {
-      setIsOnboardingOpen(true);
-    }
-  }, [userProfile.email, userProfile.isOnboarded, userProfile.goal]);
 
   // Route 1: Real Legal Routes (Accessible to logged-out visitors without AuthGate or dashboard chrome)
   const legalRoutes: Record<string, LegalTabType> = {
@@ -1124,7 +1164,7 @@ export default function App() {
       onSaveProfile={handleSaveProfile}
       onExportData={handleExportData}
     >
-      <div className="min-h-screen bg-[#F7F1E3] dark:bg-[#070707] text-[#16120A] dark:text-[#F4EBD0] font-sans flex flex-col selection:bg-[#D4AF37]/30 selection:text-[#F0D060] transition-colors duration-200">
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0B0F1E] text-[#0F172A] dark:text-[#F8FAFC] font-sans flex flex-col selection:bg-[#00D4FF]/30 selection:text-[#38BDF8] transition-colors duration-200">
         {/* App Header & Navigation */}
         <Header
           activeTab={activeTab}
@@ -1161,13 +1201,13 @@ export default function App() {
         {(pendingCount > 0 || !isOnline) && (
           <div 
             id="pending-sync-alert-banner"
-            className="w-full bg-[#D4AF37]/10 border-b border-[#D4AF37]/20 px-4 py-2 text-xs font-medium text-[#6A5312] dark:text-[#F0D060] transition-all animate-in fade-in slide-in-from-top-1"
+            className="w-full bg-[#00D4FF]/10 border-b border-[#00D4FF]/20 px-4 py-2 text-xs font-medium text-[#0C4A6E] dark:text-[#38BDF8] transition-all animate-in fade-in slide-in-from-top-1"
           >
             <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D4FF] opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00D4FF]" />
                 </span>
                 <span>
                   {!isOnline 
@@ -1189,7 +1229,7 @@ export default function App() {
                       })
                       .finally(() => setIsSyncing(false));
                   }}
-                  className="px-2.5 py-1 rounded-md bg-gradient-to-r from-[#D4AF37] to-[#A68523] hover:opacity-90 text-white font-semibold text-[11px] transition-all cursor-pointer shadow-xs"
+                  className="px-2.5 py-1 rounded-md bg-gradient-to-r from-[#00D4FF] to-[#0369A1] hover:opacity-90 text-white font-semibold text-[11px] transition-all cursor-pointer shadow-xs"
                 >
                   Sync Now ({pendingCount})
                 </button>
@@ -1271,12 +1311,12 @@ export default function App() {
           {/* 5. Coach View */}
           {activeTab === 'coach' && (
             isSubscriptionExpired ? (
-              <div className="max-w-xl mx-auto my-12 p-8 rounded-3xl bg-white dark:bg-[#111111] border border-amber-500/30 text-center space-y-4 shadow-xl animate-in zoom-in-95">
-                <div className="w-14 h-14 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center">
+              <div className="max-w-xl mx-auto my-12 p-8 rounded-3xl bg-white dark:bg-[#0E1424] border border-cyan-500/30 text-center space-y-4 shadow-xl animate-in zoom-in-95">
+                <div className="w-14 h-14 rounded-2xl bg-cyan-500/15 text-amber-600 dark:text-cyan-400 mx-auto flex items-center justify-center">
                   <Bot className="w-7 h-7" />
                 </div>
                 <div className="space-y-1">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-cyan-500/15 text-amber-800 dark:text-amber-300 border border-cyan-500/30">
                     Pro Coach Feature
                   </span>
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mt-2">
@@ -1289,7 +1329,7 @@ export default function App() {
                 <div className="pt-2">
                   <button
                     onClick={() => setIsPaywallOpen(true)}
-                    className="px-6 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs font-bold shadow-md cursor-pointer transition-colors inline-flex items-center gap-2"
+                    className="px-6 py-3 rounded-xl bg-[#00D4FF] hover:bg-[#0369A1] text-white text-xs font-bold shadow-md cursor-pointer transition-colors inline-flex items-center gap-2"
                   >
                     <span>Upgrade to Pro — ₹89/mo</span>
                   </button>
@@ -1448,6 +1488,7 @@ export default function App() {
           workoutLogs={workoutLogs}
           mealLogs={mealLogs}
           calculatedStreak={calculatedStreak}
+          isHostAdminUser={serverSaysHost}
           onOpenOnboarding={() => setIsOnboardingOpen(true)}
           onOpenCheckIn={() => setIsCheckInOpen(true)}
           onOpenCalibration={() => setIsQuarterlyCalibrationOpen(true)}

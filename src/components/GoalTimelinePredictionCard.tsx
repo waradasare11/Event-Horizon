@@ -77,12 +77,12 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
   };
 
   return (
-    <div className="rounded-3xl bg-white dark:bg-[#111111] border border-[#D4AF37]/30 dark:border-[#D4AF37]/40 shadow-xl overflow-hidden text-left space-y-0 transition-colors">
+    <div className="rounded-3xl bg-white dark:bg-[#111111] border border-[#3B82F6]/30 dark:border-[#3B82F6]/40 shadow-xl overflow-hidden text-left space-y-0 transition-colors">
       {/* Top Banner with Smooth Animated Date Count-Up */}
-      <div className="bg-gradient-to-r from-[#D4AF37] via-[#A68523] to-[#083D34] p-6 sm:p-7 text-white relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[#3B82F6] via-[#1D4ED8] to-[#083D34] p-6 sm:p-7 text-white relative overflow-hidden">
         <div className="relative z-10 space-y-3">
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-[#F0D060] border border-white/20">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-[#60A5FA] border border-white/20">
               <Sparkles className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
               <span>AI Evidence-Grounded Physiological Forecast</span>
             </div>
@@ -126,10 +126,10 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
         
         {/* SHADED CONFIDENCE INTERVAL RANGE VISUALIZER (80-95% COMPLIANCE) */}
         {showConfidenceInterval && (
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-[#D4AF37]/10 via-[#D4AF37]/5 to-[#F0D060]/10 border-2 border-[#D4AF37]/30 space-y-4">
+          <div className="p-5 rounded-2xl bg-gradient-to-br from-[#3B82F6]/10 via-[#3B82F6]/5 to-[#60A5FA]/10 border-2 border-[#3B82F6]/30 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div className="space-y-0.5">
-                <div className="text-xs font-black uppercase tracking-wider text-[#D4AF37] dark:text-[#F0D060] flex items-center gap-1.5">
+                <div className="text-xs font-black uppercase tracking-wider text-[#3B82F6] dark:text-[#60A5FA] flex items-center gap-1.5">
                   <Layers className="w-4 h-4" />
                   <span>Physiological Confidence Interval (80%–95% Compliance Zone)</span>
                 </div>
@@ -138,16 +138,16 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
                 </p>
               </div>
 
-              <div className="px-2.5 py-1 rounded-lg bg-[#D4AF37]/20 text-[#8E701C] dark:text-[#F0D060] text-[11px] font-mono font-bold shrink-0">
+              <div className="px-2.5 py-1 rounded-lg bg-[#3B82F6]/20 text-[#8E701C] dark:text-[#60A5FA] text-[11px] font-mono font-bold shrink-0">
                 ±{Math.round((slowDays80 - fastDays95) / 2)} Days Variance Band
               </div>
             </div>
 
             {/* Shaded Visual Timeline Bar */}
-            <div className="p-4 rounded-2xl bg-white dark:bg-[#111111] border border-[#D4AF37]/20 space-y-3">
+            <div className="p-4 rounded-2xl bg-white dark:bg-[#111111] border border-[#3B82F6]/20 space-y-3">
               <div className="flex justify-between text-[11px] font-mono text-gray-500 dark:text-gray-400">
                 <span>95% High Adherence (Fastest)</span>
-                <span className="font-bold text-[#B8922A] dark:text-[#F0D060]">Projected Target</span>
+                <span className="font-bold text-[#1D4ED8] dark:text-[#60A5FA]">Projected Target</span>
                 <span>80% Flexible Adherence</span>
               </div>
 
@@ -155,16 +155,16 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
               <div className="relative w-full h-8 bg-gray-100 dark:bg-[#252826] rounded-xl overflow-hidden flex items-center">
                 {/* Shaded 80-95% Compliance Range Area */}
                 <div 
-                  className="absolute left-[15%] right-[15%] h-full bg-gradient-to-r from-[#D4AF37]/30 via-[#D4AF37]/40 to-amber-500/30 border-y border-dashed border-[#D4AF37]/50 flex items-center justify-center text-[10px] font-black text-[#8E701C] dark:text-[#F0D060] tracking-wider uppercase"
+                  className="absolute left-[15%] right-[15%] h-full bg-gradient-to-r from-[#3B82F6]/30 via-[#3B82F6]/40 to-amber-500/30 border-y border-dashed border-[#3B82F6]/50 flex items-center justify-center text-[10px] font-black text-[#8E701C] dark:text-[#60A5FA] tracking-wider uppercase"
                 >
                   <span className="hidden sm:inline">Shaded Confidence Interval (80%–95%)</span>
                 </div>
 
                 {/* Left boundary pin (95% adherence) */}
-                <div className="absolute left-[15%] top-0 bottom-0 w-1 bg-[#D4AF37] z-10" />
+                <div className="absolute left-[15%] top-0 bottom-0 w-1 bg-[#3B82F6] z-10" />
                 
                 {/* Middle target pin (baseline) */}
-                <div className="absolute left-[50%] top-0 bottom-0 w-1.5 bg-[#D4AF37] dark:bg-[#F0D060] z-20 shadow-xs" />
+                <div className="absolute left-[50%] top-0 bottom-0 w-1.5 bg-[#3B82F6] dark:bg-[#60A5FA] z-20 shadow-xs" />
 
                 {/* Right boundary pin (80% adherence) */}
                 <div className="absolute right-[15%] top-0 bottom-0 w-1 bg-amber-500 z-10" />
@@ -172,14 +172,14 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
 
               {/* Range Dates Display */}
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="p-2 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20">
-                  <div className="text-[10px] text-[#A68523] dark:text-[#F0D060] font-bold uppercase">95% Compliance</div>
+                <div className="p-2 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/20">
+                  <div className="text-[10px] text-[#1D4ED8] dark:text-[#60A5FA] font-bold uppercase">95% Compliance</div>
                   <div className="font-extrabold text-gray-900 dark:text-white text-xs">{formatDate(range95Date)}</div>
                   <div className="text-[10px] text-gray-500">~{fastDays95} Days</div>
                 </div>
 
-                <div className="p-2 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 ring-1 ring-[#D4AF37]/30">
-                  <div className="text-[10px] text-[#D4AF37] dark:text-[#F0D060] font-black uppercase">Projected Baseline</div>
+                <div className="p-2 rounded-xl bg-[#3B82F6]/15 border border-[#3B82F6]/30 ring-1 ring-[#3B82F6]/30">
+                  <div className="text-[10px] text-[#3B82F6] dark:text-[#60A5FA] font-black uppercase">Projected Baseline</div>
                   <div className="font-extrabold text-gray-900 dark:text-white text-xs">{formatDate(baselineDate)}</div>
                   <div className="text-[10px] text-gray-500">~{baseDays} Days</div>
                 </div>
@@ -195,10 +195,10 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
         )}
 
         {/* COMPLIANCE RATE SENSITIVITY SIMULATOR */}
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-[#D4AF37]/5 via-[#D4AF37]/5 to-[#F0D060]/5 border border-[#D4AF37]/20 space-y-4">
+        <div className="p-5 rounded-2xl bg-gradient-to-br from-[#3B82F6]/5 via-[#3B82F6]/5 to-[#60A5FA]/5 border border-[#3B82F6]/20 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="space-y-0.5">
-              <div className="text-xs font-black uppercase tracking-wider text-[#D4AF37] dark:text-[#F0D060] flex items-center gap-1.5">
+              <div className="text-xs font-black uppercase tracking-wider text-[#3B82F6] dark:text-[#60A5FA] flex items-center gap-1.5">
                 <BarChart3 className="w-4 h-4" />
                 <span>Interactive Adherence Sensitivity Slider</span>
               </div>
@@ -213,7 +213,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
                 onClick={() => setComplianceRate(100)}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold cursor-pointer transition-all ${
                   complianceRate === 100
-                    ? 'bg-[#D4AF37] text-white'
+                    ? 'bg-[#3B82F6] text-white'
                     : 'bg-gray-100 dark:bg-[#1F2220] text-gray-700 dark:text-gray-300'
                 }`}
               >
@@ -224,7 +224,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
                 onClick={() => setComplianceRate(88)}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold cursor-pointer transition-all ${
                   complianceRate === 88
-                    ? 'bg-[#D4AF37] text-white'
+                    ? 'bg-[#3B82F6] text-white'
                     : 'bg-gray-100 dark:bg-[#1F2220] text-gray-700 dark:text-gray-300'
                 }`}
               >
@@ -235,7 +235,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
                 onClick={() => setComplianceRate(75)}
                 className={`px-2.5 py-1 rounded-xl text-[11px] font-bold cursor-pointer transition-all ${
                   complianceRate === 75
-                    ? 'bg-[#D4AF37] text-white'
+                    ? 'bg-[#3B82F6] text-white'
                     : 'bg-gray-100 dark:bg-[#1F2220] text-gray-700 dark:text-gray-300'
                 }`}
               >
@@ -248,7 +248,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-bold text-gray-700 dark:text-gray-300">
               <span>Simulated Diet & Training Adherence:</span>
-              <span className="text-[#D4AF37] dark:text-[#F0D060] font-mono text-sm">{complianceRate}%</span>
+              <span className="text-[#3B82F6] dark:text-[#60A5FA] font-mono text-sm">{complianceRate}%</span>
             </div>
             <input
               type="range"
@@ -257,7 +257,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
               step={1}
               value={complianceRate}
               onChange={(e) => setComplianceRate(Number(e.target.value))}
-              className="w-full accent-[#D4AF37] cursor-pointer"
+              className="w-full accent-[#3B82F6] cursor-pointer"
             />
             <div className="flex justify-between text-[10px] text-gray-400 font-mono">
               <span>65% (High Social/Travel Variance)</span>
@@ -270,14 +270,14 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
             <div className={`p-3 rounded-xl border text-left space-y-1 transition-all ${
               complianceRate >= 95 
-                ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 ring-2 ring-[#D4AF37]/30' 
+                ? 'bg-[#3B82F6]/15 border-[#3B82F6]/40 ring-2 ring-[#3B82F6]/30' 
                 : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
             }`}>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase text-[#B8922A] dark:text-[#F0D060]">
+                <span className="text-[10px] font-black uppercase text-[#1D4ED8] dark:text-[#60A5FA]">
                   Best Case (95-100%)
                 </span>
-                {complianceRate >= 95 && <Check className="w-3 h-3 text-[#D4AF37]" />}
+                {complianceRate >= 95 && <Check className="w-3 h-3 text-[#3B82F6]" />}
               </div>
               <div className="text-sm font-extrabold text-gray-900 dark:text-white">
                 {formatDate(bestCaseDate)}
@@ -289,14 +289,14 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
 
             <div className={`p-3 rounded-xl border text-left space-y-1 transition-all ${
               complianceRate >= 80 && complianceRate < 95
-                ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 ring-2 ring-[#D4AF37]/30' 
+                ? 'bg-[#3B82F6]/15 border-[#3B82F6]/40 ring-2 ring-[#3B82F6]/30' 
                 : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
             }`}>
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-black uppercase text-[#B8922A] dark:text-[#F0D060]">
+                <span className="text-[10px] font-black uppercase text-[#1D4ED8] dark:text-[#60A5FA]">
                   Target Expected (85-90%)
                 </span>
-                {complianceRate >= 80 && complianceRate < 95 && <Check className="w-3 h-3 text-[#D4AF37]" />}
+                {complianceRate >= 80 && complianceRate < 95 && <Check className="w-3 h-3 text-[#3B82F6]" />}
               </div>
               <div className="text-sm font-extrabold text-gray-900 dark:text-white">
                 {formatDate(expectedDate)}
@@ -334,7 +334,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
               <div>
                 <span className="text-gray-400">Caloric Deficit:</span>
-                <strong className="block text-[#B8922A] dark:text-[#F0D060]">±12 Days Variance</strong>
+                <strong className="block text-[#1D4ED8] dark:text-[#60A5FA]">±12 Days Variance</strong>
               </div>
               <div>
                 <span className="text-gray-400">Sleep (7.5h+):</span>
@@ -342,7 +342,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
               </div>
               <div>
                 <span className="text-gray-400">NEAT Steps (8k+):</span>
-                <strong className="block text-[#B8922A] dark:text-[#F0D060]">±7 Days Variance</strong>
+                <strong className="block text-[#1D4ED8] dark:text-[#60A5FA]">±7 Days Variance</strong>
               </div>
               <div>
                 <span className="text-gray-400">Lifting Progression:</span>
@@ -356,7 +356,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="p-3.5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1C1F1D] border border-gray-200 dark:border-gray-800 text-center space-y-1">
             <div className="text-[11px] font-bold text-gray-500 uppercase">Daily Calorie Target</div>
-            <div className="text-lg font-black text-[#D4AF37] dark:text-[#F0D060]">
+            <div className="text-lg font-black text-[#3B82F6] dark:text-[#60A5FA]">
               {prediction.dailyCalorieTarget} kcal
             </div>
             <div className="text-[10px] text-gray-400">
@@ -396,8 +396,8 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
         </div>
 
         {/* Scientific Evidence & Metabolic Adaptation */}
-        <div className="p-4 rounded-2xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/15 border border-[#D4AF37]/20 space-y-2">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#D4AF37] dark:text-[#F0D060] uppercase tracking-wider">
+        <div className="p-4 rounded-2xl bg-[#3B82F6]/5 dark:bg-[#3B82F6]/15 border border-[#3B82F6]/20 space-y-2">
+          <div className="flex items-center gap-2 text-xs font-bold text-[#3B82F6] dark:text-[#60A5FA] uppercase tracking-wider">
             <BookOpen className="w-4 h-4" />
             <span>Physiological Grounding & Metabolic Model</span>
           </div>
@@ -409,7 +409,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
               {prediction.scientificEvidence.citedPrinciples.map((principle, idx) => (
                 <span
                   key={idx}
-                  className="px-2 py-0.5 rounded-full bg-white dark:bg-[#070707] border border-[#D4AF37]/20 text-[10px] font-bold text-[#D4AF37] dark:text-[#F0D060]"
+                  className="px-2 py-0.5 rounded-full bg-white dark:bg-[#070707] border border-[#3B82F6]/20 text-[10px] font-bold text-[#3B82F6] dark:text-[#60A5FA]"
                 >
                   ✓ {principle}
                 </span>
@@ -422,7 +422,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
         {prediction.milestones && prediction.milestones.length > 0 && (
           <div className="space-y-3">
             <div className="text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider flex items-center gap-1.5">
-              <Target className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
+              <Target className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA]" />
               <span>Step-by-Step Physiological Milestones Roadmap</span>
             </div>
 
@@ -430,9 +430,9 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
               {prediction.milestones.map((m, idx) => (
                 <div
                   key={idx}
-                  className="p-3.5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1C1F1D] border border-gray-200 dark:border-gray-800 flex items-start gap-3 transition-all hover:border-[#D4AF37]/50"
+                  className="p-3.5 rounded-2xl bg-[#FAFAF8] dark:bg-[#1C1F1D] border border-gray-200 dark:border-gray-800 flex items-start gap-3 transition-all hover:border-[#3B82F6]/50"
                 >
-                  <div className="w-8 h-8 rounded-xl bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] font-black text-xs flex items-center justify-center shrink-0">
+                  <div className="w-8 h-8 rounded-xl bg-[#3B82F6]/10 text-[#3B82F6] dark:text-[#60A5FA] font-black text-xs flex items-center justify-center shrink-0">
                     W{m.weekNumber}
                   </div>
 
@@ -441,7 +441,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
                       <span className="font-extrabold text-gray-900 dark:text-white">
                         {m.milestoneTitle}
                       </span>
-                      <span className="text-[11px] font-mono text-[#B8922A] dark:text-[#F0D060] font-bold">
+                      <span className="text-[11px] font-mono text-[#1D4ED8] dark:text-[#60A5FA] font-bold">
                         Target: {m.projectedWeightKg} kg
                       </span>
                     </div>
@@ -486,7 +486,7 @@ export const GoalTimelinePredictionCard: React.FC<GoalTimelinePredictionCardProp
         {showActionButton && onAcceptPlan && (
           <button
             onClick={handleCommit}
-            className="w-full py-3.5 rounded-2xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-black text-sm cursor-pointer shadow-md transition-all flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-2xl bg-[#3B82F6] hover:bg-[#1D4ED8] text-white font-black text-sm cursor-pointer shadow-md transition-all flex items-center justify-center gap-2"
           >
             <span>Lock In Goal Date & Proceed to Plan Selection</span>
             <CheckCircle2 className="w-4 h-4" />

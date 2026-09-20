@@ -176,10 +176,10 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
         <div>
           <div className="flex items-center gap-2">
             <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-              <Activity className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
+              <Activity className="w-4 h-4 text-[#0284C7] dark:text-[#38BDF8]" />
               <span>Athlete Live Logins & Complete Profile Registry</span>
             </h3>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#00D4FF]/15 text-[#0369A1] dark:text-[#38BDF8] border border-[#00D4FF]/30">
               1000% Accurate Telemetry
             </span>
           </div>
@@ -195,7 +195,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
             disabled={isLoading}
             className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#B8922A]' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-[#0284C7]' : ''}`} />
             <span>Refresh</span>
           </button>
 
@@ -226,7 +226,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800 shadow-2xs">
           <div className="text-[10px] uppercase font-black text-gray-400">Unique Athletes</div>
-          <div className="text-xl font-black text-[#B8922A] dark:text-[#F0D060] mt-0.5 flex items-baseline justify-between">
+          <div className="text-xl font-black text-[#0284C7] dark:text-[#38BDF8] mt-0.5 flex items-baseline justify-between">
             <span>{aggregatedProfiles.length}</span>
             <span className="text-[10px] font-bold text-gray-400">Registered</span>
           </div>
@@ -236,23 +236,23 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
           <div className="text-[10px] uppercase font-black text-gray-400">Total Logins Logged</div>
           <div className="text-xl font-black text-gray-900 dark:text-white mt-0.5 flex items-baseline justify-between">
             <span>{logins.length}</span>
-            <span className="text-[10px] font-bold text-[#D4AF37]">100% Tracked</span>
+            <span className="text-[10px] font-bold text-[#00D4FF]">100% Tracked</span>
           </div>
         </div>
 
         <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800 shadow-2xs">
           <div className="text-[10px] uppercase font-black text-gray-400">Active Today</div>
-          <div className="text-xl font-black text-[#B8922A] dark:text-[#F0D060] mt-0.5 flex items-baseline justify-between">
+          <div className="text-xl font-black text-[#0284C7] dark:text-[#38BDF8] mt-0.5 flex items-baseline justify-between">
             <span>{todayLogins.length}</span>
-            <span className="text-[10px] font-bold text-[#D4AF37]">Sessions</span>
+            <span className="text-[10px] font-bold text-[#00D4FF]">Sessions</span>
           </div>
         </div>
 
         <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800 shadow-2xs">
           <div className="text-[10px] uppercase font-black text-gray-400">VIP Athletes</div>
-          <div className="text-xl font-black text-amber-500 mt-0.5 flex items-baseline justify-between">
+          <div className="text-xl font-black text-cyan-400 mt-0.5 flex items-baseline justify-between">
             <span>{aggregatedProfiles.filter((p) => p.isLifetimeVIP).length}</span>
-            <span className="text-[10px] font-bold text-amber-500">Lifetime</span>
+            <span className="text-[10px] font-bold text-cyan-400">Lifetime</span>
           </div>
         </div>
       </div>
@@ -267,7 +267,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
             placeholder="Search logins by athlete email, name, goal, or device..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-[#D4AF37]"
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#0E1424] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-[#00D4FF]"
           />
         </div>
 
@@ -278,7 +278,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
             onClick={() => setFilterView('profiles')}
             className={`px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer ${
               filterView === 'profiles'
-                ? 'bg-white dark:bg-[#121413] text-[#B8922A] dark:text-[#F0D060] shadow-xs'
+                ? 'bg-white dark:bg-[#121413] text-[#0284C7] dark:text-[#38BDF8] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
             }`}
           >
@@ -290,7 +290,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
             onClick={() => setFilterView('today')}
             className={`px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer ${
               filterView === 'today'
-                ? 'bg-white dark:bg-[#121413] text-[#B8922A] dark:text-[#F0D060] shadow-xs'
+                ? 'bg-white dark:bg-[#121413] text-[#0284C7] dark:text-[#38BDF8] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
             }`}
           >
@@ -302,7 +302,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
             onClick={() => setFilterView('all')}
             className={`px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all cursor-pointer ${
               filterView === 'all'
-                ? 'bg-white dark:bg-[#121413] text-[#B8922A] dark:text-[#F0D060] shadow-xs'
+                ? 'bg-white dark:bg-[#121413] text-[#0284C7] dark:text-[#38BDF8] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200'
             }`}
           >
@@ -314,7 +314,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
       {/* Profile & Login List Cards / Table */}
       <div className="space-y-3">
         {filteredItems.length === 0 ? (
-          <div className="p-8 text-center space-y-2 text-gray-500 bg-white dark:bg-[#111111] rounded-3xl border border-gray-200 dark:border-gray-800">
+          <div className="p-8 text-center space-y-2 text-gray-500 bg-white dark:bg-[#0E1424] rounded-3xl border border-gray-200 dark:border-gray-800">
             <Users className="w-10 h-10 text-gray-400 mx-auto" />
             <div className="font-bold text-gray-700 dark:text-gray-300">No Login Telemetry Records Found</div>
             <p className="text-xs text-gray-400">
@@ -332,19 +332,19 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
               return (
                 <div
                   key={record.id}
-                  className="p-4 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-2xs hover:border-[#D4AF37]/40 transition-all space-y-3"
+                  className="p-4 rounded-3xl bg-white dark:bg-[#0E1424] border border-gray-200 dark:border-gray-800 shadow-2xs hover:border-[#00D4FF]/40 transition-all space-y-3"
                 >
                   {/* Top Row: User Identity & VIP Badge */}
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#D4AF37]/20 to-[#D4AF37]/20 border border-[#D4AF37]/30 flex items-center justify-center font-black text-[#B8922A] dark:text-[#F0D060] text-sm">
+                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#00D4FF]/20 to-[#00D4FF]/20 border border-[#00D4FF]/30 flex items-center justify-center font-black text-[#0284C7] dark:text-[#38BDF8] text-sm">
                         {record.name ? record.name.charAt(0).toUpperCase() : record.email.charAt(0).toUpperCase()}
                       </div>
                       <div>
                         <div className="font-extrabold text-gray-900 dark:text-white flex items-center gap-1.5">
                           <span>{record.name || 'Athlete'}</span>
                           {record.isLifetimeVIP && (
-                            <span className="p-0.5 rounded-md bg-amber-500/15 text-amber-600 border border-amber-500/30" title="Lifetime VIP">
+                            <span className="p-0.5 rounded-md bg-cyan-500/15 text-amber-600 border border-cyan-500/30" title="Lifetime VIP">
                               <Crown className="w-3 h-3" />
                             </span>
                           )}
@@ -357,7 +357,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
 
                     <div className="text-right">
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                        <Clock className="w-2.5 h-2.5 text-[#D4AF37]" />
+                        <Clock className="w-2.5 h-2.5 text-[#00D4FF]" />
                         <span>{dateStr} {timeStr}</span>
                       </span>
                     </div>
@@ -371,7 +371,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
                         {record.weightKg ? `${record.weightKg} kg` : '--'}
                         {record.heightCm ? ` · ${record.heightCm} cm` : ''}
                       </span>
-                      {record.bmi && <span className="text-[10px] text-[#B8922A] block">BMI: {record.bmi}</span>}
+                      {record.bmi && <span className="text-[10px] text-[#0284C7] block">BMI: {record.bmi}</span>}
                     </div>
 
                     <div>
@@ -386,7 +386,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
 
                     <div>
                       <span className="text-[9px] font-bold text-gray-400 uppercase block">Activity & Targets</span>
-                      <span className="font-extrabold text-[#B8922A] dark:text-[#F0D060]">
+                      <span className="font-extrabold text-[#0284C7] dark:text-[#38BDF8]">
                         {record.dailyCalories ? `${record.dailyCalories} kcal` : '--'}
                       </span>
                       <span className="text-[10px] text-gray-400 block">
@@ -398,7 +398,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
                   {/* Device Telemetry Pill Row */}
                   <div className="flex items-center justify-between text-[10px] text-gray-400 pt-1 border-t border-gray-100 dark:border-gray-800 flex-wrap gap-1">
                     <div className="flex items-center gap-1.5 truncate">
-                      <Smartphone className="w-3 h-3 text-[#D4AF37] shrink-0" />
+                      <Smartphone className="w-3 h-3 text-[#00D4FF] shrink-0" />
                       <span className="truncate">{record.device || 'Web Client'}</span>
                       {record.timezone && <span className="text-gray-400">({record.timezone})</span>}
                     </div>
@@ -408,7 +408,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
                         <button
                           type="button"
                           onClick={() => onViewTimeline(record.email)}
-                          className="px-2 py-1 rounded-lg bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060] font-bold text-[10px] flex items-center gap-1 cursor-pointer transition-colors"
+                          className="px-2 py-1 rounded-lg bg-[#00D4FF]/10 hover:bg-[#00D4FF]/20 text-[#0369A1] dark:text-[#38BDF8] font-bold text-[10px] flex items-center gap-1 cursor-pointer transition-colors"
                         >
                           <Clock className="w-3 h-3" />
                           <span>Timeline</span>
@@ -419,7 +419,7 @@ export const AthleteLoginsSection: React.FC<AthleteLoginsSectionProps> = ({
                         <button
                           type="button"
                           onClick={() => onGrantVipToEmail(record.email)}
-                          className="px-2 py-1 rounded-lg bg-[#A68523] hover:bg-[#8E701C] text-white font-bold text-[10px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                          className="px-2 py-1 rounded-lg bg-[#0369A1] hover:bg-[#075985] text-white font-bold text-[10px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
                         >
                           <Crown className="w-3 h-3" />
                           <span>Grant VIP</span>

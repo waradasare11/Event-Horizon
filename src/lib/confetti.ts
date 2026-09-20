@@ -12,7 +12,7 @@ export function fireCelebrationConfetti() {
       angle: 60,
       spread: 55,
       origin: { x: 0.1, y: 0.7 },
-      colors: ['#D4AF37', '#F0D060', '#A68523', '#C6A04A', '#111111', '#F4EBD0'],
+      colors: ['#3B82F6', '#60A5FA', '#1D4ED8', '#38BDF8', '#0B1220', '#E8F1FF'],
     });
 
     // Right cannon
@@ -21,7 +21,7 @@ export function fireCelebrationConfetti() {
       angle: 120,
       spread: 55,
       origin: { x: 0.9, y: 0.7 },
-      colors: ['#D4AF37', '#F0D060', '#A68523', '#C6A04A', '#111111', '#F4EBD0'],
+      colors: ['#3B82F6', '#60A5FA', '#1D4ED8', '#38BDF8', '#0B1220', '#E8F1FF'],
     });
 
     // Center burst
@@ -30,7 +30,7 @@ export function fireCelebrationConfetti() {
         particleCount: 50,
         spread: 80,
         origin: { y: 0.6 },
-        colors: ['#D4AF37', '#F0D060', '#F59E0B', '#C6A04A'],
+        colors: ['#3B82F6', '#60A5FA', '#38BDF8', '#1D4ED8'],
       });
     }, 200);
   } catch (err) {

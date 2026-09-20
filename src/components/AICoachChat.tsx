@@ -162,11 +162,11 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-[#111111] rounded-3xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs overflow-hidden h-[800px] flex flex-col animate-in fade-in duration-300 text-left">
+    <div className="bg-white dark:bg-[#0E1424] rounded-3xl border border-[#E5E7EB] dark:border-[#1E293B] shadow-xs overflow-hidden h-[800px] flex flex-col animate-in fade-in duration-300 text-left">
       {/* Header */}
-      <div className="p-4 sm:p-5 border-b border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#191B1A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="p-4 sm:p-5 border-b border-[#E5E7EB] dark:border-[#1E293B] bg-[#FAFAF8] dark:bg-[#191B1A] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#D4AF37] flex items-center justify-center text-white shadow-xs">
+          <div className="w-10 h-10 rounded-xl bg-[#00D4FF] flex items-center justify-center text-white shadow-xs">
             <Bot className="w-5 h-5 text-[#E8912D]" />
           </div>
           <div>
@@ -188,11 +188,11 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
             onClick={() => setEnableThinking(!enableThinking)}
             className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border flex items-center gap-1.5 transition-all cursor-pointer ${
               enableThinking
-                ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30 font-bold'
-                : 'bg-white dark:bg-[#1E201F] text-[#6B7280] dark:text-[#9EA8A2] border-[#E5E7EB] dark:border-[#2A2416]'
+                ? 'bg-cyan-500/10 text-amber-600 dark:text-cyan-400 border-cyan-500/30 font-bold'
+                : 'bg-white dark:bg-[#1E201F] text-[#6B7280] dark:text-[#9EA8A2] border-[#E5E7EB] dark:border-[#1E293B]'
             }`}
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
             <span>Deep Thinking: {enableThinking ? 'On' : 'Off'}</span>
           </button>
 
@@ -202,17 +202,17 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
             onClick={() => setUseSearchGrounding(!useSearchGrounding)}
             className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border flex items-center gap-1.5 transition-all cursor-pointer ${
               useSearchGrounding
-                ? 'bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] border-[#D4AF37]/30'
-                : 'bg-white dark:bg-[#1E201F] text-[#6B7280] dark:text-[#9EA8A2] border-[#E5E7EB] dark:border-[#2A2416]'
+                ? 'bg-[#00D4FF]/10 text-[#00D4FF] dark:text-[#38BDF8] border-[#00D4FF]/30'
+                : 'bg-white dark:bg-[#1E201F] text-[#6B7280] dark:text-[#9EA8A2] border-[#E5E7EB] dark:border-[#1E293B]'
             }`}
           >
-            <Globe className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
+            <Globe className="w-3.5 h-3.5 text-[#00D4FF] dark:text-[#38BDF8]" />
             <span>Search: {useSearchGrounding ? 'On' : 'Off'}</span>
           </button>
 
           <button
             onClick={() => setMessages([messages[0]])}
-            className="text-xs text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white flex items-center gap-1 font-medium px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#2A2416] transition-all cursor-pointer"
+            className="text-xs text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white flex items-center gap-1 font-medium px-2 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-[#1E293B] transition-all cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Clear</span>
@@ -230,7 +230,7 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
               className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}
             >
               {!isUser && (
-                <div className="w-8 h-8 rounded-lg bg-[#D4AF37] flex items-center justify-center text-white shrink-0 mt-1">
+                <div className="w-8 h-8 rounded-lg bg-[#00D4FF] flex items-center justify-center text-white shrink-0 mt-1">
                   <Bot className="w-4 h-4 text-[#E8912D]" />
                 </div>
               )}
@@ -238,17 +238,17 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
               <div
                 className={`max-w-[88%] sm:max-w-[78%] p-4 sm:p-5 rounded-2xl text-xs sm:text-sm leading-relaxed ${
                   isUser
-                    ? 'bg-[#D4AF37] text-white rounded-tr-xs shadow-xs'
-                    : 'bg-[#FAFAF8] dark:bg-[#1C1F1D] text-[#1A1D1B] dark:text-[#E8ECE9] border border-[#E5E7EB] dark:border-[#2A2416] rounded-tl-xs shadow-xs'
+                    ? 'bg-[#00D4FF] text-white rounded-tr-xs shadow-xs'
+                    : 'bg-[#FAFAF8] dark:bg-[#1C1F1D] text-[#1A1D1B] dark:text-[#E8ECE9] border border-[#E5E7EB] dark:border-[#1E293B] rounded-tl-xs shadow-xs'
                 }`}
               >
                 <div className="whitespace-pre-wrap">{msg.content}</div>
 
                 {/* Citations block */}
                 {!isUser && msg.citations && msg.citations.length > 0 && (
-                  <div className="mt-3.5 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2416] space-y-1.5">
+                  <div className="mt-3.5 pt-3 border-t border-[#E5E7EB] dark:border-[#1E293B] space-y-1.5">
                     <div className="text-[10px] font-bold text-[#6B7280] dark:text-[#9EA8A2] uppercase tracking-wider flex items-center gap-1">
-                      <Globe className="w-3 h-3 text-[#D4AF37] dark:text-[#F0D060]" />
+                      <Globe className="w-3 h-3 text-[#00D4FF] dark:text-[#38BDF8]" />
                       <span>Cited Literature & Sources ({msg.citations.length})</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
@@ -258,7 +258,7 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
                           href={cite.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-[10px] text-[#D4AF37] dark:text-[#F0D060] font-semibold hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 transition-all max-w-[220px] truncate"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-[10px] text-[#00D4FF] dark:text-[#38BDF8] font-semibold hover:border-[#00D4FF] hover:bg-[#00D4FF]/5 transition-all max-w-[220px] truncate"
                         >
                           <span className="truncate">{cite.title || cite.domain || 'Source'}</span>
                           <ExternalLink className="w-2.5 h-2.5 shrink-0 opacity-60" />
@@ -288,10 +288,10 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
 
         {isLoading && (
           <div className="flex gap-3 justify-start">
-            <div className="w-8 h-8 rounded-lg bg-[#D4AF37] flex items-center justify-center text-white shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-[#00D4FF] flex items-center justify-center text-white shrink-0">
               <Bot className="w-4 h-4 text-[#E8912D]" />
             </div>
-            <div className="bg-[#FAFAF8] dark:bg-[#1C1F1D] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] text-xs text-[#6B7280] dark:text-[#9EA8A2] flex items-center gap-2">
+            <div className="bg-[#FAFAF8] dark:bg-[#1C1F1D] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B] text-xs text-[#6B7280] dark:text-[#9EA8A2] flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#E8912D] animate-spin" />
               <span>{enableThinking ? 'Engaging Deep Thinking reasoning engine...' : 'Querying online sports science literature & synthesizing evidence...'}</span>
             </div>
@@ -302,13 +302,13 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
       </div>
 
       {/* Suggested Quick Questions */}
-      <div className="p-3 bg-[#FAFAF8] dark:bg-[#191B1A] border-t border-[#E5E7EB] dark:border-[#2A2416] overflow-x-auto scrollbar-none flex gap-2">
+      <div className="p-3 bg-[#FAFAF8] dark:bg-[#191B1A] border-t border-[#E5E7EB] dark:border-[#1E293B] overflow-x-auto scrollbar-none flex gap-2">
         {QUICK_QUESTIONS.map((q, idx) => (
           <button
             key={idx}
             onClick={() => handleSendMessage(q)}
             disabled={isLoading}
-            className="text-[11px] font-medium px-3 py-1.5 rounded-lg bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-[#4B5563] dark:text-[#D1D5DB] hover:border-[#D4AF37] hover:text-[#D4AF37] dark:hover:text-[#F0D060] whitespace-nowrap transition-all shadow-2xs cursor-pointer"
+            className="text-[11px] font-medium px-3 py-1.5 rounded-lg bg-white dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-[#4B5563] dark:text-[#D1D5DB] hover:border-[#00D4FF] hover:text-[#00D4FF] dark:hover:text-[#38BDF8] whitespace-nowrap transition-all shadow-2xs cursor-pointer"
           >
             {q}
           </button>
@@ -316,7 +316,7 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
       </div>
 
       {/* Input Form */}
-      <div className="p-4 bg-white dark:bg-[#111111] border-t border-[#E5E7EB] dark:border-[#2A2416]">
+      <div className="p-4 bg-white dark:bg-[#0E1424] border-t border-[#E5E7EB] dark:border-[#1E293B]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -330,12 +330,12 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
             value={inputPrompt}
             onChange={(e) => setInputPrompt(e.target.value)}
             disabled={isLoading}
-            className="flex-1 text-xs sm:text-sm px-4 py-3 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#1C1F1D] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+            className="flex-1 text-xs sm:text-sm px-4 py-3 rounded-xl border border-[#E5E7EB] dark:border-[#1E293B] bg-[#FAFAF8] dark:bg-[#1C1F1D] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#00D4FF]"
           />
           <button
             type="submit"
             disabled={isLoading || !inputPrompt.trim()}
-            className="px-5 py-3 rounded-xl bg-[#D4AF37] text-white font-semibold hover:bg-[#A68523] disabled:opacity-50 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
+            className="px-5 py-3 rounded-xl bg-[#00D4FF] text-white font-semibold hover:bg-[#0369A1] disabled:opacity-50 transition-all flex items-center gap-1.5 shadow-xs cursor-pointer"
           >
             <Send className="w-4 h-4 text-[#E8912D]" />
             <span className="hidden sm:inline text-xs font-bold">Send</span>

@@ -789,7 +789,7 @@ export interface HostAuditLogEntry {
   id: string;
   timestamp: string; // ISO String
   actionType: HostAuditActionType;
-  actor: string; // e.g. "Warad Asare (Host Master)"
+  actor: string; // e.g. "Host Master"
   targetEmail?: string;
   planId?: string;
   amountINR?: number;

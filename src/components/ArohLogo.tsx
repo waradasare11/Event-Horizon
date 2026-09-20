@@ -22,36 +22,31 @@ export const ArohLogo: React.FC<ArohLogoProps> = ({
 
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      {/* Brand Vortex Logo Container - Black & Gold Theme */}
+      {/* Brand Vortex Logo Container - Cosmic Navy & Electric Blue */}
       <div className={`relative ${img} shrink-0 group`}>
-        {/* Ambient Gold Glow */}
-        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-[#D4AF37]/40 via-[#F0D060]/30 to-[#D4AF37]/40 blur-sm opacity-80 group-hover:opacity-100 transition-opacity" />
+        {/* Ambient Electric Blue Glow */}
+        <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-[#3B82F6]/40 via-[#60A5FA]/30 to-[#3B82F6]/40 blur-sm opacity-80 group-hover:opacity-100 transition-opacity" />
         
-        {/* Logo Image */}
+        {/* Logo Image without CSS filter */}
         <img
           src="/aroh-logo.png"
           alt="AROH Smart Fitness Logo"
           referrerPolicy="no-referrer"
-          className="relative w-full h-full rounded-xl object-cover border border-[#D4AF37]/50 shadow-lg shadow-[#D4AF37]/20 bg-[#070707]"
+          className="relative w-full h-full rounded-xl object-cover border border-[#3B82F6]/50 shadow-lg shadow-[#3B82F6]/20 bg-[#0B1220]"
         />
-
-        {/* Small gold star accent */}
-        <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 text-[#F0D060] pointer-events-none opacity-90">
-          ✦
-        </div>
       </div>
 
       {showText && (
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5 leading-none">
-            <span className={`font-extrabold tracking-wider ${text} text-[#D4AF37] font-['Space_Grotesk',sans-serif]`}>
+            <span className={`font-extrabold tracking-wider ${text} text-[#2563EB] dark:text-[#60A5FA] font-['Space_Grotesk',sans-serif]`}>
               AROH
             </span>
-            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#070707] border border-[#D4AF37] text-[#D4AF37] tracking-wider">
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[#0B1220] border border-[#3B82F6] text-[#60A5FA] tracking-wider">
               SMART
             </span>
           </div>
-          <span className={`text-[#9A8F78] dark:text-[#D4AF37] font-medium tracking-widest uppercase mt-0.5 ${sub}`}>
+          <span className={`text-[#8BA3C7] font-medium tracking-widest uppercase mt-0.5 ${sub}`}>
             Smart Fitness
           </span>
         </div>

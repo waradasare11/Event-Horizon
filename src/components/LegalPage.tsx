@@ -84,14 +84,14 @@ export const LegalPage: React.FC<LegalPageProps> = ({
         }
       }, 2500);
     } catch (err) {
-      alert('An error occurred during data deletion. Please contact waradasare11@gmail.com for manual assistance.');
+      alert('An error occurred during data deletion. Please contact support@aroh.fit for manual assistance.');
     } finally {
       setIsDeleting(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] font-sans flex flex-col selection:bg-[#D4AF37]/20 selection:text-[#D4AF37] transition-colors duration-200">
+    <div className="min-h-screen bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] font-sans flex flex-col selection:bg-[#3B82F6]/20 selection:text-[#3B82F6] transition-colors duration-200">
       {/* Top Application Bar */}
       <header className="border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-[#111111]/90 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
@@ -147,7 +147,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                 e.preventDefault();
                 onNavigate('/');
               }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#3B82F6] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
             >
               <Home className="w-3.5 h-3.5" />
               <span>Go to App</span>
@@ -168,7 +168,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
               </h1>
             </div>
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-              Operated by <strong>Warad Asare</strong> (AROH AI Technologies) • Pune, Maharashtra, India
+              Operated by <strong>AROH AI Technologies</strong> • Pune, Maharashtra, India
             </p>
           </div>
           <div className="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 shrink-0">
@@ -176,8 +176,8 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             <span>Pune, India</span>
             <span>•</span>
             <Mail className="w-3.5 h-3.5 text-amber-500" />
-            <a href="mailto:waradasare11@gmail.com" className="text-amber-600 dark:text-amber-400 underline">
-              waradasare11@gmail.com
+            <a href="mailto:support@aroh.fit" className="text-amber-600 dark:text-amber-400 underline">
+              support@aroh.fit
             </a>
           </div>
         </div>
@@ -292,9 +292,9 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                     1. Data Fiduciary &amp; Operator Identification
                   </h3>
                   <p>
-                    This application (<strong>AROH</strong>) is developed, operated, and maintained by <strong>Warad Asare</strong> (individual developer and sole proprietor trading as AROH AI Technologies), located in <strong>Pune, Maharashtra, India</strong>. Contact Email:{' '}
-                    <a href="mailto:waradasare11@gmail.com" className="text-amber-600 dark:text-amber-400 font-semibold underline">
-                      waradasare11@gmail.com
+                    This application (<strong>AROH</strong>) is developed, operated, and maintained by <strong>AROH AI Technologies</strong>, located in <strong>Pune, Maharashtra, India</strong>. Contact Email:{' '}
+                    <a href="mailto:support@aroh.fit" className="text-amber-600 dark:text-amber-400 font-semibold underline">
+                      support@aroh.fit
                     </a>.
                   </p>
                 </section>
@@ -359,7 +359,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                     <li><strong>Right to Access &amp; Export:</strong> You can export all your logs anytime in standard CSV format or JSON backup via the "Export CSV" tool or Google Drive backup sync.</li>
                     <li><strong>Right to Correction:</strong> You can edit any profile attribute, meal log, or workout entry directly within the application.</li>
                     <li><strong>Right to Erasure (Delete My Data):</strong> You can wipe all data across Firestore, localStorage, and Drive at any time via the "Delete My Data" tab in this portal.</li>
-                    <li><strong>Right to Grievance Redressal:</strong> Direct all privacy concerns to our Grievance Officer: <strong>Warad Asare</strong> at <a href="mailto:waradasare11@gmail.com" className="text-amber-600 dark:text-amber-400 underline">waradasare11@gmail.com</a>. We respond to all statutory inquiries within 7 business days.</li>
+                    <li><strong>Right to Grievance Redressal:</strong> Direct all privacy concerns to our Grievance Officer at <a href="mailto:support@aroh.fit" className="text-amber-600 dark:text-amber-400 underline">support@aroh.fit</a>. We respond to all statutory inquiries within 7 business days.</li>
                   </ul>
                 </section>
 
@@ -415,7 +415,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                 <section className="space-y-2">
                   <h3 className="font-bold text-gray-900 dark:text-white text-base">4. 48-Hour Cancellation &amp; Refund Limit</h3>
                   <p>
-                    All paid subscriptions include a <strong>48-hour satisfaction guarantee</strong>. You may request a full refund within 48 hours of purchase by contacting <a href="mailto:waradasare11@gmail.com" className="text-amber-600 dark:text-amber-400 underline">waradasare11@gmail.com</a>. <strong>No refunds will be granted after 48 hours</strong> from payment confirmation, except where mandated by applicable Indian consumer protection laws.
+                    All paid subscriptions include a <strong>48-hour satisfaction guarantee</strong>. You may request a full refund within 48 hours of purchase by contacting <a href="mailto:support@aroh.fit" className="text-amber-600 dark:text-amber-400 underline">support@aroh.fit</a>. <strong>No refunds will be granted after 48 hours</strong> from payment confirmation, except where mandated by applicable Indian consumer protection laws.
                   </p>
                 </section>
 
@@ -527,7 +527,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                   <h3 className="font-bold text-gray-900 dark:text-white text-base">3. How to Request a Refund</h3>
                   <p>To request your refund within the 48-hour window:</p>
                   <ol className="list-decimal pl-5 space-y-2 text-gray-600 dark:text-gray-400">
-                    <li>Send an email from your registered AROH email address to <a href="mailto:waradasare11@gmail.com" className="text-amber-600 dark:text-amber-400 underline font-semibold">waradasare11@gmail.com</a>.</li>
+                    <li>Send an email from your registered AROH email address to <a href="mailto:support@aroh.fit" className="text-amber-600 dark:text-amber-400 underline font-semibold">support@aroh.fit</a>.</li>
                     <li>Include the subject line: <code className="px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-[11px] font-mono">Refund Request - [Your Name]</code>.</li>
                     <li>Provide your 12-digit UPI UTR reference number or payment transaction ID and your registered phone number / UPI VPA.</li>
                   </ol>
@@ -622,7 +622,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                     <button
                       type="button"
                       onClick={onSignIn}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#3B82F6] hover:bg-[#1D4ED8] text-white text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer"
                     >
                       <LogIn className="w-4 h-4" />
                       <span>Sign In with Google to Delete Data</span>
@@ -634,7 +634,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                         e.preventDefault();
                         onNavigate('/');
                       }}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer"
+                      className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-[#3B82F6] hover:bg-[#1D4ED8] text-white text-xs sm:text-sm font-bold shadow-md transition-all cursor-pointer"
                     >
                       <LogIn className="w-4 h-4" />
                       <span>Open App to Sign In</span>
@@ -717,8 +717,8 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             <span>Pune, Maharashtra, India</span>
             <span>•</span>
             <Mail className="w-3.5 h-3.5 text-amber-500" />
-            <a href="mailto:waradasare11@gmail.com" className="hover:underline text-amber-600 dark:text-amber-400">
-              waradasare11@gmail.com
+            <a href="mailto:support@aroh.fit" className="hover:underline text-amber-600 dark:text-amber-400">
+              support@aroh.fit
             </a>
           </div>
 

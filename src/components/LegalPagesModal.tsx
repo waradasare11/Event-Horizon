@@ -100,7 +100,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
         }
       }, 2500);
     } catch (err) {
-      alert('An error occurred during data deletion. Please contact waradasare11@gmail.com for manual assistance.');
+      alert('An error occurred during data deletion. Please contact support@aroh.fit for manual assistance.');
     } finally {
       setIsDeleting(false);
     }
@@ -116,13 +116,13 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/50">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-[#D4AF37]/10 text-[#B8922A] dark:text-[#F0D060] border border-[#D4AF37]/20">
+            <div className="p-2 rounded-xl bg-[#3B82F6]/10 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/20">
               <Shield className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                 AROH Legal &amp; Compliance Center
-                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/20">
+                <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-[#3B82F6]/10 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/20">
                   DPDP Act, 2023
                 </span>
               </h2>
@@ -146,7 +146,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
             onClick={() => setActiveTab('privacy')}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'privacy'
-                ? 'bg-white dark:bg-slate-800 text-[#B8922A] dark:text-[#F0D060] shadow-xs border border-slate-200 dark:border-slate-700'
+                ? 'bg-white dark:bg-slate-800 text-[#1D4ED8] dark:text-[#60A5FA] shadow-xs border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -159,7 +159,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
             onClick={() => setActiveTab('terms')}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'terms'
-                ? 'bg-white dark:bg-slate-800 text-[#B8922A] dark:text-[#F0D060] shadow-xs border border-slate-200 dark:border-slate-700'
+                ? 'bg-white dark:bg-slate-800 text-[#1D4ED8] dark:text-[#60A5FA] shadow-xs border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -185,7 +185,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
             onClick={() => setActiveTab('refund')}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'refund'
-                ? 'bg-white dark:bg-slate-800 text-[#B8922A] dark:text-[#F0D060] shadow-xs border border-slate-200 dark:border-slate-700'
+                ? 'bg-white dark:bg-slate-800 text-[#1D4ED8] dark:text-[#60A5FA] shadow-xs border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -198,7 +198,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
             onClick={() => setActiveTab('cookies')}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'cookies'
-                ? 'bg-white dark:bg-slate-800 text-[#B8922A] dark:text-[#F0D060] shadow-xs border border-slate-200 dark:border-slate-700'
+                ? 'bg-white dark:bg-slate-800 text-[#1D4ED8] dark:text-[#60A5FA] shadow-xs border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -224,7 +224,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
           {/* TAB 1: PRIVACY POLICY */}
           {activeTab === 'privacy' && (
             <div className="space-y-5 animate-in fade-in duration-150">
-              <div className="p-4 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="p-4 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="font-bold text-slate-900 dark:text-white text-base">
                     AROH Privacy Policy
@@ -241,17 +241,17 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
               <div className="space-y-4 text-xs sm:text-sm">
                 <section className="space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Building className="w-4 h-4 text-[#D4AF37]" />
+                    <Building className="w-4 h-4 text-[#3B82F6]" />
                     1. Data Fiduciary &amp; Operator Identification
                   </h4>
                   <p>
-                    This application (<strong>AROH</strong>) is developed, operated, and maintained by <strong>Warad Asare</strong> (individual developer and sole proprietor trading as AROH AI Technologies), located in <strong>Pune, Maharashtra, India</strong>. Contact Email: <a href="mailto:waradasare11@gmail.com" className="text-[#B8922A] dark:text-[#F0D060] font-semibold underline">waradasare11@gmail.com</a>.
+                    This application (<strong>AROH</strong>) is developed, operated, and maintained by <strong>AROH AI Technologies</strong>, located in <strong>Pune, Maharashtra, India</strong>. Contact Email: <a href="mailto:support@aroh.fit" className="text-[#1D4ED8] dark:text-[#60A5FA] font-semibold underline">support@aroh.fit</a>.
                   </p>
                 </section>
 
                 <section className="space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Database className="w-4 h-4 text-[#D4AF37]" />
+                    <Database className="w-4 h-4 text-[#3B82F6]" />
                     2. Categories of Personal Data We Collect
                   </h4>
                   <p>To provide personalized exercise programming, calorie estimation, and physiological tracking, we collect only the data you explicitly provide:</p>
@@ -266,7 +266,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
 
                 <section className="space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Camera className="w-4 h-4 text-[#D4AF37]" />
+                    <Camera className="w-4 h-4 text-[#3B82F6]" />
                     3. Purpose &amp; Scoped Use of Camera &amp; Microphone
                   </h4>
                   <p>
@@ -279,7 +279,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
 
                 <section className="space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-[#D4AF37]" />
+                    <Lock className="w-4 h-4 text-[#3B82F6]" />
                     4. Data Processors &amp; Hosting Locations
                   </h4>
                   <p>We work with vetted tier-1 cloud infrastructure providers:</p>
@@ -291,17 +291,17 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
 
                 <section className="space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-[#D4AF37]" />
+                    <Shield className="w-4 h-4 text-[#3B82F6]" />
                     5. Strict No-Sale Guarantee
                   </h4>
-                  <div className="p-3 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#6A5312] dark:text-[#F0D060] font-semibold">
+                  <div className="p-3 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 text-[#6A5312] dark:text-[#60A5FA] font-semibold">
                     We NEVER sell, rent, lease, monetize, or trade your personal health stats, meal images, workouts, or contact information to data brokers, advertising agencies, or pharmaceutical companies. Your data exists solely to serve your athletic development.
                   </div>
                 </section>
 
                 <section className="space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <UserCheck className="w-4 h-4 text-[#D4AF37]" />
+                    <UserCheck className="w-4 h-4 text-[#3B82F6]" />
                     6. Your Rights Under DPDP Act, 2023
                   </h4>
                   <p>Under Indian privacy legislation, you maintain sovereign control over your data:</p>
@@ -309,7 +309,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
                     <li><strong>Right to Access &amp; Export:</strong> You can export all your logs anytime in standard CSV format or JSON backup via the "Export CSV" tool or Google Drive backup sync.</li>
                     <li><strong>Right to Correction:</strong> You can edit any profile attribute, meal log, or workout entry directly within the application.</li>
                     <li><strong>Right to Erasure (Delete My Data):</strong> You can wipe all data across Firestore, localStorage, and Drive at any time via the "Delete My Data" tab in this portal.</li>
-                    <li><strong>Right to Grievance Redressal:</strong> Direct all privacy concerns to our Grievance Officer: <strong>Warad Asare</strong> at <a href="mailto:waradasare11@gmail.com" className="text-[#B8922A] underline">waradasare11@gmail.com</a>. We respond to all statutory inquiries within 7 business days.</li>
+                    <li><strong>Right to Grievance Redressal:</strong> Direct all privacy concerns to our Grievance Officer at <a href="mailto:support@aroh.fit" className="text-[#1D4ED8] underline">support@aroh.fit</a>. We respond to all statutory inquiries within 7 business days.</li>
                   </ul>
                 </section>
 
@@ -365,7 +365,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
                 <section className="space-y-2">
                   <h4 className="font-bold text-slate-900 dark:text-white">4. 48-Hour Cancellation &amp; Refund Limit</h4>
                   <p>
-                    All paid subscriptions include a <strong>48-hour satisfaction guarantee</strong>. You may request a full refund within 48 hours of purchase by contacting <a href="mailto:waradasare11@gmail.com" className="text-[#B8922A] underline">waradasare11@gmail.com</a>. <strong>No refunds will be granted after 48 hours</strong> from payment confirmation, except where mandated by applicable Indian consumer protection laws.
+                    All paid subscriptions include a <strong>48-hour satisfaction guarantee</strong>. You may request a full refund within 48 hours of purchase by contacting <a href="mailto:support@aroh.fit" className="text-[#1D4ED8] underline">support@aroh.fit</a>. <strong>No refunds will be granted after 48 hours</strong> from payment confirmation, except where mandated by applicable Indian consumer protection laws.
                   </p>
                 </section>
 
@@ -449,7 +449,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
           {/* TAB 4: REFUND POLICY */}
           {activeTab === 'refund' && (
             <div className="space-y-5 animate-in fade-in duration-150">
-              <div className="p-4 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/20">
+              <div className="p-4 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/20">
                 <h3 className="font-bold text-slate-900 dark:text-white text-base">
                   Simple &amp; Transparent Refund Policy
                 </h3>
@@ -477,7 +477,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
                   <h4 className="font-bold text-slate-900 dark:text-white">3. How to Request a Refund</h4>
                   <p>To request your refund within the 48-hour window:</p>
                   <ol className="list-decimal pl-5 space-y-1.5 text-slate-600 dark:text-slate-400">
-                    <li>Send an email from your registered AROH email address to <a href="mailto:waradasare11@gmail.com" className="text-[#B8922A] underline font-semibold">waradasare11@gmail.com</a>.</li>
+                    <li>Send an email from your registered AROH email address to <a href="mailto:support@aroh.fit" className="text-[#1D4ED8] underline font-semibold">support@aroh.fit</a>.</li>
                     <li>Include the subject line: <code className="px-1.5 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-[11px] font-mono">Refund Request - [Your Name]</code>.</li>
                     <li>Provide your 12-digit UPI UTR reference number or payment transaction ID and your registered phone number / UPI VPA.</li>
                   </ol>
@@ -571,7 +571,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
                     <button
                       type="button"
                       onClick={onSignIn}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#3B82F6] hover:bg-[#1D4ED8] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
                     >
                       <LogIn className="w-4 h-4" />
                       <span>Sign In with Google</span>
@@ -582,9 +582,9 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
                   </p>
                 </div>
               ) : deletionSummary ? (
-                <div className="p-6 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-center space-y-3">
-                  <CheckCircle2 className="w-12 h-12 text-[#D4AF37] mx-auto" />
-                  <h4 className="text-base font-bold text-[#8E701C] dark:text-[#F0D060]">
+                <div className="p-6 rounded-2xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 text-center space-y-3">
+                  <CheckCircle2 className="w-12 h-12 text-[#3B82F6] mx-auto" />
+                  <h4 className="text-base font-bold text-[#8E701C] dark:text-[#60A5FA]">
                     All User Data Has Been Permanently Erased
                   </h4>
                   <div className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto space-y-1">
@@ -642,12 +642,12 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
         {/* Footer */}
         <div className="px-6 py-3 border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/60 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-2">
-            <MapPin className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <MapPin className="w-3.5 h-3.5 text-[#3B82F6]" />
             <span>Pune, Maharashtra, India</span>
             <span>•</span>
-            <Mail className="w-3.5 h-3.5 text-[#D4AF37]" />
-            <a href="mailto:waradasare11@gmail.com" className="hover:underline text-[#B8922A] dark:text-[#F0D060]">
-              waradasare11@gmail.com
+            <Mail className="w-3.5 h-3.5 text-[#3B82F6]" />
+            <a href="mailto:support@aroh.fit" className="hover:underline text-[#1D4ED8] dark:text-[#60A5FA]">
+              support@aroh.fit
             </a>
           </div>
           <button

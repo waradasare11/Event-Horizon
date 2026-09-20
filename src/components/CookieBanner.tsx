@@ -51,7 +51,7 @@ export const CookieBanner: React.FC<CookieBannerProps> = ({ onOpenLegal }) => {
       aria-label="Privacy and Cookie Notice"
     >
       <div className="flex items-start gap-3">
-        <div className="p-2 rounded-xl bg-[#D4AF37]/10 text-[#B8922A] dark:text-[#F0D060] border border-[#D4AF37]/20 shrink-0">
+        <div className="p-2 rounded-xl bg-[#00D4FF]/10 text-[#0284C7] dark:text-[#38BDF8] border border-[#00D4FF]/20 shrink-0">
           <Cookie className="w-5 h-5" />
         </div>
         <div className="flex-1 text-xs space-y-1.5">
@@ -74,7 +74,7 @@ export const CookieBanner: React.FC<CookieBannerProps> = ({ onOpenLegal }) => {
             <button
               type="button"
               onClick={() => onOpenLegal('cookies')}
-              className="text-[11px] font-semibold text-[#B8922A] dark:text-[#F0D060] hover:underline cursor-pointer"
+              className="text-[11px] font-semibold text-[#0284C7] dark:text-[#38BDF8] hover:underline cursor-pointer"
             >
               Learn More
             </button>
@@ -101,7 +101,7 @@ export const CookieBanner: React.FC<CookieBannerProps> = ({ onOpenLegal }) => {
         <button
           type="button"
           onClick={handleAcceptAll}
-          className="px-4 py-1.5 rounded-xl bg-[#A68523] hover:bg-[#8E701C] text-white text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+          className="px-4 py-1.5 rounded-xl bg-[#0369A1] hover:bg-[#075985] text-white text-xs font-bold transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
         >
           <Check className="w-3.5 h-3.5" />
           <span>Accept All</span>

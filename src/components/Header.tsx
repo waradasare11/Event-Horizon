@@ -78,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   return (
-    <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#070707]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <header className="sticky top-0 z-30 bg-white/95 dark:bg-[#0B0F1E]/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-3">
           {/* Logo & Brand */}
@@ -90,7 +90,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Daily Quick Summary Widget (Visible on lg+ screens) */}
-          <div className="hidden lg:flex items-center gap-6 bg-slate-50 dark:bg-[#111111] px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div className="hidden lg:flex items-center gap-6 bg-slate-50 dark:bg-[#0E1424] px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
             <div className="text-left">
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
                 <span>Today's Energy</span>
@@ -100,7 +100,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div className="w-28 bg-slate-200 dark:bg-slate-800 rounded-full h-2 mt-1 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-amber-500 to-yellow-400 h-2 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-blue-600 to-cyan-400 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${caloriePercent}%` }}
                 />
               </div>
@@ -117,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
               <div className="w-24 bg-slate-200 dark:bg-slate-800 rounded-full h-2 mt-1 overflow-hidden">
                 <div
-                  className="bg-gradient-to-r from-amber-500 to-amber-600 h-2 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-blue-500 to-indigo-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${proteinPercent}%` }}
                 />
               </div>
@@ -147,15 +147,15 @@ export const Header: React.FC<HeaderProps> = ({
                   const days = Math.max(0, activeSub.daysRemaining ?? 0);
                   return {
                     label: `Trial · ${days}d left`,
-                    className: 'bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/25 hover:bg-amber-500/20',
-                    dot: 'bg-amber-500',
+                    className: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/25 hover:bg-blue-500/20',
+                    dot: 'bg-blue-500',
                   };
                 }
                 if (activeSub.status === 'active') {
                   return {
                     label: 'Pro',
-                    className: 'bg-amber-500/20 text-amber-900 dark:text-amber-200 border-amber-500/40 hover:bg-amber-500/30',
-                    dot: 'bg-amber-500',
+                    className: 'bg-cyan-500/15 text-cyan-800 dark:text-cyan-300 border-cyan-500/40 hover:bg-cyan-500/25',
+                    dot: 'bg-cyan-400',
                   };
                 }
                 return {
@@ -204,14 +204,14 @@ export const Header: React.FC<HeaderProps> = ({
                     src={currentUser.photoURL}
                     alt={currentUser.displayName || 'User Avatar'}
                     referrerPolicy="no-referrer"
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-amber-500/40 object-cover cursor-pointer"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-cyan-500/40 object-cover cursor-pointer"
                     onClick={onOpenSettings}
                     title={`Signed in as ${currentUser.email || currentUser.displayName}`}
                   />
                 ) : (
                   <button
                     onClick={onOpenSettings}
-                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-700 text-black font-bold text-xs flex items-center justify-center cursor-pointer"
+                    className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center cursor-pointer shadow-xs"
                   >
                     {(currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()}
                   </button>
@@ -220,7 +220,7 @@ export const Header: React.FC<HeaderProps> = ({
             ) : (
               <button
                 onClick={onSignIn}
-                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-amber-500 text-black hover:bg-amber-400 transition-all cursor-pointer shadow-2xs font-sans"
+                className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 text-xs font-bold rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-500 hover:to-cyan-400 transition-all cursor-pointer shadow-sm font-sans"
                 title="Sign in with Google"
               >
                 <LogIn className="w-3.5 h-3.5" />
@@ -241,11 +241,11 @@ export const Header: React.FC<HeaderProps> = ({
                 onClick={() => setActiveTab(item.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all cursor-pointer ${
                   isActive
-                    ? 'bg-amber-500 text-black shadow-md shadow-amber-500/20 font-sans'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#1A1D1B]'
+                    ? 'bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-md shadow-cyan-500/20 font-sans'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-[#161F38]'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-black' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                 <span>{item.label}</span>
               </button>
             );

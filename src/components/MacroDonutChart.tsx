@@ -50,7 +50,7 @@ export const MacroDonutChart: React.FC<MacroDonutChartProps> = ({
       grams: totalProteinG,
       calories: proteinCals,
       percentage: proteinEnergyPct,
-      color: '#D4AF37',
+      color: '#3B82F6',
       unit: 'g',
     },
     {
@@ -81,14 +81,14 @@ export const MacroDonutChart: React.FC<MacroDonutChartProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-3">
         <div>
           <h3 className="font-bold text-sm sm:text-base text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
-            <PieIcon className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
+            <PieIcon className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA]" />
             <span>Today's Real-Time Macro Distribution</span>
           </h3>
           <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
             Calorie energy ratio split across Protein (4 kcal/g), Carbs (4 kcal/g), and Fats (9 kcal/g).
           </p>
         </div>
-        <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] shrink-0">
+        <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-[#3B82F6]/10 text-[#3B82F6] dark:text-[#60A5FA] shrink-0">
           {totalCalories} kcal Total
         </span>
       </div>
@@ -157,7 +157,7 @@ export const MacroDonutChart: React.FC<MacroDonutChartProps> = ({
           {/* Protein Bar */}
           <div className="p-3 rounded-xl bg-gray-50 dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#282C2A] space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-1.5 font-bold text-[#D4AF37] dark:text-[#F0D060]">
+              <div className="flex items-center gap-1.5 font-bold text-[#3B82F6] dark:text-[#60A5FA]">
                 <Dumbbell className="w-3.5 h-3.5" />
                 <span>Protein</span>
                 <span className="text-[11px] font-normal text-[#6B7280] dark:text-[#9EA8A2]">
@@ -170,7 +170,7 @@ export const MacroDonutChart: React.FC<MacroDonutChartProps> = ({
             </div>
             <div className="w-full bg-[#E5E7EB] dark:bg-[#282C2A] h-2 rounded-full overflow-hidden">
               <div
-                className="bg-[#D4AF37] h-full rounded-full transition-all duration-500"
+                className="bg-[#3B82F6] h-full rounded-full transition-all duration-500"
                 style={{ width: `${Math.min(100, Math.round((totalProteinG / Math.max(1, userProfile.dailyProtein)) * 100))}%` }}
               />
             </div>

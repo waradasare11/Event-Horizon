@@ -76,19 +76,19 @@ export const GrantTimelineModal: React.FC<GrantTimelineModalProps> = ({
   const getEventIcon = (eventType: string) => {
     switch (eventType) {
       case 'initial_grant':
-        return <Crown className="w-4 h-4 text-[#D4AF37]" />;
+        return <Crown className="w-4 h-4 text-[#3B82F6]" />;
       case 'coupon_redeemed':
         return <Ticket className="w-4 h-4 text-amber-500" />;
       case 'extension_added':
-        return <Zap className="w-4 h-4 text-[#D4AF37]" />;
+        return <Zap className="w-4 h-4 text-[#3B82F6]" />;
       case 'notification_dispatched':
         return <Send className="w-4 h-4 text-blue-500" />;
       case 'status_changed':
         return <AlertCircle className="w-4 h-4 text-rose-500" />;
       case 'repaired_synced':
-        return <Activity className="w-4 h-4 text-[#D4AF37]" />;
+        return <Activity className="w-4 h-4 text-[#3B82F6]" />;
       default:
-        return <Clock className="w-4 h-4 text-[#D4AF37]" />;
+        return <Clock className="w-4 h-4 text-[#3B82F6]" />;
     }
   };
 
@@ -97,9 +97,9 @@ export const GrantTimelineModal: React.FC<GrantTimelineModalProps> = ({
       <div className="bg-white dark:bg-[#121413] rounded-3xl max-w-2xl w-full shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden text-left my-6 flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95">
         
         {/* Header */}
-        <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-[#D4AF37]/10 via-[#D4AF37]/5 to-transparent shrink-0">
+        <div className="px-6 py-5 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gradient-to-r from-[#3B82F6]/10 via-[#3B82F6]/5 to-transparent shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center text-[#B8922A] dark:text-[#F0D060]">
+            <div className="w-10 h-10 rounded-2xl bg-[#3B82F6]/15 border border-[#3B82F6]/30 flex items-center justify-center text-[#1D4ED8] dark:text-[#60A5FA]">
               <Clock className="w-5 h-5" />
             </div>
             <div>
@@ -107,7 +107,7 @@ export const GrantTimelineModal: React.FC<GrantTimelineModalProps> = ({
                 <h3 className="text-base font-black text-gray-900 dark:text-white">
                   Athlete Grant Timeline & History
                 </h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#3B82F6]/15 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/30">
                   Cryptographic Audit
                 </span>
               </div>
@@ -125,7 +125,7 @@ export const GrantTimelineModal: React.FC<GrantTimelineModalProps> = ({
               className="p-2 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-colors cursor-pointer"
               title="Refresh Timeline"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#B8922A]' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#1D4ED8]' : ''}`} />
             </button>
             <button
               type="button"
@@ -142,14 +142,14 @@ export const GrantTimelineModal: React.FC<GrantTimelineModalProps> = ({
           <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800 shadow-2xs">
             <div className="text-[10px] font-black uppercase text-gray-400">Current Status</div>
             <div className="font-extrabold text-gray-900 dark:text-white mt-1 flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full ${currentStatus === 'Active' || isLifetime ? 'bg-[#D4AF37] animate-pulse' : 'bg-rose-500'}`} />
+              <span className={`w-2 h-2 rounded-full ${currentStatus === 'Active' || isLifetime ? 'bg-[#3B82F6] animate-pulse' : 'bg-rose-500'}`} />
               <span>{isLifetime ? 'Active (Lifetime VIP)' : currentStatus}</span>
             </div>
           </div>
 
           <div className="p-3 rounded-2xl bg-white dark:bg-[#121413] border border-gray-200 dark:border-gray-800 shadow-2xs">
             <div className="text-[10px] font-black uppercase text-gray-400">Active Plan</div>
-            <div className="font-extrabold text-[#B8922A] dark:text-[#F0D060] mt-1 flex items-center gap-1.5">
+            <div className="font-extrabold text-[#1D4ED8] dark:text-[#60A5FA] mt-1 flex items-center gap-1.5">
               <Crown className="w-3.5 h-3.5" />
               <span>{grantDetails?.planName || (isLifetime ? 'Lifetime Master VIP' : 'Pro VIP Plan')}</span>
             </div>
@@ -159,7 +159,7 @@ export const GrantTimelineModal: React.FC<GrantTimelineModalProps> = ({
             <div className="text-[10px] font-black uppercase text-gray-400">Expiration Date</div>
             <div className="font-extrabold text-gray-900 dark:text-white mt-1">
               {isLifetime ? (
-                <span className="text-[#B8922A] dark:text-[#F0D060] font-bold">Never Expires (Lifetime)</span>
+                <span className="text-[#1D4ED8] dark:text-[#60A5FA] font-bold">Never Expires (Lifetime)</span>
               ) : expiresAt ? (
                 <span>
                   {new Date(expiresAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
@@ -180,7 +180,7 @@ export const GrantTimelineModal: React.FC<GrantTimelineModalProps> = ({
         <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
           {isLoading ? (
             <div className="py-12 text-center space-y-3">
-              <RefreshCw className="w-6 h-6 animate-spin text-[#B8922A] mx-auto" />
+              <RefreshCw className="w-6 h-6 animate-spin text-[#1D4ED8] mx-auto" />
               <div className="font-bold text-gray-500">Reconstructing cryptographically verified grant timeline...</div>
             </div>
           ) : timelineEvents.length === 0 ? (
@@ -190,7 +190,7 @@ export const GrantTimelineModal: React.FC<GrantTimelineModalProps> = ({
               <p className="text-xs">No administrative actions or timeline entries found for this athlete.</p>
             </div>
           ) : (
-            <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-[#D4AF37] before:via-[#D4AF37] before:to-gray-200 dark:before:to-gray-800">
+            <div className="relative pl-6 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-[#3B82F6] before:via-[#3B82F6] before:to-gray-200 dark:before:to-gray-800">
               {timelineEvents.map((evt, idx) => {
                 const dateObj = new Date(evt.timestamp);
                 const formattedDate = dateObj.toLocaleDateString(undefined, {
@@ -203,19 +203,19 @@ export const GrantTimelineModal: React.FC<GrantTimelineModalProps> = ({
                 return (
                   <div key={evt.id || idx} className="relative group">
                     {/* Node Dot */}
-                    <div className="absolute -left-[27px] top-1 w-6 h-6 rounded-full bg-white dark:bg-[#121413] border-2 border-[#D4AF37] shadow-xs flex items-center justify-center z-10">
+                    <div className="absolute -left-[27px] top-1 w-6 h-6 rounded-full bg-white dark:bg-[#121413] border-2 border-[#3B82F6] shadow-xs flex items-center justify-center z-10">
                       {getEventIcon(evt.eventType)}
                     </div>
 
                     {/* Timeline Event Card */}
-                    <div className="p-4 rounded-2xl bg-gray-50/80 dark:bg-[#191B1A] border border-gray-200 dark:border-gray-800 space-y-2 hover:border-[#D4AF37]/40 transition-colors">
+                    <div className="p-4 rounded-2xl bg-gray-50/80 dark:bg-[#191B1A] border border-gray-200 dark:border-gray-800 space-y-2 hover:border-[#3B82F6]/40 transition-colors">
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                         <div className="flex items-center gap-2">
                           <span className="font-extrabold text-gray-900 dark:text-white text-xs">
                             {evt.title}
                           </span>
                           {evt.badge && (
-                            <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30">
+                            <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#3B82F6]/15 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/30">
                               {evt.badge}
                             </span>
                           )}
@@ -232,11 +232,11 @@ export const GrantTimelineModal: React.FC<GrantTimelineModalProps> = ({
 
                       <div className="flex items-center justify-between text-[10px] text-gray-400 pt-1 border-t border-gray-200/50 dark:border-gray-800/50">
                         <div className="flex items-center gap-1">
-                          <ShieldCheck className="w-3 h-3 text-[#B8922A] dark:text-[#F0D060]" />
+                          <ShieldCheck className="w-3 h-3 text-[#1D4ED8] dark:text-[#60A5FA]" />
                           <span>Actor: <strong>{evt.actor}</strong></span>
                         </div>
                         {evt.durationLabel && (
-                          <div className="font-semibold text-[#B8922A] dark:text-[#F0D060]">
+                          <div className="font-semibold text-[#1D4ED8] dark:text-[#60A5FA]">
                             {evt.durationLabel}
                           </div>
                         )}

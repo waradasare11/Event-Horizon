@@ -292,7 +292,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
       <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
+            <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#3B82F6]/10 text-[#3B82F6] dark:text-[#60A5FA]">
               Nutrition Hub
             </span>
             <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">BMR: {userProfile.bmr} kcal • TDEE: {userProfile.tdee} kcal</span>
@@ -311,7 +311,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
             onClick={() => setPlannerSubView('per_gram_builder')}
             className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               plannerSubView === 'per_gram_builder'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
+                ? 'bg-[#3B82F6] text-white shadow-xs'
                 : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
             }`}
           >
@@ -322,7 +322,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
             onClick={() => setPlannerSubView('smart_grocery')}
             className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               plannerSubView === 'smart_grocery'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
+                ? 'bg-[#3B82F6] text-white shadow-xs'
                 : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
             }`}
           >
@@ -333,7 +333,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
             onClick={() => setPlannerSubView('daily_blueprint')}
             className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               plannerSubView === 'daily_blueprint'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
+                ? 'bg-[#3B82F6] text-white shadow-xs'
                 : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
             }`}
           >
@@ -344,7 +344,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
             onClick={() => setPlannerSubView('recipe_database')}
             className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               plannerSubView === 'recipe_database'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
+                ? 'bg-[#3B82F6] text-white shadow-xs'
                 : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
             }`}
           >
@@ -355,7 +355,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
             onClick={() => setPlannerSubView('recipe_gen')}
             className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
               plannerSubView === 'recipe_gen'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
+                ? 'bg-[#3B82F6] text-white shadow-xs'
                 : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-[#E8ECE9]'
             }`}
           >
@@ -368,13 +368,13 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
       {/* Dietary Preference Lock Status Bar */}
       {(userProfile.dietType === 'vegetarian' || userProfile.dietType === 'vegan' || userProfile.dietaryPreferenceLock?.includes('locked')) && (
         <div className="p-3.5 rounded-2xl bg-[#FFFBF0]/80 dark:bg-[#2A2416]/40 border border-[#E6D7A8] dark:border-[#2A2416]/60 flex items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-[#6A5312] dark:text-[#F0D060]">
-            <ShieldCheck className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060] shrink-0" />
+          <div className="flex items-center gap-2 text-[#6A5312] dark:text-[#60A5FA]">
+            <ShieldCheck className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA] shrink-0" />
             <span>
               <strong>Dietary Preference Lock Enforced:</strong> 100% Zero Non-Vegetarian Filter active. All AI generations, swaps, and macro calculations are strictly verified against non-veg ingredients.
             </span>
           </div>
-          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#D4AF37] text-white flex items-center gap-1 shrink-0">
+          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#3B82F6] text-white flex items-center gap-1 shrink-0">
             <Lock className="w-3 h-3" />
             LOCKED
           </span>
@@ -411,14 +411,14 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
 
       {/* Swap Success Toast */}
       {swapToast && (
-        <div className="p-3.5 rounded-xl bg-[#FFFBF0] dark:bg-[#2A2416]/40 border border-[#D4AF37]/50 dark:border-[#2A2416] text-xs text-[#8E701C] dark:text-[#F0D060] flex items-center justify-between gap-3 animate-in slide-in-from-top-2">
+        <div className="p-3.5 rounded-xl bg-[#FFFBF0] dark:bg-[#2A2416]/40 border border-[#3B82F6]/50 dark:border-[#2A2416] text-xs text-[#8E701C] dark:text-[#60A5FA] flex items-center justify-between gap-3 animate-in slide-in-from-top-2">
           <div className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060]" />
+            <Check className="w-4 h-4 text-[#1D4ED8] dark:text-[#60A5FA]" />
             <span className="font-bold">{swapToast}</span>
           </div>
           <button
             onClick={() => setSwapToast(null)}
-            className="text-[#A68523] dark:text-[#F0D060] font-bold hover:underline"
+            className="text-[#1D4ED8] dark:text-[#60A5FA] font-bold hover:underline"
           >
             Dismiss
           </button>
@@ -443,7 +443,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
       <div className="bg-gradient-to-r from-[#FAFAF8] to-[#FAF3E0]/50 dark:from-[#111111] dark:to-[#111111]/20 p-6 rounded-2xl border border-[#E6D7A8]/80 dark:border-[#2A2416]/40 shadow-xs transition-all">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3">
-            <div className={`p-2.5 rounded-xl ${isWeightLossMode ? 'bg-[#D4AF37] text-white shadow-xs' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}`}>
+            <div className={`p-2.5 rounded-xl ${isWeightLossMode ? 'bg-[#3B82F6] text-white shadow-xs' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'}`}>
               <Scale className="w-5 h-5" />
             </div>
             <div>
@@ -453,7 +453,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
                 </h3>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide ${
                   isWeightLossMode 
-                    ? 'bg-[#D4AF37]/15 text-[#D4AF37] dark:text-[#F0D060] border border-[#D4AF37]/30' 
+                    ? 'bg-[#3B82F6]/15 text-[#3B82F6] dark:text-[#60A5FA] border border-[#3B82F6]/30' 
                     : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
                 }`}>
                   {isWeightLossMode ? '20% Deficit Active' : 'Maintenance / Standard'}
@@ -473,8 +473,8 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
             onClick={toggleWeightLossMode}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shrink-0 flex items-center gap-2 shadow-xs ${
               isWeightLossMode
-                ? 'bg-[#D4AF37] text-white hover:bg-[#A68523]'
-                : 'bg-white dark:bg-[#202422] border border-[#D1D5DB] dark:border-[#383E3B] text-[#374151] dark:text-[#D1D5DB] hover:border-[#D4AF37]'
+                ? 'bg-[#3B82F6] text-white hover:bg-[#1D4ED8]'
+                : 'bg-white dark:bg-[#202422] border border-[#D1D5DB] dark:border-[#383E3B] text-[#374151] dark:text-[#D1D5DB] hover:border-[#3B82F6]'
             }`}
           >
             <Flame className={`w-4 h-4 ${isWeightLossMode ? 'text-amber-300 animate-pulse' : 'text-gray-400'}`} />
@@ -486,7 +486,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
         {isWeightLossMode && (
           <div className="mt-5 pt-4 border-t border-[#E6D7A8]/60 dark:border-[#2A2416]/40 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs gap-1.5">
-              <span className="font-semibold text-[#6A5312] dark:text-[#F0D060] flex items-center gap-1.5">
+              <span className="font-semibold text-[#6A5312] dark:text-[#60A5FA] flex items-center gap-1.5">
                 <Flame className="w-3.5 h-3.5 text-amber-500" />
                 Deficit Progress Today: <strong>{currentActualDeficit >= 0 ? `${currentActualDeficit} kcal deficit achieved` : `${Math.abs(currentActualDeficit)} kcal surplus`}</strong>
               </span>
@@ -496,13 +496,13 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
             </div>
 
             {/* Progress Track */}
-            <div className="w-full bg-[#FDF3D0]/60 dark:bg-[#2A2416]/60 rounded-full h-3.5 p-0.5 overflow-hidden border border-[#D4AF37]/50/40 dark:border-[#2A2416]/40 relative">
+            <div className="w-full bg-[#FDF3D0]/60 dark:bg-[#2A2416]/60 rounded-full h-3.5 p-0.5 overflow-hidden border border-[#3B82F6]/50/40 dark:border-[#2A2416]/40 relative">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${
                   currentActualDeficit >= targetDeficitAmount
-                    ? 'bg-gradient-to-r from-[#D4AF37] to-[#D4AF37]'
+                    ? 'bg-gradient-to-r from-[#3B82F6] to-[#3B82F6]'
                     : currentActualDeficit > 0
-                    ? 'bg-gradient-to-r from-amber-500 to-[#F0D060]'
+                    ? 'bg-gradient-to-r from-amber-500 to-[#60A5FA]'
                     : 'bg-rose-500'
                 }`}
                 style={{
@@ -513,13 +513,13 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-[#6B7280] dark:text-[#9EA8A2] pt-1">
               <div className="bg-white/80 dark:bg-[#1B1E1D]/80 p-2 rounded-lg border border-[#E6D7A8] dark:border-[#2A2416]/30">
-                <span className="text-gray-500">Target Deficit:</span> <strong className="text-[#D4AF37] dark:text-[#F0D060]">-{targetDeficitAmount} kcal/day (20%)</strong>
+                <span className="text-gray-500">Target Deficit:</span> <strong className="text-[#3B82F6] dark:text-[#60A5FA]">-{targetDeficitAmount} kcal/day (20%)</strong>
               </div>
               <div className="bg-white/80 dark:bg-[#1B1E1D]/80 p-2 rounded-lg border border-[#E6D7A8] dark:border-[#2A2416]/30">
                 <span className="text-gray-500">Projected Rate:</span> <strong className="text-amber-600 dark:text-amber-400">-{projectedWeeklyKgLoss} kg/week</strong>
               </div>
               <div className="bg-white/80 dark:bg-[#1B1E1D]/80 p-2 rounded-lg border border-[#E6D7A8] dark:border-[#2A2416]/30">
-                <span className="text-gray-500">Zone Status:</span> <strong className="text-[#A68523] dark:text-[#F0D060]">{currentActualDeficit >= targetDeficitAmount ? '🎯 Ideal Deficit Zone' : `${Math.max(0, effectiveDailyCalories - totalCaloriesToday)} kcal remaining`}</strong>
+                <span className="text-gray-500">Zone Status:</span> <strong className="text-[#1D4ED8] dark:text-[#60A5FA]">{currentActualDeficit >= targetDeficitAmount ? '🎯 Ideal Deficit Zone' : `${Math.max(0, effectiveDailyCalories - totalCaloriesToday)} kcal remaining`}</strong>
               </div>
             </div>
           </div>
@@ -547,7 +547,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
               <Flame className="w-4 h-4 text-[#E8912D]" />
               <span>Daily Calories</span>
             </div>
-            <span className="text-xs font-bold text-[#D4AF37] dark:text-[#F0D060]">
+            <span className="text-xs font-bold text-[#3B82F6] dark:text-[#60A5FA]">
               {effectiveDailyCalories} kcal target {isWeightLossMode && '(-20%)'}
             </span>
           </div>
@@ -556,7 +556,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
           </div>
           <div className="w-full bg-[#F3F4F6] dark:bg-[#2A2416] rounded-full h-2 mt-3 overflow-hidden">
             <div
-              className="bg-[#D4AF37] h-2 rounded-full transition-all duration-500"
+              className="bg-[#3B82F6] h-2 rounded-full transition-all duration-500"
               style={{ width: `${Math.min(100, (totalCaloriesToday / effectiveDailyCalories) * 100)}%` }}
             />
           </div>
@@ -569,11 +569,11 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
         {/* Protein */}
         <div className="bg-white dark:bg-[#111111] p-5 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-xs text-[#D4AF37] dark:text-[#F0D060]">
-              <Dumbbell className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
+            <div className="flex items-center gap-1.5 text-xs text-[#3B82F6] dark:text-[#60A5FA]">
+              <Dumbbell className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA]" />
               <span>Protein Target</span>
             </div>
-            <span className="text-xs font-bold text-[#D4AF37] dark:text-[#F0D060]">
+            <span className="text-xs font-bold text-[#3B82F6] dark:text-[#60A5FA]">
               {userProfile.dailyProtein}g target
             </span>
           </div>
@@ -703,7 +703,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
                   {aiMealPlan?.planName || 'Personalized Body-Comp Adaptive Meal Plan'}
                 </h2>
                 {userProfile.dietType === 'vegetarian' && (
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FDF3D0] dark:bg-[#2A2416]/40 text-[#8E701C] dark:text-[#F0D060] flex items-center gap-1">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FDF3D0] dark:bg-[#2A2416]/40 text-[#8E701C] dark:text-[#60A5FA] flex items-center gap-1">
                     <Leaf className="w-3 h-3" />
                     Strict Vegetarian
                   </span>
@@ -722,14 +722,14 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
                 onClick={() => setPlannerSubView('smart_grocery')}
                 className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#FAFAF8] dark:bg-[#2A2416] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs font-semibold hover:bg-gray-100 dark:hover:bg-[#2E3330] transition-all cursor-pointer"
               >
-                <ShoppingCart className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
+                <ShoppingCart className="w-3.5 h-3.5 text-[#3B82F6] dark:text-[#60A5FA]" />
                 <span>View Grocery List</span>
               </button>
 
               <select
                 value={selectedCuisine}
                 onChange={(e) => setSelectedCuisine(e.target.value)}
-                className="text-xs font-medium px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#111111] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+                className="text-xs font-medium px-3 py-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#111111] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#3B82F6]"
               >
                 <option value="High-Protein Global & Mediterranean">Global & Mediterranean</option>
                 <option value="High-Protein Indian (Veg & Non-Veg)">High-Protein Indian</option>
@@ -740,7 +740,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
               <button
                 onClick={handleGenerateAIMealPlan}
                 disabled={isGeneratingPlan}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#D4AF37] text-white text-xs font-semibold hover:bg-[#A68523] transition-all shadow-xs shrink-0 cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-[#3B82F6] text-white text-xs font-semibold hover:bg-[#1D4ED8] transition-all shadow-xs shrink-0 cursor-pointer disabled:opacity-50"
               >
                 {isGeneratingPlan ? (
                   <>
@@ -759,13 +759,13 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
 
           {/* AI Rationale & Explanation Card */}
           {aiMealPlan && (
-            <div className="p-4 rounded-xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/15 border border-[#D4AF37]/20 text-xs text-[#374151] dark:text-[#D1D5DB] space-y-2">
-              <div className="flex items-center gap-2 font-bold text-[#D4AF37] dark:text-[#F0D060]">
+            <div className="p-4 rounded-xl bg-[#3B82F6]/5 dark:bg-[#3B82F6]/15 border border-[#3B82F6]/20 text-xs text-[#374151] dark:text-[#D1D5DB] space-y-2">
+              <div className="flex items-center gap-2 font-bold text-[#3B82F6] dark:text-[#60A5FA]">
                 <Lightbulb className="w-4 h-4 text-[#E8912D]" />
                 <span>Scientific Body Composition Rationale</span>
               </div>
               <p>{aiMealPlan.bodyCompRationale}</p>
-              <div className="pt-2 border-t border-[#D4AF37]/15 text-[11px] text-[#4B5563] dark:text-[#9EA8A2]">
+              <div className="pt-2 border-t border-[#3B82F6]/15 text-[11px] text-[#4B5563] dark:text-[#9EA8A2]">
                 <strong>Adaptive Strategy:</strong> {aiMealPlan.adjustmentSummary}
               </div>
             </div>
@@ -777,11 +777,11 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
               {aiMealPlan.meals.map((meal, idx) => (
                 <div
                   key={idx}
-                  className="p-4 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#111111] hover:border-[#D4AF37] dark:hover:border-[#F0D060] transition-all flex flex-col justify-between"
+                  className="p-4 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#111111] hover:border-[#3B82F6] dark:hover:border-[#60A5FA] transition-all flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]">
+                      <span className="text-[11px] font-bold uppercase tracking-wide px-2 py-0.5 rounded bg-[#3B82F6]/10 dark:bg-[#3B82F6]/20 text-[#3B82F6] dark:text-[#60A5FA]">
                         {meal.mealType}
                       </span>
                       <span className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] flex items-center gap-1">
@@ -817,7 +817,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
                   <div className="mt-4 pt-3 border-t border-[#E5E7EB] dark:border-[#2A2416] space-y-2">
                     <div className="flex items-center justify-between text-xs font-semibold">
                       <span className="text-[#E8912D]">{meal.calories} kcal</span>
-                      <span className="text-[#D4AF37] dark:text-[#F0D060]">{meal.proteinG}g Protein</span>
+                      <span className="text-[#3B82F6] dark:text-[#60A5FA]">{meal.proteinG}g Protein</span>
                     </div>
                     {meal.cookingTip && (
                       <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2] italic bg-white dark:bg-[#111111] p-2 rounded border border-[#E5E7EB] dark:border-[#2A2416]">
@@ -838,7 +838,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
                         </>
                       ) : (
                         <>
-                          <ArrowRightLeft className="w-3 h-3 text-[#D4AF37] dark:text-[#F0D060]" />
+                          <ArrowRightLeft className="w-3 h-3 text-[#3B82F6] dark:text-[#60A5FA]" />
                           <span>Swap This Meal</span>
                         </>
                       )}
@@ -849,7 +849,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
             </div>
           ) : (
             <div className="text-center py-12 px-4 border-2 border-dashed border-[#E5E7EB] dark:border-[#2A2416] rounded-xl space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 rounded-xl bg-[#3B82F6]/10 dark:bg-[#3B82F6]/20 text-[#3B82F6] dark:text-[#60A5FA] flex items-center justify-center mx-auto">
                 <ChefHat className="w-6 h-6" />
               </div>
               <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">No 1-Day Plan Generated Yet</h3>
@@ -859,7 +859,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
               <button
                 onClick={handleGenerateAIMealPlan}
                 disabled={isGeneratingPlan}
-                className="px-6 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs font-semibold hover:bg-[#A68523] transition-all shadow-xs cursor-pointer"
+                className="px-6 py-2.5 rounded-xl bg-[#3B82F6] text-white text-xs font-semibold hover:bg-[#1D4ED8] transition-all shadow-xs cursor-pointer"
               >
                 Generate AI 1-Day Plan Now
               </button>
@@ -871,7 +871,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
             <div className="flex items-center gap-2">
               <Droplet className="w-4 h-4 text-[#3B82F6]" />
               <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">Daily Hydration Target:</span>
-              <span className="font-bold text-[#D4AF37] dark:text-[#F0D060]">
+              <span className="font-bold text-[#3B82F6] dark:text-[#60A5FA]">
                 {aiMealPlan?.hydrationTargetLiters || userProfile.hydrationLiters || 3.5} Liters / day
               </span>
             </div>

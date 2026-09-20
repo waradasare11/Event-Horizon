@@ -86,16 +86,16 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
 
   // Determine Consistency Tier
   let streakTier = 'Ignition Phase 🚀';
-  let tierColor = 'text-amber-600 bg-amber-500/10 border-amber-500/30';
+  let tierColor = 'text-amber-600 bg-cyan-500/10 border-cyan-500/30';
   let nextMilestone = 3;
 
   if (currentStreak >= 30) {
     streakTier = 'Legendary Iron Master 🌟';
-    tierColor = 'text-[#B8922A] bg-[#D4AF37]/10 border-[#D4AF37]/30';
+    tierColor = 'text-[#0284C7] bg-[#00D4FF]/10 border-[#00D4FF]/30';
     nextMilestone = 60;
   } else if (currentStreak >= 14) {
     streakTier = 'Hypertrophy Consistency Master 👑';
-    tierColor = 'text-[#D4AF37] bg-[#D4AF37]/10 border-[#D4AF37]/30';
+    tierColor = 'text-[#00D4FF] bg-[#00D4FF]/10 border-[#00D4FF]/30';
     nextMilestone = 30;
   } else if (currentStreak >= 7) {
     streakTier = 'Neural Adaptation Momentum ⚡';
@@ -124,7 +124,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
         particleCount: 70,
         spread: 60,
         origin: { y: 0.6 },
-        colors: ['#D4AF37', '#E8912D', '#16A34A', '#F59E0B'],
+        colors: ['#00D4FF', '#E8912D', '#16A34A', '#F59E0B'],
       });
     } catch (e) {
       // Ignored if confetti fails
@@ -134,9 +134,9 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
   const todayLog = daysWindow.find((d) => d.isToday)?.log;
 
   return (
-    <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-3xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-6 text-left transition-colors">
+    <div className="bg-white dark:bg-[#0E1424] p-6 sm:p-8 rounded-3xl border border-[#E5E7EB] dark:border-[#1E293B] shadow-xs space-y-6 text-left transition-colors">
       {/* Top Banner with Fire Streak & Stats */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-[#E5E7EB] dark:border-[#2A2416]">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-[#E5E7EB] dark:border-[#1E293B]">
         <div>
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#E8912D]/10 dark:bg-[#E8912D]/20 text-[#E8912D] flex items-center gap-1">
@@ -156,7 +156,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
         </div>
 
         {/* Big Counter & Milestone Progress */}
-        <div className="flex items-center gap-4 bg-[#FAFAF8] dark:bg-[#111111] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shrink-0">
+        <div className="flex items-center gap-4 bg-[#FAFAF8] dark:bg-[#0E1424] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B] shrink-0">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-[#E8912D] to-amber-400 text-white flex flex-col items-center justify-center shadow-sm relative overflow-hidden">
             <Flame className="w-6 h-6 fill-white drop-shadow-xs" />
             <span className="text-xs font-black tracking-tight">{currentStreak}D</span>
@@ -170,23 +170,23 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
             <div className="flex items-center gap-3 text-[11px] text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
               <span>Best: <strong>{longestStreak} Days</strong></span>
               <span>•</span>
-              <span>28-Day Adherence: <strong className="text-[#D4AF37] dark:text-[#F0D060]">{adherencePct}%</strong></span>
+              <span>28-Day Adherence: <strong className="text-[#00D4FF] dark:text-[#38BDF8]">{adherencePct}%</strong></span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Quick Action Button for Today's Workout */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-[#D4AF37]/8 via-[#D4AF37]/4 to-transparent dark:from-[#D4AF37]/15 dark:via-[#D4AF37]/5 dark:to-transparent border border-[#D4AF37]/20 dark:border-[#D4AF37]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-4 rounded-2xl bg-gradient-to-r from-[#00D4FF]/8 via-[#00D4FF]/4 to-transparent dark:from-[#00D4FF]/15 dark:via-[#00D4FF]/5 dark:to-transparent border border-[#00D4FF]/20 dark:border-[#00D4FF]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${todayLog ? 'bg-[#D4AF37] text-white' : 'bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060]'}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${todayLog ? 'bg-[#00D4FF] text-white' : 'bg-[#00D4FF]/10 dark:bg-[#00D4FF]/20 text-[#00D4FF] dark:text-[#38BDF8]'}`}>
             {todayLog ? <CheckCircle2 className="w-5 h-5" /> : <Dumbbell className="w-5 h-5" />}
           </div>
           <div>
             <div className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
               <span>Today's Goal ({today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })})</span>
               {todayLog && (
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#FDF3D0] dark:bg-[#2A2416]/80 text-[#8E701C] dark:text-[#F0D060] border border-[#D4AF37]/50 dark:border-[#D4AF37]/40">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#161F38] dark:bg-[#1E293B]/80 text-[#075985] dark:text-[#38BDF8] border border-[#00D4FF]/50 dark:border-[#00D4FF]/40">
                   {todayLog.isRestDay ? 'Active Recovery Done' : 'Workout Completed'}
                 </span>
               )}
@@ -204,8 +204,8 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
             onClick={() => handleQuickLogToday(false)}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs ${
               todayLog && !todayLog.isRestDay
-                ? 'bg-[#A68523] text-white hover:bg-[#8E701C]'
-                : 'bg-[#D4AF37] text-white hover:bg-[#A68523]'
+                ? 'bg-[#0369A1] text-white hover:bg-[#075985]'
+                : 'bg-[#00D4FF] text-white hover:bg-[#0369A1]'
             }`}
           >
             <Check className="w-3.5 h-3.5" />
@@ -217,7 +217,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
             className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1 border ${
               todayLog && todayLog.isRestDay
                 ? 'bg-sky-100 dark:bg-sky-950/80 text-sky-800 dark:text-sky-300 border-sky-300 dark:border-sky-700'
-                : 'bg-white dark:bg-[#111111] text-[#4B5563] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#2A2416] hover:bg-[#F9FAFB] dark:hover:bg-[#2A2416]'
+                : 'bg-white dark:bg-[#0E1424] text-[#4B5563] dark:text-[#E8ECE9] border-[#E5E7EB] dark:border-[#1E293B] hover:bg-[#F9FAFB] dark:hover:bg-[#1E293B]'
             }`}
             title="Scheduled rest day for CNS and muscular repair"
           >
@@ -231,12 +231,12 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
+            <Calendar className="w-4 h-4 text-[#00D4FF] dark:text-[#38BDF8]" />
             <h3 className="text-sm font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">28-Day Consistency Matrix</h3>
           </div>
           <div className="flex items-center gap-3 text-[11px] text-[#6B7280] dark:text-[#9EA8A2]">
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-sm bg-[#D4AF37] inline-block" />
+              <span className="w-2.5 h-2.5 rounded-sm bg-[#00D4FF] inline-block" />
               Workout ({daysWindow.filter((d) => d.log && !d.log.isRestDay).length})
             </span>
             <span className="flex items-center gap-1">
@@ -244,14 +244,14 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
               Active Recovery ({daysWindow.filter((d) => d.log && d.log.isRestDay).length})
             </span>
             <span className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-sm bg-[#E5E7EB] dark:bg-[#2A2416] inline-block" />
+              <span className="w-2.5 h-2.5 rounded-sm bg-[#E5E7EB] dark:bg-[#1E293B] inline-block" />
               Missed / Rest
             </span>
           </div>
         </div>
 
         {/* Heatmap Grid (7 columns x 4 rows) */}
-        <div className="grid grid-cols-7 gap-2 sm:gap-2.5 bg-[#FAFAF8] dark:bg-[#070707] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416]">
+        <div className="grid grid-cols-7 gap-2 sm:gap-2.5 bg-[#FAFAF8] dark:bg-[#0B0F1E] p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B]">
           {daysWindow.map((day) => {
             const hasLog = !!day.log;
             const isRest = day.log?.isRestDay;
@@ -263,14 +263,14 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
                 onClick={() => setSelectedLogDate(isSelected ? null : day.dateStr)}
                 className={`p-2 sm:p-2.5 rounded-xl border text-center transition-all relative flex flex-col items-center justify-between h-16 sm:h-20 ${
                   isSelected
-                    ? 'ring-2 ring-[#D4AF37] dark:ring-[#F0D060] border-transparent shadow-xs'
-                    : 'border-[#E5E7EB] dark:border-[#2A2416]'
+                    ? 'ring-2 ring-[#00D4FF] dark:ring-[#38BDF8] border-transparent shadow-xs'
+                    : 'border-[#E5E7EB] dark:border-[#1E293B]'
                 } ${
                   hasLog
                     ? isRest
                       ? 'bg-sky-50/80 dark:bg-sky-950/40 border-sky-200 dark:border-sky-800 text-sky-900 dark:text-sky-200'
-                      : 'bg-[#FFFBF0]/90 dark:bg-[#2A2416]/40 border-[#D4AF37]/50 dark:border-[#2A2416] text-[#6A5312] dark:text-[#F0D060]'
-                    : 'bg-white dark:bg-[#111111] hover:bg-neutral-50 dark:hover:bg-[#1A1A1A] text-[#6B7280] dark:text-[#9EA8A2]'
+                      : 'bg-[#0E1424]/90 dark:bg-[#1E293B]/40 border-[#00D4FF]/50 dark:border-[#1E293B] text-[#0C4A6E] dark:text-[#38BDF8]'
+                    : 'bg-white dark:bg-[#0E1424] hover:bg-neutral-50 dark:hover:bg-[#161F38] text-[#6B7280] dark:text-[#9EA8A2]'
                 } ${day.isToday ? 'ring-2 ring-amber-400/80' : ''}`}
               >
                 <div className="flex items-center justify-between w-full text-[10px]">
@@ -289,7 +289,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
                     isRest ? (
                       <ShieldCheck className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
                     ) : (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060]" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#0284C7] dark:text-[#38BDF8]" />
                     )
                   ) : (
                     <span className="text-[10px] text-[#9CA3AF] dark:text-[#525754]">-</span>
@@ -303,7 +303,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
 
       {/* SELECTED DAY DETAIL DRAWER */}
       {selectedLogDate && (
-        <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-xs space-y-2 animate-in fade-in duration-200">
+        <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-xs space-y-2 animate-in fade-in duration-200">
           {(() => {
             const dayInfo = daysWindow.find((d) => d.dateStr === selectedLogDate);
             const log = dayInfo?.log;
@@ -335,7 +335,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
                         false
                       );
                     }}
-                    className="px-3 py-1.5 rounded-lg bg-[#D4AF37] text-white text-xs font-semibold hover:bg-[#A68523] transition-all"
+                    className="px-3 py-1.5 rounded-lg bg-[#00D4FF] text-white text-xs font-semibold hover:bg-[#0369A1] transition-all"
                   >
                     {log && !log.isRestDay ? 'Remove Log' : 'Log Workout'}
                   </button>
@@ -352,7 +352,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
                         true
                       );
                     }}
-                    className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-[#374151] dark:text-[#D1D5DB] text-xs font-semibold hover:bg-[#F3F4F6] dark:hover:bg-[#1A1A1A] transition-all"
+                    className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#0B0F1E] border border-[#E5E7EB] dark:border-[#1E293B] text-[#374151] dark:text-[#D1D5DB] text-xs font-semibold hover:bg-[#F3F4F6] dark:hover:bg-[#161F38] transition-all"
                   >
                     {log && log.isRestDay ? 'Remove Rest Log' : 'Log Rest Day'}
                   </button>
@@ -380,7 +380,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
           <div className={`p-3.5 rounded-2xl border transition-all ${
             currentStreak >= 3
               ? 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-200'
-              : 'bg-[#FAFAF8] dark:bg-[#111111] border-[#E5E7EB] dark:border-[#2A2416] opacity-50'
+              : 'bg-[#FAFAF8] dark:bg-[#0E1424] border-[#E5E7EB] dark:border-[#1E293B] opacity-50'
           }`}>
             <div className="flex items-center justify-between">
               <span className="text-xl">🚀</span>
@@ -396,7 +396,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
           <div className={`p-3.5 rounded-2xl border transition-all ${
             currentStreak >= 7
               ? 'bg-orange-50/50 dark:bg-orange-950/20 border-orange-300 dark:border-orange-800 text-orange-900 dark:text-orange-200'
-              : 'bg-[#FAFAF8] dark:bg-[#111111] border-[#E5E7EB] dark:border-[#2A2416] opacity-50'
+              : 'bg-[#FAFAF8] dark:bg-[#0E1424] border-[#E5E7EB] dark:border-[#1E293B] opacity-50'
           }`}>
             <div className="flex items-center justify-between">
               <span className="text-xl">⚡</span>
@@ -411,12 +411,12 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
           {/* Badge 3: 14-Day Hypertrophy Master */}
           <div className={`p-3.5 rounded-2xl border transition-all ${
             currentStreak >= 14
-              ? 'bg-[#FFFBF0]/60 dark:bg-[#2A2416]/20 border-[#D4AF37]/50 dark:border-[#2A2416] text-[#6A5312] dark:text-[#F0D060] shadow-2xs'
-              : 'bg-[#FAFAF8] dark:bg-[#111111] border-[#E5E7EB] dark:border-[#2A2416] opacity-50'
+              ? 'bg-[#0E1424]/60 dark:bg-[#1E293B]/20 border-[#00D4FF]/50 dark:border-[#1E293B] text-[#0C4A6E] dark:text-[#38BDF8] shadow-2xs'
+              : 'bg-[#FAFAF8] dark:bg-[#0E1424] border-[#E5E7EB] dark:border-[#1E293B] opacity-50'
           }`}>
             <div className="flex items-center justify-between">
               <span className="text-xl">🏆</span>
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#F9E5A2]/60 dark:bg-[#2A2416]/60 text-[#6A5312] dark:text-[#F0D060]">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#F9E5A2]/60 dark:bg-[#1E293B]/60 text-[#0C4A6E] dark:text-[#38BDF8]">
                 14 Days
               </span>
             </div>
@@ -428,7 +428,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
           <div className={`p-3.5 rounded-2xl border transition-all ${
             currentStreak >= 30
               ? 'bg-purple-50/60 dark:bg-purple-950/20 border-purple-300 dark:border-purple-800 text-purple-900 dark:text-purple-200 shadow-2xs'
-              : 'bg-[#FAFAF8] dark:bg-[#111111] border-[#E5E7EB] dark:border-[#2A2416] opacity-50'
+              : 'bg-[#FAFAF8] dark:bg-[#0E1424] border-[#E5E7EB] dark:border-[#1E293B] opacity-50'
           }`}>
             <div className="flex items-center justify-between">
               <span className="text-xl">🌟</span>
@@ -443,7 +443,7 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
       </div>
 
       {/* SCIENTIFIC ADHERENCE CITATION BANNER */}
-      <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+      <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-[#E8912D] shrink-0" />
           <span className="font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">Evidence Consensus (Schoenfeld et al.):</span>
@@ -454,14 +454,14 @@ export const ConsistencyStreakTracker: React.FC<ConsistencyStreakTrackerProps> =
         <button
           type="button"
           onClick={() => setShowScienceRationale(!showScienceRationale)}
-          className="text-[#D4AF37] dark:text-[#F0D060] font-bold hover:underline shrink-0 text-left sm:text-right"
+          className="text-[#00D4FF] dark:text-[#38BDF8] font-bold hover:underline shrink-0 text-left sm:text-right"
         >
           {showScienceRationale ? 'Close Details' : 'Read Science Basis'}
         </button>
       </div>
 
       {showScienceRationale && (
-        <div className="p-4 rounded-xl bg-white dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-xs text-[#4B5563] dark:text-[#D1D5DB] space-y-2 animate-in fade-in duration-200">
+        <div className="p-4 rounded-xl bg-white dark:bg-[#0B0F1E] border border-[#E5E7EB] dark:border-[#1E293B] text-xs text-[#4B5563] dark:text-[#D1D5DB] space-y-2 animate-in fade-in duration-200">
           <p>
             <strong>Why Rest Days Do Not Break Streaks:</strong> Skeletal muscle hypertrophy occurs during periods of rest through satellite cell donation and ribosomal biogenesis. Overtraining without scheduled CNS deloads causes elevated resting cortisol, catabolic muscle breakdown, and psychological burnout.
           </p>

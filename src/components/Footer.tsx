@@ -54,7 +54,7 @@ export const Footer: React.FC<FooterProps> = ({
               id="report-issue-footer-btn"
               type="button"
               onClick={onOpenReportError}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-purple-700 dark:text-[#F0D060] border border-[#D4AF37]/30 font-semibold text-[11px] transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#3B82F6]/10 hover:bg-[#3B82F6]/20 text-purple-700 dark:text-[#60A5FA] border border-[#3B82F6]/30 font-semibold text-[11px] transition-all cursor-pointer"
               title="Report a bug, calculation discrepancy, or suggest an enhancement"
             >
               <span>Report Issue / Feedback</span>
@@ -67,7 +67,7 @@ export const Footer: React.FC<FooterProps> = ({
                   <button
                     onClick={onTriggerAudit}
                     disabled={isAuditing}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-purple-700 dark:text-[#F0D060] border border-[#D4AF37]/30 font-semibold text-[11px] transition-all cursor-pointer disabled:opacity-50"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#3B82F6]/10 hover:bg-[#3B82F6]/20 text-purple-700 dark:text-[#60A5FA] border border-[#3B82F6]/30 font-semibold text-[11px] transition-all cursor-pointer disabled:opacity-50"
                     title="Audit workout programs against ExerciseRegistry"
                   >
                     <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />

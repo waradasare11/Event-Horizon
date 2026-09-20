@@ -211,19 +211,19 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       {/* Cosmic Hero Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B0F1E] via-[#10172A] to-[#1E1B4B] border border-[#D4AF37]/30 p-6 sm:p-8 text-white shadow-2xl shadow-[#D4AF37]/40">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#0B0F1E] via-[#10172A] to-[#1E1B4B] border border-[#3B82F6]/30 p-6 sm:p-8 text-white shadow-2xl shadow-[#3B82F6]/40">
         {/* Ambient Nebula Glows */}
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-[#D4AF37]/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-[#D4AF37]/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -right-20 -top-20 w-80 h-80 bg-[#3B82F6]/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-20 -bottom-20 w-80 h-80 bg-[#3B82F6]/20 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#F0D060] text-xs font-bold tracking-wider uppercase">
-              <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#3B82F6]/15 border border-[#3B82F6]/40 text-[#60A5FA] text-xs font-bold tracking-wider uppercase">
+              <Sparkles className="w-3.5 h-3.5 text-[#3B82F6]" />
               <span>AROH Curated Movement Registry</span>
             </div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight font-['Space_Grotesk',sans-serif]">
-              Evidence-Based <span className="bg-gradient-to-r from-[#D4AF37] via-[#F0D060] to-[#A68523] bg-clip-text text-transparent">Exercise Library</span>
+              Evidence-Based <span className="bg-gradient-to-r from-[#3B82F6] via-[#60A5FA] to-[#1D4ED8] bg-clip-text text-transparent">Exercise Library</span>
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
               Explore gold-standard movements classified by biomechanical tiers, hypertrophy mechanics, and safety alternatives. Favorite your go-to lifts for instant single-tap session logging.
@@ -233,19 +233,19 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-3 gap-3 shrink-0">
             <div className="p-3.5 rounded-2xl bg-[#0F1528]/80 border border-slate-700/60 text-center">
-              <div className="text-xl sm:text-2xl font-black text-[#F0D060] font-['Space_Grotesk',sans-serif]">
+              <div className="text-xl sm:text-2xl font-black text-[#60A5FA] font-['Space_Grotesk',sans-serif]">
                 {RAW_EXERCISE_REGISTRY.length}
               </div>
               <div className="text-[11px] text-slate-400 font-medium mt-0.5">Exercises</div>
             </div>
             <div className="p-3.5 rounded-2xl bg-[#0F1528]/80 border border-slate-700/60 text-center">
-              <div className="text-xl sm:text-2xl font-black text-[#F0D060] font-['Space_Grotesk',sans-serif]">
+              <div className="text-xl sm:text-2xl font-black text-[#60A5FA] font-['Space_Grotesk',sans-serif]">
                 {favoriteIds.length}
               </div>
               <div className="text-[11px] text-slate-400 font-medium mt-0.5">Favorited</div>
             </div>
             <div className="p-3.5 rounded-2xl bg-[#0F1528]/80 border border-slate-700/60 text-center">
-              <div className="text-xl sm:text-2xl font-black text-[#F0D060] font-['Space_Grotesk',sans-serif]">
+              <div className="text-xl sm:text-2xl font-black text-[#60A5FA] font-['Space_Grotesk',sans-serif]">
                 4
               </div>
               <div className="text-[11px] text-slate-400 font-medium mt-0.5">Bio-Tiers</div>
@@ -265,7 +265,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by exercise name, target muscle (e.g. Pectoralis, Hamstrings), or equipment..."
-              className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#D4AF37]"
+              className="w-full pl-10 pr-4 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#080B14] text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-[#3B82F6]"
             />
             {searchQuery && (
               <button
@@ -302,7 +302,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
               onClick={() => setSelectedCategory(cat)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 selectedCategory === cat
-                  ? 'bg-gradient-to-r from-[#D4AF37] to-[#A68523] text-white shadow-xs'
+                  ? 'bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] text-white shadow-xs'
                   : 'bg-slate-100 dark:bg-[#141C34] text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#1B2544]'
               }`}
             >
@@ -320,7 +320,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
               onClick={() => setSelectedMuscleGroup(mg)}
               className={`px-3 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 selectedMuscleGroup === mg
-                  ? 'bg-[#A68523] text-white shadow-xs'
+                  ? 'bg-[#1D4ED8] text-white shadow-xs'
                   : 'bg-slate-100 dark:bg-[#141C34] text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#1B2544]'
               }`}
             >
@@ -338,7 +338,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
               onClick={() => setSelectedEquipment(eq)}
               className={`px-3 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 selectedEquipment === eq
-                  ? 'bg-[#A68523] text-white shadow-xs'
+                  ? 'bg-[#1D4ED8] text-white shadow-xs'
                   : 'bg-slate-100 dark:bg-[#141C34] text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-[#1B2544]'
               }`}
             >
@@ -385,7 +385,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
                 setSelectedEquipment('All');
                 setOnlyFavorites(false);
               }}
-              className="px-4 py-2 rounded-xl bg-[#A68523] hover:bg-[#D4AF37] text-white text-xs font-bold transition-all cursor-pointer"
+              className="px-4 py-2 rounded-xl bg-[#1D4ED8] hover:bg-[#3B82F6] text-white text-xs font-bold transition-all cursor-pointer"
             >
               Reset Filters
             </button>
@@ -404,16 +404,16 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
               <div
                 key={exercise.id}
                 onClick={() => setSelectedExercise(exercise)}
-                className="group relative flex flex-col justify-between p-5 rounded-2xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-slate-800 hover:border-[#D4AF37]/50 hover:shadow-xl hover:shadow-[#D4AF37]/20 transition-all cursor-pointer"
+                className="group relative flex flex-col justify-between p-5 rounded-2xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-slate-800 hover:border-[#3B82F6]/50 hover:shadow-xl hover:shadow-[#3B82F6]/20 transition-all cursor-pointer"
               >
                 <div>
                   {/* Top Bar: Category, Tier & Favorite Button */}
                   <div className="flex items-center justify-between gap-2 mb-2.5">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#D4AF37]/10 text-[#B8922A] dark:text-[#D4AF37] border border-[#D4AF37]/20">
+                      <span className="text-[10px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#3B82F6]/10 text-[#1D4ED8] dark:text-[#3B82F6] border border-[#3B82F6]/20">
                         {exercise.category}
                       </span>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#D4AF37]/10 text-[#B8922A] dark:text-[#F0D060] border border-[#D4AF37]/20">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#3B82F6]/10 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/20">
                         {exercise.biomechanicalTier}
                       </span>
                     </div>
@@ -433,7 +433,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
                   </div>
 
                   {/* Exercise Title & Movement Pattern */}
-                  <h3 className="font-bold text-base text-slate-900 dark:text-white group-hover:text-[#D4AF37] transition-colors line-clamp-1 font-['Space_Grotesk',sans-serif]">
+                  <h3 className="font-bold text-base text-slate-900 dark:text-white group-hover:text-[#3B82F6] transition-colors line-clamp-1 font-['Space_Grotesk',sans-serif]">
                     {exercise.formalName}
                   </h3>
 
@@ -450,14 +450,14 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
 
                   {/* Last Performed Badge */}
                   {rec.lastPerformed ? (
-                    <div className="mt-2.5 flex items-center justify-between gap-1 text-[11px] font-bold text-[#A68523] dark:text-[#F0D060] bg-[#D4AF37]/10 px-2.5 py-1 rounded-lg border border-[#D4AF37]/25">
+                    <div className="mt-2.5 flex items-center justify-between gap-1 text-[11px] font-bold text-[#1D4ED8] dark:text-[#60A5FA] bg-[#3B82F6]/10 px-2.5 py-1 rounded-lg border border-[#3B82F6]/25">
                       <div className="flex items-center gap-1.5 truncate">
-                        <Clock className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                        <Clock className="w-3.5 h-3.5 text-[#3B82F6] shrink-0" />
                         <span className="truncate">
                           Last: {rec.lastPerformed.formattedDate} ({rec.lastPerformed.weightKg}kg × {rec.lastPerformed.reps})
                         </span>
                       </div>
-                      <span className="shrink-0 text-[10px] text-[#B8922A] dark:text-[#F0D060] font-extrabold bg-[#D4AF37]/20 px-1.5 py-0.5 rounded">
+                      <span className="shrink-0 text-[10px] text-[#1D4ED8] dark:text-[#60A5FA] font-extrabold bg-[#3B82F6]/20 px-1.5 py-0.5 rounded">
                         Vol: {rec.lastPerformed.volumeKg.toLocaleString()}kg
                       </span>
                     </div>
@@ -469,12 +469,12 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
                   )}
 
                   {/* Progression Overload Chip */}
-                  <div className="mt-2 flex items-center justify-between gap-1.5 p-2 rounded-xl bg-[#D4AF37]/10 dark:bg-[#2A2416]/30 border border-[#D4AF37]/20 text-[11px]">
-                    <div className="flex items-center gap-1.5 text-[#A68523] dark:text-[#F0D060] font-bold truncate">
-                      <TrendingUp className="w-3.5 h-3.5 text-[#D4AF37] shrink-0" />
+                  <div className="mt-2 flex items-center justify-between gap-1.5 p-2 rounded-xl bg-[#3B82F6]/10 dark:bg-[#2A2416]/30 border border-[#3B82F6]/20 text-[11px]">
+                    <div className="flex items-center gap-1.5 text-[#1D4ED8] dark:text-[#60A5FA] font-bold truncate">
+                      <TrendingUp className="w-3.5 h-3.5 text-[#3B82F6] shrink-0" />
                       <span className="truncate">{rec.progressionNote}</span>
                     </div>
-                    <span className="shrink-0 font-black text-[#A68523] dark:text-[#F0D060] bg-[#D4AF37]/20 px-1.5 py-0.5 rounded text-[10px]">
+                    <span className="shrink-0 font-black text-[#1D4ED8] dark:text-[#60A5FA] bg-[#3B82F6]/20 px-1.5 py-0.5 rounded text-[10px]">
                       {rec.recommendedWeightKg}kg × {rec.recommendedReps}
                     </span>
                   </div>
@@ -489,7 +489,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
 
                 {/* Bottom Action Footer */}
                 <div className="pt-3.5 mt-3.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
-                  <span className="text-[11px] text-[#B8922A] dark:text-[#D4AF37] font-semibold group-hover:underline flex items-center gap-1">
+                  <span className="text-[11px] text-[#1D4ED8] dark:text-[#3B82F6] font-semibold group-hover:underline flex items-center gap-1">
                     <span>Biomechanics & Form</span>
                     <ChevronRight className="w-3 h-3" />
                   </span>
@@ -497,7 +497,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
                   <button
                     type="button"
                     onClick={(e) => handleOpenQuickLog(exercise, e)}
-                    className="px-2.5 py-1 rounded-lg bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060] border border-[#D4AF37]/30 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
+                    className="px-2.5 py-1 rounded-lg bg-[#3B82F6]/10 hover:bg-[#3B82F6]/20 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/30 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer"
                     title="Quick log sets for this exercise with progressive overload recommendations"
                   >
                     <Plus className="w-3 h-3" />
@@ -513,15 +513,15 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
       {/* Comprehensive Detail & Biomechanics Modal */}
       {selectedExercise && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-[#D4AF37]/40 shadow-2xl p-6 sm:p-8 text-slate-900 dark:text-white space-y-6">
+          <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl bg-white dark:bg-[#0E1424] border border-slate-200 dark:border-[#3B82F6]/40 shadow-2xl p-6 sm:p-8 text-slate-900 dark:text-white space-y-6">
             {/* Modal Header */}
             <div className="flex items-start justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
               <div className="space-y-1">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#B8922A] dark:text-[#F0D060] border border-[#D4AF37]/30">
+                  <span className="text-xs font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#3B82F6]/15 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/30">
                     {selectedExercise.category}
                   </span>
-                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#B8922A] dark:text-[#F0D060] border border-[#D4AF37]/30">
+                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#3B82F6]/15 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/30">
                     {selectedExercise.tierLabel || selectedExercise.biomechanicalTier}
                   </span>
                 </div>
@@ -547,7 +547,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
             {/* Anatomical Targets & Equipment */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#080B14] border border-slate-200 dark:border-slate-800 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#B8922A] dark:text-[#D4AF37] uppercase tracking-wider">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#1D4ED8] dark:text-[#3B82F6] uppercase tracking-wider">
                   <Target className="w-4 h-4" />
                   <span>Primary Target Muscle</span>
                 </div>
@@ -562,7 +562,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-50 dark:bg-[#080B14] border border-slate-200 dark:border-slate-800 space-y-1.5">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-[#B8922A] dark:text-[#F0D060] uppercase tracking-wider">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-[#1D4ED8] dark:text-[#60A5FA] uppercase tracking-wider">
                   <Dumbbell className="w-4 h-4" />
                   <span>Required Equipment</span>
                 </div>
@@ -577,8 +577,8 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
 
             {/* Execution Keypoint */}
             {selectedExercise.executionKeypoint && (
-              <div className="p-4 rounded-2xl bg-[#D4AF37]/10 dark:bg-[#2A2416]/30 border border-[#D4AF37]/30 space-y-1">
-                <div className="text-xs font-bold text-[#A68523] dark:text-[#F0D060] uppercase tracking-wider flex items-center gap-1.5">
+              <div className="p-4 rounded-2xl bg-[#3B82F6]/10 dark:bg-[#2A2416]/30 border border-[#3B82F6]/30 space-y-1">
+                <div className="text-xs font-bold text-[#1D4ED8] dark:text-[#60A5FA] uppercase tracking-wider flex items-center gap-1.5">
                   <Info className="w-4 h-4" />
                   <span>Biomechanical Execution Cue</span>
                 </div>
@@ -613,14 +613,14 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
                     href={guide.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-[#080B14] border border-slate-200 dark:border-slate-800 hover:border-[#D4AF37]/50 hover:bg-slate-100 dark:hover:bg-[#131B32] transition-all group"
+                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-[#080B14] border border-slate-200 dark:border-slate-800 hover:border-[#3B82F6]/50 hover:bg-slate-100 dark:hover:bg-[#131B32] transition-all group"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
                       <div className="w-8 h-8 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center font-bold text-xs shrink-0">
                         <Play className="w-3.5 h-3.5 fill-rose-500" />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-[#D4AF37]">
+                        <div className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-[#3B82F6]">
                           {guide.channelName}
                         </div>
                         <div className="text-[10px] text-slate-500 truncate">
@@ -628,7 +628,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
                         </div>
                       </div>
                     </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#D4AF37] shrink-0" />
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#3B82F6] shrink-0" />
                   </a>
                 ))}
               </div>
@@ -656,7 +656,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
                   setSelectedExercise(null);
                   if (ex) handleOpenQuickLog(ex);
                 }}
-                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#A68523] text-white text-xs sm:text-sm font-bold shadow-lg shadow-[#D4AF37]/25 hover:opacity-90 transition-all flex items-center gap-2 cursor-pointer"
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] text-white text-xs sm:text-sm font-bold shadow-lg shadow-[#3B82F6]/25 hover:opacity-90 transition-all flex items-center gap-2 cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Log Sets in Workout</span>
@@ -669,10 +669,10 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
       {/* Quick Log Sets Modal */}
       {quickLogExercise && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in">
-          <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-[#0E1424] border border-[#D4AF37]/40 shadow-2xl p-6 text-slate-900 dark:text-white space-y-5">
+          <div className="relative w-full max-w-md rounded-3xl bg-white dark:bg-[#0E1424] border border-[#3B82F6]/40 shadow-2xl p-6 text-slate-900 dark:text-white space-y-5">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider">Quick Workout Logging</div>
+                <div className="text-[11px] font-bold text-[#3B82F6] uppercase tracking-wider">Quick Workout Logging</div>
                 <h3 className="text-lg font-bold font-['Space_Grotesk',sans-serif]">{quickLogExercise.formalName}</h3>
               </div>
               <button
@@ -689,20 +689,20 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
 
             {quickLogSuccess ? (
               <div className="py-8 text-center space-y-2">
-                <div className="w-12 h-12 rounded-full bg-[#D4AF37]/20 text-[#F0D060] flex items-center justify-center mx-auto border border-[#D4AF37]/40 animate-bounce">
+                <div className="w-12 h-12 rounded-full bg-[#3B82F6]/20 text-[#60A5FA] flex items-center justify-center mx-auto border border-[#3B82F6]/40 animate-bounce">
                   <Check className="w-6 h-6" />
                 </div>
-                <div className="text-base font-bold text-[#F0D060]">Sets Successfully Logged!</div>
+                <div className="text-base font-bold text-[#60A5FA]">Sets Successfully Logged!</div>
                 <div className="text-xs text-slate-400">Recorded into your workout history with auto-inferred target muscle.</div>
               </div>
             ) : (
               <>
                 {/* Progression Overload Guidance Banner */}
                 {activeProgression && (
-                  <div className="p-3.5 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 space-y-1.5">
+                  <div className="p-3.5 rounded-2xl bg-[#3B82F6]/10 border border-[#3B82F6]/30 space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#D4AF37] dark:text-[#D4AF37] flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#3B82F6] dark:text-[#3B82F6] flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-[#3B82F6]" />
                         <span>Recommended Progression</span>
                       </span>
                       <button
@@ -712,7 +712,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
                           setLogReps(activeProgression.recommendedReps);
                           setLogSetsCount(activeProgression.recommendedSets);
                         }}
-                        className="text-[10px] text-[#D4AF37] dark:text-[#F0D060] font-bold hover:underline flex items-center gap-1"
+                        className="text-[10px] text-[#3B82F6] dark:text-[#60A5FA] font-bold hover:underline flex items-center gap-1"
                       >
                         <RotateCcw className="w-3 h-3" />
                         <span>Reset to Target</span>
@@ -722,14 +722,14 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
                       {activeProgression.progressionNote}
                     </p>
                     {activeProgression.lastPerformed ? (
-                      <div className="text-[11px] text-slate-600 dark:text-slate-300 pt-1 border-t border-[#D4AF37]/20 flex items-center justify-between">
+                      <div className="text-[11px] text-slate-600 dark:text-slate-300 pt-1 border-t border-[#3B82F6]/20 flex items-center justify-between">
                         <span>Last Session ({activeProgression.lastPerformed.formattedDate}):</span>
-                        <span className="font-bold text-[#D4AF37] dark:text-[#F0D060]">
+                        <span className="font-bold text-[#3B82F6] dark:text-[#60A5FA]">
                           {activeProgression.lastPerformed.weightKg}kg × {activeProgression.lastPerformed.reps} reps (Vol: {activeProgression.lastPerformed.volumeKg.toLocaleString()}kg)
                         </span>
                       </div>
                     ) : (
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-[#D4AF37]/20">
+                      <div className="text-[11px] text-slate-500 dark:text-slate-400 pt-1 border-t border-[#3B82F6]/20">
                         First logged session for this movement. Starting at baseline overload resistance.
                       </div>
                     )}
@@ -805,7 +805,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
 
                 <div className="p-3 rounded-xl bg-slate-100 dark:bg-[#080B14] text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
                   <span>Total Calculated Volume:</span>
-                  <span className="font-bold text-[#D4AF37]">{(logSetsCount * logReps * logWeight).toLocaleString()} kg</span>
+                  <span className="font-bold text-[#3B82F6]">{(logSetsCount * logReps * logWeight).toLocaleString()} kg</span>
                 </div>
 
                 <div className="flex gap-2">
@@ -822,7 +822,7 @@ export const ExerciseLibraryView: React.FC<ExerciseLibraryViewProps> = ({
                   <button
                     type="button"
                     onClick={handleExecuteQuickLog}
-                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#A68523] text-white text-xs font-bold shadow-md shadow-[#D4AF37]/25 cursor-pointer hover:opacity-90 transition-opacity"
+                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#3B82F6] to-[#1D4ED8] text-white text-xs font-bold shadow-md shadow-[#3B82F6]/25 cursor-pointer hover:opacity-90 transition-opacity"
                   >
                     Confirm & Log
                   </button>

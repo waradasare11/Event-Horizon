@@ -44,6 +44,7 @@ import {
   PerformanceMetric,
 } from '../lib/performanceMonitoring';
 import { UserProfile, ReconciliationReport } from '../types';
+import { checkIsHostOnServer } from '../lib/subscription';
 import {
   getStoredMealLogs,
   getStoredWorkoutLogs,
@@ -89,10 +90,24 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
   const [reconciliationReport, setReconciliationReport] = useState<ReconciliationReport | null>(null);
   const [isRunningAudit, setIsRunningAudit] = useState(false);
 
-  const isHost =
-    userProfile?.email === 'waradasare11@gmail.com' ||
-    userProfile?.name?.toLowerCase().includes('warad') ||
-    pinUnlocked;
+  const [serverIsHost, setServerIsHost] = useState(false);
+
+  useEffect(() => {
+    const em = userProfile?.email;
+    if (!em) {
+      setServerIsHost(false);
+      return;
+    }
+    let isMounted = true;
+    checkIsHostOnServer(em).then((val) => {
+      if (isMounted) setServerIsHost(val);
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [userProfile?.email]);
+
+  const isHost = serverIsHost || pinUnlocked;
 
   const loadDataHealth = () => {
     const meals = getStoredMealLogs();
@@ -238,10 +253,10 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
     }
     return {
       label: 'Optimal',
-      color: 'text-[#B8922A] dark:text-[#F0D060]',
-      bgColor: 'bg-[#D4AF37]/10 dark:bg-[#2A2416]/30',
-      borderColor: 'border-[#D4AF37]/30',
-      dotColor: 'bg-[#D4AF37]',
+      color: 'text-[#1D4ED8] dark:text-[#60A5FA]',
+      bgColor: 'bg-[#3B82F6]/10 dark:bg-[#2A2416]/30',
+      borderColor: 'border-[#3B82F6]/30',
+      dotColor: 'bg-[#3B82F6]',
       isWarning: false,
     };
   };
@@ -252,7 +267,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
         {/* Header */}
         <div className="p-6 border-b border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between bg-[#FAFAF8] dark:bg-[#111111]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-[#3B82F6]/10 dark:bg-[#3B82F6]/20 text-[#3B82F6] dark:text-[#60A5FA] flex items-center justify-center">
               <Activity className="w-5 h-5" />
             </div>
             <div>
@@ -260,8 +275,8 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
                 <h2 className="text-lg font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                   Host Service Latency & Telemetry Monitor
                 </h2>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#D4AF37]/10 text-[#B8922A] dark:text-[#F0D060] border border-[#D4AF37]/20">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] animate-pulse" />
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#3B82F6]/10 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#3B82F6] animate-pulse" />
                   OmniRoute AI Live Telemetry
                 </span>
               </div>
@@ -312,7 +327,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
                 value={pinInput}
                 onChange={(e) => setPinInput(e.target.value)}
                 placeholder="Enter Host PIN (e.g. 1100)"
-                className="w-full text-center tracking-widest text-lg px-4 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                className="w-full text-center tracking-widest text-lg px-4 py-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
               />
               {pinError && (
                 <div className="text-xs text-red-500 font-semibold">
@@ -321,7 +336,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
               )}
               <button
                 type="submit"
-                className="w-full py-2.5 rounded-xl bg-[#D4AF37] text-white font-bold text-xs hover:bg-[#A68523] transition-all cursor-pointer shadow-sm"
+                className="w-full py-2.5 rounded-xl bg-[#3B82F6] text-white font-bold text-xs hover:bg-[#1D4ED8] transition-all cursor-pointer shadow-sm"
               >
                 Unlock Diagnostic Monitor
               </button>
@@ -385,12 +400,12 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
               <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
                 <div className="flex items-center justify-between text-[#6B7280] dark:text-[#9EA8A2] text-xs mb-1">
                   <span>Median (P50) Latency</span>
-                  <Clock className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
+                  <Clock className="w-3.5 h-3.5 text-[#3B82F6] dark:text-[#60A5FA]" />
                 </div>
                 <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                   {summary.p50DurationMs} <span className="text-xs font-normal text-[#6B7280]">ms</span>
                 </div>
-                <div className="text-[10px] text-[#B8922A] dark:text-[#F0D060] mt-1 font-semibold">
+                <div className="text-[10px] text-[#1D4ED8] dark:text-[#60A5FA] mt-1 font-semibold">
                   Optimal responsiveness
                 </div>
               </div>
@@ -411,12 +426,12 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
               <div className="p-4 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
                 <div className="flex items-center justify-between text-[#6B7280] dark:text-[#9EA8A2] text-xs mb-1">
                   <span>Success SLA</span>
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#3B82F6]" />
                 </div>
                 <div className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                   {summary.overallSuccessRatePct}%
                 </div>
-                <div className="text-[10px] text-[#B8922A] dark:text-[#F0D060] mt-1 font-semibold">
+                <div className="text-[10px] text-[#1D4ED8] dark:text-[#60A5FA] mt-1 font-semibold">
                   OmniRoute high-reasoning active
                 </div>
               </div>
@@ -439,13 +454,13 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
             <div id="performance-data-health-card" className="p-5 rounded-3xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-2xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-2xl bg-[#3B82F6]/10 dark:bg-[#3B82F6]/20 text-[#3B82F6] dark:text-[#60A5FA] flex items-center justify-center">
                     <Database className="w-5 h-5" />
                   </div>
                   <div>
                     <h3 className="font-bold text-sm text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
                       <span>Data Health & Collection Inventory</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] border border-[#D4AF37]/20">
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#3B82F6]/10 text-[#3B82F6] dark:text-[#60A5FA] border border-[#3B82F6]/20">
                         {collectionCounts.total} Total Records
                       </span>
                     </h3>
@@ -460,7 +475,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
                   disabled={isRunningAudit}
                   className="px-3.5 py-1.5 rounded-xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] hover:bg-[#FAFAF8] dark:hover:bg-[#1E2220] text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9] transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
                 >
-                  <RefreshCw className={`w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060] ${isRunningAudit ? 'animate-spin' : ''}`} />
+                  <RefreshCw className={`w-3.5 h-3.5 text-[#3B82F6] dark:text-[#60A5FA] ${isRunningAudit ? 'animate-spin' : ''}`} />
                   <span>{isRunningAudit ? 'Reconciling...' : 'Run Drift Audit'}</span>
                 </button>
               </div>
@@ -469,7 +484,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                 <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
                   <div className="flex items-center gap-1.5 text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-1">
-                    <Utensils className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060]" />
+                    <Utensils className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#60A5FA]" />
                     <span>Meal Logs</span>
                   </div>
                   <div className="text-lg font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -480,7 +495,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
 
                 <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
                   <div className="flex items-center gap-1.5 text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-1">
-                    <Dumbbell className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060]" />
+                    <Dumbbell className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#60A5FA]" />
                     <span>Workout Logs</span>
                   </div>
                   <div className="text-lg font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -502,7 +517,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
 
                 <div className="p-3 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416]">
                   <div className="flex items-center gap-1.5 text-xs text-[#6B7280] dark:text-[#9EA8A2] mb-1">
-                    <FileText className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060]" />
+                    <FileText className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#60A5FA]" />
                     <span>Programs</span>
                   </div>
                   <div className="text-lg font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -527,7 +542,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
               <div className={`p-4 rounded-2xl border transition-all ${
                 reconciliationReport && reconciliationReport.discrepanciesFound > 0
                   ? 'bg-amber-500/10 dark:bg-amber-500/15 border-amber-500/30 text-amber-900 dark:text-amber-200'
-                  : 'bg-[#D4AF37]/10 dark:bg-[#D4AF37]/15 border-[#D4AF37]/30 text-[#6A5312] dark:text-[#F0D060]'
+                  : 'bg-[#3B82F6]/10 dark:bg-[#3B82F6]/15 border-[#3B82F6]/30 text-[#6A5312] dark:text-[#60A5FA]'
               }`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2.5">
@@ -536,7 +551,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
                         <AlertTriangle className="w-4 h-4" />
                       </div>
                     ) : (
-                      <div className="w-7 h-7 rounded-xl bg-[#D4AF37]/20 text-[#B8922A] dark:text-[#F0D060] flex items-center justify-center shrink-0">
+                      <div className="w-7 h-7 rounded-xl bg-[#3B82F6]/20 text-[#1D4ED8] dark:text-[#60A5FA] flex items-center justify-center shrink-0">
                         <CheckCircle2 className="w-4 h-4" />
                       </div>
                     )}
@@ -552,7 +567,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
                           reconciliationReport && reconciliationReport.discrepanciesFound > 0
                             ? 'bg-amber-600 text-white'
-                            : 'bg-[#A68523] text-white'
+                            : 'bg-[#1D4ED8] text-white'
                         }`}>
                           {reconciliationReport && reconciliationReport.discrepanciesFound > 0
                             ? 'Drift Reconciled'
@@ -592,14 +607,14 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
             </div>
 
             {/* Live Probe Bar */}
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-[#D4AF37]/10 to-[#D4AF37]/10 border border-[#D4AF37]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-[#3B82F6]/10 to-[#3B82F6]/10 border border-[#3B82F6]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Zap className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
+                <Zap className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA]" />
                 <span className="text-xs font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
                   Instant Latency Health Probe:
                 </span>
                 {probeResult && (
-                  <span className={`text-xs font-semibold ${probeResult.latencyMs > LATENCY_WARN_THRESHOLD_MS ? 'text-rose-500' : 'text-[#B8922A] dark:text-[#F0D060]'}`}>
+                  <span className={`text-xs font-semibold ${probeResult.latencyMs > LATENCY_WARN_THRESHOLD_MS ? 'text-rose-500' : 'text-[#1D4ED8] dark:text-[#60A5FA]'}`}>
                     Latest: {probeResult.latencyMs}ms at {probeResult.time} ({probeResult.latencyMs > LATENCY_WARN_THRESHOLD_MS ? 'High Latency' : 'Optimal'})
                   </span>
                 )}
@@ -609,7 +624,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
                 <button
                   onClick={() => handleRunLiveProbe('/api/ai/analyze-meal')}
                   disabled={isProbing}
-                  className="px-3 py-1.5 rounded-xl bg-[#D4AF37] text-white text-xs font-bold hover:bg-[#A68523] transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                  className="px-3 py-1.5 rounded-xl bg-[#3B82F6] text-white text-xs font-bold hover:bg-[#1D4ED8] transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
                 >
                   {isProbing ? <RefreshCw className="w-3 h-3 animate-spin" /> : <PlayCircle className="w-3 h-3" />}
                   <span>Probe Meal Scanner</span>
@@ -620,7 +635,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
                   disabled={isProbing}
                   className="px-3 py-1.5 rounded-xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs font-bold hover:bg-[#FAFAF8] transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
                 >
-                  <PlayCircle className="w-3 h-3 text-[#D4AF37]" />
+                  <PlayCircle className="w-3 h-3 text-[#3B82F6]" />
                   <span>Probe Coach Chat</span>
                 </button>
               </div>
@@ -632,12 +647,12 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
               <div className="p-5 rounded-3xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Eye className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
+                    <Eye className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA]" />
                     <h3 className="font-bold text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
                       MealCameraScanner (Vision AI) Sparkline
                     </h3>
                   </div>
-                  <span className="text-[11px] font-semibold text-[#D4AF37] dark:text-[#F0D060] bg-[#D4AF37]/10 px-2 py-0.5 rounded-full">
+                  <span className="text-[11px] font-semibold text-[#3B82F6] dark:text-[#60A5FA] bg-[#3B82F6]/10 px-2 py-0.5 rounded-full">
                     SLA: &lt;2500ms
                   </span>
                 </div>
@@ -647,8 +662,8 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
                     <AreaChart data={scannerChartData.length > 0 ? scannerChartData : chartData}>
                       <defs>
                         <linearGradient id="mealLatencyGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.4} />
-                          <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.0} />
+                          <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.4} />
+                          <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
@@ -667,7 +682,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
                         type="monotone"
                         dataKey="latency"
                         name="Response Time (ms)"
-                        stroke="#D4AF37"
+                        stroke="#3B82F6"
                         strokeWidth={2}
                         fillOpacity={1}
                         fill="url(#mealLatencyGrad)"
@@ -681,7 +696,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
               <div className="p-5 rounded-3xl bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <BarChart3 className="w-4 h-4 text-[#D4AF37]" />
+                    <BarChart3 className="w-4 h-4 text-[#3B82F6]" />
                     <h3 className="font-bold text-xs sm:text-sm text-[#1A1D1B] dark:text-[#E8ECE9]">
                       Cross-Service Response Time (All Endpoints)
                     </h3>
@@ -734,7 +749,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
             {/* Feature Breakdown Table with Color-Coded Health Status */}
             <div className="space-y-3">
               <h3 className="text-xs sm:text-sm font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
+                <Layers className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA]" />
                 <span>AI Endpoint Health Status & Degradation SLA</span>
               </h3>
 
@@ -764,7 +779,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
                           <td className="p-3 text-[#6B7280] dark:text-[#9EA8A2]">{item.minDurationMs} / {item.maxDurationMs} ms</td>
                           <td className="p-3 text-amber-600 dark:text-amber-400 font-medium">{item.p95DurationMs} ms</td>
                           <td className="p-3">
-                            <span className={`font-semibold ${item.successRatePct >= 95 ? 'text-[#B8922A] dark:text-[#F0D060]' : 'text-amber-500'}`}>
+                            <span className={`font-semibold ${item.successRatePct >= 95 ? 'text-[#1D4ED8] dark:text-[#60A5FA]' : 'text-amber-500'}`}>
                               {item.successRatePct}%
                             </span>
                           </td>
@@ -794,7 +809,7 @@ export const PerformanceDashboardModal: React.FC<PerformanceDashboardModalProps>
 
               <button
                 onClick={onClose}
-                className="px-6 py-2.5 rounded-xl bg-[#D4AF37] text-white text-xs font-bold hover:bg-[#A68523] transition-all cursor-pointer"
+                className="px-6 py-2.5 rounded-xl bg-[#3B82F6] text-white text-xs font-bold hover:bg-[#1D4ED8] transition-all cursor-pointer"
               >
                 Close Performance Monitor
               </button>

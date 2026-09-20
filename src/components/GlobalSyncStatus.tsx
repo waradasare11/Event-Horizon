@@ -50,7 +50,7 @@ export function GlobalSyncStatus() {
             ? 'bg-blue-500/10 dark:bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30 hover:bg-blue-500/20'
             : pendingCount > 0
             ? 'bg-amber-500/10 dark:bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
-            : 'bg-[#D4AF37]/10 dark:bg-[#D4AF37]/15 text-[#A68523] dark:text-[#F0D060] border-[#D4AF37]/30 hover:bg-[#D4AF37]/20'
+            : 'bg-[#3B82F6]/10 dark:bg-[#3B82F6]/15 text-[#1D4ED8] dark:text-[#60A5FA] border-[#3B82F6]/30 hover:bg-[#3B82F6]/20'
         }`}
         title="Click to view Global Sync Status and connection details"
       >
@@ -85,10 +85,10 @@ export function GlobalSyncStatus() {
         ) : (
           <div className="flex items-center gap-1.5">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F0D060] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#D4AF37]"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#60A5FA] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3B82F6]"></span>
             </span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060]" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#60A5FA]" />
             <span className="hidden sm:inline">Cloud Synced</span>
             <span className="sm:hidden">Synced</span>
           </div>
@@ -114,7 +114,7 @@ export function GlobalSyncStatus() {
                     ? 'bg-amber-500/10 text-amber-600' 
                     : isSyncing 
                     ? 'bg-blue-500/10 text-blue-600' 
-                    : 'bg-[#D4AF37]/10 text-[#B8922A]'
+                    : 'bg-[#3B82F6]/10 text-[#1D4ED8]'
                 }`}>
                   {!isOnline ? <WifiOff className="w-4 h-4" /> : isSyncing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Cloud className="w-4 h-4" />}
                 </div>
@@ -141,7 +141,7 @@ export function GlobalSyncStatus() {
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F9FAFB] dark:bg-[#232725] border border-[#E5E7EB] dark:border-[#2E3330]">
                 <div className="flex items-center gap-2">
                   {isOnline ? (
-                    <Wifi className="w-4 h-4 text-[#D4AF37]" />
+                    <Wifi className="w-4 h-4 text-[#3B82F6]" />
                   ) : (
                     <WifiOff className="w-4 h-4 text-amber-500" />
                   )}
@@ -151,7 +151,7 @@ export function GlobalSyncStatus() {
                 </div>
                 <span className={`font-semibold px-2 py-0.5 rounded-md text-[11px] ${
                   isOnline 
-                    ? 'bg-[#D4AF37]/10 text-[#B8922A] dark:text-[#F0D060]' 
+                    ? 'bg-[#3B82F6]/10 text-[#1D4ED8] dark:text-[#60A5FA]' 
                     : 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                 }`}>
                   {isOnline ? 'Active (Connected)' : 'Disconnected (Offline)'}
@@ -178,7 +178,7 @@ export function GlobalSyncStatus() {
               {/* Last Successful Sync */}
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#F9FAFB] dark:bg-[#232725] border border-[#E5E7EB] dark:border-[#2E3330]">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#D4AF37]" />
+                  <CheckCircle2 className="w-4 h-4 text-[#3B82F6]" />
                   <span className="font-medium text-[#1A1D1B] dark:text-[#E8ECE9]">
                     Last Cloud Sync
                   </span>
@@ -197,9 +197,9 @@ export function GlobalSyncStatus() {
             </div>
 
             {/* Offline Resilience Guarantee Info */}
-            <div className="mt-3 p-2.5 rounded-xl bg-[#D4AF37]/5 dark:bg-[#D4AF37]/10 border border-[#D4AF37]/15 text-[11px] text-[#6B7280] dark:text-[#9EA8A2]">
+            <div className="mt-3 p-2.5 rounded-xl bg-[#3B82F6]/5 dark:bg-[#3B82F6]/10 border border-[#3B82F6]/15 text-[11px] text-[#6B7280] dark:text-[#9EA8A2]">
               <p className="leading-relaxed">
-                <strong className="text-[#A68523] dark:text-[#F0D060] font-semibold">Zero-Data-Loss Guarantee:</strong> All meal logs, workouts, and biometrics are saved locally instantly with 0ms latency and automatically uploaded to Firestore when connection is available.
+                <strong className="text-[#1D4ED8] dark:text-[#60A5FA] font-semibold">Zero-Data-Loss Guarantee:</strong> All meal logs, workouts, and biometrics are saved locally instantly with 0ms latency and automatically uploaded to Firestore when connection is available.
               </p>
             </div>
 

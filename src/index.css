@@ -7,44 +7,50 @@
   --color-aroh-surface: var(--surface);
   --color-aroh-surface-2: var(--surface-2);
   --color-aroh-border: var(--border);
-  --color-aroh-gold: var(--gold);
-  --color-aroh-gold-bright: var(--gold-bright);
-  --color-aroh-gold-dim: var(--gold-dim);
+  --color-aroh-accent: var(--accent);
+  --color-aroh-accent-bright: var(--accent-bright);
+  --color-aroh-accent-dim: var(--accent-dim);
+  --color-aroh-glow: var(--glow);
   --color-aroh-text: var(--text);
   --color-aroh-muted: var(--muted);
   --color-aroh-danger: var(--danger);
   --color-aroh-ok: var(--ok);
+  --color-aroh-primary: var(--accent);
+  --color-aroh-primary-bright: var(--accent-bright);
+  --color-aroh-primary-dim: var(--accent-dim);
 }
 
 :root {
   color-scheme: light;
-  --bg: #F7F1E3;
-  --surface: #FFFAEC;
-  --surface-2: #F0E6CD;
-  --border: #E6D7A8;
-  --gold: #B8922A;
-  --gold-bright: #D4AF37;
-  --gold-dim: #99751D;
-  --text: #16120A;
-  --muted: #80735E;
-  --danger: #E24B4B;
-  --ok: #B8922A;
+  --bg: #F3F7FF;
+  --surface: #FFFFFF;
+  --surface-2: #E8F0FE;
+  --border: #C9D7F2;
+  --accent: #2563EB;
+  --accent-bright: #3B82F6;
+  --accent-dim: #1D4ED8;
+  --glow: #38BDF8;
+  --text: #0B1220;
+  --muted: #64748B;
+  --danger: #F87171;
+  --ok: #34D399;
 }
 
 :root.dark,
 .dark {
   color-scheme: dark;
-  --bg: #070707;
-  --surface: #111111;
-  --surface-2: #1A1A1A;
-  --border: #2A2416;
-  --gold: #D4AF37;
-  --gold-bright: #F0D060;
-  --gold-dim: #A68523;
-  --text: #F4EBD0;
-  --muted: #9A8F78;
-  --danger: #E24B4B;
-  --ok: #C6A04A;
+  --bg: #05070F;
+  --surface: #0B1220;
+  --surface-2: #121A2B;
+  --border: #1E3A5F;
+  --accent: #3B82F6;
+  --accent-bright: #60A5FA;
+  --accent-dim: #1D4ED8;
+  --glow: #38BDF8;
+  --text: #E8F1FF;
+  --muted: #8BA3C7;
+  --danger: #F87171;
+  --ok: #34D399;
 }
 
 @layer base {

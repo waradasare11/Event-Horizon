@@ -126,12 +126,12 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
   const fatDelta = Math.round((latestPoint.bodyFatPct - firstPoint.bodyFatPct) * 10) / 10;
 
   return (
-    <div className="bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+    <div className="bg-white dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
       {/* Header & Range Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-5">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E7EB] dark:border-[#1E293B] pb-5">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-2 rounded-xl bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
+            <span className="p-2 rounded-xl bg-[#00D4FF]/10 text-[#00D4FF] dark:text-[#38BDF8]">
               <TrendingUp className="w-5 h-5" />
             </span>
             <h3 className="text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -144,12 +144,12 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
         </div>
 
         {/* Custom Time Range Selector */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-[#1A1A1A] border border-gray-200 dark:border-gray-800 self-start md:self-auto">
+        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-[#161F38] border border-gray-200 dark:border-gray-800 self-start md:self-auto">
           <button
             onClick={() => setTimeRange('7d')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               timeRange === '7d'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
+                ? 'bg-[#00D4FF] text-white shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
             }`}
           >
@@ -159,7 +159,7 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
             onClick={() => setTimeRange('30d')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               timeRange === '30d'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
+                ? 'bg-[#00D4FF] text-white shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
             }`}
           >
@@ -169,7 +169,7 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
             onClick={() => setTimeRange('90d')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               timeRange === '90d'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
+                ? 'bg-[#00D4FF] text-white shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
             }`}
           >
@@ -179,7 +179,7 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
             onClick={() => setTimeRange('1y')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               timeRange === '1y'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
+                ? 'bg-[#00D4FF] text-white shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
             }`}
           >
@@ -189,7 +189,7 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
             onClick={() => setTimeRange('all')}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               timeRange === 'all'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
+                ? 'bg-[#00D4FF] text-white shadow-xs'
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900'
             }`}
           >
@@ -201,10 +201,10 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Weight Card */}
-        <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1A1A1A] border border-gray-200 dark:border-gray-800">
+        <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#161F38] border border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between text-xs text-gray-500">
             <span className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#D4AF37]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#00D4FF]" />
               Body Weight
             </span>
             <span className="font-semibold text-gray-400">Target: {userProfile.targetWeightKg} kg</span>
@@ -214,7 +214,7 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
           </div>
           <div className="text-xs font-semibold mt-1 flex items-center gap-1">
             {weightDelta <= 0 ? (
-              <span className="text-[#B8922A] dark:text-[#F0D060] flex items-center">
+              <span className="text-[#0284C7] dark:text-[#38BDF8] flex items-center">
                 <ArrowDownRight className="w-3.5 h-3.5" />
                 {Math.abs(weightDelta)} kg in {timeRange.toUpperCase()}
               </span>
@@ -228,7 +228,7 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
         </div>
 
         {/* Muscle Mass Card */}
-        <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1A1A1A] border border-gray-200 dark:border-gray-800">
+        <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#161F38] border border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between text-xs text-gray-500">
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#3B82F6]" />
@@ -241,7 +241,7 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
           </div>
           <div className="text-xs font-semibold mt-1 flex items-center gap-1">
             {muscleDelta >= 0 ? (
-              <span className="text-[#B8922A] dark:text-[#F0D060] flex items-center">
+              <span className="text-[#0284C7] dark:text-[#38BDF8] flex items-center">
                 <ArrowUpRight className="w-3.5 h-3.5" />
                 +{muscleDelta} kg lean mass growth
               </span>
@@ -254,7 +254,7 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
         </div>
 
         {/* Body Fat % Card */}
-        <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#1A1A1A] border border-gray-200 dark:border-gray-800">
+        <div className="p-4 rounded-xl bg-gray-50 dark:bg-[#161F38] border border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between text-xs text-gray-500">
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-[#E8912D]" />
@@ -267,7 +267,7 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
           </div>
           <div className="text-xs font-semibold mt-1 flex items-center gap-1">
             {fatDelta <= 0 ? (
-              <span className="text-[#B8922A] dark:text-[#F0D060] flex items-center">
+              <span className="text-[#0284C7] dark:text-[#38BDF8] flex items-center">
                 <ArrowDownRight className="w-3.5 h-3.5" />
                 {Math.abs(fatDelta)}% reduction
               </span>
@@ -288,7 +288,7 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
               type="checkbox"
               checked={showWeight}
               onChange={(e) => setShowWeight(e.target.checked)}
-              className="w-4 h-4 rounded text-[#D4AF37] focus:ring-[#D4AF37]"
+              className="w-4 h-4 rounded text-[#00D4FF] focus:ring-[#00D4FF]"
             />
             <span className="font-semibold text-gray-700 dark:text-gray-300">Body Weight (kg)</span>
           </label>
@@ -347,7 +347,7 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
                 backgroundColor: '#1E201F',
                 color: '#E8ECE9',
                 borderRadius: '12px',
-                border: '1px solid #2A2416',
+                border: '1px solid #1E293B',
                 fontSize: '12px',
                 boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
               }}
@@ -368,11 +368,11 @@ export const BodyCompositionTrendDashboard: React.FC<BodyCompositionTrendDashboa
                 type="monotone"
                 dataKey="weightKg"
                 name="Weight (kg)"
-                stroke="#D4AF37"
-                fill="#D4AF37"
+                stroke="#00D4FF"
+                fill="#00D4FF"
                 fillOpacity={0.12}
                 strokeWidth={3}
-                dot={{ r: 3, fill: '#D4AF37' }}
+                dot={{ r: 3, fill: '#00D4FF' }}
                 activeDot={{ r: 6 }}
               />
             )}

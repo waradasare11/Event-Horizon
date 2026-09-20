@@ -103,8 +103,8 @@ export const D3MacroDonutChart: React.FC<D3MacroDonutChartProps> = ({
       targetGrams: targetProteinG,
       targetCalories: targetProteinCals,
       targetEnergyPct: targetProteinPct,
-      actualColor: '#D4AF37', // Deep Teal
-      targetColor: '#D4AF3780',
+      actualColor: '#00D4FF', // Deep Teal
+      targetColor: '#00D4FF80',
     },
     {
       key: 'carbs',
@@ -266,12 +266,12 @@ export const D3MacroDonutChart: React.FC<D3MacroDonutChartProps> = ({
   const proteinDelta = proteinEnergyPct - targetProteinPct;
 
   return (
-    <div className="p-6 rounded-2xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-5">
+    <div className="p-6 rounded-2xl bg-white dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] shadow-xs space-y-5">
       {/* Header & Date Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E7EB] dark:border-[#1E293B] pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-[#D4AF37]/10 dark:bg-[#F0D060]/10 flex items-center justify-center text-[#D4AF37] dark:text-[#F0D060]">
+            <div className="w-8 h-8 rounded-lg bg-[#00D4FF]/10 dark:bg-[#38BDF8]/10 flex items-center justify-center text-[#00D4FF] dark:text-[#38BDF8]">
               <PieIcon className="w-4 h-4" />
             </div>
             <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -333,7 +333,7 @@ export const D3MacroDonutChart: React.FC<D3MacroDonutChartProps> = ({
             ) : (
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1">
-                  <Flame className="w-3 h-3 text-amber-500" />
+                  <Flame className="w-3 h-3 text-cyan-400" />
                   <span>Consumed</span>
                 </div>
                 <div className="text-2xl font-black text-gray-900 dark:text-white">
@@ -342,7 +342,7 @@ export const D3MacroDonutChart: React.FC<D3MacroDonutChartProps> = ({
                 <div className="text-[11px] text-gray-500 dark:text-gray-400">
                   of {userProfile.dailyCalories || targetTotalCals} kcal
                 </div>
-                <div className="text-[10px] font-bold text-[#D4AF37] dark:text-[#F0D060] mt-0.5">
+                <div className="text-[10px] font-bold text-[#00D4FF] dark:text-[#38BDF8] mt-0.5">
                   {Math.round((totalConsumedCals / Math.max(1, userProfile.dailyCalories || targetTotalCals)) * 100)}% Target
                 </div>
               </div>
@@ -363,8 +363,8 @@ export const D3MacroDonutChart: React.FC<D3MacroDonutChartProps> = ({
                 onMouseLeave={() => setHoveredSlice(null)}
                 className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
                   hoveredSlice?.key === macro.key
-                    ? 'ring-2 ring-[#D4AF37] dark:ring-[#F0D060] bg-gray-50 dark:bg-[#1E2220] border-transparent shadow-xs'
-                    : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-[#1E2220]'
+                    ? 'ring-2 ring-[#00D4FF] dark:ring-[#38BDF8] bg-gray-50 dark:bg-[#1E2220] border-transparent shadow-xs'
+                    : 'bg-white dark:bg-[#0E1424] border-gray-200 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-[#1E2220]'
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -420,15 +420,15 @@ export const D3MacroDonutChart: React.FC<D3MacroDonutChartProps> = ({
           })}
 
           {/* Hypertrophy & Nutritional Science Rationale */}
-          <div className="p-3.5 rounded-xl bg-[#FFFBF0]/60 dark:bg-[#2A2416]/30 border border-[#E6D7A8] dark:border-[#2A2416] text-xs text-[#6A5312] dark:text-[#F0D060] flex items-start gap-2.5">
-            <Info className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060] shrink-0 mt-0.5" />
+          <div className="p-3.5 rounded-xl bg-[#0E1424]/60 dark:bg-[#1E293B]/30 border border-[#1E293B] dark:border-[#1E293B] text-xs text-[#0C4A6E] dark:text-[#38BDF8] flex items-start gap-2.5">
+            <Info className="w-4 h-4 text-[#00D4FF] dark:text-[#38BDF8] shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <span className="font-bold">
                 {totalProteinG >= targetProteinG 
                   ? '🎯 Protein Overload Threshold Achieved!' 
                   : `🌱 Needs ${(targetProteinG - totalProteinG).toFixed(1)}g more protein for optimal muscle protein synthesis.`}
               </span>
-              <p className="text-[11px] text-[#A68523] dark:text-[#F0D060]/80">
+              <p className="text-[11px] text-[#0369A1] dark:text-[#38BDF8]/80">
                 Target ratios are calibrated to your goal ({userProfile.goal}) with {targetProteinG}g protein ({(targetProteinG / (userProfile.weightKg || 70)).toFixed(1)} g/kg bodyweight).
               </p>
             </div>

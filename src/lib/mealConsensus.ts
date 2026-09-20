@@ -321,11 +321,11 @@ export function executeMultiModelConsensusReconciliation(
   const overallConsensusScore = Math.min(99, Math.max(88, Math.round(avgItemCertainty * 0.7 + modelCoveragePct * 0.3)));
 
   const consensusRating =
-    overallConsensusScore >= 96
-      ? 'Exceptional (98%+)'
-      : overallConsensusScore >= 90
-      ? 'High (90-97%)'
-      : 'Solid (80-89%)';
+    overallConsensusScore >= 95
+      ? 'High Confidence'
+      : overallConsensusScore >= 85
+      ? 'Moderate Confidence'
+      : 'Review Recommended';
 
   return {
     mealTitle: primaryCandidate.mealTitle || 'Consensus Verified Meal',

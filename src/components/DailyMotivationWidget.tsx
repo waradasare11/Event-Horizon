@@ -494,12 +494,12 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
   const isWaterGoalMet = waterGlasses >= 8;
 
   return (
-    <div className="mb-6 rounded-3xl bg-gradient-to-br from-[#D4AF37]/10 via-indigo-500/5 to-[#A68523]/10 dark:from-[#D4AF37]/30 dark:via-indigo-950/20 dark:to-[#A68523]/30 border border-[#D4AF37]/25 p-5 sm:p-6 text-left space-y-5 shadow-sm transition-all">
+    <div className="mb-6 rounded-3xl bg-gradient-to-br from-[#00D4FF]/10 via-indigo-500/5 to-[#0369A1]/10 dark:from-[#00D4FF]/30 dark:via-indigo-950/20 dark:to-[#0369A1]/30 border border-[#00D4FF]/25 p-5 sm:p-6 text-left space-y-5 shadow-sm transition-all">
       
       {/* Top Banner: Greeting, Streak & Audio Coach */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#A68523] text-white flex items-center justify-center shadow-md shadow-[#D4AF37]/20 shrink-0">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-[#00D4FF] to-[#0369A1] text-white flex items-center justify-center shadow-md shadow-[#00D4FF]/20 shrink-0">
             <Heart className="w-5 h-5 text-amber-300 fill-amber-300" />
           </div>
           <div>
@@ -507,8 +507,8 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
               <h2 className="text-base sm:text-lg font-black text-gray-900 dark:text-white">
                 Welcome back, {userName}!
               </h2>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300 text-xs font-black">
-                <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-amber-800 dark:text-amber-300 text-xs font-black">
+                <Flame className="w-3.5 h-3.5 fill-amber-500 text-cyan-400" />
                 {currentStreak} Day Streak
               </span>
             </div>
@@ -524,17 +524,17 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
             type="button"
             onClick={speakMotivation}
             disabled={isPlayingAudio}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 text-xs font-bold text-gray-800 dark:text-gray-200 hover:border-[#D4AF37] transition-all cursor-pointer shadow-2xs"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#0E1424] border border-gray-200 dark:border-gray-800 text-xs font-bold text-gray-800 dark:text-gray-200 hover:border-[#00D4FF] transition-all cursor-pointer shadow-2xs"
             title="Listen to daily coach motivation"
           >
-            <Volume2 className={`w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060] ${isPlayingAudio ? 'animate-pulse text-amber-500' : ''}`} />
+            <Volume2 className={`w-3.5 h-3.5 text-[#00D4FF] dark:text-[#38BDF8] ${isPlayingAudio ? 'animate-pulse text-cyan-400' : ''}`} />
             <span>{isPlayingAudio ? 'Speaking...' : 'Audio Coach'}</span>
           </button>
 
           <button
             type="button"
             onClick={handleNextQuote}
-            className="p-2 rounded-xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:text-[#D4AF37] transition-all cursor-pointer"
+            className="p-2 rounded-xl bg-white dark:bg-[#0E1424] border border-gray-200 dark:border-gray-800 text-gray-600 dark:text-gray-300 hover:text-[#00D4FF] transition-all cursor-pointer"
             title="Next motivation"
           >
             <RefreshCw className="w-3.5 h-3.5" />
@@ -546,10 +546,10 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 pt-1">
         
         {/* Module 1: Radial Progress Bar (Remaining Calorie & Protein Targets) */}
-        <div className="lg:col-span-7 p-4 rounded-2xl bg-white dark:bg-[#111111] border border-[#D4AF37]/20 shadow-xs flex flex-col justify-between space-y-3">
+        <div className="lg:col-span-7 p-4 rounded-2xl bg-white dark:bg-[#0E1424] border border-[#00D4FF]/20 shadow-xs flex flex-col justify-between space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">
-              <Zap className="w-4 h-4 text-[#D4AF37]" />
+              <Zap className="w-4 h-4 text-[#00D4FF]" />
               <span>Target Radial Balance</span>
             </div>
             <span className="text-[11px] font-bold text-gray-500 dark:text-gray-400">
@@ -611,8 +611,8 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
 
                 <defs>
                   <linearGradient id="calGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#D4AF37" />
-                    <stop offset="100%" stopColor="#D4AF37" />
+                    <stop offset="0%" stopColor="#00D4FF" />
+                    <stop offset="100%" stopColor="#00D4FF" />
                   </linearGradient>
                   <linearGradient id="proGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#F59E0B" />
@@ -635,10 +635,10 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
             {/* Target Breakdown Readout */}
             <div className="flex-1 space-y-2 text-xs">
               {/* Calorie Stats */}
-              <div className="p-2 rounded-xl bg-[#D4AF37]/10 dark:bg-[#2A2416]/30 border border-[#D4AF37]/20 flex items-center justify-between">
+              <div className="p-2 rounded-xl bg-[#00D4FF]/10 dark:bg-[#1E293B]/30 border border-[#00D4FF]/20 flex items-center justify-between">
                 <div>
-                  <div className="flex items-center gap-1 text-[11px] font-bold text-[#8E701C] dark:text-[#F0D060]">
-                    <span className="w-2 h-2 rounded-full bg-[#D4AF37] inline-block"></span>
+                  <div className="flex items-center gap-1 text-[11px] font-bold text-[#075985] dark:text-[#38BDF8]">
+                    <span className="w-2 h-2 rounded-full bg-[#00D4FF] inline-block"></span>
                     <span>Calories</span>
                   </div>
                   <div className="text-[10px] text-gray-500 dark:text-gray-400">
@@ -646,17 +646,17 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs font-black text-[#A68523] dark:text-[#F0D060]">
+                  <span className="text-xs font-black text-[#0369A1] dark:text-[#38BDF8]">
                     {calRemaining} left
                   </span>
-                  <div className="text-[9px] text-[#B8922A]/80 font-bold">
+                  <div className="text-[9px] text-[#0284C7]/80 font-bold">
                     {calPercent}% done
                   </div>
                 </div>
               </div>
 
               {/* Protein Stats */}
-              <div className="p-2 rounded-xl bg-amber-500/10 dark:bg-amber-950/30 border border-amber-500/20 flex items-center justify-between">
+              <div className="p-2 rounded-xl bg-cyan-500/10 dark:bg-amber-950/30 border border-cyan-500/20 flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-1 text-[11px] font-bold text-amber-800 dark:text-amber-300">
                     <span className="w-2 h-2 rounded-full bg-amber-500 inline-block"></span>
@@ -680,7 +680,7 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
         </div>
 
         {/* Module 3: Quick Add Snacks & Workout Reminder Controls */}
-        <div className="lg:col-span-5 p-4 rounded-2xl bg-white dark:bg-[#111111] border border-[#D4AF37]/20 shadow-xs flex flex-col justify-between space-y-3">
+        <div className="lg:col-span-5 p-4 rounded-2xl bg-white dark:bg-[#0E1424] border border-[#00D4FF]/20 shadow-xs flex flex-col justify-between space-y-3">
           {/* Quick Add Snack Launcher */}
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -691,15 +691,15 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
               <button
                 type="button"
                 onClick={() => setIsQuickAddOpen(!isQuickAddOpen)}
-                className="text-[11px] font-extrabold text-[#D4AF37] dark:text-[#F0D060] hover:underline cursor-pointer flex items-center gap-0.5"
+                className="text-[11px] font-extrabold text-[#00D4FF] dark:text-[#38BDF8] hover:underline cursor-pointer flex items-center gap-0.5"
               >
                 {isQuickAddOpen ? 'Close' : 'Presets +'}
               </button>
             </div>
 
             {lastAddedSnack && (
-              <div className="p-1.5 rounded-lg bg-[#D4AF37]/10 text-[#8E701C] dark:text-[#F0D060] text-[11px] font-bold flex items-center gap-1 mb-2 animate-in fade-in">
-                <Check className="w-3.5 h-3.5 text-[#B8922A]" />
+              <div className="p-1.5 rounded-lg bg-[#00D4FF]/10 text-[#075985] dark:text-[#38BDF8] text-[11px] font-bold flex items-center gap-1 mb-2 animate-in fade-in">
+                <Check className="w-3.5 h-3.5 text-[#0284C7]" />
                 <span>Logged {lastAddedSnack}!</span>
               </div>
             )}
@@ -711,7 +711,7 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
                   key={snack.id}
                   type="button"
                   onClick={() => handleLogPresetSnack(snack)}
-                  className="p-1.5 rounded-xl bg-gray-50 dark:bg-[#1F2220] hover:bg-[#D4AF37]/15 border border-gray-200 dark:border-gray-800 hover:border-[#D4AF37]/30 text-left text-[11px] transition-all cursor-pointer flex items-center gap-1.5 group"
+                  className="p-1.5 rounded-xl bg-gray-50 dark:bg-[#1F2220] hover:bg-[#00D4FF]/15 border border-gray-200 dark:border-gray-800 hover:border-[#00D4FF]/30 text-left text-[11px] transition-all cursor-pointer flex items-center gap-1.5 group"
                   title={`${snack.name} • ${snack.calories} kcal, ${snack.proteinG}g P`}
                 >
                   <span className="text-sm shrink-0">{snack.icon}</span>
@@ -719,7 +719,7 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
                     <div className="font-bold text-gray-900 dark:text-white truncate">
                       {snack.name.split(' ')[0]}
                     </div>
-                    <div className="text-[10px] text-gray-500 group-hover:text-[#B8922A]">
+                    <div className="text-[10px] text-gray-500 group-hover:text-[#0284C7]">
                       {snack.calories} kcal
                     </div>
                   </div>
@@ -733,7 +733,7 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-1.5 text-xs font-bold text-gray-800 dark:text-gray-200 cursor-pointer">
                 {remindWorkout ? (
-                  <BellRing className="w-3.5 h-3.5 text-amber-500 animate-bounce" />
+                  <BellRing className="w-3.5 h-3.5 text-cyan-400 animate-bounce" />
                 ) : (
                   <Bell className="w-3.5 h-3.5 text-gray-400" />
                 )}
@@ -745,7 +745,7 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
                 type="button"
                 onClick={handleToggleReminder}
                 className={`w-9 h-5 rounded-full transition-colors relative cursor-pointer ${
-                  remindWorkout ? 'bg-[#D4AF37]' : 'bg-gray-300 dark:bg-gray-700'
+                  remindWorkout ? 'bg-[#00D4FF]' : 'bg-gray-300 dark:bg-gray-700'
                 }`}
                 title="Toggle workout browser notifications"
               >
@@ -763,14 +763,14 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
                   type="time"
                   value={workoutReminderTime}
                   onChange={(e) => setWorkoutReminderTime(e.target.value)}
-                  className="px-2 py-1 rounded-lg bg-gray-50 dark:bg-[#111111] border border-gray-200 dark:border-gray-800 text-[11px] font-bold text-gray-800 dark:text-gray-200 outline-hidden"
+                  className="px-2 py-1 rounded-lg bg-gray-50 dark:bg-[#0E1424] border border-gray-200 dark:border-gray-800 text-[11px] font-bold text-gray-800 dark:text-gray-200 outline-hidden"
                   title="Select preferred daily workout time"
                 />
 
                 <button
                   type="button"
                   onClick={handleTestNotification}
-                  className="text-[10px] font-extrabold text-gray-600 dark:text-gray-400 hover:text-[#D4AF37] underline cursor-pointer"
+                  className="text-[10px] font-extrabold text-gray-600 dark:text-gray-400 hover:text-[#00D4FF] underline cursor-pointer"
                 >
                   Test Alert
                 </button>
@@ -778,7 +778,7 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
             )}
 
             {reminderTestStatus && (
-              <div className="text-[10px] font-bold text-[#B8922A] dark:text-[#F0D060]">
+              <div className="text-[10px] font-bold text-[#0284C7] dark:text-[#38BDF8]">
                 {reminderTestStatus}
               </div>
             )}
@@ -788,16 +788,16 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
       </div>
 
       {/* Horizontal Scroll of Quick Add Frequently Eaten Meals */}
-      <div className="p-4 rounded-3xl bg-white dark:bg-[#111111] border border-[#D4AF37]/20 shadow-xs space-y-3">
+      <div className="p-4 rounded-3xl bg-white dark:bg-[#0E1424] border border-[#00D4FF]/20 shadow-xs space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-xl bg-amber-500/10 text-amber-500">
+            <span className="p-1.5 rounded-xl bg-cyan-500/10 text-cyan-400">
               <Zap className="w-4 h-4 fill-amber-500" />
             </span>
             <div>
               <h3 className="text-xs sm:text-sm font-black text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
                 <span>Frequently Eaten Meals</span>
-                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-[#00D4FF]/10 text-[#00D4FF] dark:text-[#38BDF8]">
                   One-Tap Quick Add
                 </span>
               </h3>
@@ -838,26 +838,26 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
               key={meal.id}
               type="button"
               onClick={() => handleQuickAddFrequentMeal(meal)}
-              className="shrink-0 flex items-center gap-3 px-3.5 py-2.5 rounded-2xl bg-gray-50 dark:bg-[#111111] hover:bg-[#FFFBF0] dark:hover:bg-[#D4AF37]/15 border border-gray-200 dark:border-gray-800 hover:border-[#D4AF37]/50 transition-all cursor-pointer text-left group shadow-2xs hover:scale-102 hover:shadow-xs active:scale-98"
+              className="shrink-0 flex items-center gap-3 px-3.5 py-2.5 rounded-2xl bg-gray-50 dark:bg-[#0E1424] hover:bg-[#0E1424] dark:hover:bg-[#00D4FF]/15 border border-gray-200 dark:border-gray-800 hover:border-[#00D4FF]/50 transition-all cursor-pointer text-left group shadow-2xs hover:scale-102 hover:shadow-xs active:scale-98"
             >
               <span className="text-2xl group-hover:scale-110 transition-transform">
                 {meal.icon || '🍽️'}
               </span>
               <div className="space-y-0.5">
-                <div className="text-xs font-black text-gray-900 dark:text-white group-hover:text-[#D4AF37] dark:group-hover:text-[#F0D060] whitespace-nowrap">
+                <div className="text-xs font-black text-gray-900 dark:text-white group-hover:text-[#00D4FF] dark:group-hover:text-[#38BDF8] whitespace-nowrap">
                   {meal.name}
                 </div>
                 <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 dark:text-gray-400">
-                  <span className="text-[#A68523] dark:text-[#F0D060] font-extrabold">
+                  <span className="text-[#0369A1] dark:text-[#38BDF8] font-extrabold">
                     {meal.calories} kcal
                   </span>
                   <span>•</span>
-                  <span className="text-amber-700 dark:text-amber-400 font-extrabold">
+                  <span className="text-amber-700 dark:text-cyan-400 font-extrabold">
                     {meal.proteinG}g Protein
                   </span>
                 </div>
               </div>
-              <span className="p-1 rounded-lg bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="p-1 rounded-lg bg-[#00D4FF]/10 text-[#00D4FF] dark:text-[#38BDF8] opacity-0 group-hover:opacity-100 transition-opacity">
                 <Plus className="w-3.5 h-3.5" />
               </span>
             </button>
@@ -867,10 +867,10 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
 
       {/* Expanded Quick Add Presets Drawer */}
       {isQuickAddOpen && (
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#111111] border border-[#D4AF37]/30 shadow-md space-y-3 animate-in slide-in-from-top-2 duration-200">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#0E1424] border border-[#00D4FF]/30 shadow-md space-y-3 animate-in slide-in-from-top-2 duration-200">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-              <Zap className="w-4 h-4 text-amber-500" />
+              <Zap className="w-4 h-4 text-cyan-400" />
               <span>Full One-Click Healthy Snack Menu</span>
             </span>
             <span className="text-[11px] text-gray-500">Tap any item to instantly add to today's log</span>
@@ -882,13 +882,13 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
                 key={snack.id}
                 type="button"
                 onClick={() => handleLogPresetSnack(snack)}
-                className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#111111] border border-gray-200 dark:border-gray-800 hover:border-[#D4AF37] hover:bg-[#D4AF37]/5 text-center space-y-1 transition-all cursor-pointer group"
+                className="p-3 rounded-2xl bg-[#FAFAF8] dark:bg-[#0E1424] border border-gray-200 dark:border-gray-800 hover:border-[#00D4FF] hover:bg-[#00D4FF]/5 text-center space-y-1 transition-all cursor-pointer group"
               >
                 <div className="text-2xl">{snack.icon}</div>
                 <div className="text-xs font-bold text-gray-900 dark:text-white truncate">
                   {snack.name}
                 </div>
-                <div className="text-[11px] font-black text-[#D4AF37] dark:text-[#F0D060]">
+                <div className="text-[11px] font-black text-[#00D4FF] dark:text-[#38BDF8]">
                   {snack.calories} kcal
                 </div>
                 <div className="text-[10px] text-gray-500">
@@ -901,10 +901,10 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
       )}
 
       {/* Bottom Row: Hydration Tracker + Today's Checklist */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#D4AF37]/15">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-[#00D4FF]/15">
         
         {/* Interactive Hydration Tracker */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#111111] border border-[#D4AF37]/20 flex flex-col justify-between space-y-3 shadow-xs">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#0E1424] border border-[#00D4FF]/20 flex flex-col justify-between space-y-3 shadow-xs">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-extrabold text-gray-900 dark:text-white">
               <Droplets className="w-4 h-4 text-blue-500" />
@@ -962,43 +962,43 @@ export const DailyMotivationWidget: React.FC<DailyMotivationWidgetProps> = ({
         </div>
 
         {/* Daily Simple Win Checklist */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#111111] border border-[#D4AF37]/20 flex flex-col justify-between space-y-2.5 shadow-xs">
+        <div className="p-4 rounded-2xl bg-white dark:bg-[#0E1424] border border-[#00D4FF]/20 flex flex-col justify-between space-y-2.5 shadow-xs">
           <div className="flex items-center justify-between text-xs font-extrabold text-gray-900 dark:text-white">
             <div className="flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-amber-500" />
+              <Trophy className="w-4 h-4 text-cyan-400" />
               <span>Today's 3 Simple Wins</span>
             </div>
-            <span className="text-[11px] font-bold text-[#B8922A] dark:text-[#F0D060]">
+            <span className="text-[11px] font-bold text-[#0284C7] dark:text-[#38BDF8]">
               {[isWaterGoalMet, hasLoggedMeal, hasLoggedWorkoutToday].filter(Boolean).length} / 3 Completed
             </span>
           </div>
 
           <div className="space-y-1.5 text-xs">
             {/* Win 1 */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-gray-50 dark:bg-[#111111] border border-gray-100 dark:border-gray-800">
+            <div className="flex items-center justify-between p-2 rounded-xl bg-gray-50 dark:bg-[#0E1424] border border-gray-100 dark:border-gray-800">
               <span className="text-gray-800 dark:text-gray-200">1. Drink 8 glasses of water</span>
               {isWaterGoalMet ? (
-                <CheckCircle2 className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]/20 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#00D4FF] fill-[#00D4FF]/20 shrink-0" />
               ) : (
                 <span className="text-[10px] text-gray-400 font-bold">{waterGlasses}/8</span>
               )}
             </div>
 
             {/* Win 2 */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-gray-50 dark:bg-[#111111] border border-gray-100 dark:border-gray-800">
+            <div className="flex items-center justify-between p-2 rounded-xl bg-gray-50 dark:bg-[#0E1424] border border-gray-100 dark:border-gray-800">
               <span className="text-gray-800 dark:text-gray-200">2. Log meals & hit protein goal</span>
               {hasLoggedMeal ? (
-                <CheckCircle2 className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]/20 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#00D4FF] fill-[#00D4FF]/20 shrink-0" />
               ) : (
                 <span className="text-[10px] text-amber-600 font-bold">Log with Quick Add or Scan</span>
               )}
             </div>
 
             {/* Win 3 */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-gray-50 dark:bg-[#111111] border border-gray-100 dark:border-gray-800">
+            <div className="flex items-center justify-between p-2 rounded-xl bg-gray-50 dark:bg-[#0E1424] border border-gray-100 dark:border-gray-800">
               <span className="text-gray-800 dark:text-gray-200">3. Complete daily workout or walk</span>
               {hasLoggedWorkoutToday ? (
-                <CheckCircle2 className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]/20 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-[#00D4FF] fill-[#00D4FF]/20 shrink-0" />
               ) : (
                 <span className="text-[10px] text-gray-400 font-bold">
                   {remindWorkout ? `Reminder set for ${workoutReminderTime}` : 'Pending'}

@@ -91,7 +91,7 @@ export const GoogleKeepSyncModal: React.FC<GoogleKeepSyncModalProps> = ({
 
         return {
           title,
-          content: `${title}\n\n🎯 DAILY TARGETS:\n• Calories: ${targetCalories} kcal\n• Protein: ${targetProtein}g\n• Carbs: ${targetCarbs}g\n• Healthy Fats: ${targetFat}g\n• Water Target: 3.5 Liters\n\n🍽️ MEAL LOG CHECKLIST:\n${loggedMealsSummary}\n\nNotes: Log all meals in AROH camera scanner for instant 95%+ precision vision cross-validation.`,
+          content: `${title}\n\n🎯 DAILY TARGETS:\n• Calories: ${targetCalories} kcal\n• Protein: ${targetProtein}g\n• Carbs: ${targetCarbs}g\n• Healthy Fats: ${targetFat}g\n• Water Target: 3.5 Liters\n\n🍽️ MEAL LOG CHECKLIST:\n${loggedMealsSummary}\n\nNotes: Log all meals in AROH camera scanner for ICMR-IFCT verified nutritional tracking.`,
         };
       }
 
@@ -181,7 +181,7 @@ export const GoogleKeepSyncModal: React.FC<GoogleKeepSyncModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center gap-3.5 mb-5">
-          <div className="w-12 h-12 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-400/30 flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-cyan-500/15 text-amber-600 dark:text-cyan-400 border border-amber-400/30 flex items-center justify-center flex-shrink-0">
             {/* Google Keep Icon Styled */}
             <CheckSquare className="w-6 h-6" />
           </div>
@@ -190,7 +190,7 @@ export const GoogleKeepSyncModal: React.FC<GoogleKeepSyncModalProps> = ({
               <h2 id="google-keep-modal-title" className="text-lg font-bold text-zinc-900 dark:text-white">
                 Google Keep Integration
               </h2>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-800 dark:text-amber-300 uppercase tracking-wider">
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-500/20 text-amber-800 dark:text-amber-300 uppercase tracking-wider">
                 Direct Sync
               </span>
             </div>
@@ -207,7 +207,7 @@ export const GoogleKeepSyncModal: React.FC<GoogleKeepSyncModalProps> = ({
             onClick={() => setActiveCategory('shopping')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               activeCategory === 'shopping'
-                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/20'
+                ? 'bg-amber-500 text-white shadow-sm shadow-cyan-500/20'
                 : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`}
           >
@@ -220,7 +220,7 @@ export const GoogleKeepSyncModal: React.FC<GoogleKeepSyncModalProps> = ({
             onClick={() => setActiveCategory('nutrition')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               activeCategory === 'nutrition'
-                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/20'
+                ? 'bg-amber-500 text-white shadow-sm shadow-cyan-500/20'
                 : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`}
           >
@@ -233,7 +233,7 @@ export const GoogleKeepSyncModal: React.FC<GoogleKeepSyncModalProps> = ({
             onClick={() => setActiveCategory('workout')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               activeCategory === 'workout'
-                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/20'
+                ? 'bg-amber-500 text-white shadow-sm shadow-cyan-500/20'
                 : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`}
           >
@@ -246,7 +246,7 @@ export const GoogleKeepSyncModal: React.FC<GoogleKeepSyncModalProps> = ({
             onClick={() => setActiveCategory('coaching')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
               activeCategory === 'coaching'
-                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/20'
+                ? 'bg-amber-500 text-white shadow-sm shadow-cyan-500/20'
                 : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
             }`}
           >
@@ -260,7 +260,7 @@ export const GoogleKeepSyncModal: React.FC<GoogleKeepSyncModalProps> = ({
           <div className="p-4 rounded-xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 text-left">
             <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-amber-200/60 dark:border-amber-800/40">
               <span className="text-xs font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                <FileText className="w-3.5 h-3.5 text-amber-600 dark:text-cyan-400" />
                 Google Keep Note Preview (Ready to Paste)
               </span>
               <button
@@ -268,7 +268,7 @@ export const GoogleKeepSyncModal: React.FC<GoogleKeepSyncModalProps> = ({
                 onClick={handleCopyOnly}
                 className="text-[11px] font-bold text-amber-700 dark:text-amber-300 hover:underline flex items-center gap-1 cursor-pointer"
               >
-                {copied ? <Check className="w-3 h-3 text-[#B8922A]" /> : <Copy className="w-3 h-3" />}
+                {copied ? <Check className="w-3 h-3 text-[#0284C7]" /> : <Copy className="w-3 h-3" />}
                 <span>{copied ? 'Copied!' : 'Copy Text'}</span>
               </button>
             </div>
@@ -297,7 +297,7 @@ export const GoogleKeepSyncModal: React.FC<GoogleKeepSyncModalProps> = ({
               onClick={handleCopyOnly}
               className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-bold text-zinc-700 dark:text-zinc-300 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-[#D4AF37]" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-[#00D4FF]" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied' : 'Copy'}</span>
             </button>
 
@@ -305,7 +305,7 @@ export const GoogleKeepSyncModal: React.FC<GoogleKeepSyncModalProps> = ({
               id="google-keep-launch-btn"
               type="button"
               onClick={handleCopyAndLaunchKeep}
-              className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-all shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5 cursor-pointer"
+              className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold transition-all shadow-md shadow-cyan-500/20 flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <CheckSquare className="w-4 h-4" />
               <span>Copy & Open in Keep</span>

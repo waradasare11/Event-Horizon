@@ -162,7 +162,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
         {/* Header */}
         <div className="p-5 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#D4AF37]/10 dark:bg-[#F0D060]/10 flex items-center justify-center text-[#D4AF37] dark:text-[#F0D060]">
+            <div className="w-10 h-10 rounded-xl bg-[#3B82F6]/10 dark:bg-[#60A5FA]/10 flex items-center justify-center text-[#3B82F6] dark:text-[#60A5FA]">
               <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
@@ -189,7 +189,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
               <label className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
+                <Calendar className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA]" />
                 <span>1. Select Date Range</span>
               </label>
               <span className="text-[11px] text-gray-500 dark:text-gray-400">
@@ -211,7 +211,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                   onClick={() => setDateRange(range.id as any)}
                   className={`py-2 px-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer text-center ${
                     dateRange === range.id
-                      ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-2xs'
+                      ? 'bg-[#3B82F6] text-white border-[#3B82F6] shadow-2xs'
                       : 'bg-gray-50 dark:bg-[#1E2220] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-[#252A28]'
                   }`}
                 >
@@ -253,14 +253,14 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
           <div className="space-y-2.5 pt-2 border-t border-gray-200 dark:border-gray-800">
             <div className="flex items-center justify-between">
               <label className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
-                <Layers className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
+                <Layers className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA]" />
                 <span>2. Select Data Categories</span>
               </label>
               <div className="flex items-center gap-2 text-xs">
                 <button
                   type="button"
                   onClick={() => handleSelectAll(true)}
-                  className="text-[#D4AF37] dark:text-[#F0D060] hover:underline font-semibold cursor-pointer"
+                  className="text-[#3B82F6] dark:text-[#60A5FA] hover:underline font-semibold cursor-pointer"
                 >
                   Select All
                 </button>
@@ -281,12 +281,12 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setIncludeWorkouts(!includeWorkouts)}
                 className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
                   includeWorkouts 
-                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#D4AF37]/50 dark:border-[#2A2416]' 
+                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#3B82F6]/50 dark:border-[#2A2416]' 
                     : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="text-[#D4AF37] dark:text-[#F0D060]">
+                  <div className="text-[#3B82F6] dark:text-[#60A5FA]">
                     {includeWorkouts ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4 text-gray-400" />}
                   </div>
                   <div>
@@ -309,12 +309,12 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setIncludeMeals(!includeMeals)}
                 className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
                   includeMeals 
-                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#D4AF37]/50 dark:border-[#2A2416]' 
+                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#3B82F6]/50 dark:border-[#2A2416]' 
                     : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="text-[#D4AF37] dark:text-[#F0D060]">
+                  <div className="text-[#3B82F6] dark:text-[#60A5FA]">
                     {includeMeals ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4 text-gray-400" />}
                   </div>
                   <div>
@@ -337,12 +337,12 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setIncludeMetrics(!includeMetrics)}
                 className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
                   includeMetrics 
-                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#D4AF37]/50 dark:border-[#2A2416]' 
+                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#3B82F6]/50 dark:border-[#2A2416]' 
                     : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="text-[#D4AF37] dark:text-[#F0D060]">
+                  <div className="text-[#3B82F6] dark:text-[#60A5FA]">
                     {includeMetrics ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4 text-gray-400" />}
                   </div>
                   <div>
@@ -365,12 +365,12 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setIncludeCheckIns(!includeCheckIns)}
                 className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
                   includeCheckIns 
-                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#D4AF37]/50 dark:border-[#2A2416]' 
+                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#3B82F6]/50 dark:border-[#2A2416]' 
                     : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="text-[#D4AF37] dark:text-[#F0D060]">
+                  <div className="text-[#3B82F6] dark:text-[#60A5FA]">
                     {includeCheckIns ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4 text-gray-400" />}
                   </div>
                   <div>
@@ -393,12 +393,12 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setIncludeProfileMetadata(!includeProfileMetadata)}
                 className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
                   includeProfileMetadata 
-                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#D4AF37]/50 dark:border-[#2A2416]' 
+                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#3B82F6]/50 dark:border-[#2A2416]' 
                     : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="text-[#D4AF37] dark:text-[#F0D060]">
+                  <div className="text-[#3B82F6] dark:text-[#60A5FA]">
                     {includeProfileMetadata ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4 text-gray-400" />}
                   </div>
                   <div>
@@ -427,7 +427,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setDelimiter(',')}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold border cursor-pointer ${
                   delimiter === ','
-                    ? 'bg-[#D4AF37] text-white border-[#D4AF37]'
+                    ? 'bg-[#3B82F6] text-white border-[#3B82F6]'
                     : 'bg-white dark:bg-[#1E2220] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700'
                 }`}
               >
@@ -438,7 +438,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setDelimiter(';')}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold border cursor-pointer ${
                   delimiter === ';'
-                    ? 'bg-[#D4AF37] text-white border-[#D4AF37]'
+                    ? 'bg-[#3B82F6] text-white border-[#3B82F6]'
                     : 'bg-white dark:bg-[#1E2220] text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-700'
                 }`}
                 title="Recommended for European Excel versions"
@@ -463,7 +463,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
               className="px-3.5 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1A1A1A] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               title="Copy CSV to clipboard"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-[#B8922A]" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-[#1D4ED8]" /> : <Copy className="w-3.5 h-3.5" />}
               <span>{copied ? 'Copied!' : 'Copy CSV'}</span>
             </button>
 
@@ -472,7 +472,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
               type="button"
               onClick={handleTriggerExport}
               disabled={totalSelectedRecords === 0}
-              className="px-5 py-2 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-xs sm:text-sm font-bold shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2 rounded-xl bg-[#3B82F6] hover:bg-[#1D4ED8] text-white text-xs sm:text-sm font-bold shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Download className="w-4 h-4" />
               <span>Download CSV</span>

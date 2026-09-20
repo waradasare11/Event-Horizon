@@ -256,7 +256,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
   const triggerAIAnalysis = async (photosToAnalyze?: string[], specificNotes?: string) => {
     const photos = photosToAnalyze || mealPhotos;
     if (!photos || photos.length === 0) {
-      setErrorMessage('Please capture or upload at least 1 photo of your meal (up to 4 angles for 95%–97% precision).');
+      setErrorMessage('Please capture or upload at least 1 photo of your meal (up to 4 angles for multi-angle volumetric calibration).');
       return;
     }
 
@@ -271,7 +271,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
 
       const fullCustomNotes = [
         specificNotes || customPromptNote,
-        `[Multi-Angle Vision: ${photos.length} angle photo(s) provided. Automatically detect and calibrate against any reference object (e.g. coin, utensil, plate rim) kept near the dish for 95%–97% volumetric calculation.]`
+        `[Multi-Angle Vision: ${photos.length} angle photo(s) provided. Automatically detect and calibrate against any reference object (e.g. coin, utensil, plate rim) kept near the dish for volumetric calibration.]`
       ].filter(Boolean).join(' ');
 
       setAnalysisProgress('Analyzing meal dimensions, standard measures & ingredients across high-reasoning vision models...');
@@ -436,7 +436,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Top Header Card */}
-      <div className="bg-gradient-to-br from-[#D4AF37] to-[#8E701C] text-white p-6 sm:p-8 rounded-3xl shadow-sm text-left relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#00D4FF] to-[#075985] text-white p-6 sm:p-8 rounded-3xl shadow-sm text-left relative overflow-hidden">
         <div className="absolute right-0 top-0 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none" />
         <div className="max-w-3xl relative z-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-[#E8912D] text-xs font-bold uppercase tracking-wider mb-3">
@@ -447,20 +447,20 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
             Meal Scanner & Macro Calculator
           </h1>
           <p className="text-sm sm:text-base text-[#D1D5DB] mt-2 leading-relaxed">
-            Snap 1 to 4 photos from different angles or enter meal details to calculate exact grams, calories, and protein density (95%–97% estimated precision).
+            Snap 1 to 4 photos from different angles or enter meal details to estimate grams, calories, and protein density with ICMR-IFCT verified databases.
           </p>
         </div>
       </div>
 
       {/* Navigation Switcher Tabs */}
       {!analysisResult && (
-        <div className="flex items-center justify-start border-b border-[#E5E7EB] dark:border-[#2A2416] gap-2 overflow-x-auto pb-1">
+        <div className="flex items-center justify-start border-b border-[#E5E7EB] dark:border-[#1E293B] gap-2 overflow-x-auto pb-1">
           <button
             onClick={() => setActiveTab('camera')}
             className={`px-4 py-2.5 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'camera'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
-                : 'text-[#6B7280] dark:text-[#9EA8A2] hover:bg-[#FAFAF8] dark:hover:bg-[#111111]'
+                ? 'bg-[#00D4FF] text-white shadow-xs'
+                : 'text-[#6B7280] dark:text-[#9EA8A2] hover:bg-[#FAFAF8] dark:hover:bg-[#0E1424]'
             }`}
           >
             <Camera className="w-4 h-4 text-[#E8912D]" />
@@ -471,8 +471,8 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
             onClick={() => setActiveTab('web_match')}
             className={`px-4 py-2.5 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'web_match'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
-                : 'text-[#6B7280] dark:text-[#9EA8A2] hover:bg-[#FAFAF8] dark:hover:bg-[#111111]'
+                ? 'bg-[#00D4FF] text-white shadow-xs'
+                : 'text-[#6B7280] dark:text-[#9EA8A2] hover:bg-[#FAFAF8] dark:hover:bg-[#0E1424]'
             }`}
           >
             <Globe className="w-4 h-4 text-[#E8912D]" />
@@ -483,8 +483,8 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
             onClick={() => setActiveTab('indian_intelligence')}
             className={`px-4 py-2.5 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'indian_intelligence'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
-                : 'text-[#6B7280] dark:text-[#9EA8A2] hover:bg-[#FAFAF8] dark:hover:bg-[#111111]'
+                ? 'bg-[#00D4FF] text-white shadow-xs'
+                : 'text-[#6B7280] dark:text-[#9EA8A2] hover:bg-[#FAFAF8] dark:hover:bg-[#0E1424]'
             }`}
           >
             <Sparkles className="w-4 h-4 text-[#E8912D]" />
@@ -495,8 +495,8 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
             onClick={() => setActiveTab('manual')}
             className={`px-4 py-2.5 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'manual'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
-                : 'text-[#6B7280] dark:text-[#9EA8A2] hover:bg-[#FAFAF8] dark:hover:bg-[#111111]'
+                ? 'bg-[#00D4FF] text-white shadow-xs'
+                : 'text-[#6B7280] dark:text-[#9EA8A2] hover:bg-[#FAFAF8] dark:hover:bg-[#0E1424]'
             }`}
           >
             <PenTool className="w-4 h-4 text-[#E8912D]" />
@@ -507,8 +507,8 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
             onClick={() => setActiveTab('indian_recipes')}
             className={`px-4 py-2.5 font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
               activeTab === 'indian_recipes'
-                ? 'bg-[#D4AF37] text-white shadow-xs'
-                : 'text-[#6B7280] dark:text-[#9EA8A2] hover:bg-[#FAFAF8] dark:hover:bg-[#111111]'
+                ? 'bg-[#00D4FF] text-white shadow-xs'
+                : 'text-[#6B7280] dark:text-[#9EA8A2] hover:bg-[#FAFAF8] dark:hover:bg-[#0E1424]'
             }`}
           >
             <BookOpen className="w-4 h-4 text-[#E8912D]" />
@@ -524,16 +524,16 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
           {activeTab === 'camera' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Camera / Multi-Angle Upload Container (2 cols) */}
-              <div className="lg:col-span-2 bg-white dark:bg-[#111111] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs transition-colors">
+              <div className="lg:col-span-2 bg-white dark:bg-[#0E1424] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B] shadow-xs transition-colors">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <Camera className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060]" />
+                    <Camera className="w-5 h-5 text-[#00D4FF] dark:text-[#38BDF8]" />
                     <h2 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">Multi-Angle Food Scanner (1 to 4 Photos)</h2>
                   </div>
                   {isCameraActive && (
                     <button
                       onClick={() => setFacingMode((prev) => (prev === 'environment' ? 'user' : 'environment'))}
-                      className="flex items-center gap-1 text-xs text-[#D4AF37] dark:text-[#F0D060] font-semibold hover:underline cursor-pointer"
+                      className="flex items-center gap-1 text-xs text-[#00D4FF] dark:text-[#38BDF8] font-semibold hover:underline cursor-pointer"
                     >
                       <FlipHorizontal className="w-4 h-4" />
                       Flip Camera
@@ -550,11 +550,11 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                 )}
 
                 {/* Viewport: Live Camera Feed OR Preview OR Multi-Angle Strip */}
-                <div className="relative aspect-4/3 w-full bg-[#1A1D1B] dark:bg-[#070707] rounded-xl overflow-hidden border border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-center">
+                <div className="relative aspect-4/3 w-full bg-[#1A1D1B] dark:bg-[#0B0F1E] rounded-xl overflow-hidden border border-[#E5E7EB] dark:border-[#1E293B] flex items-center justify-center">
                   {isAnalyzing ? (
                     <div className="flex flex-col items-center justify-center p-6 text-center space-y-4">
                       <div className="relative">
-                        <div className="w-16 h-16 rounded-full border-4 border-[#D4AF37]/30 dark:border-[#F0D060]/30 border-t-[#E8912D] animate-spin" />
+                        <div className="w-16 h-16 rounded-full border-4 border-[#00D4FF]/30 dark:border-[#38BDF8]/30 border-t-[#E8912D] animate-spin" />
                         <Sparkles className="w-6 h-6 text-[#E8912D] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
                       </div>
                       <div>
@@ -576,9 +576,9 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                       <div className="absolute inset-0 pointer-events-none p-4 flex flex-col justify-between">
                         <div className="bg-black/75 backdrop-blur-md rounded-xl p-2.5 border border-white/15 flex items-center justify-between gap-2 shadow-lg">
                           <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-[#F0D060] animate-ping" />
+                            <span className="w-2 h-2 rounded-full bg-[#38BDF8] animate-ping" />
                             <span className="text-[11px] font-bold text-white tracking-wide flex items-center gap-1.5">
-                              <Scale className="w-3.5 h-3.5 text-amber-400" />
+                              <Scale className="w-3.5 h-3.5 text-cyan-400" />
                               Capturing Angle {mealPhotos.length + 1} of 4
                             </span>
                           </div>
@@ -593,15 +593,15 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                             <div className="absolute -top-3 bg-black/70 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-white/20">
                               🍽️ Center Meal / Bowl Here
                             </div>
-                            <div className="w-4 h-4 border-t-2 border-l-2 border-amber-400 absolute top-2 left-2" />
-                            <div className="w-4 h-4 border-t-2 border-r-2 border-amber-400 absolute top-2 right-2" />
-                            <div className="w-4 h-4 border-b-2 border-l-2 border-amber-400 absolute bottom-2 left-2" />
-                            <div className="w-4 h-4 border-b-2 border-r-2 border-amber-400 absolute bottom-2 right-2" />
+                            <div className="w-4 h-4 border-t-2 border-l-2 border-cyan-400 absolute top-2 left-2" />
+                            <div className="w-4 h-4 border-t-2 border-r-2 border-cyan-400 absolute top-2 right-2" />
+                            <div className="w-4 h-4 border-b-2 border-l-2 border-cyan-400 absolute bottom-2 left-2" />
+                            <div className="w-4 h-4 border-b-2 border-r-2 border-cyan-400 absolute bottom-2 right-2" />
                           </div>
                         </div>
 
                         <div className="bg-black/70 backdrop-blur-xs text-white text-[10px] sm:text-[11px] px-3 py-1.5 rounded-xl border border-white/10 text-center font-medium">
-                          💡 Tip: Any coin, spoon, or utensil placed next to the bowl is automatically detected for 95%–97% volumetric calculation.
+                          💡 Tip: Any coin, spoon, or utensil placed next to the bowl is automatically detected for volumetric calibration.
                         </div>
                       </div>
                     </>
@@ -626,9 +626,9 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                       {mealPhotos.length < 4 && (
                         <div
                           onClick={() => setIsCameraActive(true)}
-                          className="flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-lg p-3 text-center cursor-pointer hover:border-amber-400/60 transition-all"
+                          className="flex flex-col items-center justify-center border-2 border-dashed border-white/20 rounded-lg p-3 text-center cursor-pointer hover:border-cyan-400/60 transition-all"
                         >
-                          <Camera className="w-6 h-6 text-amber-400 mb-1" />
+                          <Camera className="w-6 h-6 text-cyan-400 mb-1" />
                           <span className="text-[11px] text-gray-300 font-semibold">+ Add Angle {mealPhotos.length + 1}</span>
                           <span className="text-[9px] text-gray-400">({4 - mealPhotos.length} slots left)</span>
                         </div>
@@ -637,7 +637,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                   ) : (
                     <div className="text-center p-8 space-y-3">
                       <div className="w-16 h-16 rounded-2xl bg-white/10 dark:bg-white/5 text-white flex items-center justify-center mx-auto">
-                        <Camera className="w-8 h-8 text-[#D4AF37] dark:text-[#F0D060]" />
+                        <Camera className="w-8 h-8 text-[#00D4FF] dark:text-[#38BDF8]" />
                       </div>
                       <div>
                         <h3 className="text-white font-semibold text-sm sm:text-base">Camera is Ready</h3>
@@ -663,7 +663,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                       </button>
                       <button
                         onClick={() => setIsCameraActive(false)}
-                        className="px-5 py-3 rounded-full bg-[#F3F4F6] dark:bg-[#2A2416] text-[#4B5563] dark:text-[#E8ECE9] text-xs font-semibold hover:bg-[#E5E7EB] dark:hover:bg-[#343A37] cursor-pointer"
+                        className="px-5 py-3 rounded-full bg-[#F3F4F6] dark:bg-[#1E293B] text-[#4B5563] dark:text-[#E8ECE9] text-xs font-semibold hover:bg-[#E5E7EB] dark:hover:bg-[#343A37] cursor-pointer"
                       >
                         Cancel Camera
                       </button>
@@ -674,7 +674,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                         <button
                           onClick={() => setIsCameraActive(true)}
                           disabled={isAnalyzing}
-                          className="px-6 py-3 rounded-xl bg-[#D4AF37] text-white font-semibold text-xs sm:text-sm hover:bg-[#A68523] transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+                          className="px-6 py-3 rounded-xl bg-[#00D4FF] text-white font-semibold text-xs sm:text-sm hover:bg-[#0369A1] transition-all shadow-xs flex items-center gap-2 cursor-pointer"
                         >
                           <Camera className="w-4 h-4 text-[#E8912D]" />
                           <span>{mealPhotos.length === 0 ? 'Open Camera' : `Snap Another Angle (${mealPhotos.length}/4)`}</span>
@@ -684,9 +684,9 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isAnalyzing}
-                        className="px-6 py-3 rounded-xl bg-white dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] font-semibold text-xs sm:text-sm hover:bg-[#F9FAFB] dark:hover:bg-[#2A2416] transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+                        className="px-6 py-3 rounded-xl bg-white dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-[#1A1D1B] dark:text-[#E8ECE9] font-semibold text-xs sm:text-sm hover:bg-[#F9FAFB] dark:hover:bg-[#1E293B] transition-all shadow-xs flex items-center gap-2 cursor-pointer"
                       >
-                        <Upload className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
+                        <Upload className="w-4 h-4 text-[#00D4FF] dark:text-[#38BDF8]" />
                         <span>{mealPhotos.length === 0 ? 'Upload Photos (1-4)' : 'Add More Photos'}</span>
                       </button>
                       <input
@@ -702,10 +702,10 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                         <button
                           onClick={() => triggerAIAnalysis()}
                           disabled={isAnalyzing}
-                          className="px-8 py-3 rounded-xl bg-[#E8912D] text-white font-bold text-xs sm:text-sm hover:bg-[#D97D1A] transition-all shadow-md flex items-center gap-2 cursor-pointer"
+                          className="px-8 py-3 rounded-xl bg-[#00D4FF] text-white font-bold text-xs sm:text-sm hover:bg-[#00B4D8] transition-all shadow-md flex items-center gap-2 cursor-pointer"
                         >
                           <Sparkles className="w-4 h-4" />
-                          <span>Analyze {mealPhotos.length} Photo{mealPhotos.length > 1 ? 's' : ''} (95%–97% Precision)</span>
+                          <span>Analyze {mealPhotos.length} Photo{mealPhotos.length > 1 ? 's' : ''} with Multi-Angle Vision</span>
                         </button>
                       )}
                     </>
@@ -713,23 +713,23 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                 </div>
 
                 {/* Spatial Size Calibration Tip */}
-                <div className="mt-4 p-3.5 rounded-2xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 text-left flex items-start gap-2.5">
-                  <div className="p-1.5 rounded-xl bg-amber-500/20 text-amber-700 dark:text-amber-300 shrink-0 mt-0.5">
+                <div className="mt-4 p-3.5 rounded-2xl bg-cyan-500/10 dark:bg-cyan-500/15 border border-cyan-500/30 text-left flex items-start gap-2.5">
+                  <div className="p-1.5 rounded-xl bg-cyan-500/20 text-[#0284C7] dark:text-[#38BDF8] shrink-0 mt-0.5">
                     <Scale className="w-4 h-4" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
+                    <h4 className="text-xs font-bold text-[#0F172A] dark:text-[#F8FAFC] flex items-center gap-1.5">
                       <span>Automated 3D Measure Reasoning</span>
-                      <span className="text-[10px] uppercase font-black tracking-wider bg-amber-500/20 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded">95%–97% Precision</span>
+                      <span className="text-[10px] uppercase font-black tracking-wider bg-cyan-500/20 text-[#0284C7] dark:text-[#38BDF8] px-1.5 py-0.5 rounded">Multi-Angle Vision</span>
                     </h4>
-                    <p className="text-[11px] text-amber-800/90 dark:text-amber-300/90 mt-0.5 leading-relaxed">
-                      For highest precision, capture 2 to 4 photos from different angles (overhead and 45° angle) or place any standard item (coin, spoon, or card) next to your dish. The vision AI automatically scales pixel dimensions against physical boundaries.
+                    <p className="text-[11px] text-[#475569] dark:text-[#94A3B8] mt-0.5 leading-relaxed">
+                      For highest precision, capture 2 to 4 photos from different angles (overhead and 45° angle) or place any standard item (coin, spoon, or card) next to your dish. The vision AI scales pixel dimensions against physical reference markers.
                     </p>
                   </div>
                 </div>
 
                 {/* Optional Custom Context / Notes before scanning */}
-                <div className="mt-4 pt-4 border-t border-[#E5E7EB] dark:border-[#2A2416] text-left">
+                <div className="mt-4 pt-4 border-t border-[#E5E7EB] dark:border-[#1E293B] text-left">
                   <label className="block text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9] mb-1">
                     Optional Dish / Ingredient Notes (e.g. "Sabudana khichdi with roasted peanuts & curd chilly chutney"):
                   </label>
@@ -738,13 +738,13 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                     placeholder="Provide recipe context or ingredients for accurate per-gram mapping..."
                     value={customPromptNote}
                     onChange={(e) => setCustomPromptNote(e.target.value)}
-                    className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#D4AF37] dark:focus:ring-[#F0D060]"
+                    className="w-full text-xs px-3 py-2 rounded-lg border border-[#E5E7EB] dark:border-[#1E293B] bg-[#FAFAF8] dark:bg-[#0B0F1E] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-1 focus:ring-[#00D4FF] dark:focus:ring-[#38BDF8]"
                   />
                 </div>
               </div>
 
               {/* Quick Preset Indian & Global Meals (1 col) */}
-              <div className="bg-white dark:bg-[#111111] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs text-left flex flex-col justify-between transition-colors">
+              <div className="bg-white dark:bg-[#0E1424] p-6 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B] shadow-xs text-left flex flex-col justify-between transition-colors">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <Sparkles className="w-4 h-4 text-[#E8912D]" />
@@ -766,15 +766,15 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                         key={idx}
                         onClick={() => handleSelectPresetMeal(preset)}
                         disabled={isAnalyzing}
-                        className="w-full flex items-center gap-3 p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37] dark:hover:border-[#F0D060] hover:bg-[#D4AF37]/5 dark:hover:bg-[#D4AF37]/15 transition-all text-left group cursor-pointer"
+                        className="w-full flex items-center gap-3 p-2.5 rounded-xl border border-[#E5E7EB] dark:border-[#1E293B] hover:border-[#00D4FF] dark:hover:border-[#38BDF8] hover:bg-[#00D4FF]/5 dark:hover:bg-[#00D4FF]/15 transition-all text-left group cursor-pointer"
                       >
                         <img
                           src={preset.url}
                           alt={preset.title}
-                          className="w-12 h-12 rounded-lg object-cover border border-[#E5E7EB] dark:border-[#2A2416] shrink-0"
+                          className="w-12 h-12 rounded-lg object-cover border border-[#E5E7EB] dark:border-[#1E293B] shrink-0"
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="font-semibold text-xs text-[#1A1D1B] dark:text-[#E8ECE9] truncate group-hover:text-[#D4AF37] dark:group-hover:text-[#F0D060]">
+                          <div className="font-semibold text-xs text-[#1A1D1B] dark:text-[#E8ECE9] truncate group-hover:text-[#00D4FF] dark:group-hover:text-[#38BDF8]">
                             {preset.title}
                           </div>
                           <div className="text-[10px] text-[#6B7280] dark:text-[#9EA8A2]">{preset.type}</div>
@@ -784,7 +784,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                   </div>
                 </div>
 
-                <div className="mt-6 p-3 rounded-xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] text-[11px] text-[#6B7280] dark:text-[#9EA8A2]">
+                <div className="mt-6 p-3 rounded-xl bg-[#FAFAF8] dark:bg-[#0B0F1E] border border-[#E5E7EB] dark:border-[#1E293B] text-[11px] text-[#6B7280] dark:text-[#9EA8A2]">
                   🔬 <strong>IFCT Standard:</strong> Backed by the Indian Council of Medical Research (ICMR-NIN) database for authentic calorie, protein, and fat per gram values.
                 </div>
               </div>
@@ -793,10 +793,10 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
 
           {/* TAB 2: Manual Food Input (Deep AI Calculator) */}
           {activeTab === 'manual' && (
-            <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-3xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-sm text-left space-y-6">
+            <div className="bg-white dark:bg-[#0E1424] p-6 sm:p-8 rounded-3xl border border-[#E5E7EB] dark:border-[#1E293B] shadow-sm text-left space-y-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] text-xs font-bold uppercase tracking-wider mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00D4FF]/10 text-[#00D4FF] dark:text-[#38BDF8] text-xs font-bold uppercase tracking-wider mb-2">
                     <Scale className="w-3.5 h-3.5" />
                     <span>Deep Reasoning Nutrition Engine</span>
                   </div>
@@ -819,7 +819,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                   value={manualMealText}
                   onChange={(e) => setManualMealText(e.target.value)}
                   placeholder="e.g. Cooked tapioca pearls with potato and peanuts eating with peanut and curd and chilly chutney, or 2 whole wheat rotis with 150g paneer bhurji and 1 bowl of moong dal..."
-                  className="w-full text-sm p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-2 focus:ring-[#D4AF37] dark:focus:ring-[#F0D060] focus:outline-none"
+                  className="w-full text-sm p-4 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B] bg-[#FAFAF8] dark:bg-[#0B0F1E] text-[#1A1D1B] dark:text-[#E8ECE9] focus:ring-2 focus:ring-[#00D4FF] dark:focus:ring-[#38BDF8] focus:outline-none"
                 />
               </div>
 
@@ -840,7 +840,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                       key={idx}
                       type="button"
                       onClick={() => setManualMealText(sample)}
-                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] hover:border-[#D4AF37] dark:hover:border-[#F0D060] transition-all cursor-pointer truncate max-w-md"
+                      className="px-3 py-1.5 rounded-full text-xs font-medium bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-[#1A1D1B] dark:text-[#E8ECE9] hover:border-[#00D4FF] dark:hover:border-[#38BDF8] transition-all cursor-pointer truncate max-w-md"
                     >
                       {sample}
                     </button>
@@ -849,13 +849,13 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
               </div>
 
               {/* Action Button */}
-              <div className="pt-4 border-t border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between flex-wrap gap-4">
+              <div className="pt-4 border-t border-[#E5E7EB] dark:border-[#1E293B] flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">Meal Type:</span>
                   <select
                     value={manualMealType}
                     onChange={(e) => setManualMealType(e.target.value)}
-                    className="text-xs px-3 py-1.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#111111] text-[#1A1D1B] dark:text-[#E8ECE9] font-medium"
+                    className="text-xs px-3 py-1.5 rounded-xl border border-[#E5E7EB] dark:border-[#1E293B] bg-white dark:bg-[#0E1424] text-[#1A1D1B] dark:text-[#E8ECE9] font-medium"
                   >
                     <option value="Breakfast">Breakfast</option>
                     <option value="Lunch">Lunch</option>
@@ -868,7 +868,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                 <button
                   onClick={handleAnalyzeManualMeal}
                   disabled={isAnalyzing || !manualMealText.trim()}
-                  className="px-8 py-3 rounded-2xl bg-[#D4AF37] text-white font-bold text-sm hover:bg-[#A68523] transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-8 py-3 rounded-2xl bg-[#00D4FF] text-white font-bold text-sm hover:bg-[#0369A1] transition-all shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {isAnalyzing ? (
                     <>
@@ -908,7 +908,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
 
           {/* TAB 3: Indian Recipe & IFCT Explorer (Search Grounded) */}
           {activeTab === 'indian_recipes' && (
-            <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-3xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-sm text-left space-y-6">
+            <div className="bg-white dark:bg-[#0E1424] p-6 sm:p-8 rounded-3xl border border-[#E5E7EB] dark:border-[#1E293B] shadow-sm text-left space-y-6">
               <div>
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E8912D]/10 text-[#E8912D] text-xs font-bold uppercase tracking-wider mb-2">
                   <Search className="w-3.5 h-3.5" />
@@ -932,13 +932,13 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                     onChange={(e) => setRecipeSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleLookupIndianRecipe()}
                     placeholder="Enter Indian dish name (e.g. Sabudana Khichdi, Dal Makhani, Moong Dal Chilla, Paneer Bhurji)..."
-                    className="w-full text-sm pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] bg-[#FAFAF8] dark:bg-[#070707] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
+                    className="w-full text-sm pl-10 pr-4 py-3 rounded-2xl border border-[#E5E7EB] dark:border-[#1E293B] bg-[#FAFAF8] dark:bg-[#0B0F1E] text-[#1A1D1B] dark:text-[#E8ECE9] focus:outline-none focus:ring-2 focus:ring-[#00D4FF]"
                   />
                 </div>
                 <button
                   onClick={handleLookupIndianRecipe}
                   disabled={isSearchingRecipe || !recipeSearchQuery.trim()}
-                  className="px-6 py-3 rounded-2xl bg-[#D4AF37] text-white font-bold text-sm hover:bg-[#A68523] transition-all shadow-xs flex items-center gap-2 cursor-pointer shrink-0 disabled:opacity-50"
+                  className="px-6 py-3 rounded-2xl bg-[#00D4FF] text-white font-bold text-sm hover:bg-[#0369A1] transition-all shadow-xs flex items-center gap-2 cursor-pointer shrink-0 disabled:opacity-50"
                 >
                   {isSearchingRecipe ? (
                     <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
@@ -966,7 +966,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                     onClick={() => {
                       setRecipeSearchQuery(dish);
                     }}
-                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#FAFAF8] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] hover:border-[#D4AF37] cursor-pointer"
+                    className="px-3 py-1.5 rounded-full text-xs font-semibold bg-[#FAFAF8] dark:bg-[#0E1424] border border-[#E5E7EB] dark:border-[#1E293B] text-[#1A1D1B] dark:text-[#E8ECE9] hover:border-[#00D4FF] cursor-pointer"
                   >
                     {dish}
                   </button>
@@ -975,10 +975,10 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
 
               {/* Search Grounding Results Display */}
               {recipeSearchResult && (
-                <div className="p-6 rounded-2xl bg-[#FAFAF8] dark:bg-[#070707] border border-[#E5E7EB] dark:border-[#2A2416] space-y-4 animate-in fade-in duration-300">
-                  <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#2A2416] pb-3">
+                <div className="p-6 rounded-2xl bg-[#FAFAF8] dark:bg-[#0B0F1E] border border-[#E5E7EB] dark:border-[#1E293B] space-y-4 animate-in fade-in duration-300">
+                  <div className="flex items-center justify-between border-b border-[#E5E7EB] dark:border-[#1E293B] pb-3">
                     <div className="flex items-center gap-2">
-                      <BookOpen className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060]" />
+                      <BookOpen className="w-5 h-5 text-[#00D4FF] dark:text-[#38BDF8]" />
                       <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">
                         {recipeSearchResult.dishName} — Nutritional Analysis
                       </h3>
@@ -988,7 +988,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                         setManualMealText(`1 serving of authentic ${recipeSearchResult.dishName}`);
                         setActiveTab('manual');
                       }}
-                      className="text-xs font-bold text-[#D4AF37] dark:text-[#F0D060] hover:underline flex items-center gap-1 cursor-pointer"
+                      className="text-xs font-bold text-[#00D4FF] dark:text-[#38BDF8] hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <span>Calculate as Meal Log</span>
                       <ChevronRight className="w-3.5 h-3.5" />
@@ -1000,7 +1000,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                   </div>
 
                   {recipeSearchResult.sources && recipeSearchResult.sources.length > 0 && (
-                    <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#2A2416] flex items-center gap-2 flex-wrap">
+                    <div className="pt-3 border-t border-[#E5E7EB] dark:border-[#1E293B] flex items-center gap-2 flex-wrap">
                       <span className="text-[11px] font-semibold text-[#6B7280] dark:text-[#9EA8A2]">Web Grounding Sources:</span>
                       {recipeSearchResult.sources.map((chunk: any, i: number) => {
                         const web = chunk.web;
@@ -1011,7 +1011,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                             href={web.uri}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-[11px] text-[#D4AF37] dark:text-[#F0D060] hover:underline bg-white dark:bg-[#111111] px-2 py-0.5 rounded border border-[#E5E7EB] dark:border-[#2A2416]"
+                            className="inline-flex items-center gap-1 text-[11px] text-[#00D4FF] dark:text-[#38BDF8] hover:underline bg-white dark:bg-[#0E1424] px-2 py-0.5 rounded border border-[#E5E7EB] dark:border-[#1E293B]"
                           >
                             <span>{web.title || 'Source'}</span>
                             <ExternalLink className="w-2.5 h-2.5" />
@@ -1028,22 +1028,22 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
       ) : (
         /* Results Section */
         <div className="space-y-6">
-          {/* Refined Multi-Angle Scan Banner (when consensus score < 95% or requiresRefinedScan) */}
-          {(showRefinedScanPrompt || (analysisResult.consensusScore && analysisResult.consensusScore < 95)) && (
-            <div className="p-5 rounded-3xl bg-amber-500/10 dark:bg-amber-500/15 border-2 border-amber-500/40 text-left space-y-4 shadow-sm animate-in fade-in duration-300">
+          {/* Multi-Angle Verification Guidance Banner */}
+          {(showRefinedScanPrompt || (analysisResult.consensusScore && analysisResult.consensusScore < 85)) && (
+            <div className="p-5 rounded-3xl bg-cyan-500/10 dark:bg-cyan-500/15 border-2 border-cyan-500/40 text-left space-y-4 shadow-sm animate-in fade-in duration-300">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-2xl bg-amber-500/20 text-amber-700 dark:text-amber-300 shrink-0">
+                  <div className="p-2 rounded-2xl bg-cyan-500/20 text-[#0284C7] dark:text-[#38BDF8] shrink-0">
                     <Scale className="w-5 h-5" />
                   </div>
                   <div>
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wider mb-1">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-[#0284C7] dark:text-[#38BDF8] text-[10px] font-bold uppercase tracking-wider mb-1">
                       Portion Guidance
                     </div>
-                    <h3 className="font-bold text-sm sm:text-base text-amber-900 dark:text-amber-100">
+                    <h3 className="font-bold text-sm sm:text-base text-[#0F172A] dark:text-[#F8FAFC]">
                       AI estimate — you can correct portions
                     </h3>
-                    <p className="text-xs text-amber-800/90 dark:text-amber-200/90 mt-1 leading-relaxed">
+                    <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-1 leading-relaxed">
                       Due to food layering or gravies, this is an AI estimate. You can directly edit the portion weights below or capture a secondary angle to refine the estimate.
                     </p>
                   </div>
@@ -1051,7 +1051,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
 
                 <button
                   onClick={() => setShowRefinedScanPrompt(false)}
-                  className="text-xs text-amber-700 dark:text-amber-400 hover:underline shrink-0 font-semibold cursor-pointer"
+                  className="text-xs text-[#0284C7] dark:text-cyan-400 hover:underline shrink-0 font-semibold cursor-pointer"
                 >
                   Dismiss
                 </button>
@@ -1059,9 +1059,9 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
 
               {/* Multi Angle Previews */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                <div className="rounded-xl overflow-hidden border border-amber-500/30 bg-black/20 p-2 text-center">
+                <div className="rounded-xl overflow-hidden border border-cyan-500/30 bg-black/20 p-2 text-center">
                   <div className="text-[10px] font-bold text-amber-900 dark:text-amber-300 mb-1.5 flex items-center justify-center gap-1">
-                    <CheckCircle className="w-3.5 h-3.5 text-[#D4AF37]" />
+                    <CheckCircle className="w-3.5 h-3.5 text-[#00D4FF]" />
                     <span>Primary Overhead View ({mealPhotos.length} photo{mealPhotos.length > 1 ? 's' : ''} captured)</span>
                   </div>
                   {mealPhotos.length > 0 && (
@@ -1073,11 +1073,11 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                   )}
                 </div>
 
-                <div className="rounded-xl overflow-hidden border-2 border-dashed border-amber-500/40 bg-amber-500/5 p-2 text-center flex flex-col justify-center items-center min-h-[140px]">
+                <div className="rounded-xl overflow-hidden border-2 border-dashed border-cyan-500/40 bg-amber-500/5 p-2 text-center flex flex-col justify-center items-center min-h-[140px]">
                   {mealPhotos.length > 1 ? (
                     <div>
                       <div className="text-[10px] font-bold text-amber-900 dark:text-amber-300 mb-1.5 flex items-center justify-center gap-1">
-                        <CheckCircle className="w-3.5 h-3.5 text-[#D4AF37]" />
+                        <CheckCircle className="w-3.5 h-3.5 text-[#00D4FF]" />
                         <span>Secondary 45° Cross Angle (Ready)</span>
                       </div>
                       <img
@@ -1088,7 +1088,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                     </div>
                   ) : (
                     <div className="space-y-2 py-2">
-                      <Camera className="w-6 h-6 text-amber-600 dark:text-amber-400 mx-auto" />
+                      <Camera className="w-6 h-6 text-amber-600 dark:text-cyan-400 mx-auto" />
                       <div className="text-[11px] font-bold text-amber-900 dark:text-amber-200">
                         Add Angle 2 (45° Side / Depth View)
                       </div>
@@ -1122,7 +1122,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                             };
                             input.click();
                           }}
-                          className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#111111] border border-amber-500/40 text-amber-900 dark:text-amber-200 text-[11px] font-bold hover:bg-amber-500/10 cursor-pointer"
+                          className="px-3 py-1.5 rounded-lg bg-white dark:bg-[#0E1424] border border-cyan-500/40 text-amber-900 dark:text-amber-200 text-[11px] font-bold hover:bg-cyan-500/10 cursor-pointer"
                         >
                           Upload Angle 2
                         </button>
@@ -1148,10 +1148,10 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
       )}
 
       {/* Recent Meal Logs History */}
-      <div className="bg-white dark:bg-[#111111] p-6 rounded-3xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs text-left transition-colors">
+      <div className="bg-white dark:bg-[#0E1424] p-6 rounded-3xl border border-[#E5E7EB] dark:border-[#1E293B] shadow-xs text-left transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
-            <History className="w-5 h-5 text-[#D4AF37] dark:text-[#F0D060]" />
+            <History className="w-5 h-5 text-[#00D4FF] dark:text-[#38BDF8]" />
             <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">Today's Logged Meals</h3>
             <span className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">({mealLogs.length} logged items)</span>
           </div>
@@ -1162,7 +1162,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                 <button
                   type="button"
                   onClick={handleSelectAllMeals}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-[#1A1A1A] dark:hover:bg-[#2A2416] text-[#374151] dark:text-[#D1D5DB] text-xs font-semibold transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-[#161F38] dark:hover:bg-[#1E293B] text-[#374151] dark:text-[#D1D5DB] text-xs font-semibold transition-all cursor-pointer"
                 >
                   <span>{selectedMealIds.length === mealLogs.length ? 'Deselect All' : 'Select All'}</span>
                 </button>
@@ -1184,7 +1184,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
               id="meal-scanner-google-keep-btn"
               type="button"
               onClick={() => setIsKeepModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold border border-amber-500/30 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-amber-700 dark:text-cyan-400 text-xs font-bold border border-cyan-500/30 transition-all cursor-pointer"
               title="Sync Meals & Macros to Google Keep"
             >
               <span>Keep Sync</span>
@@ -1195,10 +1195,10 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                 <button
                   onClick={handleBatchVerifyLogs}
                   disabled={isBatchVerifying}
-                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] text-xs font-bold hover:bg-[#D4AF37]/20 transition-all border border-[#D4AF37]/30 cursor-pointer disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#00D4FF]/10 dark:bg-[#00D4FF]/20 text-[#00D4FF] dark:text-[#38BDF8] text-xs font-bold hover:bg-[#00D4FF]/20 transition-all border border-[#00D4FF]/30 cursor-pointer disabled:opacity-50"
                 >
                   {isBatchVerifying ? (
-                    <div className="w-3.5 h-3.5 rounded-full border-2 border-[#D4AF37] border-t-transparent animate-spin" />
+                    <div className="w-3.5 h-3.5 rounded-full border-2 border-[#00D4FF] border-t-transparent animate-spin" />
                   ) : (
                     <ShieldCheck className="w-3.5 h-3.5" />
                   )}
@@ -1221,8 +1221,8 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
         </div>
 
         {batchVerificationSummary && (
-          <div className="mb-4 p-3 rounded-2xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 border border-[#D4AF37]/30 text-[#8E701C] dark:text-[#F0D060] text-xs flex items-start gap-2 animate-in fade-in duration-200">
-            <CheckCheck className="w-4 h-4 text-[#B8922A] dark:text-[#F0D060] shrink-0 mt-0.5" />
+          <div className="mb-4 p-3 rounded-2xl bg-[#00D4FF]/10 dark:bg-[#00D4FF]/20 border border-[#00D4FF]/30 text-[#075985] dark:text-[#38BDF8] text-xs flex items-start gap-2 animate-in fade-in duration-200">
+            <CheckCheck className="w-4 h-4 text-[#0284C7] dark:text-[#38BDF8] shrink-0 mt-0.5" />
             <span>{batchVerificationSummary}</span>
           </div>
         )}
@@ -1241,7 +1241,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                   className={`p-4 rounded-2xl border flex items-center justify-between gap-3 transition-colors ${
                     isSelected
                       ? 'bg-rose-50/50 dark:bg-rose-950/20 border-rose-300 dark:border-rose-800 shadow-2xs'
-                      : 'bg-[#FAFAF8] dark:bg-[#111111] border-[#E5E7EB] dark:border-[#2A2416]'
+                      : 'bg-[#FAFAF8] dark:bg-[#0E1424] border-[#E5E7EB] dark:border-[#1E293B]'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -1249,17 +1249,17 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => toggleSelectMeal(log.id)}
-                      className="w-4 h-4 rounded text-[#D4AF37] focus:ring-[#D4AF37] border-gray-300 dark:border-zinc-700 cursor-pointer"
+                      className="w-4 h-4 rounded text-[#00D4FF] focus:ring-[#00D4FF] border-gray-300 dark:border-zinc-700 cursor-pointer"
                       title={isSelected ? 'Deselect meal log' : 'Select meal log for batch action'}
                     />
                     {log.photoUrl ? (
                       <img
                         src={log.photoUrl}
                         alt={log.mealTitle}
-                        className="w-12 h-12 rounded-xl object-cover border border-[#E5E7EB] dark:border-[#2A2416]"
+                        className="w-12 h-12 rounded-xl object-cover border border-[#E5E7EB] dark:border-[#1E293B]"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-xl bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center font-bold text-xs">
+                      <div className="w-12 h-12 rounded-xl bg-[#00D4FF]/10 dark:bg-[#00D4FF]/20 text-[#00D4FF] dark:text-[#38BDF8] flex items-center justify-center font-bold text-xs">
                         {log.mealType[0]}
                       </div>
                     )}
@@ -1267,7 +1267,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">{log.mealTitle}</span>
                         {log.analysis?.consensusScore && (
-                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-[#D4AF37]/10 text-[#A68523] dark:text-[#F0D060]">
+                          <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-[#00D4FF]/10 text-[#0369A1] dark:text-[#38BDF8]">
                             {log.analysis.consensusScore}% Verified
                           </span>
                         )}
