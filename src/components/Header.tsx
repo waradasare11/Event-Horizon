@@ -146,7 +146,7 @@ export const Header: React.FC<HeaderProps> = ({
                 if (activeSub.status === 'trial' || activeSub.isTrialActive) {
                   const days = Math.max(0, activeSub.daysRemaining ?? 0);
                   return {
-                    label: `Trial · ${days}d left`,
+                    label: `Trial · ${days} ${days === 1 ? 'day' : 'days'}`,
                     className: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/25 hover:bg-blue-500/20',
                     dot: 'bg-blue-500',
                   };

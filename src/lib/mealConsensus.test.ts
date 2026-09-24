@@ -96,7 +96,7 @@ describe('Meal Scanner Multi-Model Consensus & Weighted-Confidence Logic', () =>
     expect(result.items[0].modelAgreementCount).toBe(3);
     expect(result.items[1].modelAgreementCount).toBe(3);
     expect(result.modelConsensus?.overallConsensusScore).toBeGreaterThanOrEqual(95);
-    expect(result.modelConsensus?.consensusRating).toBe('Exceptional (98%+)');
+    expect(result.modelConsensus?.consensusRating).toBe('High Confidence');
     expect(result.modelConsensus?.consensusVoteRatio).toBe('3/3 Models in Agreement');
   });
 

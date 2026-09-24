@@ -3,13 +3,20 @@ import { BrainCircuit, ShieldCheck, CheckCircle2, ChevronUp, ChevronDown, Sparkl
 
 interface PrecisionSystemStatusProps {
   onOpenPerformanceDashboard?: () => void;
+  isHostAdminUser?: boolean;
 }
 
 export const PrecisionSystemStatus: React.FC<PrecisionSystemStatusProps> = ({
   onOpenPerformanceDashboard,
+  isHostAdminUser = false,
 }) => {
   const [isConsensusActive, setIsConsensusActive] = useState<boolean>(true);
   const [showDetails, setShowDetails] = useState<boolean>(false);
+
+  // Hidden for athletes — only host administrators have access to telemetry & consensus controls
+  if (!isHostAdminUser) {
+    return null;
+  }
 
   const toggleStatus = () => {
     setIsConsensusActive((prev) => !prev);

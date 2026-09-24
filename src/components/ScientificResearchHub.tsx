@@ -142,7 +142,7 @@ export const ScientificResearchHub: React.FC<ScientificResearchHubProps> = ({ us
             Scientific Research & Literature Hub
           </h1>
           <p className="text-xs sm:text-sm text-[#6B7280] leading-relaxed">
-            Real-time evidence synthesis powered by Gemini 3.7 Flash with Google Search Grounding. Query peer-reviewed sports science journals, ISSN position stands, meta-analyses, and clinical trials on health, fat loss, muscle hypertrophy, and supplements.
+            Real-time evidence synthesis powered by sports science research databases. Query peer-reviewed sports science journals, ISSN position stands, meta-analyses, and clinical trials on health, fat loss, muscle hypertrophy, and supplements.
           </p>
         </div>
 

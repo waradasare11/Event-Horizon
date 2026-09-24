@@ -191,6 +191,9 @@ service cloud.firestore {
     match /hostGrantedSubscriptions/{grantId} {
       allow read, write: if false;
     }
+    match /HostGrantedSubscriptions/{grantId} {
+      allow read, write: if false;
+    }
 
     match /host_ledger/{ledgerId} {
       allow read, write: if false;
@@ -225,6 +228,12 @@ service cloud.firestore {
     }
 
     match /host_coupons/{couponId} {
+      allow read, write: if false;
+    }
+    match /hostCoupons/{couponId} {
+      allow read, write: if false;
+    }
+    match /HostCoupons/{couponId} {
       allow read, write: if false;
     }
 

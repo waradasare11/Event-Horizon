@@ -171,7 +171,7 @@ export function BiomechanicsFormAnalyzer({
       onSaveFormAnalysis(result);
     } catch (err: any) {
       console.error('Biomechanics audit error:', err);
-      setErrorMsg(err.message || 'Error communicating with Gemini Vision AI');
+      setErrorMsg(err.message || 'Error communicating with vision analysis service');
     } finally {
       setIsAnalyzing(false);
     }
@@ -324,7 +324,7 @@ export function BiomechanicsFormAnalyzer({
                 {isAnalyzing ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    Auditing Biomechanics with Gemini AI...
+                    Auditing Biomechanics with Vision AI...
                   </>
                 ) : (
                   <>

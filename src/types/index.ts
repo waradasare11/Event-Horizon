@@ -88,6 +88,7 @@ export interface UserProfile {
   injuryNotes?: string;
   allergies?: string;
   cuisinePreference?: string;
+  foodLabelLanguage?: 'english' | 'english_hindi';
   dietaryPreferenceLock?: 'vegetarian_locked' | 'vegan_locked' | 'jain_locked' | 'eggetarian_locked' | 'unlocked';
   
   // Detailed Lifestyle & Physiological Predictors

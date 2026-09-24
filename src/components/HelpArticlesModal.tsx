@@ -25,85 +25,86 @@ export interface HelpArticle {
 
 export const HELP_ARTICLES: HelpArticle[] = [
   {
-    id: 'scan-meal',
-    title: 'How to scan a meal',
+    id: 'scan',
+    title: 'Scan: How to scan a meal',
     category: 'Scanner & Food',
     icon: Camera,
-    summary: 'Point your camera at your plate or thali in good lighting. AROH identifies visible items.',
+    summary: 'Point your camera at your plate or thali in good lighting. AROH identifies visible foods.',
     content: [
       'Position your phone camera directly above your plate, bowl, or thali in well-lit conditions.',
-      'Tap Capture. AROH will detect individual visible foods and estimate portions based on dish geometry.',
+      'Tap Capture. The vision engine detects individual visible foods and segments portions based on dish geometry.',
       'Scientific limit: A photograph cannot measure hidden cooking oil, added sugars, or exact density. Always review the detected items before confirming.',
-      'If identification fails or an item is obscured, AROH will visibly notify you rather than hallucinating an imaginary meal.'
+      'If identification fails or an item is obscured, AROH will notify you clearly rather than guessing.'
+    ],
+  },
+  {
+    id: 'quick-log',
+    title: 'Quick Log: Quick log calories & protein',
+    category: 'Scanner & Food',
+    icon: Search,
+    summary: 'Quickly log meals, calories, and protein in seconds without waiting for image recognition.',
+    content: [
+      'Need to log your meal in 10 seconds? Open the Food tab and tap Quick Log or Search.',
+      'Type any dish name in Hindi, regional Indian terms, or English (e.g., "khichdi", "idli", "rajma", "paneer bhurji", "boiled eggs").',
+      'You can also directly enter custom calories and protein numbers in one step.',
+      'Direct verified table lookup ensures instant, accurate macro tracking.'
     ],
   },
   {
     id: 'fix-grams',
-    title: 'How to fix grams in one tap',
+    title: 'Fix Grams: Fix grams in one tap',
     category: 'Scanner & Food',
     icon: Sliders,
-    summary: 'Adjust the portion slider to your exact cooked grams. All calories and micros recompute instantly.',
+    summary: 'Adjust the portion slider or gram input. All macros and calories recompute instantly.',
     content: [
-      'After scanning, each detected food appears with an interactive portion slider.',
-      'Move the slider or type the exact grams you cooked (e.g. 45g roti, 150g dal, 100g paneer).',
+      'Every logged or scanned food item features an interactive portion slider and numeric gram field.',
+      'Move the slider or tap to enter the exact cooked grams (e.g., 45g roti, 150g dal, 100g paneer).',
       'The engine immediately recomputes calories, protein, carbs, fats, and micronutrients from the authoritative database tables (ICMR-IFCT for Indian dishes, USDA FoodData Central for international foods).',
-      'Locking in accurate grams gives you laboratory-grade macro tracking without relying on automated guess-work.'
+      'Locking in accurate grams gives you laboratory-grade macro tracking without guess-work.'
     ],
   },
   {
-    id: 'type-meal',
-    title: 'How to type a meal (manual entry)',
-    category: 'Scanner & Food',
-    icon: Search,
-    summary: 'Search over 8,000 verified foods from ICMR-IFCT and USDA without AI estimation.',
-    content: [
-      'Prefer manual logging? Open the Food view and switch to the Search / Type tab.',
-      'Type any dish name in Hindi, regional Indian terms, or English (e.g., "khichdi", "idli", "rajma", "paneer bhurji").',
-      'Select the exact preparation from the verified database and specify your portion in grams or standard bowl/katori sizes.',
-      'Direct table lookup guarantees zero AI hallucinations with 100% verified nutrient figures.'
-    ],
-  },
-  {
-    id: 'billing-plans',
-    title: 'Billing & transparent pricing',
+    id: 'billing',
+    title: 'Billing: Transparent prepaid plans (₹89 / ₹239 / ₹919)',
     category: 'Billing & Privacy',
     icon: CreditCard,
-    summary: 'Clear one-time plans: 7-day free trial, ₹89/month, ₹239/quarter, or ₹919/year. No surprise debits.',
+    summary: 'Clear prepaid plans: 7-day free trial, ₹89/month, ₹239/3 months, or ₹919/year. Zero surprise debits.',
     content: [
-      'AROH begins with a full-featured 7-day free trial at ₹0 with no credit card required upfront.',
+      'AROH begins with a full-featured 7-day free trial at ₹0 with no payment details required upfront.',
       'When your trial finishes, you choose between Monthly (₹89), Quarterly (₹239), or Yearly (₹919) access.',
       'All subscriptions are one-time prepayments processed securely through authorized Indian payment gateways (UPI, debit/credit cards, and net banking).',
-      'There are zero surprise recurring auto-debits unless you explicitly establish an authorized UPI mandate.'
+      'There are zero surprise recurring auto-debits.'
     ],
   },
   {
-    id: 'drive-folder',
-    title: 'Your personal Google Drive folder (AROH AI)',
+    id: 'drive-backup',
+    title: 'Drive Optional Backup: AROH AI personal Google Drive folder',
     category: 'Billing & Privacy',
     icon: FolderLock,
-    summary: 'Your health logs live inside your own Google Drive in an app-dedicated "AROH AI" folder.',
+    summary: 'Optionally sync your health data directly into your personal Google Drive account in the AROH AI folder.',
     content: [
-      'Unlike closed-wall fitness applications that hold your health history hostage, AROH syncs directly with your personal Google Drive.',
-      'All workout logs, meal entries, and profile settings are stored in an app-dedicated folder named "AROH AI".',
-      'Because the files are in your cloud storage, you retain sovereign ownership of your biometric and lifestyle data at all times.'
+      'AROH can sync directly with your personal Google Drive account if you choose to enable cloud backup.',
+      'All workout logs, meal entries, and profile settings are saved in an app-dedicated folder named "AROH AI" (AROH_UserMemory.json).',
+      'Because the files live in your own personal cloud storage, you retain sovereign ownership of your biometric and training data at all times.',
+      'If you prefer to stay local, you can use the app without connecting Drive.'
     ],
   },
   {
-    id: 'export-data',
-    title: 'How to export your data',
+    id: 'export',
+    title: 'Export: How to export your data',
     category: 'Data & Safety',
     icon: Download,
     summary: 'Download your entire training and nutrition history as a JSON or CSV file at any moment.',
     content: [
-      'Open Settings & Tools from the header gear icon.',
-      'Locate the "Export Athlete History" action.',
-      'Tap Export to immediately download a comprehensive JSON archive containing all logged workouts, nutrition entries, weight weigh-ins, and personal bests.',
-      'You can import or analyze this data in spreadsheets, research tools, or personal fitness archives.'
+      'Open Settings & Tools from the header gear icon or Progress tab.',
+      'Locate the "Export CSV" or "Export Athlete History" action.',
+      'Tap Export to immediately download a comprehensive CSV or JSON archive containing all logged workouts, nutrition entries, body metrics, and personal records.',
+      'You can open and analyze this data in Excel, Google Sheets, or personal fitness archives.'
     ],
   },
   {
     id: 'delete-data',
-    title: 'How to delete your data (DPDP Act, 2023)',
+    title: 'Delete Data: How to delete your data (DPDP Act, 2023)',
     category: 'Data & Safety',
     icon: Trash2,
     summary: 'Complete right to erasure under Indian privacy regulations. Purge local or cloud records anytime.',
@@ -115,11 +116,11 @@ export const HELP_ARTICLES: HelpArticle[] = [
     ],
   },
   {
-    id: 'under-18-consent',
-    title: 'Under-18 parental consent & safety',
+    id: 'parent-consent',
+    title: 'Parent Consent: Under-18 athlete safety & guardian consent',
     category: 'Data & Safety',
     icon: ShieldAlert,
-    summary: 'Adolescent safety guidelines. Users aged 13-17 require verified guardian consent.',
+    summary: 'Adolescent safety guidelines. Users aged 13-17 require verified parental or guardian consent.',
     content: [
       'AROH is designed for adult physical training. Users under 13 years of age are strictly prohibited from using the platform.',
       'Athletes aged 13 to 17 require verified parental or guardian consent before following structured calorie deficits or intense resistance programs.',

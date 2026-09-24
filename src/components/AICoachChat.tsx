@@ -152,7 +152,7 @@ export const AICoachChat: React.FC<AICoachChatProps> = ({ userProfile }) => {
       const errorMsg: Message = {
         id: 'msg_err_' + Date.now(),
         role: 'assistant',
-        content: `I ran into a temporary issue connecting to the Gemini engine: ${err.message || 'Please try again.'}`,
+        content: `I ran into a temporary issue connecting to the coaching engine: ${err.message || 'Please try again.'}`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       };
       persistMessages([...updatedWithUser, errorMsg]);

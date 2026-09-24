@@ -1308,47 +1308,6 @@ export async function redeemHostCouponCode(
     }
     return { success: false, error: data.error || 'Redemption failed.' };
   } catch (e: any) {
-    // Fallback: Check local coupons list
-    try {
-      const raw = getStoredItemMigrated('aroh_host_coupons', 'peakform_host_coupons');
-      if (raw) {
-        const coupons: HostCouponCode[] = JSON.parse(raw);
-        const matched = coupons.find(c => c.code.toUpperCase() === cleanCode && c.status === 'active');
-        if (matched && new Date(matched.expiresAt).getTime() > Date.now()) {
-          const fallbackGrant: HostGrantedSubscription = {
-            id: `grant_coupon_${Date.now()}`,
-            email: cleanEmail,
-            sanitizedEmail: cleanEmail.replace(/[^a-zA-Z0-9_]/g, '_'),
-            planId: matched.planId,
-            planName: matched.planName,
-            grantedBy: matched.createdBy,
-            grantedByName: 'Host Administrator (Coupon)',
-            grantedAt: new Date().toISOString(),
-            status: 'active',
-            isLifetime: matched.planId === 'all_plans' || matched.planId === '3_years',
-            durationMonths: matched.planId === '1_month' ? 1 : matched.planId === '3_months' ? 3 : 12,
-            durationDays: matched.planId === '1_month' ? 30 : matched.planId === '3_months' ? 90 : 365,
-            expiresAt: matched.expiresAt,
-            notes: `Redeemed coupon ${cleanCode}`,
-          };
-          const fallbackSub = createGrantedUserSubscription(fallbackGrant);
-          localStorage.setItem(`aroh_user_grant_${cleanEmail}`, JSON.stringify(fallbackGrant));
-          if (fallbackGrant.isLifetime) {
-            setLifetimeVipOverride(cleanEmail, fallbackGrant);
-          } else {
-            localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
-            localStorage.removeItem(`${LEGACY_LIFETIME_VIP_PREFIX}${cleanEmail}`);
-          }
-          syncHostGrantedSubscription(fallbackGrant).catch(() => {});
-          return {
-            success: true,
-            message: `Coupon '${cleanCode}' applied successfully!`,
-            subscription: fallbackSub,
-            grant: fallbackGrant,
-          };
-        }
-      }
-    } catch (err) {}
     return { success: false, error: e.message || 'Network error during coupon redemption.' };
   }
 }

@@ -72,7 +72,6 @@ import { SubscriptionPaywallModal } from './components/SubscriptionPaywallModal'
 import { HostAdminPortalModal } from './components/HostAdminPortalModal';
 import { ReportAppErrorModal } from './components/ReportAppErrorModal';
 import { PerformanceDashboardModal } from './components/PerformanceDashboardModal';
-import { GoogleKeepSyncModal } from './components/GoogleKeepSyncModal';
 import { GlobalSyncStatus } from './components/GlobalSyncStatus';
 import { CommunityChallenges } from './components/CommunityChallenges';
 import { QuarterlyProfileCalibrationModal } from './components/QuarterlyProfileCalibrationModal';
@@ -159,7 +158,6 @@ export default function App() {
   const [isHostAdminOpen, setIsHostAdminOpen] = useState<boolean>(false);
   const [isReportAppErrorOpen, setIsReportAppErrorOpen] = useState<boolean>(false);
   const [isPerformanceDashboardOpen, setIsPerformanceDashboardOpen] = useState<boolean>(false);
-  const [isKeepSyncOpen, setIsKeepSyncOpen] = useState<boolean>(false);
   const [precisionStatus, setPrecisionStatus] = useState<'active' | 'standby'>('active');
 
   // Real URL routing for /privacy, /terms, /disclaimer, /refund, /cookies, /delete-data, and 404
@@ -1438,15 +1436,6 @@ export default function App() {
           workoutPrograms={workoutPrograms}
         />
 
-        {/* Google Keep Sync Modal */}
-        <GoogleKeepSyncModal
-          isOpen={isKeepSyncOpen}
-          onClose={() => setIsKeepSyncOpen(false)}
-          userProfile={userProfile}
-          mealLogs={mealLogs}
-          workoutPrograms={workoutPrograms}
-        />
-
         {/* Granular CSV Export Modal */}
         <GranularCSVExportModal
           isOpen={isGranularExportOpen}
@@ -1489,13 +1478,13 @@ export default function App() {
           mealLogs={mealLogs}
           calculatedStreak={calculatedStreak}
           isHostAdminUser={serverSaysHost}
+          onUpdateProfile={handleSaveProfile}
           onOpenOnboarding={() => setIsOnboardingOpen(true)}
           onOpenCheckIn={() => setIsCheckInOpen(true)}
           onOpenCalibration={() => setIsQuarterlyCalibrationOpen(true)}
           onOpenSubscriptionModal={() => setIsPaywallOpen(true)}
           onOpenHostAdminModal={() => setIsHostAdminOpen(true)}
           onOpenPerformanceDashboard={() => setIsPerformanceDashboardOpen(true)}
-          onOpenKeepSync={() => setIsKeepSyncOpen(true)}
           onOpenAuditModal={() => setIsAuditModalOpen(true)}
           onExportData={handleExportData}
           onForceSync={() => {

@@ -29,7 +29,7 @@ import { MealAnalysisResultCard } from './MealAnalysisResultCard';
 import { IndianCuisineIntelligence } from './IndianCuisineIntelligence';
 import { ReverseVisualRecipeMatcher } from './ReverseVisualRecipeMatcher';
 import { ClearHistoryConfirmModal } from './ClearHistoryConfirmModal';
-import { GoogleKeepSyncModal } from './GoogleKeepSyncModal';
+import { getFoodHindiName } from '../lib/hindiFoodNames';
 
 interface MealCameraScannerProps {
   userProfile: UserProfile;
@@ -91,7 +91,6 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
   const [isClearHistoryModalOpen, setIsClearHistoryModalOpen] = useState<boolean>(false);
   const [isBatchDeleteModalOpen, setIsBatchDeleteModalOpen] = useState<boolean>(false);
   const [selectedMealIds, setSelectedMealIds] = useState<string[]>([]);
-  const [isKeepModalOpen, setIsKeepModalOpen] = useState<boolean>(false);
 
   const toggleSelectMeal = (id: string) => {
     setSelectedMealIds((prev) =>
@@ -323,7 +322,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
       }
     } catch (err: any) {
       console.error('Error during AI meal analysis:', err);
-      setErrorMessage(`Gemini Vision analysis error: ${err.message || 'Please check your connection and try again.'}`);
+      setErrorMessage(`Vision analysis error: ${err.message || 'Please check your connection and try again.'}`);
     } finally {
       setIsAnalyzing(false);
       setAnalysisProgress('');
@@ -1180,16 +1179,6 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
               </>
             )}
 
-            <button
-              id="meal-scanner-google-keep-btn"
-              type="button"
-              onClick={() => setIsKeepModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-amber-700 dark:text-cyan-400 text-xs font-bold border border-cyan-500/30 transition-all cursor-pointer"
-              title="Sync Meals & Macros to Google Keep"
-            >
-              <span>Keep Sync</span>
-            </button>
-
             {mealLogs.length > 0 && (
               <>
                 <button
@@ -1265,7 +1254,18 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                     )}
                     <div>
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">{log.mealTitle}</span>
+                        <span className="font-bold text-xs text-[#1A1D1B] dark:text-[#E8ECE9]">
+                          {log.mealTitle}
+                          {userProfile?.foodLabelLanguage === 'english_hindi' && (() => {
+                            const hindi = getFoodHindiName(log.mealTitle);
+                            if (!hindi) return null;
+                            return (
+                              <span className="ml-1 text-[10px] font-normal text-amber-700 dark:text-amber-300 bg-amber-500/10 px-1 py-0.5 rounded">
+                                {hindi}
+                              </span>
+                            );
+                          })()}
+                        </span>
                         {log.analysis?.consensusScore && (
                           <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-[#00D4FF]/10 text-[#0369A1] dark:text-[#38BDF8]">
                             {log.analysis.consensusScore}% Verified
@@ -1318,15 +1318,6 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
         }}
         historyType="meals"
         itemCount={mealLogs.length}
-      />
-
-      {/* Google Keep Integration Modal */}
-      <GoogleKeepSyncModal
-        isOpen={isKeepModalOpen}
-        onClose={() => setIsKeepModalOpen(false)}
-        userProfile={userProfile}
-        mealLogs={mealLogs}
-        initialCategory="nutrition"
       />
     </div>
   );

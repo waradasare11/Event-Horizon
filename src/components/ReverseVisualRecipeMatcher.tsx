@@ -191,7 +191,7 @@ export const ReverseVisualRecipeMatcher: React.FC<ReverseVisualRecipeMatcherProp
             Photo-Based Reverse Web Recipe Matcher
           </h2>
           <p className="text-xs sm:text-sm text-[#5C6460] dark:text-[#9EA8A2] mt-1 max-w-2xl">
-            Upload or snap a photo of any plate. Gemini 3.7 Flash searches live culinary databases to identify the authentic regional recipe, calculate exact per-gram IFCT ingredients, and optimize cooking fat.
+            Upload or snap a photo of any plate. Computer vision analyzes live culinary databases to identify the authentic regional recipe, calculate exact per-gram IFCT ingredients, and optimize cooking fat.
           </p>
         </div>
       </div>

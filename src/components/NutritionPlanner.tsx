@@ -854,7 +854,7 @@ export const NutritionPlanner: React.FC<NutritionPlannerProps> = ({
               </div>
               <h3 className="font-bold text-base text-[#1A1D1B] dark:text-[#E8ECE9]">No 1-Day Plan Generated Yet</h3>
               <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] max-w-md mx-auto">
-                Tap the button below to have Gemini generate a calibrated meal plan based on your current weight ({userProfile.weightKg}kg), target, and {userProfile.dietType} preference.
+                Tap the button below to generate a calibrated meal plan based on your current weight ({userProfile.weightKg}kg), target, and {userProfile.dietType} preference.
               </p>
               <button
                 onClick={handleGenerateAIMealPlan}

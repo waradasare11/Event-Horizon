@@ -25,6 +25,7 @@ import {
 import { AIAnalysisResult, FoodItemBreakdown, MealLog, UserProfile } from '../types';
 import { IndianCuisineIntelligence } from './IndianCuisineIntelligence';
 import { ReportAccuracyModal } from './ReportAccuracyModal';
+import { getFoodHindiName } from '../lib/hindiFoodNames';
 import confetti from 'canvas-confetti';
 
 interface MealAnalysisResultCardProps {
@@ -293,7 +294,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                 Engine 1: 3D Volumetrics
               </span>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#00D4FF]/10 text-[#0369A1] dark:text-[#38BDF8]">
-                Gemini 3.7 Vision
+                Spatial Vision Engine
               </span>
             </div>
             <p className="text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -311,7 +312,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                 Engine 2: Culinary Decomposer
               </span>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/10 text-amber-700 dark:text-amber-300">
-                Gemini 3.1 Flash
+                Culinary Intelligence
               </span>
             </div>
             <p className="text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -329,7 +330,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                 Engine 3: Macro Validator
               </span>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-700 dark:text-blue-300">
-                Gemini 2.5 Flash
+                Verified Macro Engine
               </span>
             </div>
             <p className="text-xs font-semibold text-[#1A1D1B] dark:text-[#E8ECE9]">
@@ -492,7 +493,18 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">{item.name}</span>
+                        <span className="font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                          {item.name}
+                          {userProfile?.foodLabelLanguage === 'english_hindi' && (() => {
+                            const hindi = getFoodHindiName(item.name, item.hindiName);
+                            if (!hindi) return null;
+                            return (
+                              <span className="ml-1.5 text-xs font-normal text-amber-700 dark:text-amber-300 bg-amber-500/10 px-1.5 py-0.5 rounded">
+                                {hindi}
+                              </span>
+                            );
+                          })()}
+                        </span>
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#00D4FF]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#00D4FF]/20">
                           AI estimate — you can correct portions
                         </span>
@@ -773,9 +785,9 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
           consensusRating,
           consensusVoteRatio: consensusRatio,
           modelsQueried: [
-            'Gemini 3.7 Vision (Volumetric 3D Segmenter)',
-            'Gemini 3.1 Flash (Culinary Multi-Cuisine Identifier)',
-            'Gemini-Flash-Latest (USDA & ICMR-IFCT Biochemical Validator)',
+            'Volumetric 3D Segmenter Engine',
+            'Culinary Multi-Cuisine Identifier',
+            'USDA & ICMR-IFCT Biochemical Validator',
           ],
         }}
         originalPayload={{

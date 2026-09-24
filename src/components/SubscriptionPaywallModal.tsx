@@ -42,9 +42,10 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
   userProfile,
   onSubscriptionUpdated,
 }) => {
-  const [plansList, setPlansList] = useState<SubscriptionPlanConfig[]>(SUBSCRIPTION_PLANS);
+  const allowedPlans = SUBSCRIPTION_PLANS.filter((p) => [89, 239, 919].includes(p.priceINR));
+  const [plansList, setPlansList] = useState<SubscriptionPlanConfig[]>(allowedPlans);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlanConfig>(
-    SUBSCRIPTION_PLANS.find((p) => p.id === '1_year') || SUBSCRIPTION_PLANS[1]
+    allowedPlans.find((p) => p.priceINR === 239) || allowedPlans[0]
   );
   const [razorpayConfig, setRazorpayConfig] = useState<RazorpayConfig>({ isLive: false, keyId: null });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -68,11 +69,12 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
         setRazorpayConfig({ isLive: false, keyId: null });
       });
 
-      // 2. Fetch personalized pricing
+      // 2. Fetch personalized pricing (strictly constrained to ₹89, ₹239, ₹919)
       fetchPersonalizedPlans(userProfile.email).then((res) => {
-        setPlansList(res.plans);
-        const freePlan = res.plans.find((p) => p.priceINR === 0);
-        const preferred = freePlan || res.plans.find((p) => p.id === '1_year') || res.plans[0];
+        const filtered = res.plans.filter((p) => [89, 239, 919].includes(p.priceINR));
+        const finalPlans = filtered.length > 0 ? filtered : allowedPlans;
+        setPlansList(finalPlans);
+        const preferred = finalPlans.find((p) => p.priceINR === 239) || finalPlans[0];
         setSelectedPlan(preferred);
       });
 
@@ -225,9 +227,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
   };
 
   const rawPlans = plansList && plansList.length > 0 ? plansList : SUBSCRIPTION_PLANS;
-  const displayPlans = rawPlans.filter(
-    (p) => !['6_months', '2_years', '3_years', 'plan_2y', 'plan_3y'].includes(p.id)
-  );
+  const displayPlans = rawPlans.filter((p) => [89, 239, 919].includes(p.priceINR));
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
@@ -380,8 +380,8 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
               </div>
             </div>
 
-            {/* Free VIP Access Box if Price is ₹0 or hasHostGrant */}
-            {(selectedPlan.priceINR === 0 || hasHostGrant) && (
+            {/* Free VIP Access Box ONLY if host grant is verified from server */}
+            {hasHostGrant && grantDetails && (
               <div className="bg-gradient-to-br from-[#D4AF37]/15 via-[#D4AF37]/10 to-[#F0D060]/15 p-6 rounded-2xl border-2 border-[#D4AF37]/40 dark:border-[#D4AF37]/20 text-center space-y-4 shadow-sm">
                 <div className="w-12 h-12 rounded-2xl bg-[#A68523] text-white flex items-center justify-center mx-auto shadow-md">
                   <Crown className="w-6 h-6 text-amber-300 fill-amber-300" />
@@ -399,29 +399,22 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                     Administrator has granted your Gmail ID (<strong>{userProfile.email}</strong>) full VIP membership.
                     {grantDetails?.isLifetime 
                       ? ' Lifetime access is active!' 
-                      : ` Valid for ${grantDetails?.durationDays || selectedPlan.durationDays || 90} days.`} No payment required!
+                      : ` Valid for ${grantDetails?.durationDays || 90} days.`} No payment required!
                   </p>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => {
-                    const fallbackSub = isUserHost
-                      ? createHostLifetimeSubscription()
-                      : createGrantedUserSubscription(grantDetails || {
-                          id: `grant_${Date.now()}`,
-                          email: userProfile.email || '',
-                          planId: selectedPlan.id as any,
-                          planName: selectedPlan.name,
-                          isLifetime: false,
-                          durationDays: selectedPlan.durationDays || 90,
-                          grantedAt: new Date().toISOString(),
-                          expiresAt: new Date(Date.now() + (selectedPlan.durationDays || 90) * 86400000).toISOString(),
-                          grantedBy: 'Host VIP Grant',
-                        });
-
-                    setVerificationSuccess(true);
-                    onSubscriptionUpdated(fallbackSub);
+                    if (isUserHost) {
+                      const hostSub = createHostLifetimeSubscription();
+                      setVerificationSuccess(true);
+                      onSubscriptionUpdated(hostSub);
+                    } else if (grantDetails) {
+                      const grantedSub = createGrantedUserSubscription(grantDetails);
+                      setVerificationSuccess(true);
+                      onSubscriptionUpdated(grantedSub);
+                    }
                   }}
                   className="w-full py-3.5 px-6 rounded-xl bg-[#A68523] hover:bg-[#D4AF37] text-white font-black text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
@@ -557,13 +550,13 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                     </div>
                     <div className="space-y-1.5">
                       <span className="text-[11px] font-bold uppercase tracking-wider text-[#A68523] dark:text-[#F0D060] bg-[#D4AF37]/20 px-2.5 py-1 rounded-md">
-                        Payments coming soon — your 7-day trial is active
+                        Payments coming soon
                       </span>
                       <h4 className="text-base font-bold text-gray-900 dark:text-white pt-1">
-                        Enjoy Full Pro Access During Setup
+                        Payments coming soon
                       </h4>
                       <p className="text-xs text-gray-600 dark:text-gray-300 max-w-md mx-auto leading-relaxed">
-                        Online payment processing via Razorpay is currently being finalized. You have full, unrestricted access to all AROH Pro features during your active 7-day free trial.
+                        Online payment checkout via Razorpay is currently being configured. Subscription plans shown (₹89 / ₹239 / ₹919) will be available shortly. Enjoy uninterrupted workout tracking and nutrition logging during setup.
                       </p>
                     </div>
 
@@ -572,7 +565,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                       onClick={onClose}
                       className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-xs shadow-md transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <span>Continue with 7-Day Free Access</span>
+                      <span>Continue Training</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>

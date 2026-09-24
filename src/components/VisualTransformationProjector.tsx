@@ -265,7 +265,7 @@ export const VisualTransformationProjector: React.FC<VisualTransformationProject
               <div className="flex items-center gap-2">
                 <BrainCircuit className="w-5 h-5 text-[#F0D060]" />
                 <span className="text-xs uppercase tracking-widest text-[#F0D060] font-bold">
-                  Gemini Deep Science Model Output
+                  Biochemical Prognosis Engine Output
                 </span>
               </div>
               <h3 className="text-2xl sm:text-3xl font-extrabold text-white">

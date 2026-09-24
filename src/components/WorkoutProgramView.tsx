@@ -55,7 +55,6 @@ import {
 } from '../data/ExerciseRegistry';
 import { WorkoutAuditModal } from './WorkoutAuditModal';
 import { ClearHistoryConfirmModal } from './ClearHistoryConfirmModal';
-import { GoogleKeepSyncModal } from './GoogleKeepSyncModal';
 import { getExercisePhoto } from '../lib/exerciseImages';
 import { saveStoredWorkoutPrograms, getStoredWorkoutPrograms } from '../lib/storage';
 import { 
@@ -117,7 +116,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
   const [isBatchDeleteModalOpen, setIsBatchDeleteModalOpen] = useState<boolean>(false);
   const [selectedWorkoutIds, setSelectedWorkoutIds] = useState<string[]>([]);
   const [showManageHistory, setShowManageHistory] = useState<boolean>(false);
-  const [isKeepModalOpen, setIsKeepModalOpen] = useState<boolean>(false);
+  const [completedSetsMap, setCompletedSetsMap] = useState<Record<string, number[]>>({});
   const [activePostWorkoutNotes, setActivePostWorkoutNotes] = useState<string>('');
   const [editingLogId, setEditingLogId] = useState<string | null>(null);
   const [editingLogNotes, setEditingLogNotes] = useState<string>('');
@@ -178,6 +177,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
   const [isRestTimerActive, setIsRestTimerActive] = useState<boolean>(false);
   const [activeRestSeconds, setActiveRestSeconds] = useState<number>(90);
   const [activeRestExerciseName, setActiveRestExerciseName] = useState<string>('Inter-Set Rest Interval');
+  const [restTimerKey, setRestTimerKey] = useState<number>(1);
 
   // Smart Swap Modal State
   const [smartSwapExercise, setSmartSwapExercise] = useState<Exercise | null>(null);
@@ -527,6 +527,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
   const startRestForExercise = (exerciseName: string, restSec: number) => {
     setActiveRestExerciseName(exerciseName);
     setActiveRestSeconds(restSec || 90);
+    setRestTimerKey((prev) => prev + 1);
     setIsRestTimerActive(true);
   };
 
@@ -562,6 +563,33 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
       }
 
       return nextState;
+    });
+  };
+
+  const handleLogSet = (exerciseId: string, setNumber: number, exerciseName: string, restSec: number) => {
+    setCompletedSetsMap((prev) => {
+      const currentSets = prev[exerciseId] || [];
+      const isCompleted = currentSets.includes(setNumber);
+      const updatedSets = isCompleted
+        ? currentSets.filter((s) => s !== setNumber)
+        : [...currentSets, setNumber];
+
+      if (!isCompleted) {
+        triggerHapticSetComplete();
+        // Auto-starts rest interval timer after logged set
+        startRestForExercise(exerciseName, restSec || 90);
+      }
+
+      // If all prescribed sets for this movement are completed, check the exercise complete
+      const targetExercise = activeDay?.exercises.find((e) => e.id === exerciseId);
+      if (targetExercise && updatedSets.length >= (targetExercise.sets || 3)) {
+        setCompletedExercises((prevComp) => ({ ...prevComp, [exerciseId]: true }));
+      }
+
+      return {
+        ...prev,
+        [exerciseId]: updatedSets,
+      };
     });
   };
 
@@ -793,6 +821,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
       {/* INTERACTIVE FLOATING REST INTERVAL TIMER */}
       {isRestTimerActive && (
         <RestIntervalTimer
+          key={restTimerKey}
           initialSeconds={activeRestSeconds}
           exerciseName={activeRestExerciseName}
           isFloating={true}
@@ -925,16 +954,6 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                     )}
                   </>
                 )}
-
-                <button
-                  id="workout-keep-sync-btn"
-                  type="button"
-                  onClick={() => setIsKeepModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 text-xs font-bold border border-amber-500/30 transition-all cursor-pointer"
-                  title="Sync today's workout routine to Google Keep"
-                >
-                  <span>Google Keep Sync</span>
-                </button>
 
                 {workoutLogs.length > 0 && (
                   <button
@@ -1484,6 +1503,43 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                         </button>
                       </div>
                     </div>
+
+                    {/* Interactive Set-by-Set Logging — Auto-starts RestIntervalTimer on tap */}
+                    <div className="mt-2.5 pt-2.5 border-t border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between flex-wrap gap-2">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] font-bold text-[#6B7280] dark:text-[#9EA8A2] uppercase tracking-wider mr-1">
+                          Log Sets:
+                        </span>
+                        {Array.from({ length: exercise.sets || 3 }).map((_, setIdx) => {
+                          const setNum = setIdx + 1;
+                          const isSetDone = (completedSetsMap[exercise.id] || []).includes(setNum);
+                          return (
+                            <button
+                              key={setNum}
+                              type="button"
+                              onClick={() => handleLogSet(exercise.id, setNum, exercise.name, exercise.restSeconds || 90)}
+                              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                                isSetDone
+                                  ? 'bg-[#16A34A] text-white shadow-xs'
+                                  : 'bg-white dark:bg-[#1E201F] text-[#374151] dark:text-[#D1D5DB] border border-[#E5E7EB] dark:border-[#2A2416] hover:border-[#D4AF37] dark:hover:border-[#F0D060]'
+                              }`}
+                              title={isSetDone ? `Set ${setNum} logged. Click to toggle.` : `Log Set ${setNum} and auto-start ${exercise.restSeconds || 90}s rest timer`}
+                            >
+                              {isSetDone ? (
+                                <Check className="w-3 h-3 text-white" />
+                              ) : (
+                                <Circle className="w-3 h-3 text-gray-400" />
+                              )}
+                              <span>Set {setNum}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="text-[11px] text-gray-500 dark:text-gray-400 font-medium">
+                        {(completedSetsMap[exercise.id]?.length || 0)} of {exercise.sets || 3} sets logged
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
@@ -1713,15 +1769,6 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
         }}
         historyType="workouts"
         itemCount={workoutLogs.length}
-      />
-
-      {/* Google Keep Integration Modal */}
-      <GoogleKeepSyncModal
-        isOpen={isKeepModalOpen}
-        onClose={() => setIsKeepModalOpen(false)}
-        userProfile={userProfile}
-        workoutPrograms={workoutPrograms}
-        initialCategory="workout"
       />
     </div>
   );

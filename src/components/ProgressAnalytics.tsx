@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   LineChart, 
   Line, 
@@ -89,6 +89,70 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
   const initialWeight = bodyMetrics[0]?.weightKg || userProfile.weightKg;
   const currentWeight = bodyMetrics[bodyMetrics.length - 1]?.weightKg || userProfile.weightKg;
   const totalChange = Number((currentWeight - initialWeight).toFixed(1));
+
+  // Real Math Calculations for Weekly Summary Card (Past 7 Days)
+  const weeklyStats = useMemo(() => {
+    const today = new Date();
+    const dateList: string[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      dateList.push(d.toISOString().split('T')[0]);
+    }
+    const startDateStr = dateList[0];
+    const endDateStr = dateList[dateList.length - 1];
+
+    // 1. Workouts Done (Real count of completed training sessions in past 7 days)
+    const weekWorkouts = workoutLogs.filter((w) => dateList.includes(w.date) && !w.isRestDay);
+    const workoutsDone = weekWorkouts.length;
+    const targetWorkouts = userProfile.trainingDaysPerWeek || 4;
+
+    // 2. Avg Protein & Kcal vs Target (Daily sums for logged days in past 7 days)
+    const weekMeals = mealLogs.filter((m) => dateList.includes(m.date));
+    const dailyMap: Record<string, { cals: number; protein: number }> = {};
+    weekMeals.forEach((m) => {
+      if (!dailyMap[m.date]) dailyMap[m.date] = { cals: 0, protein: 0 };
+      dailyMap[m.date].cals += m.calories || 0;
+      dailyMap[m.date].protein += m.proteinG || 0;
+    });
+
+    const loggedDays = Object.values(dailyMap).filter((d) => d.cals > 0);
+    const numLoggedDays = loggedDays.length;
+
+    const totalCals = loggedDays.reduce((acc, d) => acc + d.cals, 0);
+    const totalProtein = loggedDays.reduce((acc, d) => acc + d.protein, 0);
+
+    const avgProtein = numLoggedDays > 0 ? Math.round(totalProtein / numLoggedDays) : 0;
+    const avgCals = numLoggedDays > 0 ? Math.round(totalCals / numLoggedDays) : 0;
+    const targetCalories = userProfile.dailyCalories || 2000;
+    const targetProtein = userProfile.dailyProtein || 150;
+    const kcalDelta = avgCals > 0 ? avgCals - targetCalories : 0;
+
+    // 3. Weight Change (Real math from bodyMetrics)
+    const sortedMetrics = [...bodyMetrics].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const priorMetrics = sortedMetrics.filter((m) => m.date <= startDateStr);
+    const startMetric = priorMetrics.length > 0 ? priorMetrics[priorMetrics.length - 1] : sortedMetrics[0];
+    const latestMetric = sortedMetrics[sortedMetrics.length - 1];
+
+    const startW = startMetric?.weightKg ?? userProfile.weightKg;
+    const curW = latestMetric?.weightKg ?? userProfile.weightKg;
+    const weightChange = Number((curW - startW).toFixed(2));
+
+    return {
+      dateRange: `${startDateStr.slice(5)} to ${endDateStr.slice(5)}`,
+      workoutsDone,
+      targetWorkouts,
+      avgProtein,
+      targetProtein,
+      avgCals,
+      targetCalories,
+      kcalDelta,
+      numLoggedDays,
+      weightChange,
+      startWeight: startW,
+      currentWeight: curW,
+    };
+  }, [workoutLogs, mealLogs, bodyMetrics, userProfile]);
 
   // Build projected trajectory data points
   const chartData = bodyMetrics.map((m, index) => {
@@ -238,8 +302,119 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
         </div>
       )}
 
-      {/* CIRCULAR PROGRESS CHART: Daily Macronutrient & Calorie Intake vs Calculated Targets */}
-      <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-6 transition-colors">
+      {bodyMetrics.length === 0 ? (
+        /* EMPTY PROGRESS: "Log a weigh-in" ONE BUTTON */
+        <div className="max-w-md mx-auto my-12 p-8 rounded-3xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 text-center space-y-4 shadow-sm animate-in fade-in duration-300">
+          <div className="w-16 h-16 rounded-2xl bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060] flex items-center justify-center mx-auto">
+            <Scale className="w-8 h-8" />
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">No Weigh-Ins Recorded Yet</h2>
+            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed max-w-sm mx-auto">
+              Start by recording your first weigh-in. Your weekly performance card, weight trajectory, and metabolic analytics will appear automatically.
+            </p>
+          </div>
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => setShowAddMetricModal(true)}
+              className="px-6 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white text-sm font-bold shadow-md cursor-pointer transition-all inline-flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Log a weigh-in</span>
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* WEEKLY PROGRESS SUMMARY CARD (Real Math Only) */}
+          <div className="bg-white dark:bg-[#111111] p-6 sm:p-7 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-5 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#D4AF37] dark:text-[#F0D060]">
+                    Weekly Performance
+                  </span>
+                  <span className="text-xs text-gray-400 dark:text-gray-500">•</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{weeklyStats.dateRange}</span>
+                </div>
+                <h2 className="text-lg sm:text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] mt-0.5">
+                  Weekly Summary
+                </h2>
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                Real arithmetic calculations from athlete logs
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* 1. Workouts Done */}
+              <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-[#FAFAF8] dark:bg-[#161817] space-y-1.5">
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                  <Dumbbell className="w-3.5 h-3.5 text-[#D4AF37] dark:text-[#F0D060]" />
+                  Workouts Done
+                </span>
+                <div className="text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  {weeklyStats.workoutsDone} <span className="text-xs font-normal text-gray-500">/ {weeklyStats.targetWorkouts}</span>
+                </div>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                  {weeklyStats.workoutsDone >= weeklyStats.targetWorkouts
+                    ? 'Target achieved'
+                    : `${weeklyStats.targetWorkouts - weeklyStats.workoutsDone} remaining`}
+                </p>
+              </div>
+
+              {/* 2. Avg Protein */}
+              <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-[#FAFAF8] dark:bg-[#161817] space-y-1.5">
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                  <Flame className="w-3.5 h-3.5 text-blue-500" />
+                  Avg Protein
+                </span>
+                <div className="text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  {weeklyStats.avgProtein}g <span className="text-xs font-normal text-gray-500">/ day</span>
+                </div>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                  Target: {weeklyStats.targetProtein}g ({weeklyStats.avgProtein >= weeklyStats.targetProtein ? 'Goal met' : `${weeklyStats.targetProtein - weeklyStats.avgProtein}g below target`})
+                </p>
+              </div>
+
+              {/* 3. Kcal vs Target */}
+              <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-[#FAFAF8] dark:bg-[#161817] space-y-1.5">
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                  <PieIcon className="w-3.5 h-3.5 text-purple-500" />
+                  Kcal vs Target
+                </span>
+                <div className="text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  {weeklyStats.avgCals} <span className="text-xs font-normal text-gray-500">kcal/day</span>
+                </div>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                  {weeklyStats.kcalDelta === 0
+                    ? `On target (${weeklyStats.targetCalories} kcal)`
+                    : weeklyStats.kcalDelta > 0
+                    ? `+${weeklyStats.kcalDelta} vs ${weeklyStats.targetCalories} target`
+                    : `${weeklyStats.kcalDelta} vs ${weeklyStats.targetCalories} target`}
+                </p>
+              </div>
+
+              {/* 4. Weight Change */}
+              <div className="p-4 rounded-xl border border-gray-200 dark:border-gray-800 bg-[#FAFAF8] dark:bg-[#161817] space-y-1.5">
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                  <Scale className="w-3.5 h-3.5 text-emerald-500" />
+                  Weight Change
+                </span>
+                <div className="text-2xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
+                  {weeklyStats.weightChange > 0 ? `+${weeklyStats.weightChange}` : weeklyStats.weightChange} <span className="text-xs font-normal text-gray-500">kg</span>
+                </div>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                  {weeklyStats.startWeight}kg → {weeklyStats.currentWeight}kg this week
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* CIRCULAR PROGRESS CHART: Daily Macronutrient & Calorie Intake vs Calculated Targets */}
+          <div className="bg-white dark:bg-[#111111] p-6 sm:p-8 rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-xs space-y-6 transition-colors">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E5E7EB] dark:border-[#2A2416] pb-4">
           <div>
             <h2 className="text-lg sm:text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9] flex items-center gap-2">
@@ -801,6 +976,8 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
 
       {/* Manual Add Weight Modal */}

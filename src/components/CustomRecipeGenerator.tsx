@@ -207,7 +207,7 @@ export const CustomRecipeGenerator: React.FC<CustomRecipeGeneratorProps> = ({
               AI Macro-Friendly Recipe Generator
             </h2>
             <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#00D4FF]/10 dark:bg-[#00D4FF]/20 text-[#00D4FF] dark:text-[#38BDF8]">
-              Gemini 3.7 Flash
+              Culinary Engine
             </span>
           </div>
           <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1">

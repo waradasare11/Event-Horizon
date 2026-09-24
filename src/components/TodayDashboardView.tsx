@@ -9,6 +9,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { UserProfile, WorkoutCompletionLog, WorkoutProgram, MealLog } from '../types';
+import { getFoodHindiName } from '../lib/hindiFoodNames';
 
 interface TodayDashboardViewProps {
   userProfile: UserProfile;
@@ -311,8 +312,17 @@ export const TodayDashboardView: React.FC<TodayDashboardViewProps> = ({
                       className="p-3 rounded-xl bg-[#E8F0FE]/60 dark:bg-[#121A2B] border border-[#C9D7F2] dark:border-[#1E3A5F] flex items-center justify-between gap-3 text-xs"
                     >
                       <div className="truncate">
-                        <div className="font-semibold text-[#0B1220] dark:text-[#E8F1FF] truncate">
-                          {meal.mealTitle || 'Logged Meal'}
+                        <div className="font-semibold text-[#0B1220] dark:text-[#E8F1FF] truncate flex items-center gap-1.5">
+                          <span>{meal.mealTitle || 'Logged Meal'}</span>
+                          {userProfile?.foodLabelLanguage === 'english_hindi' && (() => {
+                            const hindi = getFoodHindiName(meal.mealTitle);
+                            if (!hindi) return null;
+                            return (
+                              <span className="text-[10px] font-normal text-amber-700 dark:text-amber-300 bg-amber-500/10 px-1.5 py-0.5 rounded shrink-0">
+                                {hindi}
+                              </span>
+                            );
+                          })()}
                         </div>
                         <div className="text-[11px] text-slate-500 dark:text-[#8BA3C7]">
                           {meal.proteinG}g P • {meal.carbsG || 0}g C • {meal.fatG || 0}g F

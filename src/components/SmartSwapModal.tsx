@@ -92,7 +92,7 @@ export const SmartSwapModal: React.FC<SmartSwapModalProps> = ({
                   AI Smart Swap
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#D4AF37] dark:text-[#F0D060] font-bold">
-                  Gemini 3.7 Biomechanics
+                  Kinematic Biomechanics
                 </span>
               </div>
               <h2 className="text-lg sm:text-xl font-bold text-[#1A1D1B] dark:text-[#E8ECE9]">
