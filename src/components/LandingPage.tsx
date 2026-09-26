@@ -175,7 +175,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
         {/* Subtitle */}
         <p className="mt-6 text-sm sm:text-lg text-[#8BA3C7] max-w-3xl mx-auto leading-relaxed">
-          AROH estimates your plate from a photo, then you fix the grams. Calories and nutrients come from ICMR-IFCT and USDA — not a made-up 97%.
+          AROH estimates your plate from a photo, then you fix the grams. Calories and nutrients come from ICMR-IFCT and USDA — honest AI estimates with real portion control.
         </p>
 
         {/* CTA Area */}

@@ -418,11 +418,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
           </div>
 
-          {/* Operator tools (Visible to signed-in user) */}
-          {(currentUser || userProfile.email) && (
+          {/* Operator tools (Visible only if GET /api/host/whoami isHost === true) */}
+          {serverIsHost && (
             <div className="space-y-2">
-              <h3 className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider px-1 flex items-center gap-1.5">
-                <Crown className="w-3.5 h-3.5" />
+              <h3 className="text-xs font-bold text-[#3B82F6] dark:text-[#60A5FA] uppercase tracking-wider px-1 flex items-center gap-1.5">
+                <Crown className="w-3.5 h-3.5 text-[#3B82F6]" />
                 <span>Operator tools</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -432,13 +432,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClose();
                     onOpenHostAdminModal();
                   }}
-                  className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-left hover:bg-amber-500/20 transition-all flex items-center justify-between cursor-pointer"
+                  className="p-3 rounded-2xl bg-[#3B82F6]/10 border border-[#3B82F6]/30 text-left hover:bg-[#3B82F6]/20 transition-all flex items-center justify-between cursor-pointer"
                 >
                   <div>
-                    <div className="text-xs font-bold text-amber-900 dark:text-amber-200">Unlock Host Console</div>
-                    <div className="text-[11px] text-amber-800/80 dark:text-amber-300/80">Host ledger, grants & PIN gate</div>
+                    <div className="text-xs font-bold text-[#1E3A5F] dark:text-[#93C5FD]">Unlock Host Console</div>
+                    <div className="text-[11px] text-[#3B82F6]/80 dark:text-[#60A5FA]/80">Host ledger, grants & PIN gate</div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-amber-600" />
+                  <ChevronRight className="w-4 h-4 text-[#3B82F6]" />
                 </button>
 
                 <button
@@ -447,13 +447,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onClose();
                     onOpenPerformanceDashboard();
                   }}
-                  className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-left hover:bg-amber-500/20 transition-all flex items-center justify-between cursor-pointer"
+                  className="p-3 rounded-2xl bg-[#3B82F6]/10 border border-[#3B82F6]/30 text-left hover:bg-[#3B82F6]/20 transition-all flex items-center justify-between cursor-pointer"
                 >
                   <div>
-                    <div className="text-xs font-bold text-amber-900 dark:text-amber-200">Performance Monitor</div>
-                    <div className="text-[11px] text-amber-800/80 dark:text-amber-300/80">FPS, latency & memory telemetry</div>
+                    <div className="text-xs font-bold text-[#1E3A5F] dark:text-[#93C5FD]">Performance Monitor</div>
+                    <div className="text-[11px] text-[#3B82F6]/80 dark:text-[#60A5FA]/80">FPS, latency & memory telemetry</div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-amber-600" />
+                  <ChevronRight className="w-4 h-4 text-[#3B82F6]" />
                 </button>
               </div>
             </div>
@@ -462,13 +462,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* Legal Compliance Links */}
           <div className="pt-2 border-t border-gray-100 dark:border-gray-800 flex flex-wrap items-center justify-between gap-2 text-xs text-gray-500">
             <div className="flex items-center gap-2">
-              <a href="/privacy" className="hover:text-amber-500 underline">Privacy Policy</a>
+              <a href="/privacy" className="hover:text-[#3B82F6] underline">Privacy Policy</a>
               <span>•</span>
-              <a href="/terms" className="hover:text-amber-500 underline">Terms</a>
+              <a href="/terms" className="hover:text-[#3B82F6] underline">Terms</a>
               <span>•</span>
-              <a href="/disclaimer" className="hover:text-amber-500 underline">Disclaimer</a>
+              <a href="/disclaimer" className="hover:text-[#3B82F6] underline">Disclaimer</a>
               <span>•</span>
-              <a href="/refund" className="hover:text-amber-500 underline">Refund Policy</a>
+              <a href="/refund" className="hover:text-[#3B82F6] underline">Refund Policy</a>
             </div>
             <span className="font-mono text-[10px]">DPDP Act, 2023</span>
           </div>

@@ -223,6 +223,12 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // UPI Pending Tickets (manual confirm via Host Ledger)
+    match /upiPendingTickets/{ticketId} {
+      allow create: if isSignedIn() && request.auth.token.email == request.resource.data.userEmail;
+      allow read, update, delete: if false;
+    }
+
     match /persistent_host_grants/{grantId} {
       allow read, write: if false;
     }

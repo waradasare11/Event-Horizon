@@ -87,7 +87,7 @@ export const Footer: React.FC<FooterProps> = ({
                     }`}
                   >
                     <span className={`w-2 h-2 rounded-full ${
-                      precisionStatus === 'active' ? 'bg-amber-500 animate-pulse' : 'bg-gray-400'
+                      precisionStatus === 'active' ? 'bg-[#3B82F6] animate-pulse' : 'bg-gray-400'
                     }`} />
                     <span>Consensus: {precisionStatus === 'active' ? 'Active' : 'Standby'}</span>
                   </button>
@@ -98,10 +98,10 @@ export const Footer: React.FC<FooterProps> = ({
                     id="open-performance-dashboard-footer-btn"
                     type="button"
                     onClick={onOpenPerformanceDashboard}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 font-semibold text-[11px] transition-all cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#3B82F6]/10 hover:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#60A5FA] border border-[#3B82F6]/30 font-semibold text-[11px] transition-all cursor-pointer"
                     title="Open Real-time Service Latency & Telemetry Dashboard"
                   >
-                    <Activity className="w-3 h-3 text-amber-500" />
+                    <Activity className="w-3 h-3 text-[#3B82F6]" />
                     <span>Host Latency</span>
                   </button>
                 )}

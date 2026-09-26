@@ -1114,6 +1114,27 @@ export interface BulkOperationResult {
   updatedGrants?: HostGrantedSubscription[];
 }
 
+export interface UpiPendingTicket {
+  id: string;
+  userEmail: string;
+  userName?: string;
+  planId: string;
+  amountINR: number;
+  createdAt: string;
+  status: 'pending_host_confirm' | 'confirmed' | 'dismissed';
+}
+
+export interface UpiConfigResponse {
+  vpa: string | null;
+  payeeName: string;
+  qrUrl: string;
+  plans: {
+    id: string;
+    amountINR: number;
+    label: string;
+  }[];
+}
+
 
 
 

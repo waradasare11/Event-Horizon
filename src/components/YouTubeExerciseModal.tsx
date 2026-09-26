@@ -76,13 +76,13 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
                 <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${bioClass.badgeColor}`}>
                   {bioClass.tierLabel}
                 </span>
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 text-[#A68523] dark:text-[#F0D060] text-[11px] font-bold border border-[#D4AF37]/30">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#B8922A] dark:text-[#F0D060]" />
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#3B82F6]/10 dark:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#60A5FA] text-[11px] font-bold border border-[#3B82F6]/30">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#3B82F6] dark:text-[#60A5FA]" />
                   <span>Registry Verified</span>
                 </span>
               </div>
               {targetMuscle && (
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] dark:text-[#F0D060]">
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#3B82F6]/10 text-[#3B82F6] dark:text-[#60A5FA]">
                   {targetMuscle}
                 </span>
               )}
@@ -91,14 +91,14 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
               {exerciseName}
             </div>
             <div className="flex items-center gap-2 text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-1 flex-wrap">
-              <span className="font-semibold text-[#D4AF37] dark:text-[#F0D060]">{bioClass.movementPattern}</span>
+              <span className="font-semibold text-[#3B82F6] dark:text-[#60A5FA]">{bioClass.movementPattern}</span>
               <span>•</span>
               <span>{bioClass.jointType}</span>
               {equipment && (
                 <>
                   <span>•</span>
                   <span className="flex items-center gap-1">
-                    <Dumbbell className="w-3 h-3 text-[#D4AF37]" />
+                    <Dumbbell className="w-3 h-3 text-[#3B82F6]" />
                     {equipment}
                   </span>
                 </>
@@ -119,12 +119,12 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
 
             <button
               onClick={() => handleCopyQuery(`${cleanName} proper form exercise tutorial`, 'main-query')}
-              className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] hover:bg-gray-50 dark:hover:bg-[#252A27] font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-xl bg-white dark:bg-[#1E2220] border border-[#E5E7EB] dark:border-[#1E3A5F] text-[#1A1D1B] dark:text-[#E8ECE9] hover:bg-gray-50 dark:hover:bg-[#252A27] font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer"
             >
               {copiedId === 'main-query' ? (
                 <>
-                  <Check className="w-4 h-4 text-[#D4AF37]" />
-                  <span className="text-[#B8922A] dark:text-[#F0D060] font-bold">Standard Query Copied to Clipboard!</span>
+                  <Check className="w-4 h-4 text-[#3B82F6]" />
+                  <span className="text-[#2563EB] dark:text-[#60A5FA] font-bold">Standard Query Copied to Clipboard!</span>
                 </>
               ) : (
                 <>
@@ -179,7 +179,7 @@ export const YouTubeExerciseModal: React.FC<YouTubeExerciseModalProps> = ({
                         title={`Copy "${opt.query}"`}
                       >
                         {isCopied ? (
-                          <Check className="w-3.5 h-3.5 text-[#D4AF37]" />
+                          <Check className="w-3.5 h-3.5 text-[#3B82F6]" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
                         )}

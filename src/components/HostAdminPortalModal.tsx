@@ -40,7 +40,8 @@ import {
   FileCheck,
   CheckSquare,
   Layers,
-  CalendarPlus
+  CalendarPlus,
+  QrCode
 } from 'lucide-react';
 import { 
   HOST_ADMIN_CONFIG, 
@@ -63,7 +64,10 @@ import {
   createHostCouponCode,
   revokeHostCouponCode,
   executeBulkOperation,
-  fetchGrantVerificationLogs
+  fetchGrantVerificationLogs,
+  fetchHostPendingUpiTickets,
+  dismissHostUpiTicket,
+  confirmHostUpiTicket
 } from '../lib/subscription';
 import { 
   fetchPersistentGrantsCollection, 
@@ -75,9 +79,11 @@ import {
   HostGrantedSubscription,
   HostAuditLogEntry,
   HostCouponCode,
-  GrantVerificationLog
+  GrantVerificationLog,
+  UpiPendingTicket
 } from '../types';
 import { fireCelebrationConfetti } from '../lib/confetti';
+import { auth } from '../lib/firebase';
 import { GrantTimelineModal } from './GrantTimelineModal';
 import { ProgramValuationDashboard } from './ProgramValuationDashboard';
 import { AthleteLoginsSection } from './AthleteLoginsSection';
@@ -201,6 +207,84 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
   const [pinChangeError, setPinChangeError] = useState<string | null>(null);
   const [isUpdatingPin, setIsUpdatingPin] = useState<boolean>(false);
 
+  // Pending UPI Payments State
+  const [upiPendingTickets, setUpiPendingTickets] = useState<UpiPendingTicket[]>([]);
+  const [isLoadingUpiTickets, setIsLoadingUpiTickets] = useState<boolean>(false);
+  const [upiTicketsError, setUpiTicketsError] = useState<string | null>(null);
+  const [processingTicketId, setProcessingTicketId] = useState<string | null>(null);
+
+  // Load Pending UPI Tickets (Host + PIN)
+  const loadPendingUpiTickets = async () => {
+    setIsLoadingUpiTickets(true);
+    setUpiTicketsError(null);
+    try {
+      const pin = hostPassword || gatePinInput.trim() || '';
+      const tickets = await fetchHostPendingUpiTickets(pin, hostEmail);
+      setUpiPendingTickets(tickets);
+    } catch (err: any) {
+      setUpiTicketsError(err?.message || 'Failed to fetch pending UPI tickets.');
+    } finally {
+      setIsLoadingUpiTickets(false);
+    }
+  };
+
+  const handleGrantUpiTicket = async (ticket: UpiPendingTicket) => {
+    const pin = hostPassword || gatePinInput.trim() || '';
+    if (!pin) {
+      alert('Host PIN required to grant access.');
+      return;
+    }
+    setProcessingTicketId(ticket.id);
+    try {
+      let grantPlanId = ticket.planId;
+      if (grantPlanId === 'plan_1m') grantPlanId = '1_month';
+      if (grantPlanId === 'plan_3m') grantPlanId = '3_months';
+      if (grantPlanId === 'plan_1y') grantPlanId = '1_year';
+
+      const grantRes = await grantUserFreeSubscription({
+        pin,
+        email: hostEmail,
+        targetEmail: ticket.userEmail,
+        planId: grantPlanId,
+        isLifetime: false,
+        notes: `UPI QR payment confirmed in FamPay: ₹${ticket.amountINR} (${ticket.planId})`,
+      });
+
+      if (!grantRes.success) {
+        alert(`Failed to grant subscription: ${grantRes.error || 'Unknown error'}`);
+        setProcessingTicketId(null);
+        return;
+      }
+
+      await confirmHostUpiTicket(ticket.id, pin, hostEmail);
+      await Promise.all([loadLedger(), loadPendingUpiTickets()]);
+    } catch (err: any) {
+      alert(`Error: ${err?.message || 'Failed to grant plan'}`);
+    } finally {
+      setProcessingTicketId(null);
+    }
+  };
+
+  const handleDismissUpiTicket = async (ticketId: string) => {
+    const pin = hostPassword || gatePinInput.trim() || '';
+    if (!confirm('Mark this UPI payment notice as not received? This will dismiss the notice without granting Pro.')) {
+      return;
+    }
+    setProcessingTicketId(ticketId);
+    try {
+      const res = await dismissHostUpiTicket(ticketId, pin, hostEmail);
+      if (!res.success) {
+        alert(`Failed to dismiss ticket: ${res.error || 'Unknown error'}`);
+      } else {
+        await loadPendingUpiTickets();
+      }
+    } catch (err: any) {
+      alert(`Error: ${err?.message || 'Failed to dismiss notice'}`);
+    } finally {
+      setProcessingTicketId(null);
+    }
+  };
+
   // Load Host Ledger (API only with PIN + HOST_EMAIL)
   const loadLedger = async () => {
     setIsLoadingLedger(true);
@@ -208,6 +292,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     try {
       const records = await fetchHostGrantedSubscriptions(hostPassword || gatePinInput.trim() || '', hostEmail);
       setGrantedList(records);
+      loadPendingUpiTickets();
     } catch (e: any) {
       if (e?.message === 'PIN required or not host') {
         setLedgerError('PIN required or not host');
@@ -315,11 +400,19 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     let isMounted = true;
     setIsCheckingHost(true);
 
-    fetch(`/api/host/whoami?email=${encodeURIComponent(hostEmail)}`, {
-      headers: { 'x-user-email': hostEmail }
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    const checkHost = async () => {
+      try {
+        const headers: Record<string, string> = { 'x-user-email': hostEmail };
+        if (auth.currentUser) {
+          try {
+            const token = await auth.currentUser.getIdToken();
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+          } catch (e) {
+            console.warn('Could not retrieve token for whoami:', e);
+          }
+        }
+        const res = await fetch(`/api/host/whoami?email=${encodeURIComponent(hostEmail)}`, { headers });
+        const data = await res.json();
         if (!isMounted) return;
         const validHost = Boolean(data.isHost);
         setServerIsHost(validHost);
@@ -330,14 +423,15 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
           loadActivityLogs();
           loadVerificationLogs();
         }
-      })
-      .catch(() => {
+      } catch {
         if (!isMounted) return;
         setServerIsHost(false);
-      })
-      .finally(() => {
+      } finally {
         if (isMounted) setIsCheckingHost(false);
-      });
+      }
+    };
+
+    checkHost();
 
     setGrantSuccessMsg(null);
     setGrantErrorMsg(null);
@@ -1134,13 +1228,16 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
     return (
       <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
         <div className="bg-white dark:bg-[#121413] rounded-3xl max-w-md w-full p-8 border border-gray-200 dark:border-gray-800 text-center space-y-5 shadow-2xl">
-          <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-[#3B82F6]/15 text-[#1D4ED8] dark:text-[#60A5FA] mx-auto flex items-center justify-center">
             <KeyRound className="w-6 h-6" />
           </div>
           <div className="space-y-1.5">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white">Host Ledger</h3>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Grants, discounts, and sign-ins. PIN is never stored in the browser bundle.
+            </p>
+            <p className="text-[11px] text-[#1D4ED8] dark:text-[#60A5FA] font-medium leading-relaxed">
+              UPI QR payments are manual: check FamPay, then Grant. Never trust a UTR typed in the app.
             </p>
             <div className="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800/80 text-xs text-gray-700 dark:text-gray-300 font-mono break-all text-left mt-2">
               <span className="text-[10px] uppercase font-bold text-gray-400 block mb-0.5">Signed in as:</span>
@@ -1161,7 +1258,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 }}
                 placeholder="Enter Host PIN"
                 autoFocus
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#3B82F6]"
               />
               {gatePinError && (
                 <p className="text-xs text-rose-500 font-medium mt-1.5">{gatePinError}</p>
@@ -1178,7 +1275,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               <button
                 type="submit"
                 disabled={isVerifyingGatePin || !gatePinInput.trim()}
-                className="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold disabled:opacity-50 cursor-pointer shadow-xs transition-all"
+                className="flex-1 py-2.5 rounded-xl bg-[#1D4ED8] hover:bg-[#1E40AF] text-white text-xs font-bold disabled:opacity-50 cursor-pointer shadow-xs transition-all"
               >
                 {isVerifyingGatePin ? 'Verifying...' : 'Unlock Portal'}
               </button>
@@ -1562,6 +1659,126 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                   )}
 
                 </form>
+              </div>
+
+              {/* SECTION: PENDING UPI PAYMENTS */}
+              <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111111] border-2 border-[#3B82F6]/30 shadow-xs space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
+                  <div>
+                    <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
+                      <QrCode className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA]" />
+                      <span>Pending UPI payments ({upiPendingTickets.length})</span>
+                    </h3>
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
+                      Confirm payment arrived in your FamPay app, then click Grant this plan.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={loadPendingUpiTickets}
+                    disabled={isLoadingUpiTickets}
+                    className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs shrink-0 self-start sm:self-auto"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingUpiTickets ? 'animate-spin text-[#1D4ED8]' : ''}`} />
+                    <span>Refresh</span>
+                  </button>
+                </div>
+
+                {upiTicketsError && (
+                  <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{upiTicketsError}</span>
+                  </div>
+                )}
+
+                {isLoadingUpiTickets && upiPendingTickets.length === 0 ? (
+                  <div className="p-6 text-center text-gray-500 text-xs space-y-2">
+                    <RefreshCw className="w-5 h-5 animate-spin mx-auto text-[#3B82F6]" />
+                    <p>Loading pending notices...</p>
+                  </div>
+                ) : upiPendingTickets.length === 0 ? (
+                  <div className="p-6 text-center space-y-2 rounded-2xl bg-gray-50/50 dark:bg-[#161817] border border-gray-100 dark:border-gray-800">
+                    <div className="w-10 h-10 rounded-2xl bg-blue-500/10 flex items-center justify-center mx-auto text-[#3B82F6]">
+                      <CheckCircle2 className="w-5 h-5" />
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 max-w-lg mx-auto font-medium">
+                      No pending UPI notices. When a customer taps I’ve paid, they show up here. Confirm in FamPay first, then Grant.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="rounded-2xl border border-gray-200 dark:border-gray-800 overflow-x-auto bg-white dark:bg-[#111111]">
+                    <table className="w-full text-left text-xs">
+                      <thead>
+                        <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50/70 dark:bg-[#121413] text-[10px] font-black uppercase tracking-wider text-gray-500 dark:text-gray-400 select-none">
+                          <th className="p-3.5">Time</th>
+                          <th className="p-3.5">Athlete Email</th>
+                          <th className="p-3.5">Plan</th>
+                          <th className="p-3.5">Amount</th>
+                          <th className="p-3.5 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60 font-medium">
+                        {upiPendingTickets.map((ticket) => {
+                          const isProcessing = processingTicketId === ticket.id;
+                          const planName =
+                            ticket.planId === '1_month' || ticket.planId === 'plan_1m'
+                              ? '1 Month'
+                              : ticket.planId === '3_months' || ticket.planId === 'plan_3m'
+                              ? '3 Months'
+                              : ticket.planId === '1_year' || ticket.planId === 'plan_1y'
+                              ? '12 Months'
+                              : ticket.planId;
+
+                          return (
+                            <tr key={ticket.id} className="hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors">
+                              <td className="p-3.5 whitespace-nowrap text-gray-500 dark:text-gray-400 text-[11px]">
+                                {ticket.createdAt ? new Date(ticket.createdAt).toLocaleString('en-IN', {
+                                  dateStyle: 'short',
+                                  timeStyle: 'short',
+                                }) : 'Just now'}
+                              </td>
+                              <td className="p-3.5">
+                                <div className="font-bold text-gray-900 dark:text-white">{ticket.userEmail}</div>
+                                {ticket.userName && (
+                                  <div className="text-[10px] text-gray-400">{ticket.userName}</div>
+                                )}
+                              </td>
+                              <td className="p-3.5 whitespace-nowrap">
+                                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#3B82F6]/10 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/20">
+                                  {planName}
+                                </span>
+                              </td>
+                              <td className="p-3.5 whitespace-nowrap font-black text-gray-900 dark:text-white">
+                                ₹{ticket.amountINR}
+                              </td>
+                              <td className="p-3.5 text-right whitespace-nowrap space-x-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleGrantUpiTicket(ticket)}
+                                  disabled={isProcessing}
+                                  className="px-3 py-1.5 rounded-xl bg-[#3B82F6] hover:bg-[#1D4ED8] text-white font-bold text-xs shadow-xs cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5"
+                                >
+                                  <CheckCircle2 className="w-3.5 h-3.5" />
+                                  <span>{isProcessing ? 'Granting...' : 'Grant this plan'}</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDismissUpiTicket(ticket.id)}
+                                  disabled={isProcessing}
+                                  className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:bg-rose-500/10 text-gray-600 dark:text-gray-400 font-bold text-xs cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5 transition-colors"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                  <span>Not received</span>
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
 
               {/* SECTION 2: ORGANIZED HOST LEDGER TABLE & SEARCH & STATUS BADGES */}

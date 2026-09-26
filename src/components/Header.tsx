@@ -112,11 +112,11 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="button"
               onClick={onOpenHostAdminModal}
-              className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl text-amber-500 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 transition-all cursor-pointer flex items-center justify-center"
+              className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-xl text-[#3B82F6] bg-[#3B82F6]/10 border border-[#3B82F6]/30 hover:bg-[#3B82F6]/20 transition-all cursor-pointer flex items-center justify-center"
               title="Host Ledger & Grants"
               aria-label="Host Ledger"
             >
-              <Crown className="w-4 h-4 fill-amber-500/20" />
+              <Crown className="w-4 h-4 fill-[#3B82F6]/20" />
             </button>
           )}
 

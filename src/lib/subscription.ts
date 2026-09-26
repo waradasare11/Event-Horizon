@@ -1,4 +1,4 @@
-import { SubscriptionPlanConfig, SubscriptionPlanId, UserProfile, UserSubscription, PaymentTransaction, HostAuditLogEntry, HostGrantedSubscription, HostAuditActionType, HostCouponCode, GrantVerificationLog, AthleteLoginRecord } from '../types';
+import { SubscriptionPlanConfig, SubscriptionPlanId, UserProfile, UserSubscription, PaymentTransaction, HostAuditLogEntry, HostGrantedSubscription, HostAuditActionType, HostCouponCode, GrantVerificationLog, AthleteLoginRecord, UpiPendingTicket, UpiConfigResponse } from '../types';
 import { 
   syncHostGrantedSubscription, 
   deleteHostGrantedSubscription, 
@@ -1381,7 +1381,20 @@ export function isHostAdmin(_userEmail?: string | null): boolean {
 
 export async function checkIsHostOnServer(email?: string | null): Promise<boolean> {
   try {
-    const res = await fetch(`/api/host/whoami${email ? `?email=${encodeURIComponent(email)}` : ''}`);
+    const headers: Record<string, string> = {};
+    if (auth.currentUser) {
+      try {
+        const idToken = await auth.currentUser.getIdToken();
+        if (idToken) {
+          headers['Authorization'] = `Bearer ${idToken}`;
+        }
+      } catch (tokenErr) {
+        console.warn('[Whoami] Could not get user ID token:', tokenErr);
+      }
+    }
+    const res = await fetch(`/api/host/whoami${email ? `?email=${encodeURIComponent(email)}` : ''}`, {
+      headers,
+    });
     const data = await res.json();
     return Boolean(data && data.isHost);
   } catch {
@@ -2126,6 +2139,117 @@ export async function fetchGrantVerificationLogs(): Promise<GrantVerificationLog
   } catch (e) {
     console.warn('Notice: Error fetching grant verification logs:', e);
     return [];
+  }
+}
+
+/**
+ * 14.2.2 FamPay / Manual UPI Payment Protocol
+ */
+
+export async function fetchUpiConfig(): Promise<UpiConfigResponse> {
+  try {
+    const res = await fetch('/api/payments/upi-config');
+    if (!res.ok) throw new Error('Failed to fetch UPI config');
+    return await res.json();
+  } catch {
+    return {
+      vpa: null,
+      payeeName: 'AROH',
+      qrUrl: '/upi-qr.png',
+      plans: [
+        { id: '1_month', amountINR: 89, label: '1 Month (₹89)' },
+        { id: '3_months', amountINR: 239, label: '3 Months (₹239)' },
+        { id: '1_year', amountINR: 919, label: '12 Months (₹919)' },
+      ],
+    };
+  }
+}
+
+export async function submitUpiPendingPayment(params: {
+  userEmail: string;
+  userName?: string;
+  planId: string;
+  amountINR: number;
+}): Promise<{ success: boolean; ticket?: UpiPendingTicket; error?: string; message?: string }> {
+  try {
+    const res = await fetch('/api/payments/upi-pending', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Failed to submit payment notice' };
+  }
+}
+
+export async function fetchHostPendingUpiTickets(hostPin?: string, hostEmail?: string): Promise<UpiPendingTicket[]> {
+  try {
+    const headers: Record<string, string> = {};
+    if (hostPin) headers['x-host-pin'] = hostPin;
+    if (hostEmail) headers['x-host-email'] = hostEmail;
+    if (auth.currentUser) {
+      try {
+        const token = await auth.currentUser.getIdToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+      } catch (e) {}
+    }
+    const res = await fetch('/api/host/upi-pending', { headers });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.tickets || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function dismissHostUpiTicket(
+  ticketId: string,
+  hostPin?: string,
+  hostEmail?: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const headers: Record<string, string> = {};
+    if (hostPin) headers['x-host-pin'] = hostPin;
+    if (hostEmail) headers['x-host-email'] = hostEmail;
+    if (auth.currentUser) {
+      try {
+        const token = await auth.currentUser.getIdToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+      } catch (e) {}
+    }
+    const res = await fetch(`/api/host/upi-pending/${encodeURIComponent(ticketId)}/dismiss`, {
+      method: 'POST',
+      headers,
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Failed to dismiss ticket' };
+  }
+}
+
+export async function confirmHostUpiTicket(
+  ticketId: string,
+  hostPin?: string,
+  hostEmail?: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const headers: Record<string, string> = {};
+    if (hostPin) headers['x-host-pin'] = hostPin;
+    if (hostEmail) headers['x-host-email'] = hostEmail;
+    if (auth.currentUser) {
+      try {
+        const token = await auth.currentUser.getIdToken();
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+      } catch (e) {}
+    }
+    const res = await fetch(`/api/host/upi-pending/${encodeURIComponent(ticketId)}/confirm`, {
+      method: 'POST',
+      headers,
+    });
+    return await res.json();
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Failed to confirm ticket' };
   }
 }
 
