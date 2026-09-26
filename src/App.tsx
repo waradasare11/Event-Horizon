@@ -134,7 +134,7 @@ export default function App() {
   const [serverSaysHost, setServerSaysHost] = useState<boolean>(false);
 
   useEffect(() => {
-    const email = userProfile?.email;
+    const email = currentUser?.email || userProfile?.email;
     if (!email) {
       setServerSaysHost(false);
       return;
@@ -146,7 +146,7 @@ export default function App() {
     return () => {
       isMounted = false;
     };
-  }, [userProfile?.email]);
+  }, [currentUser?.email, userProfile?.email]);
 
   const [theme, setTheme] = useState<ThemeMode>(getStoredTheme);
   const [effectiveTheme, setEffectiveTheme] = useState<'light' | 'dark'>(() => resolveEffectiveTheme(getStoredTheme()));
@@ -296,15 +296,26 @@ export default function App() {
 
         const isHost = isHostAdmin(email);
         const stored = getStoredProfile(email);
+        const storedIsReturning = Boolean(
+          stored && (
+            stored.isOnboarded ||
+            (stored.goal && Number(stored.dailyCalories) > 0 && Number(stored.weightKg) > 0)
+          )
+        );
         const updatedInitial: UserProfile = {
           ...stored,
           email,
           name: user.displayName || stored.name || 'Athlete',
           subscription: isHost ? createHostLifetimeSubscription() : (stored.subscription || createInitialTrialSubscription()),
-          isOnboarded: Boolean(stored.isOnboarded || (stored.goal && stored.dailyCalories > 0)),
+          isOnboarded: storedIsReturning,
         };
         setUserProfile(updatedInitial);
         saveStoredProfile(updatedInitial);
+
+        if (storedIsReturning) {
+          setIsOnboardingOpen(false);
+          setActiveTab('today');
+        }
 
         // Steps 1-4: Restore from Google Drive (Source of Truth) -> Firestore secondary cache -> Local fallback
         restoreUserMemory(email, user.uid).then((restored) => {
@@ -318,22 +329,23 @@ export default function App() {
             return;
           }
 
-          const prof = snap?.userProfile;
+          const prof = snap?.userProfile || (storedIsReturning ? stored : null);
           const isReturning = Boolean(
-            prof && (
+            storedIsReturning ||
+            (prof && (
               prof.isOnboarded ||
               (prof.goal && Number(prof.dailyCalories) > 0 && Number(prof.weightKg) > 0)
-            )
+            ))
           );
 
-          if (isReturning && snap) {
+          if (isReturning && (snap || storedIsReturning)) {
             const mergedProfile: UserProfile = {
               ...stored,
-              ...snap.userProfile,
+              ...(snap?.userProfile || {}),
               email,
-              name: user.displayName || snap.userProfile?.name || stored.name || 'Athlete',
+              name: user.displayName || snap?.userProfile?.name || stored.name || 'Athlete',
               isOnboarded: true,
-              subscription: isHost ? createHostLifetimeSubscription() : (snap.userProfile?.subscription || stored.subscription || createInitialTrialSubscription()),
+              subscription: isHost ? createHostLifetimeSubscription() : (snap?.userProfile?.subscription || stored.subscription || createInitialTrialSubscription()),
             };
             if (isHost) {
               mergedProfile.subscription = createHostLifetimeSubscription();
@@ -394,12 +406,12 @@ export default function App() {
               workoutPrograms: snap.workoutPrograms,
               aiMealPlan: snap.aiMealPlan,
             });
-          } else {
+          } else if (!storedIsReturning) {
             // New Gmail only: empty logs [], open onboarding ONCE.
             const initialBlankProfile: UserProfile = {
-              ...stored,
+              ...getStoredProfile(email),
               email,
-              name: user.displayName || stored.name || 'Athlete',
+              name: user.displayName || 'Athlete',
               subscription: isHost ? createHostLifetimeSubscription() : createInitialTrialSubscription(),
               isOnboarded: false,
             };
@@ -1027,26 +1039,53 @@ export default function App() {
     setCurrentActiveEmail(cleanEmail);
 
     const isHost = isHostAdmin(cleanEmail);
+    const existing = getStoredProfile(cleanEmail);
+    const existingIsReturning = Boolean(
+      existing && (
+        existing.isOnboarded ||
+        (existing.goal && Number(existing.dailyCalories) > 0 && Number(existing.weightKg) > 0)
+      )
+    );
+
+    if (existingIsReturning) {
+      const returningProfile: UserProfile = {
+        ...existing,
+        email: cleanEmail,
+        name: name || existing.name || 'Athlete',
+        isOnboarded: true,
+        subscription: isHost ? createHostLifetimeSubscription() : (existing.subscription || createInitialTrialSubscription()),
+      };
+      setUserProfile(returningProfile);
+      saveStoredProfile(returningProfile);
+      setIsOnboardingOpen(false);
+      setActiveTab('today');
+      triggerSyncToast(
+        `Welcome back, ${returningProfile.name || 'Athlete'}.`,
+        'Your plan is loaded.',
+        'firestore'
+      );
+    }
 
     try {
       const restored = await restoreUserMemory(cleanEmail, currentUser?.uid);
       const snap = restored?.snapshot;
-      const prof = snap?.userProfile;
+      const prof = snap?.userProfile || (existingIsReturning ? existing : null);
       const isReturning = Boolean(
-        prof && (
+        existingIsReturning ||
+        (prof && (
           prof.isOnboarded ||
           (prof.goal && Number(prof.dailyCalories) > 0 && Number(prof.weightKg) > 0)
-        )
+        ))
       );
 
-      if (isReturning && snap) {
+      if (isReturning && (snap || existingIsReturning)) {
         const mergedProfile: UserProfile = {
-          ...getStoredProfile(cleanEmail),
-          ...snap.userProfile,
+          ...existing,
+          ...(snap?.userProfile || {}),
           email: cleanEmail,
-          name: name || snap.userProfile?.name || 'Athlete',
+          name: name || snap?.userProfile?.name || existing.name || 'Athlete',
           isOnboarded: true,
-          subscription: isHost ? createHostLifetimeSubscription() : (snap.userProfile?.subscription || createInitialTrialSubscription()),
+          subscription: isHost ? createHostLifetimeSubscription() : (snap?.userProfile?.subscription || existing.subscription || createInitialTrialSubscription()),
         };
         if (isHost) {
           mergedProfile.subscription = createHostLifetimeSubscription();
@@ -1055,27 +1094,27 @@ export default function App() {
         setUserProfile(mergedProfile);
         saveStoredProfile(mergedProfile);
 
-        if (snap.mealLogs && snap.mealLogs.length > 0) {
+        if (snap?.mealLogs && snap.mealLogs.length > 0) {
           setMealLogs(snap.mealLogs);
           saveStoredMealLogs(snap.mealLogs, cleanEmail);
         }
-        if (snap.workoutLogs && snap.workoutLogs.length > 0) {
+        if (snap?.workoutLogs && snap.workoutLogs.length > 0) {
           setWorkoutLogs(snap.workoutLogs);
           saveStoredWorkoutLogs(snap.workoutLogs, cleanEmail);
         }
-        if (snap.bodyMetrics && snap.bodyMetrics.length > 0) {
+        if (snap?.bodyMetrics && snap.bodyMetrics.length > 0) {
           setBodyMetrics(snap.bodyMetrics);
           saveStoredBodyMetrics(snap.bodyMetrics, cleanEmail);
         }
-        if (snap.formAnalyses && snap.formAnalyses.length > 0) {
+        if (snap?.formAnalyses && snap.formAnalyses.length > 0) {
           setFormAnalyses(snap.formAnalyses);
           saveStoredFormAnalyses(snap.formAnalyses);
         }
-        if (snap.workoutPrograms && snap.workoutPrograms.length > 0) {
+        if (snap?.workoutPrograms && snap.workoutPrograms.length > 0) {
           setWorkoutPrograms(snap.workoutPrograms);
           saveStoredWorkoutPrograms(snap.workoutPrograms);
         }
-        if (snap.aiMealPlan) {
+        if (snap?.aiMealPlan) {
           setAiMealPlan(snap.aiMealPlan);
           saveStoredAIMealPlan(snap.aiMealPlan);
         }
@@ -1094,17 +1133,18 @@ export default function App() {
     }
 
     // Only if brand new athlete
-    const existing = getStoredProfile(cleanEmail);
-    const trialSub = existing.subscription || createInitialTrialSubscription();
-    const newAthlete: UserProfile = {
-      ...existing,
-      email: cleanEmail,
-      name: name || existing.name || 'Athlete',
-      subscription: isHost ? createHostLifetimeSubscription() : trialSub,
-      isOnboarded: false,
-    };
-    handleSaveProfile(newAthlete);
-    setIsOnboardingOpen(true);
+    if (!existingIsReturning) {
+      const trialSub = existing.subscription || createInitialTrialSubscription();
+      const newAthlete: UserProfile = {
+        ...existing,
+        email: cleanEmail,
+        name: name || existing.name || 'Athlete',
+        subscription: isHost ? createHostLifetimeSubscription() : trialSub,
+        isOnboarded: false,
+      };
+      handleSaveProfile(newAthlete);
+      setIsOnboardingOpen(true);
+    }
   };
 
   // Route 1: Real Legal Routes (Accessible to logged-out visitors without AuthGate or dashboard chrome)
@@ -1182,6 +1222,8 @@ export default function App() {
           onSignIn={handleSignIn}
           onSignOut={handleSignOut}
           isSyncing={isSyncing}
+          isHostUser={serverSaysHost}
+          onOpenHostAdminModal={() => setIsHostAdminOpen(true)}
           onForceSync={() => {
             setIsSyncing(true);
             setTimeout(() => {
@@ -1355,7 +1397,7 @@ export default function App() {
         <Footer
           onOpenLegal={handleOpenLegal}
           onOpenReportError={() => setIsReportAppErrorOpen(true)}
-          isHostAdminUser={serverSaysHost && isHostAdmin()}
+          isHostAdminUser={serverSaysHost}
           onTriggerAudit={handleTriggerAudit}
           isAuditing={isAuditing}
           precisionStatus={precisionStatus}
@@ -1409,6 +1451,7 @@ export default function App() {
           isOpen={isHostAdminOpen}
           onClose={() => setIsHostAdminOpen(false)}
           currentUserProfile={userProfile}
+          currentUserEmail={currentUser?.email || userProfile?.email || ''}
           onUpdateSubscription={handleUpdateSubscription}
         />
 

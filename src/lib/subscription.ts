@@ -12,6 +12,7 @@ import {
   syncAthleteLoginToFirestore,
   fetchAthleteLoginsFromFirestore
 } from './firestoreSync';
+import { auth } from './firebase';
 
 export const HOST_ADMIN_CONFIG = {
   name: 'Host Administrator',
@@ -696,8 +697,7 @@ export async function grantUserFreeSubscription(params: {
       }
     }
 
-    // Dedicated per-user grant storage
-    localStorage.setItem(`aroh_user_grant_${cleanTargetEmail}`, JSON.stringify(grantData));
+    // Clean up any legacy overrides
     localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanTargetEmail}`);
     localStorage.removeItem(`${LEGACY_LIFETIME_VIP_PREFIX}${cleanTargetEmail}`);
 
@@ -721,70 +721,45 @@ export async function grantUserFreeSubscription(params: {
     console.warn('LocalStorage grant caching notice:', e);
   }
 
-  // 2. Non-blocking asynchronous sync to Firestore in background
+  // 2. Call backend server route (Authoritative)
   try {
-    syncHostGrantedSubscription(grantData).catch((err) => {
-      console.warn('Background Firestore grant sync notice:', err);
-    });
-    recordHostVerificationLogFirestore({
-      action: 'HOST_SUBSCRIPTION_GRANT',
-      authMethod: 'HOST_PASSWORD_AUTHENTICATED',
-      pinProvided: '****',
-      actorEmail: params.email,
-      targetEmail: cleanTargetEmail,
-      status: 'AUTHENTICATED',
-      details: `Host granted ${params.isLifetime ? 'Lifetime VIP' : planName} (${durationDays} days) to ${cleanTargetEmail}`,
-      metadata: {
-        planId: params.planId,
-        durationDays,
-        expiresAt,
-        isLifetime: !!params.isLifetime,
-        notes: params.notes,
-      },
-    }).catch((err) => {
-      console.warn('Background Grant Verification Log sync notice:', err);
-    });
-  } catch (e) {
-    // ignore
-  }
-
-  // 3. Call backend server route with safe 3-second timeout
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3000);
-
     const res = await fetch('/api/host/grant-free-subscription', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'x-host-pin': params.pin,
+        'x-host-email': params.email,
+      },
       body: JSON.stringify(params),
-      signal: controller.signal,
     });
-    clearTimeout(timeoutId);
 
     const data = await res.json();
-    if (data && data.success) {
+    if (res.ok && data && data.success) {
       return {
         success: true,
         message: data.message || `Free subscription granted to ${cleanTargetEmail}!`,
         grant: data.grant || grantData,
       };
+    } else {
+      return {
+        success: false,
+        message: data?.error || 'Failed to grant subscription on server.',
+      };
     }
   } catch (e: any) {
-    console.warn('Server grant endpoint note (local grant preserved):', e);
+    return {
+      success: false,
+      message: e.message || 'Network error reaching server grant endpoint.',
+    };
   }
-
-  return {
-    success: true,
-    message: `Free VIP subscription activated for ${cleanTargetEmail}!`,
-    grant: grantData,
-  };
 }
 
 /**
- * Fetch all host-granted subscriptions from server & Firestore (Server is authoritative)
+ * Fetch all host-granted subscriptions from server (Server is authoritative)
  */
 export async function fetchHostGrantedSubscriptions(pin?: string, email?: string): Promise<HostGrantedSubscription[]> {
-  const map = new Map<string, HostGrantedSubscription>();
+  const hostEmail = (email || '').trim().toLowerCase();
+  const hostPin = (pin || '').trim();
 
   // Clean legacy host storage keys
   try {
@@ -797,55 +772,39 @@ export async function fetchHostGrantedSubscriptions(pin?: string, email?: string
     });
   } catch (e) {}
 
-  // 1. Fetch from backend server (Authoritative)
   try {
-    const hostEmail = email || '';
-    const hostPin = pin || '';
     const res = await fetch(`/api/host/granted-subscriptions?email=${encodeURIComponent(hostEmail)}`, {
       headers: {
         'x-host-pin': hostPin,
         'x-host-email': hostEmail,
       },
     });
+
+    if (!res.ok) {
+      if (res.status === 401 || res.status === 403) {
+        throw new Error('PIN required or not host');
+      }
+      return [];
+    }
+
     const data = await res.json();
-    if (data.success && Array.isArray(data.grants)) {
-      data.grants.forEach((g: HostGrantedSubscription) => {
-        if (g && g.email) {
-          map.set(g.email.trim().toLowerCase(), g);
-        }
+    if (data && data.success && Array.isArray(data.grants)) {
+      return data.grants.sort((a: HostGrantedSubscription, b: HostGrantedSubscription) => {
+        return new Date(b.grantedAt || 0).getTime() - new Date(a.grantedAt || 0).getTime();
       });
     }
-  } catch (e) {
-    console.warn('Server fetch grants fallback notice:', e);
-  }
-
-  // 2. Fetch from Firestore collections
-  try {
-    const { fetchAllHostGrantedSubscriptions } = await import('./firestoreSync');
-    const firestoreGrants = await fetchAllHostGrantedSubscriptions();
-    if (Array.isArray(firestoreGrants)) {
-      firestoreGrants.forEach((g) => {
-        if (g && g.email) {
-          const clean = g.email.trim().toLowerCase();
-          if (!map.has(clean) || new Date(g.grantedAt || 0).getTime() >= new Date(map.get(clean)?.grantedAt || 0).getTime()) {
-            map.set(clean, g);
-          }
-        }
-      });
+    return [];
+  } catch (e: any) {
+    if (e.message === 'PIN required or not host') {
+      throw e;
     }
-  } catch (e) {
-    console.warn('Firestore fetch grants fallback notice:', e);
+    console.warn('fetchHostGrantedSubscriptions error:', e);
+    return [];
   }
-
-  const merged = Array.from(map.values()).sort((a, b) => {
-    return new Date(b.grantedAt || 0).getTime() - new Date(a.grantedAt || 0).getTime();
-  });
-
-  return merged;
 }
 
 /**
- * Revoke a host granted subscription from Firestore & server
+ * Revoke a host granted subscription via server API
  */
 export async function revokeHostGrantedSubscription(email: string, pin: string, hostEmail: string): Promise<boolean> {
   const cleanEmail = email.trim().toLowerCase();
@@ -865,16 +824,17 @@ export async function revokeHostGrantedSubscription(email: string, pin: string, 
   }
 
   try {
-    await deleteHostGrantedSubscription(cleanEmail);
-    await fetch(`/api/host/revoke-granted-subscription/${encodeURIComponent(cleanEmail)}`, {
+    const res = await fetch(`/api/host/revoke-granted-subscription/${encodeURIComponent(cleanEmail)}`, {
       method: 'DELETE',
       headers: {
         'x-host-pin': pin || '',
         'x-host-email': hostEmail || '',
       },
     });
-    return true;
+    const data = await res.json();
+    return Boolean(data && data.success);
   } catch (e) {
+    console.warn('Server revoke error:', e);
     return false;
   }
 }
@@ -946,25 +906,7 @@ export async function checkUserHostGrant(email: string): Promise<{ hasGrant: boo
       return { hasGrant: true, isHost: false, grant: data.grant };
     }
   } catch (e) {
-    // fallback to firestore
-  }
-
-  // 2. Query Firestore across top-level 'grants' and redundant collections
-  try {
-    const { fetchHostGrantedSubscriptionByEmail, fetchAllHostGrantedSubscriptions } = await import('./firestoreSync');
-    const firestoreGrant = await fetchHostGrantedSubscriptionByEmail(cleanEmail);
-    if (firestoreGrant && firestoreGrant.status === 'active') {
-      updateActiveProfileWithGrant(firestoreGrant);
-      return { hasGrant: true, isHost: false, grant: firestoreGrant };
-    }
-    const allGrants = await fetchAllHostGrantedSubscriptions();
-    const matchedInAll = allGrants.find((g) => g && g.email && g.email.trim().toLowerCase() === cleanEmail && g.status === 'active');
-    if (matchedInAll) {
-      updateActiveProfileWithGrant(matchedInAll);
-      return { hasGrant: true, isHost: false, grant: matchedInAll };
-    }
-  } catch (e) {
-    // ignore
+    // network error
   }
 
   return { hasGrant: false };
@@ -1251,16 +1193,14 @@ export async function redeemHostCouponCode(
     if (data.success && (data.subscription || data.grant)) {
       const activeSub = createGrantedUserSubscription(data.grant || data.subscription);
       
-      // Set local grant cache and lifetime override if applicable
+      // Athlete Pro is authoritative on server/Razorpay webhook
       if (data.grant) {
-        localStorage.setItem(`aroh_user_grant_${cleanEmail}`, JSON.stringify(data.grant));
         if (data.grant.isLifetime) {
           setLifetimeVipOverride(cleanEmail, data.grant);
         } else {
           localStorage.removeItem(`${LIFETIME_VIP_PREFIX}${cleanEmail}`);
           localStorage.removeItem(`${LEGACY_LIFETIME_VIP_PREFIX}${cleanEmail}`);
         }
-        syncHostGrantedSubscription(data.grant).catch(() => {});
       }
 
       // Update cached user profile
@@ -1903,18 +1843,28 @@ export async function recordAthleteLoginSession(profile?: any): Promise<void> {
       notes: `Verified login session from ${timezone} on ${deviceFingerprint}`,
     };
 
-    // Dual async persistence to server and Firestore (Server & Firestore are authoritative)
-    fetch('/api/host/record-login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(loginPayload),
-    }).catch((err) => {
-      console.warn('Notice: Background login telemetry sync:', err);
-    });
+    // Authenticated session logging via POST /api/me/session with Firebase ID token
+    (async () => {
+      try {
+        let idToken: string | undefined;
+        try {
+          idToken = await auth.currentUser?.getIdToken();
+        } catch {}
 
-    syncAthleteLoginToFirestore(loginPayload).catch((err) => {
-      console.warn('Notice: Firestore athlete login sync:', err);
-    });
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (idToken) {
+          headers['Authorization'] = `Bearer ${idToken}`;
+        }
+
+        await fetch('/api/me/session', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(loginPayload),
+        });
+      } catch (err) {
+        console.warn('Notice: Background login telemetry sync:', err);
+      }
+    })();
   } catch (err) {
     console.warn('Notice: recordAthleteLoginSession error:', err);
   }
@@ -1922,7 +1872,7 @@ export async function recordAthleteLoginSession(profile?: any): Promise<void> {
 
 /**
  * Fetch complete history of athlete logins and aggregated profile details
- * Merges server records and Firestore records seamlessly (Server is authoritative).
+ * Loads from server API (/api/host/athlete-logins).
  */
 export async function fetchAthleteLogins(pin: string = '', email: string = ''): Promise<{
   success: boolean;
@@ -1940,7 +1890,7 @@ export async function fetchAthleteLogins(pin: string = '', email: string = ''): 
     localStorage.removeItem('peakform_athlete_logins_local');
   } catch (e) {}
 
-  // 1. Load from server (Authoritative)
+  // Load from server (Authoritative)
   try {
     const res = await fetch('/api/host/athlete-logins', {
       headers: {
@@ -1959,14 +1909,6 @@ export async function fetchAthleteLogins(pin: string = '', email: string = ''): 
   } catch (e) {
     console.warn('Server fetchAthleteLogins notice:', e);
   }
-
-  // 2. Load from Firestore
-  try {
-    const firestoreLogins = await fetchAthleteLoginsFromFirestore();
-    firestoreLogins.forEach((l) => {
-      if (l && l.id) loginMap.set(l.id, l);
-    });
-  } catch (e) {}
 
   const merged = Array.from(loginMap.values()).sort(
     (a, b) => new Date(b.loginTimestamp).getTime() - new Date(a.loginTimestamp).getTime()

@@ -120,80 +120,85 @@ export function getStoredProfile(userEmail?: string): UserProfile {
   try {
     const effectiveEmail = (userEmail || getCurrentActiveEmail() || '').trim().toLowerCase();
     const sanitized = effectiveEmail.replace(/[^a-z0-9]/g, '_');
-    const scopedKey = getUserScopedKey(STORAGE_KEYS.PROFILE, effectiveEmail);
+    const isAuthUser = Boolean(effectiveEmail && effectiveEmail.includes('@'));
 
-    let raw = localStorage.getItem(scopedKey);
+    let raw: string | null = null;
 
-    // If scoped key didn't have it, check Drive persistent profile cache
-    if (!raw && sanitized) {
-      raw = localStorage.getItem(`aroh_drive_profile_${sanitized}`);
-      if (!raw) {
-        raw = localStorage.getItem(`peakform_drive_profile_${sanitized}`);
-        if (raw) {
-          localStorage.setItem(`aroh_drive_profile_${sanitized}`, raw);
-        }
+    if (isAuthUser) {
+      // 1. Check user-scoped local key
+      const scopedKey = getUserScopedKey(STORAGE_KEYS.PROFILE, effectiveEmail);
+      raw = localStorage.getItem(scopedKey);
+
+      // 2. Check Drive persistent profile cache
+      if (!raw && sanitized) {
+        raw = localStorage.getItem(`aroh_drive_profile_${sanitized}`) ||
+              localStorage.getItem(`peakform_drive_profile_${sanitized}`);
       }
-    }
 
-    // If still not found, check complete Drive backup cache
-    if (!raw && sanitized) {
-      let driveBackup = localStorage.getItem(`aroh_drive_backup_${sanitized}`);
-      if (!driveBackup) {
-        driveBackup = localStorage.getItem(`peakform_drive_backup_${sanitized}`);
+      // 3. Check complete Drive backup cache
+      if (!raw && sanitized) {
+        const driveBackup = localStorage.getItem(`aroh_drive_backup_${sanitized}`) ||
+                            localStorage.getItem(`peakform_drive_backup_${sanitized}`);
         if (driveBackup) {
-          localStorage.setItem(`aroh_drive_backup_${sanitized}`, driveBackup);
+          try {
+            const parsedBundle = JSON.parse(driveBackup);
+            if (parsedBundle?.userProfile) {
+              raw = JSON.stringify(parsedBundle.userProfile);
+            }
+          } catch (e) {}
         }
       }
-      if (driveBackup) {
+
+      // If profile data is found for this specific user
+      if (raw) {
         try {
-          const parsedBundle = JSON.parse(driveBackup);
-          if (parsedBundle?.userProfile) {
-            raw = JSON.stringify(parsedBundle.userProfile);
+          const parsed = JSON.parse(raw);
+          // STRICT USER ISOLATION: Reject if data belonged to a different email
+          if (!parsed.email || parsed.email.trim().toLowerCase() === effectiveEmail) {
+            const isReturning = Boolean(
+              parsed.isOnboarded ||
+              (parsed.goal && Number(parsed.dailyCalories) > 0 && Number(parsed.weightKg) > 0)
+            );
+            return {
+              ...INITIAL_USER_PROFILE,
+              ...parsed,
+              email: effectiveEmail,
+              isOnboarded: isReturning,
+            };
           }
         } catch (e) {}
       }
+
+      // User B has no prior data: Return clean fresh profile, NEVER leak User A's data
+      return {
+        ...INITIAL_USER_PROFILE,
+        email: effectiveEmail,
+        name: 'Athlete',
+        isOnboarded: false,
+      };
     }
 
-    // Fallback to base storage key
-    if (!raw) {
-      raw = localStorage.getItem(STORAGE_KEYS.PROFILE);
-    }
-
+    // Guest / unauthenticated fallback
+    raw = localStorage.getItem(STORAGE_KEYS.PROFILE);
     if (raw) {
       const parsed = JSON.parse(raw);
-      // If profile has no valid email, ensure it starts unauthenticated
       if (!parsed.email || !parsed.email.includes('@')) {
-        if (effectiveEmail && effectiveEmail.includes('@')) {
-          return {
-            ...INITIAL_USER_PROFILE,
-            ...parsed,
-            email: effectiveEmail,
-            // If they had previously chosen goals, keep them onboarded
-            isOnboarded: Boolean(parsed.isOnboarded || (parsed.goal && parsed.dailyCalories > 0)),
-          };
-        }
         return {
           ...INITIAL_USER_PROFILE,
           ...parsed,
           email: '',
-          isOnboarded: false,
+          isOnboarded: Boolean(parsed.isOnboarded || (parsed.goal && parsed.dailyCalories > 0)),
         };
       }
-
-      // Valid email exists on profile
-      return {
-        ...INITIAL_USER_PROFILE,
-        ...parsed,
-        email: effectiveEmail || parsed.email,
-        isOnboarded: Boolean(parsed.isOnboarded || (parsed.goal && parsed.dailyCalories > 0)),
-      };
     }
   } catch (e) {
     console.error('Failed reading user profile from storage', e);
   }
+
   return {
     ...INITIAL_USER_PROFILE,
     email: userEmail || getCurrentActiveEmail() || '',
+    isOnboarded: false,
   };
 }
 
@@ -206,7 +211,11 @@ export function saveStoredProfile(profile: UserProfile): void {
     const scopedKey = getUserScopedKey(STORAGE_KEYS.PROFILE, email);
     const serialized = JSON.stringify(profile);
     localStorage.setItem(scopedKey, serialized);
-    localStorage.setItem(STORAGE_KEYS.PROFILE, serialized);
+
+    // Only write to unscoped guest key if no user email
+    if (!email || !email.includes('@')) {
+      localStorage.setItem(STORAGE_KEYS.PROFILE, serialized);
+    }
 
     if (email) {
       const sanitized = email.replace(/[^a-z0-9]/g, '_');

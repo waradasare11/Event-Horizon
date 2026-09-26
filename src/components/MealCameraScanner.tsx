@@ -1040,10 +1040,10 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                       Portion Guidance
                     </div>
                     <h3 className="font-bold text-sm sm:text-base text-[#0F172A] dark:text-[#F8FAFC]">
-                      AI estimate — you can correct portions
+                      AI estimate — confirm grams.
                     </h3>
                     <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-1 leading-relaxed">
-                      Due to food layering or gravies, this is an AI estimate. You can directly edit the portion weights below or capture a secondary angle to refine the estimate.
+                      Due to plate geometry and hidden ingredients, this is an AI estimate — confirm grams below or adjust portion weights before saving.
                     </p>
                   </div>
                 </div>

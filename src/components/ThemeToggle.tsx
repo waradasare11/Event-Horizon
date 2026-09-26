@@ -6,6 +6,7 @@ interface ThemeToggleProps {
   theme: ThemeMode;
   effectiveTheme: 'light' | 'dark';
   onThemeChange: (theme: ThemeMode) => void;
+  className?: string;
   compact?: boolean;
 }
 
@@ -13,83 +14,49 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   theme,
   effectiveTheme,
   onThemeChange,
-  compact = false,
+  className = '',
 }) => {
-  const toggleTheme = () => {
-    // Cycle light -> dark -> light
-    if (effectiveTheme === 'dark') {
-      onThemeChange('light');
-    } else {
+  // Cycle light -> dark -> system (auto) -> light
+  const cycleTheme = () => {
+    if (theme === 'light') {
       onThemeChange('dark');
+    } else if (theme === 'dark') {
+      onThemeChange('system');
+    } else {
+      onThemeChange('light');
     }
   };
 
-  const isDark = effectiveTheme === 'dark';
+  const getThemeDetails = () => {
+    if (theme === 'light') {
+      return {
+        label: 'Theme: Light (click for Dark)',
+        icon: <Sun className="w-4 h-4 text-[#3B82F6]" />,
+      };
+    }
+    if (theme === 'dark') {
+      return {
+        label: 'Theme: Dark (click for Auto)',
+        icon: <Moon className="w-4 h-4 text-[#60A5FA]" />,
+      };
+    }
+    return {
+      label: `Theme: Auto (${effectiveTheme === 'dark' ? 'Dark' : 'Light'}) (click for Light)`,
+      icon: <Monitor className="w-4 h-4 text-[#8BA3C7]" />,
+    };
+  };
 
-  if (compact) {
-    return (
-      <button
-        type="button"
-        onClick={toggleTheme}
-        className="p-2 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416] bg-white dark:bg-[#111111] text-[#4B5563] dark:text-[#E8ECE9] hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] transition-all shadow-xs flex items-center justify-center relative group"
-        aria-label={`Switch to ${isDark ? 'light mode' : 'gym dark mode'}`}
-        title={`Current: ${isDark ? 'Dark Gym Mode' : 'Light Mode'}. Click to switch.`}
-      >
-        {isDark ? (
-          <Sun className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]/20 transition-transform group-hover:rotate-45" />
-        ) : (
-          <Moon className="w-4 h-4 text-[#B8922A] fill-[#B8922A]/20 transition-transform group-hover:-rotate-12" />
-        )}
-      </button>
-    );
-  }
+  const { label, icon } = getThemeDetails();
 
   return (
-    <div className="inline-flex items-center p-1 rounded-xl bg-[#F3F4F6] dark:bg-[#111111] border border-[#E5E7EB] dark:border-[#2A2416] shadow-2xs">
-      <button
-        type="button"
-        onClick={() => onThemeChange('light')}
-        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-          theme === 'light'
-            ? 'bg-white text-[#1A1D1B] shadow-2xs'
-            : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
-        }`}
-        aria-label="Light mode"
-        title="Daylight Clean Light Theme"
-      >
-        <Sun className={`w-3.5 h-3.5 ${theme === 'light' ? 'text-amber-500 fill-amber-500/20' : ''}`} />
-        <span className="hidden sm:inline">Light</span>
-      </button>
-
-      <button
-        type="button"
-        onClick={() => onThemeChange('dark')}
-        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-          theme === 'dark'
-            ? 'bg-[#2A2416] text-white shadow-2xs'
-            : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
-        }`}
-        aria-label="Dark gym mode"
-        title="Low-Light Gym Dark Theme"
-      >
-        <Moon className={`w-3.5 h-3.5 ${theme === 'dark' ? 'text-amber-400 fill-amber-400/20' : ''}`} />
-        <span className="hidden sm:inline">Gym Dark</span>
-      </button>
-
-      <button
-        type="button"
-        onClick={() => onThemeChange('system')}
-        className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
-          theme === 'system'
-            ? 'bg-white dark:bg-[#2A2416] text-[#1A1D1B] dark:text-white shadow-2xs'
-            : 'text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white'
-        }`}
-        aria-label="Auto system theme"
-        title="Sync with OS Preference"
-      >
-        <Monitor className="w-3.5 h-3.5" />
-        <span className="hidden md:inline">Auto</span>
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={cycleTheme}
+      className={`min-w-[36px] min-h-[36px] p-2 rounded-xl border border-slate-200 dark:border-[#1E3A5F] bg-white dark:bg-[#0B1220] hover:bg-slate-100 dark:hover:bg-[#1E3A5F]/40 text-[#8BA3C7] hover:text-slate-900 dark:hover:text-[#E8F1FF] transition-all flex items-center justify-center cursor-pointer shadow-xs ${className}`}
+      aria-label={label}
+      title={label}
+    >
+      {icon}
+    </button>
   );
 };

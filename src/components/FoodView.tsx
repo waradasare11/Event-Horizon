@@ -3,6 +3,7 @@ import { Camera, Utensils, Sparkles, Lock } from 'lucide-react';
 import { UserProfile, MealLog, AIAdjustedMealPlan } from '../types';
 import { MealCameraScanner } from './MealCameraScanner';
 import { NutritionPlanner } from './NutritionPlanner';
+import { NutritionTableQuickLog } from './NutritionTableQuickLog';
 
 interface FoodViewProps {
   userProfile: UserProfile;
@@ -35,6 +36,12 @@ export const FoodView: React.FC<FoodViewProps> = ({
 
   return (
     <div className="space-y-6 animate-in fade-in duration-200">
+      {/* 1. Quick Log from Verified Database (Top of Food Tab) */}
+      <NutritionTableQuickLog
+        onSaveMealLog={onSaveMealLog}
+        userProfile={userProfile}
+      />
+
       {/* Sub-Panel Navigation Control */}
       <div className="flex items-center justify-between flex-wrap gap-3 p-2 rounded-2xl bg-white dark:bg-[#111111] border border-gray-200 dark:border-gray-800 shadow-xs">
         <div className="flex items-center gap-1.5 p-1 rounded-xl bg-gray-100 dark:bg-gray-800/60 w-full sm:w-auto">

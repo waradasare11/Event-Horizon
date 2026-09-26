@@ -154,18 +154,6 @@ export async function syncUserProfile(profile: UserProfile): Promise<void> {
 
   let effectiveSubscription = sanitized.subscription || null;
 
-  // Protect against accidental profile update downgrades or trial overrides
-  if (cleanEmail) {
-    try {
-      const activeGrant = await fetchHostGrantedSubscriptionByEmail(cleanEmail);
-      if (activeGrant && activeGrant.status === 'active') {
-        effectiveSubscription = buildSubscriptionFromHostGrant(activeGrant);
-      }
-    } catch (e) {
-      // ignore
-    }
-  }
-
   try {
     const payload = {
       userId: user.uid,
@@ -684,231 +672,30 @@ export function sanitizeEmailForDocId(email: string): string {
 }
 
 /**
- * Save or update a host granted subscription in Firestore across quad-redundant collections:
- * 1. 'grants' (Primary Top-Level Master Collection - Immune to profile-level overrides)
- * 2. 'persistent_host_grants'
- * 3. 'hostGrantedSubscriptions'
- * 4. 'host_ledger'
- * to guarantee 1000% zero-loss permanence.
+ * Host grants are managed exclusively by the backend server (/api/host/*).
+ * Server owns host_ledger, hostGrantedSubscriptions, grants, and persistent_host_grants collections.
  */
-export async function syncHostGrantedSubscription(grant: HostGrantedSubscription): Promise<void> {
-  const docId = sanitizeEmailForDocId(grant.email);
-  const nowIso = new Date().toISOString();
-  
-  const grantPayload = {
-    ...grant,
-    email: grant.email.trim().toLowerCase(),
-    sanitizedEmail: docId,
-    updatedAt: nowIso,
-    isPermanentGrant: true,
-  };
-
-  // Write to collection 0: Primary top-level 'grants' collection
-  try {
-    const grantDocRef = doc(db, 'grants', docId);
-    await setDoc(grantDocRef, grantPayload, { merge: true });
-  } catch (error) {
-    console.warn('Sync to grants notice:', error);
-  }
-
-  // Write to collection 1: persistent_host_grants (dedicated immutable mirror)
-  try {
-    const persistentRef = doc(db, 'persistent_host_grants', docId);
-    await setDoc(persistentRef, grantPayload, { merge: true });
-  } catch (error) {
-    console.warn('Sync to persistent_host_grants notice:', error);
-  }
-
-  // Write to collection 2: hostGrantedSubscriptions
-  try {
-    const docRef = doc(db, 'hostGrantedSubscriptions', docId);
-    await setDoc(docRef, grantPayload, { merge: true });
-  } catch (error) {
-    console.warn('Sync to hostGrantedSubscriptions notice:', error);
-  }
-
-  // Write to collection 3: host_ledger
-  try {
-    const ledgerRef = doc(db, 'host_ledger', docId);
-    await setDoc(ledgerRef, grantPayload, { merge: true });
-  } catch (error) {
-    console.warn('Sync to host_ledger notice:', error);
-  }
+export async function syncHostGrantedSubscription(_grant: HostGrantedSubscription): Promise<void> {
+  // Server owns grants and host ledger. Client firestore writes removed per rule D.
 }
 
-/**
- * Fetch a host granted subscription by user email from Firestore with top-level 'grants' primary lookup
- */
-export async function fetchHostGrantedSubscriptionByEmail(email: string): Promise<HostGrantedSubscription | null> {
-  if (!email) return null;
-  const cleanEmail = email.trim().toLowerCase();
-  const docId = sanitizeEmailForDocId(cleanEmail);
-
-  // 1. Check primary top-level 'grants' collection first
-  try {
-    const gRef = doc(db, 'grants', docId);
-    const snap = await getDoc(gRef);
-    if (snap.exists()) {
-      return snap.data() as HostGrantedSubscription;
-    }
-  } catch (error) {}
-
-  // 2. Check persistent_host_grants
-  try {
-    const pRef = doc(db, 'persistent_host_grants', docId);
-    const snap = await getDoc(pRef);
-    if (snap.exists()) {
-      return snap.data() as HostGrantedSubscription;
-    }
-  } catch (error) {}
-
-  // 3. Check hostGrantedSubscriptions
-  try {
-    const docRef = doc(db, 'hostGrantedSubscriptions', docId);
-    const snap = await getDoc(docRef);
-    if (snap.exists()) {
-      return snap.data() as HostGrantedSubscription;
-    }
-  } catch (error) {}
-
-  // 4. Check host_ledger
-  try {
-    const ledgerRef = doc(db, 'host_ledger', docId);
-    const snap = await getDoc(ledgerRef);
-    if (snap.exists()) {
-      return snap.data() as HostGrantedSubscription;
-    }
-  } catch (error) {}
-
+export async function fetchHostGrantedSubscriptionByEmail(_email: string): Promise<HostGrantedSubscription | null> {
+  // Server owns grants and host ledger. Client firestore reads removed per rule D.
   return null;
 }
 
-/**
- * Fetch all active and historical host granted subscriptions from all Firestore collections
- */
 export async function fetchAllHostGrantedSubscriptions(): Promise<HostGrantedSubscription[]> {
-  const map = new Map<string, HostGrantedSubscription>();
-
-  // 1. Primary top-level 'grants'
-  try {
-    const colRef = collection(db, 'grants');
-    const snap = await getDocs(colRef);
-    snap.docs.forEach((d) => {
-      const data = d.data() as HostGrantedSubscription;
-      if (data.email) {
-        map.set(data.email.toLowerCase().trim(), data);
-      }
-    });
-  } catch (error) {
-    console.warn('Notice querying grants collection:', error);
-  }
-
-  // 2. persistent_host_grants
-  try {
-    const colRef = collection(db, 'persistent_host_grants');
-    const snap = await getDocs(colRef);
-    snap.docs.forEach((d) => {
-      const data = d.data() as HostGrantedSubscription;
-      if (data.email) {
-        const clean = data.email.toLowerCase().trim();
-        if (!map.has(clean) || new Date(data.updatedAt || data.grantedAt || 0).getTime() > new Date(map.get(clean)?.updatedAt || map.get(clean)?.grantedAt || 0).getTime()) {
-          map.set(clean, data);
-        }
-      }
-    });
-  } catch (error) {
-    console.warn('Notice querying persistent_host_grants:', error);
-  }
-
-  // 3. hostGrantedSubscriptions
-  try {
-    const colRef = collection(db, 'hostGrantedSubscriptions');
-    const snap = await getDocs(colRef);
-    snap.docs.forEach((d) => {
-      const data = d.data() as HostGrantedSubscription;
-      if (data.email) {
-        const clean = data.email.toLowerCase().trim();
-        if (!map.has(clean) || new Date(data.updatedAt || data.grantedAt || 0).getTime() > new Date(map.get(clean)?.updatedAt || map.get(clean)?.grantedAt || 0).getTime()) {
-          map.set(clean, data);
-        }
-      }
-    });
-  } catch (error) {
-    console.warn('Error fetching hostGrantedSubscriptions:', error);
-  }
-
-  // 4. host_ledger
-  try {
-    const colRef = collection(db, 'host_ledger');
-    const snap = await getDocs(colRef);
-    snap.docs.forEach((d) => {
-      const data = d.data() as HostGrantedSubscription;
-      if (data.email) {
-        const clean = data.email.toLowerCase().trim();
-        if (!map.has(clean)) {
-          map.set(clean, data);
-        }
-      }
-    });
-  } catch (error) {
-    console.warn('Error fetching host_ledger:', error);
-  }
-
-  return Array.from(map.values());
+  // Server owns grants and host ledger. Client firestore reads removed per rule D.
+  return [];
 }
 
-/**
- * Dedicated helper to fetch isolated persistent grants from 'grants' or 'persistent_host_grants'
- * for zero-lag immediate rendering in the Host Admin Portal tab.
- */
 export async function fetchPersistentGrantsCollection(): Promise<HostGrantedSubscription[]> {
-  try {
-    const colRef = collection(db, 'grants');
-    const snap = await getDocs(colRef);
-    if (!snap.empty) {
-      return snap.docs.map((d) => d.data() as HostGrantedSubscription);
-    }
-  } catch (error) {
-    console.warn('Fallback querying grants collection:', error);
-  }
-  try {
-    const colRef = collection(db, 'persistent_host_grants');
-    const snap = await getDocs(colRef);
-    if (!snap.empty) {
-      return snap.docs.map((d) => d.data() as HostGrantedSubscription);
-    }
-  } catch (error) {
-    console.warn('Fallback querying persistent_host_grants collection:', error);
-  }
-  return fetchAllHostGrantedSubscriptions();
+  // Server owns grants and host ledger. Client firestore reads removed per rule D.
+  return [];
 }
 
-/**
- * Delete / revoke a host granted subscription from all Firestore collections including 'grants'
- */
-export async function deleteHostGrantedSubscription(email: string): Promise<void> {
-  const cleanEmail = email.trim().toLowerCase();
-  const docId = sanitizeEmailForDocId(cleanEmail);
-
-  try {
-    const docRef = doc(db, 'grants', docId);
-    await deleteDoc(docRef);
-  } catch (error) {}
-
-  try {
-    const docRef = doc(db, 'persistent_host_grants', docId);
-    await deleteDoc(docRef);
-  } catch (error) {}
-
-  try {
-    const docRef = doc(db, 'hostGrantedSubscriptions', docId);
-    await deleteDoc(docRef);
-  } catch (error) {}
-
-  try {
-    const ledgerRef = doc(db, 'host_ledger', docId);
-    await deleteDoc(ledgerRef);
-  } catch (error) {}
+export async function deleteHostGrantedSubscription(_email: string): Promise<void> {
+  // Server owns grants and host ledger. Client firestore deletes removed per rule D.
 }
 
 /**
@@ -1047,38 +834,15 @@ export async function fetchHostVerificationLogsFirestore(): Promise<any[]> {
 }
 
 /**
- * Sync an athlete's login session and complete profile snapshot directly to Firestore 'athlete_logins'
+ * Athlete login telemetry is handled exclusively via server route /api/me/session.
+ * Client Firestore writes/reads removed per rule D.
  */
-export async function syncAthleteLoginToFirestore(loginRecord: any): Promise<void> {
-  const loginId = loginRecord.id || `login_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
-  try {
-    const logRef = doc(db, 'athlete_logins', loginId);
-    await setDoc(logRef, {
-      ...loginRecord,
-      id: loginId,
-      timestamp: loginRecord.loginTimestamp || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }, { merge: true });
-  } catch (error) {
-    console.warn('Notice syncing athlete login session to Firestore:', error);
-  }
+export async function syncAthleteLoginToFirestore(_loginRecord: any): Promise<void> {
+  // Server owns athlete logins. Client firestore writes removed per rule D.
 }
 
-/**
- * Fetch all athlete login telemetry and full profile details from Firestore 'athlete_logins'
- */
 export async function fetchAthleteLoginsFromFirestore(): Promise<any[]> {
-  try {
-    const colRef = collection(db, 'athlete_logins');
-    const snap = await getDocs(colRef);
-    if (!snap.empty) {
-      return snap.docs
-        .map((d) => d.data())
-        .sort((a: any, b: any) => new Date(b.loginTimestamp || b.timestamp || 0).getTime() - new Date(a.loginTimestamp || a.timestamp || 0).getTime());
-    }
-  } catch (error) {
-    console.warn('Notice fetching athlete logins from Firestore:', error);
-  }
+  // Server owns athlete logins via /api/host/athlete-logins. Client firestore reads removed per rule D.
   return [];
 }
 

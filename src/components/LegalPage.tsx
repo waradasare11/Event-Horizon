@@ -307,6 +307,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
                   <p>To provide personalized exercise programming, calorie estimation, and physiological tracking, we collect only the data you explicitly provide:</p>
                   <ul className="list-disc pl-5 space-y-1.5 text-gray-600 dark:text-gray-400">
                     <li><strong>Account Credentials:</strong> Full name, email address, optional Google account profile identifier.</li>
+                    <li><strong>Session &amp; Security Logs:</strong> Account email address and login timestamps collected to maintain session security, audit active host VIP subscription grants, and prevent unauthorized account access.</li>
                     <li><strong>Physical &amp; Metabolic Baseline:</strong> Age, biological sex, height (cm), current body weight (kg), target weight, and optional estimated body fat percentage.</li>
                     <li><strong>Nutrition &amp; Meal History:</strong> Meal names, food descriptions, portion sizes, macronutrient breakdowns (calories, protein, carbohydrates, fats, fiber), and timestamps.</li>
                     <li><strong>Workout Logs &amp; Athletic Performance:</strong> Exercise names, sets, repetitions, resistance weight, RPE (rate of perceived exertion), notes, and completion timestamps.</li>

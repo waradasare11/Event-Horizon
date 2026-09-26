@@ -534,9 +534,9 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                     <button
                       onClick={handleRazorpayCheckout}
                       disabled={isProcessingPayment}
-                      className="w-full py-3.5 px-4 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
+                      className="w-full py-3.5 px-4 rounded-xl bg-[#3B82F6] hover:bg-[#1D4ED8] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer disabled:opacity-50"
                     >
-                      <ShieldCheck className="w-4 h-4 text-[#F0D060]" />
+                      <ShieldCheck className="w-4 h-4 text-white" />
                       <span>
                         {isProcessingPayment ? 'Connecting to Razorpay...' : `Pay ₹${selectedPlan.priceINR} via Razorpay`}
                       </span>
@@ -544,12 +544,12 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                   </div>
                 ) : (
                   /* Payments Coming Soon Banner (Razorpay not configured) */
-                  <div className="bg-gradient-to-br from-[#D4AF37]/10 via-[#D4AF37]/5 to-[#D4AF37]/10 p-6 rounded-2xl border border-[#D4AF37]/20 text-center space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#A68523]/20 text-[#B8922A] dark:text-[#F0D060] flex items-center justify-center mx-auto">
+                  <div className="bg-gradient-to-br from-[#00D4FF]/10 via-[#3B82F6]/5 to-[#00D4FF]/10 p-6 rounded-2xl border border-[#00D4FF]/20 text-center space-y-4">
+                    <div className="w-12 h-12 rounded-2xl bg-[#00D4FF]/20 text-[#0284C7] dark:text-[#38BDF8] flex items-center justify-center mx-auto">
                       <ShieldCheck className="w-6 h-6" />
                     </div>
                     <div className="space-y-1.5">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#A68523] dark:text-[#F0D060] bg-[#D4AF37]/20 px-2.5 py-1 rounded-md">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#0369A1] dark:text-[#38BDF8] bg-[#00D4FF]/20 px-2.5 py-1 rounded-md">
                         Payments coming soon
                       </span>
                       <h4 className="text-base font-bold text-gray-900 dark:text-white pt-1">
@@ -563,7 +563,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
                     <button
                       type="button"
                       onClick={onClose}
-                      className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#A68523] text-white font-bold text-xs shadow-md transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
+                      className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#3B82F6] hover:bg-[#1D4ED8] text-white font-bold text-xs shadow-md transition-all inline-flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <span>Continue Training</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -578,7 +578,7 @@ export const SubscriptionPaywallModal: React.FC<SubscriptionPaywallModalProps> =
         {/* Footer */}
         <div className="px-6 py-4 bg-[#FAFAF8] dark:bg-[#070707] border-t border-[#E5E7EB] dark:border-[#2A2416] text-[11px] text-[#6B7280] dark:text-[#9EA8A2] flex items-center justify-between">
           <span className="flex items-center gap-1.5">
-            <Lock className="w-3.5 h-3.5 text-[#D4AF37]" />
+            <Lock className="w-3.5 h-3.5 text-[#3B82F6]" />
             <span>AROH Pro • Encrypted 256-Bit SSL Checkout</span>
           </span>
           <span>7-Day Risk-Free Guarantee</span>

@@ -706,7 +706,7 @@ function reconcileMultiModelConsensus(
   const validResults = results.filter((r) => r && Array.isArray(r.items) && r.items.length > 0);
 
   if (validResults.length === 0) {
-    return generateFallbackMealAnalysis(userProfile, customNotes);
+    throw new Error("scan_failed: No food items identified by consensus models");
   }
 
   // Use the primary high-reasoning result as the structural baseline
@@ -751,19 +751,19 @@ function reconcileMultiModelConsensus(
   const sumFat = Number(unifiedItems.reduce((s, it) => s + (Number(it.fatG) || 0), 0).toFixed(1));
   const sumFiber = Number(unifiedItems.reduce((s, it) => s + (Number(it.fiberG) || 0), 0).toFixed(1));
 
-  // Compute overall consensus agreement score
+  // Compute overall consensus agreement score without artificial clamping
   const avgItemCertainty = Math.round(
     unifiedItems.reduce((s, it) => s + (it.confidenceScorePct || 90), 0) / Math.max(1, unifiedItems.length)
   );
   const modelCoverageScore = Math.min(100, Math.round((validModelsCount / totalModelsQueried) * 100));
-  const overallConsensusScore = Math.min(99, Math.max(88, Math.round(avgItemCertainty * 0.7 + modelCoverageScore * 0.3)));
+  const overallConsensusScore = Math.min(99, Math.max(50, Math.round(avgItemCertainty * 0.7 + modelCoverageScore * 0.3)));
 
   const consensusRating =
-    overallConsensusScore >= 96
-      ? "Exceptional (98%+)"
-      : overallConsensusScore >= 90
-      ? "High (90-97%)"
-      : "Solid (80-89%)";
+    overallConsensusScore >= 90
+      ? "High Agreement"
+      : overallConsensusScore >= 75
+      ? "Moderate Agreement"
+      : "Preliminary Estimate";
 
   return {
     ...primaryResult,
@@ -795,7 +795,8 @@ function reconcileMultiModelConsensus(
   };
 }
 
-function generateHighAccuracyFallbackAnalysis(userProfile?: any, customNotes?: string) {
+function generateHighAccuracyFallbackAnalysis(userProfile?: any, customNotes?: string): any {
+  throw new Error("scan_failed: Automated fallback mock disabled. Real multi-vision plate analysis required.");
   const notesLower = (customNotes || "").toLowerCase();
   const isStrictSabudanaExplicit = 
     notesLower.includes("sabudana") || 
@@ -1344,23 +1345,22 @@ Output a comprehensive, strictly formatted JSON analysis.`;
     const initialScore = parsedResult.consensusScore || parsedResult.modelConsensus?.overallConsensusScore || 92;
     const isMultiAngleScan = inlineImages.length >= 2;
 
-    // If multi-angle photos are provided (2-4 angles), calibrate confidence score to 96%-97%
+    // If multi-angle photos are provided (2-4 angles), mark multi-angle verified
     if (isMultiAngleScan) {
       console.log(`[MealScanner] ${inlineImages.length} multi-angle photos received. Triangulating 3D stereoscopic volumetric boundaries...`);
-      parsedResult.consensusScore = Math.min(97, Math.max(95, parsedResult.consensusScore || 96));
       parsedResult.requiresRefinedScan = false;
       parsedResult.multiAngleVerified = true;
       parsedResult.confidence = "High";
       if (parsedResult.modelConsensus) {
         parsedResult.modelConsensus.overallConsensusScore = parsedResult.consensusScore;
-        parsedResult.modelConsensus.consensusRating = `High Precision (${parsedResult.consensusScore}% Multi-Angle Verified)`;
+        parsedResult.modelConsensus.consensusRating = `Multi-Angle Verified (${parsedResult.consensusScore}%)`;
         parsedResult.modelConsensus.consensusVoteRatio = `${inlineImages.length}-Angle Stereoscopic Consensus Harmonized`;
       }
     } else {
       // Single angle scan
-      if (initialScore < 95) {
+      if (initialScore < 85) {
         parsedResult.requiresRefinedScan = true;
-        parsedResult.refinedScanPrompt = `Single-angle scan estimated at ~${initialScore}% confidence. For 95%–97% estimated accuracy, capture 2 to 4 photos from different angles (overhead, 45° angle, and close-up) with any standard measure nearby.`;
+        parsedResult.refinedScanPrompt = `Single-angle scan estimated at ~${initialScore}% confidence. For higher confidence and volumetric depth, capture 2 to 4 photos from different angles (overhead, 45° angle, and close-up) with any standard measure nearby.`;
       } else {
         parsedResult.requiresRefinedScan = false;
       }
@@ -1434,7 +1434,10 @@ Output strictly valid JSON with mealTitle, summaryDescription, totalCalories, to
           const sumFat = Number(calibratedItems.reduce((s: number, it: any) => s + (Number(it.fatG) || 0), 0).toFixed(1));
           const sumFiber = Number(calibratedItems.reduce((s: number, it: any) => s + (Number(it.fiberG) || 0), 0).toFixed(1));
 
-          const calibratedScore = isMultiAngleScan ? 96 : 95;
+          const avgCalibratedCertainty = Math.round(
+            calibratedItems.reduce((s: number, it: any) => s + (it.confidenceScorePct || 85), 0) / Math.max(1, calibratedItems.length)
+          );
+          const calibratedScore = Math.min(98, Math.max(60, Math.round(avgCalibratedCertainty * 0.7 + (isMultiAngleScan ? 90 : 80) * 0.3)));
 
           parsedResult = {
             ...parsedResult,
@@ -1448,7 +1451,7 @@ Output strictly valid JSON with mealTitle, summaryDescription, totalCalories, to
             confidence: "High",
             consensusScore: calibratedScore,
             requiresRefinedScan: !isMultiAngleScan && inlineImages.length < 2,
-            refinedScanPrompt: !isMultiAngleScan ? `Single-angle scan calibrated at ~95% confidence. For multi-angle verification (~96%-97%), capture 2-4 photos from different angles.` : undefined,
+            refinedScanPrompt: !isMultiAngleScan ? `Single-angle scan calibrated. For multi-angle verification, capture 2-4 photos from different angles.` : undefined,
             failoverEngaged: true,
             failoverModel: "High-Reasoning AI (OmniRoute + Gemini 3.7 Flash)",
             failoverReason: `High-reasoning failover successfully calibrated volumetric boundaries and food items against USDA/IFCT database.`,
@@ -1456,7 +1459,7 @@ Output strictly valid JSON with mealTitle, summaryDescription, totalCalories, to
             referenceObjectNotes: "Volumetric scaling calibrated via plate boundaries and automatic reference measure detection.",
             modelConsensus: {
               overallConsensusScore: calibratedScore,
-              consensusRating: isMultiAngleScan ? "High Precision (~96%-97% Multi-Angle)" : "Standard Precision (~95% Single-Angle)",
+              consensusRating: isMultiAngleScan ? "Multi-Angle Consensus Harmonized" : "Single-Angle Calibrated",
               modelsQueried: [
                 "Primary Multi-Vision Consensus",
                 "High-Reasoning Volumetric Engine (OmniRoute / Gemini 3.7 Flash)",
@@ -1481,8 +1484,11 @@ Output strictly valid JSON with mealTitle, summaryDescription, totalCalories, to
     return res.json({ success: true, data: parsedResult });
   } catch (error: any) {
     console.error("Error analyzing meal in multi-model consensus pipeline:", error);
-    const fallback = generateFallbackMealAnalysis(req.body?.userProfile, req.body?.customNotes);
-    return res.json({ success: true, data: fallback });
+    return res.status(422).json({
+      success: false,
+      error: "scan_failed",
+      message: "Unable to clearly identify food from the image. Please retake photo with good lighting and clear view of the food plate.",
+    });
   }
 });
 
@@ -1962,8 +1968,12 @@ Your Task:
 
       parsedResult = JSON.parse(response.text || "{}");
     } catch (err: any) {
-      console.warn("Manual AI calculation fallback:", err?.message);
-      parsedResult = generateFallbackMealAnalysis(userProfile, mealText);
+      console.warn("Manual AI calculation fallback error:", err?.message);
+      return res.status(422).json({
+        success: false,
+        error: "scan_failed",
+        message: "Unable to calculate nutritional breakdown for the provided meal text. Please provide ingredient weights or details.",
+      });
     }
 
     if (isStrictVegManual) {
@@ -4413,6 +4423,7 @@ export interface AthleteLoginRecord {
   lastActiveTimestamp?: string;
   sessionDurationMinutes?: number;
   device: string;
+  deviceFingerprint?: string;
   browser?: string;
   os?: string;
   screenResolution?: string;
@@ -4425,18 +4436,33 @@ export interface AthleteLoginRecord {
   heightCm?: number;
   bmi?: number;
   targetWeightKg?: number;
+  targetDate?: string;
+  bodyFatPct?: number;
   goal?: string;
   dietType?: string;
   experienceLevel?: string;
+  trainingDaysPerWeek?: number;
+  sessionDurationMin?: number;
+  preferredTime?: string;
+  musclePriority?: string;
+  bmr?: number;
+  tdee?: number;
   dailyCalories?: number;
   dailyProtein?: number;
+  dailyCarbs?: number;
+  dailyFat?: number;
   hydrationLiters?: number;
+  weeklyRateKg?: number;
   workoutStreakDays?: number;
   totalWorkoutsLogged?: number;
+  mealLogsCount?: number;
+  isOnboarded?: boolean;
   isStrictVegetarian?: boolean;
   subscriptionPlan?: string;
   isLifetimeVIP?: boolean;
   subscriptionStatus?: string;
+  daysRemaining?: number;
+  expiresAt?: string;
   notes?: string;
 }
 
@@ -4732,7 +4758,8 @@ app.get("/api/subscription/plans", (req, res) => {
 // 14.1b Host Identity Check
 app.get("/api/host/whoami", (req, res) => {
   const queryEmail = (req.query.email as string || req.headers["x-user-email"] as string || "").trim().toLowerCase();
-  const isHost = Boolean(HOST_EMAIL && queryEmail && queryEmail === HOST_EMAIL);
+  const hasSecrets = Boolean(HOST_EMAIL && process.env.HOST_SECURITY_PIN);
+  const isHost = Boolean(hasSecrets && queryEmail && queryEmail === HOST_EMAIL.toLowerCase());
   return res.json({
     isHost,
     appName: "AROH Pro",
@@ -5049,8 +5076,122 @@ app.post("/api/payment/razorpay/webhook", (req, res) => {
   }
 });
 
+function decodeFirebaseIdToken(token: string): { uid?: string; email?: string; name?: string } | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length < 2) return null;
+    const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));
+    return {
+      uid: payload.user_id || payload.sub || payload.uid,
+      email: payload.email,
+      name: payload.name,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function checkHostRequestAuth(req: express.Request): { authorized: boolean; reason?: string; status?: number } {
+  if (!HOST_EMAIL || !process.env.HOST_SECURITY_PIN) {
+    return { authorized: false, reason: "Host secrets not configured", status: 503 };
+  }
+
+  const pin = (req.headers["x-host-pin"] as string) || (req.body?.pin as string);
+  if (!verifyHostPin(pin)) {
+    return { authorized: false, reason: "Host PIN verification required.", status: 403 };
+  }
+
+  let email = (req.headers["x-host-email"] as string) || (req.query?.email as string) || (req.body?.email as string) || "";
+  email = String(email).trim().toLowerCase();
+
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.slice(7).trim();
+    const decoded = decodeFirebaseIdToken(token);
+    if (decoded && decoded.email) {
+      email = decoded.email.trim().toLowerCase();
+    }
+  }
+
+  if (!email || email !== HOST_EMAIL.toLowerCase()) {
+    return { authorized: false, reason: "Unauthorized. Host email required.", status: 403 };
+  }
+
+  return { authorized: true };
+}
+
+// Authenticated session logging for athletes (server route using Firebase ID token or body)
+app.post("/api/me/session", (req, res) => {
+  const authHeader = req.headers.authorization;
+  let tokenEmail: string | undefined;
+  let tokenUid: string | undefined;
+  let tokenName: string | undefined;
+
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.slice(7).trim();
+    const decoded = decodeFirebaseIdToken(token);
+    if (decoded) {
+      tokenEmail = decoded.email;
+      tokenUid = decoded.uid;
+      tokenName = decoded.name;
+    }
+  }
+
+  const email = (tokenEmail || req.body.email || "").trim().toLowerCase();
+  if (!email || !email.includes("@")) {
+    return res.status(401).json({ success: false, error: "Valid authenticated user session required." });
+  }
+
+  const userId = tokenUid || req.body.userId || `user_${email.replace(/[^a-zA-Z0-9_]/g, "_")}`;
+  const name = tokenName || req.body.name || email.split("@")[0];
+  const loginId = req.body.id || `session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+  const sessionRecord: AthleteLoginRecord = {
+    id: loginId,
+    userId,
+    email,
+    name,
+    loginTimestamp: req.body.loginTimestamp || new Date().toISOString(),
+    device: req.body.device || "Browser Client",
+    browser: req.body.browser,
+    os: req.body.os,
+    screenResolution: req.body.screenResolution,
+    timezone: req.body.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+    deviceFingerprint: req.body.deviceFingerprint,
+    age: req.body.age,
+    sex: req.body.sex,
+    weightKg: req.body.weightKg,
+    heightCm: req.body.heightCm,
+    bmi: req.body.bmi,
+    targetWeightKg: req.body.targetWeightKg,
+    goal: req.body.goal,
+    dietType: req.body.dietType,
+    experienceLevel: req.body.experienceLevel,
+    dailyCalories: req.body.dailyCalories,
+    dailyProtein: req.body.dailyProtein,
+    subscriptionPlan: req.body.subscriptionPlan,
+    isLifetimeVIP: Boolean(req.body.isLifetimeVIP),
+    subscriptionStatus: req.body.subscriptionStatus || "active",
+    daysRemaining: req.body.daysRemaining,
+    expiresAt: req.body.expiresAt,
+    notes: req.body.notes || `Signed in at ${new Date().toISOString()}`,
+  };
+
+  athleteLoginSessions.unshift(sessionRecord);
+  if (athleteLoginSessions.length > 2000) {
+    athleteLoginSessions = athleteLoginSessions.slice(0, 2000);
+  }
+  savePersistedHostData();
+
+  return res.json({ success: true, message: "Session recorded successfully.", sessionId: loginId });
+});
+
 // 14.3 Host Admin Security PIN Authentication & Updates
 app.post("/api/host/verify-pin", (req, res) => {
+  if (!HOST_EMAIL || !process.env.HOST_SECURITY_PIN) {
+    return res.status(503).json({ success: false, error: "Host secrets not configured" });
+  }
+
   const { pin, email } = req.body;
   const clientIp = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.ip || "unknown-client";
   const rateLimitKey = `${clientIp}:${String(email || "host").toLowerCase().trim()}`;
@@ -5065,8 +5206,19 @@ app.post("/api/host/verify-pin", (req, res) => {
     });
   }
 
-  const cleanEmail = String(email || "").trim().toLowerCase();
-  if (!HOST_EMAIL || !cleanEmail || cleanEmail !== HOST_EMAIL.toLowerCase()) {
+  // Also support Authorization: Bearer <Firebase ID token> plus PIN
+  const authHeader = req.headers.authorization;
+  let tokenEmail: string | undefined;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.slice(7).trim();
+    const decoded = decodeFirebaseIdToken(token);
+    if (decoded && decoded.email) {
+      tokenEmail = decoded.email.trim().toLowerCase();
+    }
+  }
+
+  const cleanEmail = String(tokenEmail || email || "").trim().toLowerCase();
+  if (!cleanEmail || cleanEmail !== HOST_EMAIL.toLowerCase()) {
     recordPinFailure(rateLimitKey);
     return res.status(403).json({ success: false, error: "Unauthorized. Host email required." });
   }
@@ -5206,11 +5358,12 @@ app.delete("/api/host/delete-discount-rule/:id", (req, res) => {
 
 // 14.4.1 Host Direct Free Lifetime / Plan Grant Endpoint
 app.post("/api/host/grant-free-subscription", (req, res) => {
-  const { pin, email, targetEmail, planId, isLifetime, notes } = req.body;
-
-  if (String(email).toLowerCase() !== HOST_EMAIL.toLowerCase() || !verifyHostPin(pin)) {
-    return res.status(403).json({ success: false, error: "Invalid Host Security PIN or Unauthorized Email." });
+  const authCheck = checkHostRequestAuth(req);
+  if (!authCheck.authorized) {
+    return res.status(authCheck.status || 403).json({ success: false, error: authCheck.reason || "Unauthorized Host Access." });
   }
+
+  const { targetEmail, planId, isLifetime, notes } = req.body;
 
   if (!targetEmail || !targetEmail.includes("@")) {
     return res.status(400).json({ success: false, error: "Valid athlete Gmail/Email address required." });
@@ -5345,11 +5498,9 @@ app.post("/api/host/grant-free-subscription", (req, res) => {
 
 // 14.4.2 Fetch all Host Granted Subscriptions
 app.get("/api/host/granted-subscriptions", (req, res) => {
-  const pin = req.headers["x-host-pin"] as string;
-  const email = (req.headers["x-host-email"] as string) || (req.query.email as string);
-
-  if (String(email).toLowerCase() !== HOST_EMAIL.toLowerCase() || !verifyHostPin(pin)) {
-    return res.status(403).json({ success: false, error: "Host PIN verification required." });
+  const authCheck = checkHostRequestAuth(req);
+  if (!authCheck.authorized) {
+    return res.status(authCheck.status || 403).json({ success: false, error: authCheck.reason || "Host PIN verification required." });
   }
 
   return res.json({
@@ -5361,26 +5512,25 @@ app.get("/api/host/granted-subscriptions", (req, res) => {
 
 // 14.4.3 Revoke a Host Granted Subscription
 app.delete("/api/host/revoke-granted-subscription/:email", (req, res) => {
-  const pin = req.headers["x-host-pin"] as string;
-  const authEmail = req.headers["x-host-email"] as string;
-  const targetEmail = decodeURIComponent(req.params.email).toLowerCase().trim();
-
-  if (String(authEmail).toLowerCase() !== HOST_EMAIL.toLowerCase() || !verifyHostPin(pin)) {
-    return res.status(403).json({ success: false, error: "Host PIN verification required." });
+  const authCheck = checkHostRequestAuth(req);
+  if (!authCheck.authorized) {
+    return res.status(authCheck.status || 403).json({ success: false, error: authCheck.reason || "Host PIN verification required." });
   }
+
+  const targetEmail = decodeURIComponent(req.params.email).toLowerCase().trim();
 
   const existing = hostGrantedSubscriptions.find((g) => g.email.toLowerCase() === targetEmail);
   hostGrantedSubscriptions = hostGrantedSubscriptions.filter((g) => g.email.toLowerCase() !== targetEmail);
   hostDiscountRules = hostDiscountRules.filter((r) => !(r.targetType === "individual" && r.targetEmail?.toLowerCase() === targetEmail));
 
-  if (existing) {
-    recordAuditLog(
-      "discount_deleted",
-      `Revoked Free Subscription access for ${targetEmail}.`,
-      targetEmail,
-      existing.planId
-    );
-  }
+  recordAuditLog(
+    "grant_revoked" as any,
+    `Revoked Free Subscription access for ${targetEmail}.`,
+    targetEmail,
+    existing?.planId || "all_plans",
+    0,
+    { targetEmail, previousPlan: existing?.planName, previousStatus: existing?.status }
+  );
 
   savePersistedHostData();
 
@@ -6131,11 +6281,9 @@ app.post("/api/host/record-login", (req, res) => {
 
 // 14.7.2 Fetch All Athlete Logins & Aggregated Profiles (Host Protected)
 app.get("/api/host/athlete-logins", (req, res) => {
-  const pin = req.headers["x-host-pin"] as string;
-  const email = (req.headers["x-host-email"] as string) || (req.query.email as string);
-
-  if (String(email).toLowerCase() !== HOST_EMAIL.toLowerCase() || !verifyHostPin(pin)) {
-    return res.status(403).json({ success: false, error: "Host PIN and email verification required for athlete login telemetry." });
+  const authCheck = checkHostRequestAuth(req);
+  if (!authCheck.authorized) {
+    return res.status(authCheck.status || 403).json({ success: false, error: authCheck.reason || "Host PIN and email verification required for athlete login telemetry." });
   }
 
   // Deduplicate to create unique aggregated latest profile for each athlete

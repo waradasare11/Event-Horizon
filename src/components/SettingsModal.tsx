@@ -343,7 +343,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   }}
                   className={`px-3 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                     userProfile.foodLabelLanguage === 'english_hindi'
-                      ? 'bg-[#D4AF37] text-white shadow-xs'
+                      ? 'bg-[#3B82F6] text-white shadow-xs'
                       : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
@@ -418,34 +418,36 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </button>
           </div>
 
-          {/* Admin & Host Portal (Visible to Host Admin) */}
-          {isHost && (
+          {/* Operator tools (Visible to signed-in user) */}
+          {(currentUser || userProfile.email) && (
             <div className="space-y-2">
               <h3 className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider px-1 flex items-center gap-1.5">
                 <Crown className="w-3.5 h-3.5" />
-                <span>Host Administration</span>
+                <span>Operator tools</span>
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
+                  type="button"
                   onClick={() => {
                     onClose();
                     onOpenHostAdminModal();
                   }}
-                  className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-left hover:bg-amber-500/20 transition-all flex items-center justify-between"
+                  className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-left hover:bg-amber-500/20 transition-all flex items-center justify-between cursor-pointer"
                 >
                   <div>
-                    <div className="text-xs font-bold text-amber-900 dark:text-amber-200">Host Admin Portal</div>
-                    <div className="text-[11px] text-amber-800/80 dark:text-amber-300/80">User grants & valuations</div>
+                    <div className="text-xs font-bold text-amber-900 dark:text-amber-200">Unlock Host Console</div>
+                    <div className="text-[11px] text-amber-800/80 dark:text-amber-300/80">Host ledger, grants & PIN gate</div>
                   </div>
                   <ChevronRight className="w-4 h-4 text-amber-600" />
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => {
                     onClose();
                     onOpenPerformanceDashboard();
                   }}
-                  className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-left hover:bg-amber-500/20 transition-all flex items-center justify-between"
+                  className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-left hover:bg-amber-500/20 transition-all flex items-center justify-between cursor-pointer"
                 >
                   <div>
                     <div className="text-xs font-bold text-amber-900 dark:text-amber-200">Performance Monitor</div>

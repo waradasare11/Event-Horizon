@@ -66,7 +66,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
   const currentTotalFat = items.reduce((sum, item) => sum + item.fatG, 0);
   const currentTotalFiber = analysis.totalFiberG;
 
-  const consensusScore = analysis.modelConsensus?.overallConsensusScore || analysis.consensusScore || 88;
+  const consensusScore = analysis.modelConsensus?.overallConsensusScore || analysis.consensusScore || 0;
   const consensusRating = analysis.modelConsensus?.consensusRating || (consensusScore >= 90 ? 'High Confidence' : 'Moderate Confidence');
   const consensusRatio = analysis.modelConsensus?.consensusVoteRatio || '3/3 Multi-Vision Models in Agreement';
 
@@ -231,7 +231,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                 </span>
                 <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#00D4FF]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#00D4FF]/20 flex items-center gap-1">
                   <CheckCircle className="w-3 h-3 text-[#0284C7] dark:text-[#38BDF8]" />
-                  AI estimate — you can correct portions
+                  AI estimate — confirm grams.
                 </span>
                 {analysis.failoverEngaged && (
                   <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30 flex items-center gap-1">
@@ -414,7 +414,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                 </span>
               </div>
               <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
-                AI estimate — you can correct portions. Adjust gram weights or add custom ingredients if needed.
+                AI estimate — confirm grams. Adjust gram weights or add custom ingredients if needed.
               </p>
             </div>
 
@@ -506,7 +506,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                           })()}
                         </span>
                         <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#00D4FF]/10 text-[#0369A1] dark:text-[#38BDF8] border border-[#00D4FF]/20">
-                          AI estimate — you can correct portions
+                          AI estimate — confirm grams.
                         </span>
                         {item.verifiedDatabaseName && (
                           <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-300 border border-blue-500/20 flex items-center gap-1">

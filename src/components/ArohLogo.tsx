@@ -4,12 +4,14 @@ interface ArohLogoProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showText?: boolean;
+  hideSubtitleBelow1100?: boolean;
 }
 
 export const ArohLogo: React.FC<ArohLogoProps> = ({
   className = '',
   size = 'md',
   showText = true,
+  hideSubtitleBelow1100 = false,
 }) => {
   const sizeMap = {
     sm: { img: 'w-7 h-7', text: 'text-base', sub: 'text-[9px]' },
@@ -46,7 +48,7 @@ export const ArohLogo: React.FC<ArohLogoProps> = ({
               SMART
             </span>
           </div>
-          <span className={`text-[#8BA3C7] font-medium tracking-widest uppercase mt-0.5 ${sub}`}>
+          <span className={`text-[#8BA3C7] font-medium tracking-widest uppercase mt-0.5 ${sub} ${hideSubtitleBelow1100 ? 'hidden min-[1100px]:block' : ''}`}>
             Smart Fitness
           </span>
         </div>

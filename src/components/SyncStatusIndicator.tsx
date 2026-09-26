@@ -98,8 +98,8 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
   const getBadgeContent = () => {
     if (!isOnline) {
       return {
-        icon: <WifiOff className="w-3.5 h-3.5 text-zinc-400" />,
-        label: 'Offline — will sync when online',
+        icon: <span className="w-1.5 h-1.5 rounded-full bg-zinc-400 shrink-0" />,
+        label: 'Offline',
         colorClass: 'bg-zinc-500/10 text-zinc-700 dark:text-zinc-300 border-zinc-500/30',
         dotClass: 'bg-zinc-400',
         pendingBadge: pendingCount > 0 ? pendingCount : null,
@@ -108,61 +108,19 @@ export const SyncStatusIndicator: React.FC<SyncStatusIndicatorProps> = ({
 
     if (activeSyncing || driveStatus.status === 'saving') {
       return {
-        icon: <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-500" />,
+        icon: <RefreshCw className="w-3 h-3 animate-spin text-[#3B82F6] shrink-0" />,
         label: 'Saving…',
-        colorClass: 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/30',
-        dotClass: 'bg-blue-500 animate-ping',
+        colorClass: 'bg-[#3B82F6]/10 text-[#2563EB] dark:text-[#60A5FA] border-[#3B82F6]/30',
+        dotClass: 'bg-[#3B82F6] animate-ping',
         pendingBadge: pendingCount > 0 ? pendingCount : null,
       };
     }
 
-    if (driveStatus.status === 'reconnect_needed') {
-      return {
-        icon: <AlertCircle className="w-3.5 h-3.5 text-amber-500" />,
-        label: 'Reconnect Google Drive',
-        colorClass: 'bg-amber-500/15 text-amber-800 dark:text-amber-200 border-amber-500/40 ring-1 ring-amber-500/20',
-        dotClass: 'bg-amber-500 animate-pulse',
-        pendingBadge: null,
-      };
-    }
-
-    if (pendingCount > 0) {
-      return {
-        icon: <ArrowUpCircle className="w-3.5 h-3.5 text-amber-500 animate-bounce" />,
-        label: `${pendingCount} Pending Sync`,
-        colorClass: 'bg-amber-500/15 text-amber-800 dark:text-amber-200 border-amber-500/40 ring-1 ring-amber-500/20',
-        dotClass: 'bg-amber-500 animate-pulse',
-        pendingBadge: pendingCount,
-      };
-    }
-
-    if (internalState === 'validating') {
-      return {
-        icon: <RefreshCw className="w-3.5 h-3.5 text-amber-500 animate-spin" />,
-        label: 'Validating Drift...',
-        colorClass: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30',
-        dotClass: 'bg-amber-500',
-        pendingBadge: null,
-      };
-    }
-
-    if (internalState === 'drift_corrected') {
-      return {
-        icon: <Zap className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />,
-        label: 'Drift Reconciled',
-        colorClass: 'bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-500/30',
-        dotClass: 'bg-amber-500',
-        pendingBadge: null,
-      };
-    }
-
-    const savedTimeLabel = driveStatus.lastSavedAt ? `Synced • saved ${driveStatus.lastSavedAt}` : (currentUser ? 'Synced' : 'Cloud Ready');
-
     return {
-      icon: <CheckCircle2 className="w-3.5 h-3.5 text-amber-500" />,
-      label: savedTimeLabel,
-      colorClass: 'bg-amber-500/10 text-amber-900 dark:text-amber-200 border-amber-500/30',
-      dotClass: 'bg-amber-500',
+      icon: <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_6px_#34D399]" />,
+      label: 'Saved',
+      colorClass: 'bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 border-emerald-500/30',
+      dotClass: 'bg-emerald-400',
       pendingBadge: null,
     };
   };

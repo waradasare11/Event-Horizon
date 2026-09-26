@@ -28,6 +28,8 @@ export const GOOGLE_WORKSPACE_SCOPES = [
   'https://www.googleapis.com/auth/tasks',
 ].join(' ');
 
+import { checkIsHostOnServer } from './subscription';
+
 /**
  * Get stored Google Workspace authorization state
  */
@@ -617,18 +619,20 @@ export async function backupHostLedgerToGoogleDrive(ledgerData: {
   hostEmail: string;
 }): Promise<{ success: boolean; message?: string }> {
   try {
-    const { checkIsHostOnServer } = await import('./subscription');
     const auth = getStoredGoogleWorkspaceAuth();
-    const driveEmail = (auth.userEmail || ledgerData.hostEmail || '').trim().toLowerCase();
-
-    // Verify against /api/host/whoami that this email is host. Must strictly no-op otherwise.
-    const isServerHost = await checkIsHostOnServer(driveEmail);
-    if (!isServerHost) {
-      console.warn('backupHostLedgerToGoogleDrive no-op: /api/host/whoami indicates email is not host:', driveEmail);
-      return { success: true, message: 'No-op: email is not verified host on /api/host/whoami.' };
+    if (!auth.accessToken || !auth.userEmail) {
+      return { success: false, message: 'Google Drive not connected or no authenticated Drive user email.' };
     }
 
-    if (!auth.accessToken) return { success: false, message: 'Google Drive not connected' };
+    const driveEmail = auth.userEmail.trim().toLowerCase();
+    const expectedHostEmail = (ledgerData.hostEmail || '').trim().toLowerCase();
+
+    // Verify against /api/host/whoami that the authenticated Google Drive account is strictly the HOST_EMAIL
+    const isServerHost = await checkIsHostOnServer(driveEmail);
+    if (!isServerHost || (expectedHostEmail && driveEmail !== expectedHostEmail)) {
+      console.warn('backupHostLedgerToGoogleDrive blocked: Drive account is not verified HOST_EMAIL:', driveEmail);
+      return { success: true, message: 'No-op: Host Drive backup permitted only when connected Drive email is verified HOST_EMAIL.' };
+    }
 
     const folderId = auth.driveFolderId || (await getOrCreateArohFolder(auth.accessToken));
     const dateStr = new Date().toISOString().split('T')[0];
