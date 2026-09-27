@@ -665,7 +665,7 @@ function crossReferenceAndValidateItem(item: any, modelVotesCount: number = 2): 
       glycemicIndex: matched.glycemicIndex,
       foodCategory: matched.category,
       ingredientSource: `${matched.database} Verified Benchmark`,
-      confidenceScorePct: Math.min(99, Math.max(88, 90 + modelVotesCount * 3)),
+      confidenceScorePct: Math.min(90, Math.max(80, 82 + modelVotesCount * 3)),
       modelAgreementCount: modelVotesCount,
       verifiedByDatabase: true,
       verifiedDatabaseName: matched.database,
@@ -4155,7 +4155,7 @@ Return ONLY a valid JSON object matching this schema:
 const HOST_SECRET_KEY = process.env.HOST_SECRET_KEY || crypto.randomBytes(32).toString("hex");
 const HOST_VPA = (process.env.HOST_UPI_VPA || "").trim();
 const HOST_NAME = process.env.HOST_NAME || "AROH Administrator";
-const HOST_EMAIL = (process.env.HOST_EMAIL || process.env.VITE_HOST_EMAIL || "waradasare11@gmail.com").trim().toLowerCase();
+const HOST_EMAIL = (process.env.HOST_EMAIL || "").trim().toLowerCase();
 
 const BASE_OFFICIAL_PLANS = [
   {
@@ -4558,10 +4558,10 @@ function hashPin(pin: string): string {
   return crypto.createHmac("sha256", HOST_SECRET_KEY).update(`${pin}::${PIN_SALT}`).digest("hex");
 }
 
-// set HOST_SECURITY_PIN in env, never default to a real PIN
+// If HOST_SECURITY_PIN is unset, runtimeHashedPin must be null (never default to a fallback PIN)
 let runtimeHashedPin: string | null = process.env.HOST_SECURITY_PIN
   ? hashPin(process.env.HOST_SECURITY_PIN.trim())
-  : hashPin("1234");
+  : null;
 
 // In-memory rate limiting and lockout tracking for Host Security PIN
 // Enforces max 5 attempts per 15 minutes, with lockout upon 5 failed attempts
@@ -4637,7 +4637,7 @@ function calculateEffectivePlanPrice(plan: (typeof BASE_OFFICIAL_PLANS)[0], user
   const cleanEmail = (userEmail || "").trim().toLowerCase();
 
   // Host always gets everything 100% Free Lifetime
-  if (cleanEmail === HOST_EMAIL.toLowerCase()) {
+  if (Boolean(HOST_EMAIL) && Boolean(cleanEmail) && cleanEmail === HOST_EMAIL.toLowerCase()) {
     return {
       priceINR: 0,
       originalPriceINR: plan.priceINR,
@@ -4745,8 +4745,8 @@ function calculateEffectivePlanPrice(plan: (typeof BASE_OFFICIAL_PLANS)[0], user
 
 // 14.1 Get Subscription Plans (Dynamically personalized with Host Discounts)
 app.get("/api/subscription/plans", (req, res) => {
-  const userEmail = (req.query.email as string) || "";
-  const isHost = userEmail.toLowerCase() === HOST_EMAIL.toLowerCase();
+  const userEmail = ((req.query.email as string) || "").trim();
+  const isHost = Boolean(HOST_EMAIL) && Boolean(userEmail) && userEmail.toLowerCase() === HOST_EMAIL.toLowerCase();
 
   const allowedCustomerPlanIds = new Set(["1_month", "3_months", "1_year"]);
   const visibleBasePlans = BASE_OFFICIAL_PLANS.filter((p) => allowedCustomerPlanIds.has(p.id));
@@ -4767,6 +4767,14 @@ app.get("/api/subscription/plans", (req, res) => {
     isHost,
     plans: personalizedPlans,
   });
+});
+
+// Enforce HOST_SECURITY_PIN requirement on all /api/host/* endpoints
+app.use("/api/host", (_req, res, next) => {
+  if (!process.env.HOST_SECURITY_PIN && !runtimeHashedPin) {
+    return res.status(503).json({ success: false, error: "Set HOST_SECURITY_PIN", message: "Set HOST_SECURITY_PIN" });
+  }
+  next();
 });
 
 // 14.1b Host Identity Check
@@ -5120,8 +5128,11 @@ function decodeFirebaseIdToken(token: string): { uid?: string; email?: string; n
 }
 
 function checkHostRequestAuth(req: express.Request): { authorized: boolean; reason?: string; status?: number } {
-  if (!HOST_EMAIL || (!process.env.HOST_SECURITY_PIN && !runtimeHashedPin)) {
-    return { authorized: false, reason: "Host secrets not configured", status: 503 };
+  if (!process.env.HOST_SECURITY_PIN && !runtimeHashedPin) {
+    return { authorized: false, reason: "Set HOST_SECURITY_PIN", status: 503 };
+  }
+  if (!HOST_EMAIL) {
+    return { authorized: false, reason: "Unauthorized. Host email required.", status: 403 };
   }
 
   const pin = (req.headers["x-host-pin"] as string) || (req.body?.pin as string);

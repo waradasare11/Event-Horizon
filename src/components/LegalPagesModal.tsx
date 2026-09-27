@@ -172,7 +172,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
             onClick={() => setActiveTab('disclaimer')}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'disclaimer'
-                ? 'bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 shadow-xs border border-slate-200 dark:border-slate-700'
+                ? 'bg-white dark:bg-slate-800 text-[#1D4ED8] dark:text-[#60A5FA] shadow-xs border border-slate-200 dark:border-slate-700'
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -295,7 +295,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
                     <Shield className="w-4 h-4 text-[#3B82F6]" />
                     5. Strict No-Sale Guarantee
                   </h4>
-                  <div className="p-3 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 text-[#6A5312] dark:text-[#60A5FA] font-semibold">
+                  <div className="p-3 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 text-[#1D4ED8] dark:text-[#60A5FA] font-semibold">
                     We NEVER sell, rent, lease, monetize, or trade your personal health stats, meal images, workouts, or contact information to data brokers, advertising agencies, or pharmaceutical companies. Your data exists solely to serve your athletic development.
                   </div>
                 </section>
@@ -400,18 +400,18 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
           {/* TAB 3: MEDICAL DISCLAIMER */}
           {activeTab === 'disclaimer' && (
             <div className="space-y-5 animate-in fade-in duration-150">
-              <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-base mb-1">
-                  <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+              <div className="p-4 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/20">
+                <div className="flex items-center gap-2 text-[#1D4ED8] dark:text-[#60A5FA] font-bold text-base mb-1">
+                  <AlertTriangle className="w-5 h-5 text-[#3B82F6] shrink-0" />
                   Mandatory Medical &amp; Health Disclaimer
                 </div>
-                <p className="text-xs text-amber-900/80 dark:text-amber-300/80">
+                <p className="text-xs text-[#1E3A5F]/80 dark:text-[#60A5FA]/80">
                   Read this before undertaking any exercise program or dietary modification.
                 </p>
               </div>
 
               {/* Exact user requirement quote banner */}
-              <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-800/80 border-l-4 border-amber-500 text-slate-900 dark:text-slate-100 font-medium text-xs sm:text-sm">
+              <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-800/80 border-l-4 border-[#3B82F6] text-slate-900 dark:text-slate-100 font-medium text-xs sm:text-sm">
                 “AROH is a fitness tracking and education tool, not a doctor, dietitian, or physiotherapist. Meal calorie estimates can be wrong. Workout and form tips are general guidance. If you are under 18, have an injury, or a medical condition, get a parent/guardian and a qualified professional involved before you train or change how you eat.”
               </div>
 

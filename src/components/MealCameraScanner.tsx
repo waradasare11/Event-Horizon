@@ -1043,7 +1043,7 @@ export const MealCameraScanner: React.FC<MealCameraScannerProps> = ({
                       AI estimate — confirm grams.
                     </h3>
                     <p className="text-xs text-[#475569] dark:text-[#94A3B8] mt-1 leading-relaxed">
-                      Due to plate geometry and hidden ingredients, this is an AI estimate — confirm grams below or adjust portion weights before saving.
+                      Due to plate geometry and hidden ingredients, this is an AI estimate — confirm grams below. A photo is not a lab.
                     </p>
                   </div>
                 </div>

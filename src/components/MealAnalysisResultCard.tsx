@@ -414,7 +414,7 @@ export const MealAnalysisResultCard: React.FC<MealAnalysisResultCardProps> = ({
                 </span>
               </div>
               <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2] mt-0.5">
-                AI estimate — confirm grams. Adjust gram weights or add custom ingredients if needed.
+                AI estimate — confirm grams. A photo is not a lab. Adjust gram weights or add custom ingredients if needed.
               </p>
             </div>
 

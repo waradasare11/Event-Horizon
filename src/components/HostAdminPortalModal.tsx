@@ -1387,13 +1387,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
             }}
             className={`px-4 py-2.5 rounded-t-2xl font-bold text-xs flex items-center gap-2 transition-all cursor-pointer border-b-2 whitespace-nowrap ${
               activeTab === 'coupons'
-                ? 'bg-white dark:bg-[#121413] text-amber-600 dark:text-amber-400 border-amber-500 shadow-xs'
+                ? 'bg-white dark:bg-[#121413] text-[#1D4ED8] dark:text-[#60A5FA] border-[#3B82F6] shadow-xs'
                 : 'text-gray-500 hover:text-gray-800 dark:hover:text-gray-200 border-transparent'
             }`}
           >
-            <Ticket className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+            <Ticket className="w-4 h-4 text-[#1D4ED8] dark:text-[#60A5FA]" />
             <span>Coupon Codes</span>
-            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-amber-500/15 text-amber-700 dark:text-amber-400 font-extrabold">
+            <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-[#3B82F6]/15 text-[#1D4ED8] dark:text-[#60A5FA] font-extrabold">
               {couponsList.length}
             </span>
           </button>
@@ -1462,10 +1462,10 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
           {/* Security PIN Change Drawer (Collapsible) */}
           {showSecuritySettings && (
-            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-3 animate-in fade-in slide-in-from-top-2">
+            <div className="p-4 rounded-2xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 space-y-3 animate-in fade-in slide-in-from-top-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-amber-900 dark:text-amber-200 font-bold text-xs">
-                  <KeyRound className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                <div className="flex items-center gap-2 text-[#1E3A5F] dark:text-[#60A5FA] font-bold text-xs">
+                  <KeyRound className="w-4 h-4 text-[#1D4ED8] dark:text-[#60A5FA]" />
                   <span>Update Host Master Verification Password</span>
                 </div>
                 <button
@@ -1495,7 +1495,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 <button
                   type="submit"
                   disabled={isUpdatingPin}
-                  className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold cursor-pointer transition-colors disabled:opacity-50"
+                  className="px-4 py-2.5 rounded-xl bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-bold cursor-pointer transition-colors disabled:opacity-50"
                 >
                   {isUpdatingPin ? 'Saving...' : 'Update PIN'}
                 </button>
@@ -1639,7 +1639,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                   {/* Feedback Notifications */}
                   {grantSuccessMsg && (
-                    <div className="p-4 rounded-2xl bg-[#3B82F6]/15 border border-[#3B82F6]/30 text-[#6A5312] dark:text-[#60A5FA] flex items-start gap-2.5 animate-in fade-in">
+                    <div className="p-4 rounded-2xl bg-[#3B82F6]/15 border border-[#3B82F6]/30 text-[#1D4ED8] dark:text-[#60A5FA] flex items-start gap-2.5 animate-in fade-in">
                       <CheckCircle2 className="w-5 h-5 text-[#1D4ED8] dark:text-[#60A5FA] shrink-0 mt-0.5" />
                       <div className="space-y-1">
                         <div className="font-black text-xs">VIP Subscription Activated Successfully!</div>
@@ -2608,10 +2608,10 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
             <div className="space-y-6 animate-in fade-in">
               
               {/* SECTION: CREATE NEW COUPON CODE FORM */}
-              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#FAFAF8] to-amber-50/30 dark:from-[#111111] dark:to-amber-950/10 border-2 border-amber-500/30 shadow-sm space-y-5">
+              <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-br from-[#FAFAF8] to-blue-50/30 dark:from-[#111111] dark:to-blue-950/10 border-2 border-[#3B82F6]/30 shadow-sm space-y-5">
                 <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-3">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black shadow-xs">
+                    <div className="w-8 h-8 rounded-xl bg-[#3B82F6] text-white flex items-center justify-center font-black shadow-xs">
                       <Ticket className="w-4 h-4" />
                     </div>
                     <div>
@@ -2623,7 +2623,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       </p>
                     </div>
                   </div>
-                  <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/30">
+                  <span className="hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#3B82F6]/15 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/30">
                     Host Promo Engine
                   </span>
                 </div>
@@ -2635,13 +2635,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
                         <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                          <Tag className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                          <Tag className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#60A5FA]" />
                           <span>Coupon Code <span className="text-rose-500">*</span></span>
                         </label>
                         <button
                           type="button"
                           onClick={handleGenerateRandomCode}
-                          className="text-[10px] font-bold text-amber-600 hover:text-amber-700 cursor-pointer"
+                          className="text-[10px] font-bold text-[#1D4ED8] hover:text-[#1E40AF] cursor-pointer"
                         >
                           Auto-Generate
                         </button>
@@ -2652,7 +2652,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                         placeholder="e.g. AROH-VIP2026"
                         value={couponCodeInput}
                         onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
-                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono font-bold text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-hidden transition-all uppercase"
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono font-bold text-xs focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent outline-hidden transition-all uppercase"
                       />
                       <span className="text-[10px] text-gray-500 dark:text-gray-400 block">
                         Unique coupon voucher code
@@ -2662,13 +2662,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     {/* 2. UNLOCKED PLAN & ACCESS TIME */}
                     <div className="space-y-1.5">
                       <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                        <Crown className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        <Crown className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#60A5FA]" />
                         <span>Unlocked Plan <span className="text-rose-500">*</span></span>
                       </label>
                       <select
                         value={couponPlanOption}
                         onChange={(e) => setCouponPlanOption(e.target.value)}
-                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-hidden transition-all cursor-pointer"
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent outline-hidden transition-all cursor-pointer"
                       >
                         {DURATION_PRESETS.map((preset) => (
                           <option key={preset.id} value={preset.id}>
@@ -2676,7 +2676,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                           </option>
                         ))}
                       </select>
-                      <span className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold block">
+                      <span className="text-[10px] text-[#1D4ED8] dark:text-[#60A5FA] font-semibold block">
                         Subscription granted to recipient
                       </span>
                     </div>
@@ -2684,13 +2684,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     {/* 3. COUPON EXPIRATION PERIOD */}
                     <div className="space-y-1.5">
                       <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        <Clock className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#60A5FA]" />
                         <span>Code Expiry <span className="text-rose-500">*</span></span>
                       </label>
                       <select
                         value={couponExpiryDays}
                         onChange={(e) => setCouponExpiryDays(e.target.value)}
-                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-hidden transition-all cursor-pointer"
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent outline-hidden transition-all cursor-pointer"
                       >
                         <option value="3">Expires in 3 Days</option>
                         <option value="7">Expires in 7 Days (1 Week)</option>
@@ -2709,13 +2709,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     {/* 4. MAX USES / REDEMPTIONS */}
                     <div className="space-y-1.5">
                       <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                        <Users className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        <Users className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#60A5FA]" />
                         <span>Max Redemptions</span>
                       </label>
                       <select
                         value={couponMaxUses}
                         onChange={(e) => setCouponMaxUses(e.target.value)}
-                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-hidden transition-all cursor-pointer"
+                        className="w-full p-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-bold text-xs focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent outline-hidden transition-all cursor-pointer"
                       >
                         <option value="1">1 Athlete (Single-Use)</option>
                         <option value="5">5 Athletes</option>
@@ -2749,7 +2749,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                     <div className="space-y-1.5">
                       <label className="block text-[11px] font-black uppercase tracking-wider text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
-                        <Lock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        <Lock className="w-3.5 h-3.5 text-[#1D4ED8] dark:text-[#60A5FA]" />
                         <span>Host Verification PIN <span className="text-rose-500">*</span></span>
                       </label>
                       <div className="relative">
@@ -2759,7 +2759,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                           placeholder="Host PIN"
                           value={hostPassword}
                           onChange={(e) => setHostPassword(e.target.value)}
-                          className="w-full p-3 pr-10 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono text-xs focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-hidden"
+                          className="w-full p-3 pr-10 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#191B1A] text-gray-900 dark:text-white font-mono text-xs focus:ring-2 focus:ring-[#3B82F6] focus:border-transparent outline-hidden"
                         />
                         <button
                           type="button"
@@ -2776,7 +2776,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     <button
                       type="submit"
                       disabled={isCreatingCoupon}
-                      className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-amber-600 hover:bg-amber-700 text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                     >
                       {isCreatingCoupon ? (
                         <>
@@ -2794,7 +2794,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
                   {/* Feedback Messages */}
                   {couponSuccessMsg && (
-                    <div className="p-4 rounded-2xl bg-[#3B82F6]/15 border border-[#3B82F6]/30 text-[#6A5312] dark:text-[#60A5FA] flex items-start gap-2.5 animate-in fade-in">
+                    <div className="p-4 rounded-2xl bg-[#3B82F6]/15 border border-[#3B82F6]/30 text-[#1D4ED8] dark:text-[#60A5FA] flex items-start gap-2.5 animate-in fade-in">
                       <CheckCircle2 className="w-5 h-5 text-[#1D4ED8] dark:text-[#60A5FA] shrink-0 mt-0.5" />
                       <div className="space-y-1">
                         <div className="font-black text-xs">Coupon Code Ready for Distribution!</div>
@@ -2820,7 +2820,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
                   <div>
                     <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                      <Ticket className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                      <Ticket className="w-4 h-4 text-[#1D4ED8] dark:text-[#60A5FA]" />
                       <span>Host Coupon Codes Inventory ({couponsList.length})</span>
                     </h3>
                     <p className="text-[11px] text-gray-500 dark:text-gray-400">
@@ -2835,7 +2835,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       disabled={isLoadingCoupons}
                       className="px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold flex items-center gap-1.5 cursor-pointer text-xs"
                     >
-                      <RefreshCw className={`w-3.5 h-3.5 ${isLoadingCoupons ? 'animate-spin text-amber-600' : ''}`} />
+                      <RefreshCw className={`w-3.5 h-3.5 ${isLoadingCoupons ? 'animate-spin text-[#1D4ED8]' : ''}`} />
                       <span>Refresh</span>
                     </button>
                   </div>
@@ -2849,7 +2849,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     placeholder="Search coupons by code name or plan..."
                     value={couponsSearchQuery}
                     onChange={(e) => setCouponsSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-amber-500"
+                    className="w-full pl-10 pr-9 py-2.5 rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111111] text-gray-900 dark:text-white text-xs outline-hidden focus:ring-2 focus:ring-[#3B82F6]"
                   />
                   {couponsSearchQuery && (
                     <button
@@ -2904,13 +2904,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                   {/* Code with Copy Button */}
                                   <td className="p-3.5 font-mono font-bold text-gray-900 dark:text-white">
                                     <div className="flex items-center gap-2">
-                                      <span className="px-2 py-1 rounded-lg bg-amber-500/10 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-black tracking-wider">
+                                      <span className="px-2 py-1 rounded-lg bg-[#3B82F6]/10 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/30 text-xs font-black tracking-wider">
                                         {coupon.code}
                                       </span>
                                       <button
                                         type="button"
                                         onClick={() => handleCopyCouponCode(coupon.code)}
-                                        className="p-1 rounded-md text-gray-400 hover:text-amber-600 transition-colors cursor-pointer"
+                                        className="p-1 rounded-md text-gray-400 hover:text-[#1D4ED8] transition-colors cursor-pointer"
                                         title="Copy Coupon Code"
                                       >
                                         {copiedCouponCode === coupon.code ? (
@@ -2930,7 +2930,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                                   {/* Unlocked Plan & Duration */}
                                   <td className="p-3.5">
                                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#3B82F6]/15 text-[#1D4ED8] dark:text-[#60A5FA] border border-[#3B82F6]/30">
-                                      {coupon.isLifetime ? <Crown className="w-3 h-3 text-amber-500" /> : <Clock className="w-3 h-3" />}
+                                      {coupon.isLifetime ? <Crown className="w-3 h-3 text-[#3B82F6]" /> : <Clock className="w-3 h-3" />}
                                       <span>{coupon.planName || (coupon.isLifetime ? 'Lifetime VIP' : 'Pro Plan')}</span>
                                     </span>
                                   </td>
@@ -3592,7 +3592,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               </button>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-[#FFFBF0] dark:bg-[#2A2416]/30 border border-[#E6D7A8] dark:border-[#2A2416] text-xs text-[#6A5312] dark:text-[#60A5FA]">
+            <div className="p-3.5 rounded-2xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900 text-xs text-[#1D4ED8] dark:text-[#60A5FA]">
               <span className="font-bold">Summary: </span>
               {notifyResult.message}
             </div>
