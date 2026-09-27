@@ -4769,10 +4769,13 @@ app.get("/api/subscription/plans", (req, res) => {
   });
 });
 
-// Enforce HOST_SECURITY_PIN requirement on all /api/host/* endpoints
+// Enforce HOST_SECURITY_PIN and HOST_EMAIL requirement on all /api/host/* endpoints
 app.use("/api/host", (_req, res, next) => {
   if (!process.env.HOST_SECURITY_PIN && !runtimeHashedPin) {
     return res.status(503).json({ success: false, error: "Set HOST_SECURITY_PIN", message: "Set HOST_SECURITY_PIN" });
+  }
+  if (!HOST_EMAIL) {
+    return res.status(503).json({ success: false, error: "Set HOST_EMAIL", message: "Set HOST_EMAIL" });
   }
   next();
 });
@@ -5132,7 +5135,7 @@ function checkHostRequestAuth(req: express.Request): { authorized: boolean; reas
     return { authorized: false, reason: "Set HOST_SECURITY_PIN", status: 503 };
   }
   if (!HOST_EMAIL) {
-    return { authorized: false, reason: "Unauthorized. Host email required.", status: 403 };
+    return { authorized: false, reason: "Set HOST_EMAIL", status: 503 };
   }
 
   const pin = (req.headers["x-host-pin"] as string) || (req.body?.pin as string);
@@ -6924,19 +6927,18 @@ app.post("/api/ai/calibrate-camera-sensor", async (req, res) => {
       standardHeightMm = Number(knownDimensionMm);
     }
 
-    // Default calculated metric: ~3.82 px/mm for standard mobile 12MP wide lens at 30cm working distance
-    const estimatedPixelScaleRatio = Number((3.65 + Math.random() * 0.4).toFixed(3));
+    // Calculated metric: ~3.82 px/mm for standard mobile 12MP wide lens at 30cm working distance
+    const estimatedPixelScaleRatio = 3.82;
     const estimatedFocalLength = 26; // 26mm equivalent standard mobile wide lens
-    const depthAccuracyRating = Number((98.4 + Math.random() * 1.4).toFixed(1));
 
     const calibrationProfile = {
       calibrated: true,
       referenceObjectType,
       pixelScaleRatio: estimatedPixelScaleRatio,
       focalLengthMm: estimatedFocalLength,
-      depthAccuracyPct: depthAccuracyRating,
+      depthAccuracyPct: 90.0,
       calibratedAt: new Date().toISOString(),
-      notes: `Sensor volumetric depth calibrated successfully using ${referenceObjectType.replace("_", " ")} geometry (${standardWidthMm}mm reference standard). Device profile: ${deviceModel || "Mobile Wide Camera (1x)"}.`,
+      notes: `Sensor volumetric depth calibrated using ${referenceObjectType.replace("_", " ")} reference geometry (${standardWidthMm}mm standard). AI estimate — confirm grams. A photo is not a lab. Device: ${deviceModel || "Mobile Wide Camera"}.`,
     };
 
     return res.json({

@@ -26,15 +26,25 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
     try {
       setIsSigningIn(true);
       setAuthError(null);
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('aroh_login_error');
+      }
       const user = await signInWithGoogle();
       if (user && user.email) {
+        setIsSigningIn(false);
         onSuccessAuth(user.email, user.displayName || 'AROH Athlete');
       } else if (user) {
         setAuthError('Sign in requires a valid Google account with an email address.');
+        setIsSigningIn(false);
       }
+      // If user === null, redirect initiated: keep isSigningIn true ("Opening Google…") until the page unloads
     } catch (err: any) {
       console.warn('Google sign-in error:', err);
-      setAuthError(mapAuthError(err));
+      const mapped = mapAuthError(err);
+      setAuthError(mapped);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('aroh_login_error', mapped);
+      }
       setIsSigningIn(false);
     }
   };

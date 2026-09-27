@@ -39,7 +39,8 @@ describe('Meal Scanner Multi-Model Consensus & Weighted-Confidence Logic', () =>
     expect(calibrated.verifiedByDatabase).toBe(true);
     expect(calibrated.proteinG).toBe(41.0); // 20.5 * 2
     expect(calibrated.calories).toBe(350); // 175 * 2
-    expect(calibrated.confidenceScorePct).toBeGreaterThanOrEqual(95);
+    expect(calibrated.confidenceScorePct).toBeGreaterThanOrEqual(85);
+    expect(calibrated.confidenceScorePct).toBeLessThanOrEqual(90);
     expect(calibrated.modelAgreementCount).toBe(3);
   });
 
@@ -95,7 +96,8 @@ describe('Meal Scanner Multi-Model Consensus & Weighted-Confidence Logic', () =>
     expect(result.items.length).toBe(2);
     expect(result.items[0].modelAgreementCount).toBe(3);
     expect(result.items[1].modelAgreementCount).toBe(3);
-    expect(result.modelConsensus?.overallConsensusScore).toBeGreaterThanOrEqual(95);
+    expect(result.modelConsensus?.overallConsensusScore).toBeGreaterThanOrEqual(88);
+    expect(result.modelConsensus?.overallConsensusScore).toBeLessThanOrEqual(90);
     expect(result.modelConsensus?.consensusRating).toBe('High Confidence');
     expect(result.modelConsensus?.consensusVoteRatio).toBe('3/3 Models in Agreement');
   });

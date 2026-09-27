@@ -198,7 +198,9 @@ export async function completeRedirectSignIn(): Promise<User | null> {
       if (
         code === 'auth/popup-closed-by-user' ||
         code === 'auth/cancelled-popup-request' ||
-        code === 'auth/null-user'
+        code === 'auth/null-user' ||
+        code === 'auth/no-auth-event' ||
+        code === 'auth/no-redirect-event'
       ) {
         return null;
       }

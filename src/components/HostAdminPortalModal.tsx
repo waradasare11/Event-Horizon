@@ -1621,7 +1621,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-[#1D4ED8] hover:bg-[#8E701C] text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0"
+                      className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-extrabold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0"
                     >
                       {isSubmitting ? (
                         <>
@@ -1663,6 +1663,13 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
 
               {/* SECTION: PENDING UPI PAYMENTS */}
               <div className="p-5 sm:p-6 rounded-3xl bg-white dark:bg-[#111111] border-2 border-[#3B82F6]/30 shadow-xs space-y-4">
+                <div className="p-3.5 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-800 dark:text-blue-300 text-xs flex items-center gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0 text-[#3B82F6] dark:text-[#60A5FA]" />
+                  <span className="font-semibold leading-relaxed">
+                    Grants/tickets are stored on this server instance; republish may clear pending UPI tickets — Grant promptly after FamPay.
+                  </span>
+                </div>
+
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 dark:border-gray-800 pb-3">
                   <div>
                     <h3 className="font-extrabold text-sm text-gray-900 dark:text-white flex items-center gap-2">
@@ -2084,7 +2091,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                         type="button"
                         onClick={() => handleExecuteBulkAction('extend_duration', 30)}
                         disabled={isExecutingBulkOp}
-                        className="px-2.5 py-1.5 rounded-xl bg-[#1D4ED8] hover:bg-[#8E701C] text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                        className="px-2.5 py-1.5 rounded-xl bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
                       >
                         <CalendarPlus className="w-3 h-3" />
                         <span>+30 Days</span>
@@ -2095,7 +2102,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                         type="button"
                         onClick={() => handleExecuteBulkAction('extend_duration', 90)}
                         disabled={isExecutingBulkOp}
-                        className="px-2.5 py-1.5 rounded-xl bg-[#1D4ED8] hover:bg-[#8E701C] text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs hidden sm:flex"
+                        className="px-2.5 py-1.5 rounded-xl bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs hidden sm:flex"
                       >
                         <CalendarPlus className="w-3 h-3" />
                         <span>+90 Days</span>
@@ -2106,7 +2113,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                         type="button"
                         onClick={() => handleExecuteBulkAction('set_lifetime')}
                         disabled={isExecutingBulkOp}
-                        className="px-2.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
+                        className="px-2.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors shadow-2xs"
                       >
                         <Crown className="w-3 h-3" />
                         <span>Make Lifetime</span>
@@ -2127,7 +2134,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                 </div>
 
                 {bulkOpMsg && (
-                  <div className="p-3 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/30 text-[#8E701C] dark:text-[#60A5FA] font-semibold text-xs flex items-center justify-between">
+                  <div className="p-3 rounded-xl bg-[#3B82F6]/10 border border-[#3B82F6]/30 text-[#1D4ED8] dark:text-[#60A5FA] font-semibold text-xs flex items-center justify-between">
                     <span>{bulkOpMsg}</span>
                     <button type="button" onClick={() => setBulkOpMsg(null)} className="cursor-pointer">
                       <X className="w-3.5 h-3.5" />
@@ -3058,7 +3065,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                     type="button"
                     onClick={handleExportVerificationCSV}
                     disabled={filteredVerificationLogs.length === 0}
-                    className="px-3 py-1.5 rounded-xl bg-[#1D4ED8] hover:bg-[#8E701C] text-white font-bold flex items-center gap-1.5 cursor-pointer text-xs shadow-2xs disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-xl bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-bold flex items-center gap-1.5 cursor-pointer text-xs shadow-2xs disabled:opacity-50"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Export Audit CSV</span>
@@ -3182,8 +3189,8 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                               <div className="flex items-center gap-2 flex-wrap">
                                 <span className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${
                                   isCoupon
-                                    ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-500/30'
-                                    : 'bg-[#3B82F6]/15 text-[#8E701C] dark:text-[#60A5FA] border-[#3B82F6]/30'
+                                    ? 'bg-blue-500/15 text-blue-800 dark:text-blue-300 border-blue-500/30'
+                                    : 'bg-[#3B82F6]/15 text-[#1D4ED8] dark:text-[#60A5FA] border-[#3B82F6]/30'
                                 }`}>
                                   {log.authenticated ? 'AUTHENTICATED' : 'FAILED'} • {isCoupon ? 'COUPON VERIFIED' : 'PIN VERIFIED'}
                                 </span>
@@ -3614,7 +3621,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       {n.plan} • {n.remainingDays}
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#FDF3D0] dark:bg-[#2A2416]/50 text-[#1D4ED8] dark:text-[#60A5FA] shrink-0">
+                  <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-blue-100 dark:bg-blue-950/50 text-[#1D4ED8] dark:text-[#60A5FA] shrink-0">
                     Delivered
                   </span>
                 </div>
@@ -3625,7 +3632,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowNotifyModal(false)}
-                className="w-full py-2.5 rounded-xl bg-[#1D4ED8] hover:bg-[#8E701C] text-white font-bold text-xs cursor-pointer transition-colors shadow-xs"
+                className="w-full py-2.5 rounded-xl bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-bold text-xs cursor-pointer transition-colors shadow-xs"
               >
                 Close & Return to Ledger
               </button>

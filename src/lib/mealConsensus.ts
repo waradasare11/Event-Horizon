@@ -196,9 +196,10 @@ export function validateAndCalibrateFoodItem(
   const benchmark = findVerifiedFoodBenchmark(item.name || '');
 
   // Confidence calculation based on model consensus + database verification
+  // Capped strictly at 90 for camera estimates: "A photo is not a lab."
   const agreementRatio = Math.min(1, modelAgreementCount / Math.max(1, totalModelsQueried));
-  const baseConfidence = benchmark ? 92 : 82;
-  const confidenceScorePct = Math.min(99, Math.round(baseConfidence + agreementRatio * 7));
+  const baseConfidence = benchmark ? 85 : 78;
+  const confidenceScorePct = Math.min(90, Math.round(baseConfidence + agreementRatio * 5));
 
   if (benchmark) {
     const scale = weightG / 100;
@@ -318,12 +319,12 @@ export function executeMultiModelConsensusReconciliation(
     unifiedItems.reduce((sum, item) => sum + (item.confidenceScorePct || 90), 0) / Math.max(1, unifiedItems.length)
   );
   const modelCoveragePct = Math.min(100, Math.round((validCandidates.length / totalModelsQueried) * 100));
-  const overallConsensusScore = Math.min(99, Math.max(88, Math.round(avgItemCertainty * 0.7 + modelCoveragePct * 0.3)));
+  const overallConsensusScore = Math.min(90, Math.max(70, Math.round(avgItemCertainty * 0.7 + modelCoveragePct * 0.3)));
 
   const consensusRating =
-    overallConsensusScore >= 95
+    overallConsensusScore >= 88
       ? 'High Confidence'
-      : overallConsensusScore >= 85
+      : overallConsensusScore >= 78
       ? 'Moderate Confidence'
       : 'Review Recommended';
 

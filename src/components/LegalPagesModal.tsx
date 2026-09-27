@@ -585,7 +585,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
               ) : deletionSummary ? (
                 <div className="p-6 rounded-2xl bg-[#3B82F6]/10 border border-[#3B82F6]/20 text-center space-y-3">
                   <CheckCircle2 className="w-12 h-12 text-[#3B82F6] mx-auto" />
-                  <h4 className="text-base font-bold text-[#8E701C] dark:text-[#60A5FA]">
+                  <h4 className="text-base font-bold text-[#1D4ED8] dark:text-[#60A5FA]">
                     All User Data Has Been Permanently Erased
                   </h4>
                   <div className="text-xs text-slate-600 dark:text-slate-400 max-w-md mx-auto space-y-1">

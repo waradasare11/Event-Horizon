@@ -279,15 +279,34 @@ export default function App() {
 
   // Startup: Await completeRedirectSignIn before other UI work so returning from Google redirect completes on boot
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedErr = sessionStorage.getItem('aroh_login_error');
+      if (savedErr) {
+        setLoginError(savedErr);
+        sessionStorage.removeItem('aroh_login_error');
+      }
+    }
+
     completeRedirectSignIn()
       .then((user) => {
         if (user) {
           setLoginError(null);
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('aroh_login_error');
+          }
         }
       })
       .catch((err) => {
+        const code = String(err?.code || '');
+        if (code === 'auth/no-auth-event' || code === 'auth/null-user') {
+          return;
+        }
         console.warn('Redirect sign-in resolution error on boot:', err);
-        setLoginError(mapAuthError(err));
+        const mapped = mapAuthError(err);
+        setLoginError(mapped);
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('aroh_login_error', mapped);
+        }
       });
   }, []);
 
@@ -656,11 +675,21 @@ export default function App() {
     try {
       setIsSigningIn(true);
       setLoginError(null);
-      await signInWithGoogle();
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('aroh_login_error');
+      }
+      const user = await signInWithGoogle();
+      if (user) {
+        setIsSigningIn(false);
+      }
+      // If user === null, redirect flow has begun: keep isSigningIn true ("Opening Google…") until the page unloads
     } catch (err: any) {
       console.error('Google Sign In Error:', err);
-      setLoginError(mapAuthError(err));
-    } finally {
+      const mapped = mapAuthError(err);
+      setLoginError(mapped);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('aroh_login_error', mapped);
+      }
       setIsSigningIn(false);
     }
   };

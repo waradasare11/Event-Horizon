@@ -190,9 +190,9 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       referenceObjectType: 'credit_card',
       pixelScaleRatio: 3.78,
       focalLengthMm: 26.0,
-      depthAccuracyPct: 98.8,
+      depthAccuracyPct: 90.0,
       calibratedAt: new Date().toISOString(),
-      notes: 'Calibrated focal perspective & stereoscopic distortion matrix.',
+      notes: 'Calibrated focal perspective & stereoscopic distortion matrix. AI estimate — confirm grams.',
     }
   );
   const [isCalibratingSensor, setIsCalibratingSensor] = useState<boolean>(false);
@@ -242,11 +242,11 @@ export const OnboardingModal: React.FC<OnboardingModalProps> = ({
       referenceObjectType: 'device_preset',
       pixelScaleRatio: 3.82,
       focalLengthMm: detectedFocalMm,
-      depthAccuracyPct: 99.4,
+      depthAccuracyPct: 90.0,
       calibratedAt: new Date().toISOString(),
       notes: hardwareCalibrated
-        ? `Direct device sensor calibrated via camera hardware (${detectedResolution}, ${detectedFocalMm}mm focal length).`
-        : 'Stereoscopic perspective & sensor matrix calibrated with 99.4% volumetric accuracy.',
+        ? `Direct device sensor calibrated via camera hardware (${detectedResolution}, ${detectedFocalMm}mm focal length). AI estimate — confirm grams. A photo is not a lab.`
+        : 'Stereoscopic perspective & sensor matrix calibrated. AI estimate — confirm grams. A photo is not a lab.',
     };
 
     setCameraCalibration(updatedCalib);
