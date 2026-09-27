@@ -24,7 +24,7 @@ import { ThemeMode } from './theme';
 import { getOrCreateArohFolder } from './googleWorkspace';
 import { getCurrentActiveEmail, setCurrentActiveEmail, getStoredProfile } from './storage';
 import { auth, db } from './firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 
 export interface CoachChatMessage {
   id: string;
@@ -969,20 +969,51 @@ export async function restoreUserMemory(
         }
       }
 
-      // If userData/main not found, check doc(db, 'users', uid) directly
+      // If userData/main not found, check doc(db, 'users', uid) directly and fetch subcollections
       if (!firestoreSnapshot) {
         const userProfileRef = doc(db, 'users', uid);
         const profDoc = await getDoc(userProfileRef);
         if (profDoc.exists()) {
           const pData = profDoc.data();
           if (pData && (!pData.email || pData.email.trim().toLowerCase() === cleanEmail)) {
-            if (pData.isOnboarded || (pData.goal && Number(pData.dailyCalories) > 0 && Number(pData.weightKg) > 0)) {
+            const isReturning = Boolean(
+              pData.isOnboarded ||
+              (pData.goal && Number(pData.dailyCalories) > 0 && Number(pData.weightKg) > 0)
+            );
+
+            // Fetch subcollections in parallel for complete profile/meals/workouts/metrics restoration
+            let meals: MealLog[] = [];
+            let workouts: WorkoutCompletionLog[] = [];
+            let metrics: BodyMetric[] = [];
+            let formAnalyses: FormAnalysisResult[] = [];
+
+            try {
+              const [mealsSnap, workoutsSnap, metricsSnap, formSnap] = await Promise.all([
+                getDocs(collection(db, 'users', uid, 'mealLogs')),
+                getDocs(collection(db, 'users', uid, 'workoutLogs')),
+                getDocs(collection(db, 'users', uid, 'bodyMetrics')),
+                getDocs(collection(db, 'users', uid, 'formAnalyses')),
+              ]);
+
+              meals = mealsSnap.docs.map((d) => d.data() as MealLog);
+              workouts = workoutsSnap.docs.map((d) => d.data() as WorkoutCompletionLog);
+              metrics = metricsSnap.docs.map((d) => d.data() as BodyMetric);
+              formAnalyses = formSnap.docs.map((d) => d.data() as FormAnalysisResult);
+            } catch (subErr) {
+              console.warn('Subcollection fetch notice during Firestore restore:', subErr);
+            }
+
+            if (isReturning || meals.length > 0 || workouts.length > 0 || metrics.length > 0) {
               firestoreSnapshot = sanitizeSnapshotForDrive({
                 schemaVersion: 1,
                 email: cleanEmail,
                 uid,
                 savedAt: pData.updatedAt || new Date().toISOString(),
                 userProfile: pData as UserProfile,
+                mealLogs: meals,
+                workoutLogs: workouts,
+                bodyMetrics: metrics,
+                formAnalyses: formAnalyses,
               });
             }
           }

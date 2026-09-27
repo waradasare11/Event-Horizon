@@ -37,8 +37,15 @@ import {
   WorkoutCompletionLog, 
   FormAnalysisResult 
 } from './types';
-import { auth, createLoginGoogleProvider, googleProvider } from './lib/firebase';
-import { onAuthStateChanged, signInWithPopup, signOut, User } from 'firebase/auth';
+import { 
+  auth, 
+  createLoginGoogleProvider, 
+  googleProvider,
+  completeRedirectSignIn,
+  signInWithGoogle,
+  mapAuthError
+} from './lib/firebase';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
 import { 
   syncUserProfile, 
   syncMealLog, 
@@ -266,6 +273,24 @@ export default function App() {
   const [auditReport, setAuditReport] = useState<WorkoutProgramAuditReport | null>(null);
   const [isAuditing, setIsAuditing] = useState<boolean>(false);
 
+  // Authentication State for Google Identity
+  const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
+
+  // Startup: Await completeRedirectSignIn before other UI work so returning from Google redirect completes on boot
+  useEffect(() => {
+    completeRedirectSignIn()
+      .then((user) => {
+        if (user) {
+          setLoginError(null);
+        }
+      })
+      .catch((err) => {
+        console.warn('Redirect sign-in resolution error on boot:', err);
+        setLoginError(mapAuthError(err));
+      });
+  }, []);
+
   const handleTriggerAudit = () => {
     setIsAuditing(true);
     setTimeout(() => {
@@ -451,6 +476,14 @@ export default function App() {
         const unsubs = subscribeUserData(user.uid, {
           onProfile: (remoteProfile) => {
             if (remoteProfile) {
+              const isReturningRemote = Boolean(
+                remoteProfile.isOnboarded ||
+                (remoteProfile.goal && Number(remoteProfile.dailyCalories) > 0 && Number(remoteProfile.weightKg) > 0)
+              );
+              if (isReturningRemote) {
+                setIsOnboardingOpen(false);
+              }
+
               setUserProfile((prev) => {
                 let merged = { ...prev, ...remoteProfile } as UserProfile;
                 if (isHostAdmin(user.email)) {
@@ -621,16 +654,22 @@ export default function App() {
 
   const handleSignIn = async () => {
     try {
-      const loginProvider = createLoginGoogleProvider();
-      await signInWithPopup(auth, loginProvider);
+      setIsSigningIn(true);
+      setLoginError(null);
+      await signInWithGoogle();
     } catch (err: any) {
       console.error('Google Sign In Error:', err);
+      setLoginError(mapAuthError(err));
+    } finally {
+      setIsSigningIn(false);
     }
   };
 
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      setLoginError(null);
+      setIsSigningIn(false);
       setCurrentActiveEmail('');
       const defaultProf = getStoredProfile('');
       setUserProfile(defaultProf);
@@ -1185,6 +1224,8 @@ export default function App() {
       <LandingPage
         onSignIn={handleSignIn}
         onNavigate={handleNavigate}
+        signingIn={isSigningIn}
+        loginError={loginError}
       />
     );
   }

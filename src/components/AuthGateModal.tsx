@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { 
   Sparkles, 
   Lock, 
-  Crown,
-  AlertCircle
+  Crown, 
+  AlertCircle 
 } from 'lucide-react';
-import { signInWithGoogle } from '../lib/firebase';
+import { signInWithGoogle, mapAuthError } from '../lib/firebase';
 
 interface AuthGateModalProps {
   isOpen: boolean;
@@ -29,13 +29,12 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
       const user = await signInWithGoogle();
       if (user && user.email) {
         onSuccessAuth(user.email, user.displayName || 'AROH Athlete');
-      } else {
+      } else if (user) {
         setAuthError('Sign in requires a valid Google account with an email address.');
       }
     } catch (err: any) {
       console.warn('Google sign-in error:', err);
-      setAuthError(err?.message || 'Google sign-in was closed or interrupted. Please click below to try again.');
-    } finally {
+      setAuthError(mapAuthError(err));
       setIsSigningIn(false);
     }
   };
@@ -48,7 +47,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
           <div className="absolute top-0 right-0 -mr-8 -mt-8 w-44 h-44 rounded-full bg-white/10 blur-2xl pointer-events-none" />
           
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 backdrop-blur-xs text-xs font-bold text-[#38BDF8] border border-white/20 mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <Sparkles className="w-3.5 h-3.5 text-blue-200" />
             <span>1-Week Free Subscription Included on Sign In</span>
           </div>
 
@@ -118,20 +117,20 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
 
               {/* 3 Years */}
               <div className="p-3 rounded-2xl bg-cyan-500/10 border-2 border-cyan-500/40 text-left relative space-y-1">
-                <div className="inline-block px-1.5 py-0.5 rounded-full bg-amber-600 text-white text-[9px] font-black uppercase">
+                <div className="inline-block px-1.5 py-0.5 rounded-full bg-blue-600 text-white text-[9px] font-black uppercase">
                   Best Value
                 </div>
                 <div className="text-xs font-black text-gray-900 dark:text-white">3 Years (36 Mo)</div>
-                <div className="text-base font-black text-amber-600 dark:text-cyan-400">₹2700</div>
-                <div className="text-[10px] text-amber-700 dark:text-amber-300 font-semibold">₹75.0 / month</div>
+                <div className="text-base font-black text-blue-600 dark:text-cyan-400">₹2700</div>
+                <div className="text-[10px] text-blue-700 dark:text-blue-300 font-semibold">₹75.0 / month</div>
               </div>
             </div>
           </div>
 
           {/* Error Message if any */}
           {authError && (
-            <div className="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-700 dark:text-red-300 text-xs flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
               <span>{authError}</span>
             </div>
           )}
@@ -161,7 +160,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                 />
               </svg>
-              <span>{isSigningIn ? 'Connecting to Google...' : 'Continue with Google (Instant 1-Week Free Trial)'}</span>
+              <span>{isSigningIn ? 'Opening Google…' : 'Continue with Google (Instant 1-Week Free Trial)'}</span>
             </button>
             <p className="text-[11px] text-center text-gray-500 dark:text-gray-400 mt-2.5">
               Secure authentication powered by Google Identity (Email & Profile only). Optional Google Drive backup can be connected anytime from Settings.
@@ -180,7 +179,7 @@ export const AuthGateModal: React.FC<AuthGateModalProps> = ({
             <span>•</span>
             <a href="/terms" className="hover:text-[#00D4FF] dark:hover:text-[#38BDF8] underline">Terms</a>
             <span>•</span>
-            <a href="/disclaimer" className="hover:text-amber-600 dark:hover:text-cyan-400 underline">Disclaimer</a>
+            <a href="/disclaimer" className="hover:text-blue-600 dark:hover:text-cyan-400 underline">Disclaimer</a>
             <span>•</span>
             <a href="/refund" className="hover:text-[#00D4FF] dark:hover:text-[#38BDF8] underline">Refunds</a>
           </div>

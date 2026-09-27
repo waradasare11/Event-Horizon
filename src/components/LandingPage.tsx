@@ -15,18 +15,23 @@ import {
   Lock,
   Flame,
   Utensils,
-  Dumbbell
+  Dumbbell,
+  AlertCircle
 } from 'lucide-react';
 import { ArohLogo } from './ArohLogo';
 
 interface LandingPageProps {
   onSignIn: () => void;
   onNavigate: (path: string) => void;
+  signingIn?: boolean;
+  loginError?: string | null;
 }
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   onSignIn,
   onNavigate,
+  signingIn = false,
+  loginError = null,
 }) => {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
@@ -134,6 +139,25 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     <div className="min-h-screen bg-[#05070F] text-[#E8F1FF] font-sans flex flex-col transition-colors selection:bg-[#3B82F6]/30 selection:text-[#60A5FA]">
+      {/* Red Error Banner if login fails or is blocked */}
+      {loginError && (
+        <div className="bg-red-950/80 border-b border-red-500/40 px-4 py-3 sticky top-0 z-50 backdrop-blur-md">
+          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-red-200">
+            <div className="flex items-center gap-2.5">
+              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
+              <span className="font-medium leading-snug">{loginError}</span>
+            </div>
+            <button
+              onClick={onSignIn}
+              disabled={signingIn}
+              className="px-4 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shrink-0 cursor-pointer disabled:opacity-50 transition-colors shadow-sm"
+            >
+              {signingIn ? 'Opening Google…' : 'Try again'}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Navigation Bar */}
       <header className="sticky top-0 z-40 bg-[#05070F]/90 backdrop-blur-md border-b border-[#1E3A5F]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -144,16 +168,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex items-center gap-3">
             <button
               onClick={onSignIn}
-              className="text-xs font-bold text-[#8BA3C7] hover:text-[#E8F1FF] px-3 py-2 rounded-xl transition-colors cursor-pointer"
-            >
-              Sign In
-            </button>
-            <button
-              onClick={onSignIn}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] hover:from-[#60A5FA] hover:to-[#3B82F6] text-black text-xs font-black shadow-md shadow-[#3B82F6]/15 transition-all flex items-center gap-1.5 cursor-pointer"
+              disabled={signingIn}
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] hover:from-[#60A5FA] hover:to-[#3B82F6] text-black text-xs font-black shadow-md shadow-[#3B82F6]/15 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               <LogIn className="w-3.5 h-3.5" />
-              <span>Start Free Trial</span>
+              <span>{signingIn ? 'Opening Google…' : 'Continue with Google'}</span>
             </button>
           </div>
         </div>
@@ -182,9 +201,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5">
           <button
             onClick={onSignIn}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] hover:from-[#60A5FA] hover:to-[#3B82F6] text-black font-black text-sm shadow-lg shadow-[#3B82F6]/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.01]"
+            disabled={signingIn}
+            className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] hover:from-[#60A5FA] hover:to-[#3B82F6] text-black font-black text-sm shadow-lg shadow-[#3B82F6]/25 flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.01] disabled:opacity-50"
           >
-            <span>Start 7-Day Free Trial</span>
+            <span>{signingIn ? 'Opening Google…' : 'Continue with Google'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
           <a
@@ -225,7 +245,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               Built for how Indians actually eat & train
             </h2>
             <p className="text-xs sm:text-sm text-[#8BA3C7]">
-              Three core views designed with scientific discipline, zero AI hallucinations, and absolute clarity.
+              Three core views designed with scientific discipline and absolute clarity.
             </p>
           </div>
 
@@ -473,13 +493,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <div className="pt-6">
                 <button
                   onClick={onSignIn}
-                  className={`w-full py-3 px-4 rounded-xl font-black text-xs transition-all cursor-pointer ${
+                  disabled={signingIn}
+                  className={`w-full py-3 px-4 rounded-xl font-black text-xs transition-all cursor-pointer disabled:opacity-50 ${
                     tier.primary
                       ? 'bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] hover:from-[#60A5FA] hover:to-[#3B82F6] text-black shadow-md'
                       : 'bg-[#121A2B] hover:bg-[#1E3A5F] text-[#E8F1FF]'
                   }`}
                 >
-                  {tier.cta}
+                  {signingIn ? 'Opening Google…' : 'Continue with Google'}
                 </button>
               </div>
             </div>
