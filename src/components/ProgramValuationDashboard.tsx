@@ -180,7 +180,7 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
           </div>
           <div className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center justify-between pt-1 border-t border-blue-500/20">
             <span>Settlement: Direct Gateway</span>
-            <span className="font-bold text-blue-600">100% Cryptographic</span>
+            <span className="font-bold text-blue-600">Cryptographically Verified</span>
           </div>
         </div>
 
@@ -294,8 +294,8 @@ export const ProgramValuationDashboard: React.FC<ProgramValuationDashboardProps>
             <Award className="w-3 h-3 text-[#B8922A]" />
             <span>Host Verified</span>
           </div>
-          <div className="text-base font-black text-[#B8922A] dark:text-[#F0D060] mt-1">
-            100% Cryptographic
+          <div className="text-base font-black text-blue-600 dark:text-blue-400 mt-1">
+            Cryptographically Verified
           </div>
         </div>
       </div>

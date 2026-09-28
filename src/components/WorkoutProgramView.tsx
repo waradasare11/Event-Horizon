@@ -1325,7 +1325,7 @@ export const WorkoutProgramView: React.FC<WorkoutProgramViewProps> = ({
                           {/* Authoritative ExerciseRegistry Verified Checkmark Badge */}
                           <span 
                             className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#3B82F6]/10 dark:bg-[#3B82F6]/20 text-[#2563EB] dark:text-[#60A5FA] text-[11px] font-bold border border-[#3B82F6]/30 shadow-2xs"
-                            title="Cross-referenced & verified with ExerciseRegistry. YouTube search URL guaranteed 100% precision."
+                            title="Cross-referenced & verified with authoritative ExerciseRegistry."
                           >
                             <CheckCircle2 className="w-3.5 h-3.5 text-[#3B82F6] dark:text-[#60A5FA]" />
                             <span>Verified</span>

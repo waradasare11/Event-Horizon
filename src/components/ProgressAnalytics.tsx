@@ -26,6 +26,7 @@ import {
   Award,
   BarChart2,
   Download,
+  FileText,
   Flame,
   Dumbbell,
   Wheat,
@@ -266,11 +267,11 @@ export const ProgressAnalytics: React.FC<ProgressAnalyticsProps> = ({
         <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={handleExportData}
-            title="Export all data to CSV"
-            className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-[#2A2416] text-[#1A1D1B] dark:text-[#E8ECE9] text-xs sm:text-sm font-semibold hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] transition-all shadow-xs cursor-pointer"
+            title="Export static offline PDF report or CSV spreadsheet"
+            className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#1E201F] border border-[#E5E7EB] dark:border-gray-800 text-[#1A1D1B] dark:text-[#E8ECE9] text-xs sm:text-sm font-semibold hover:bg-[#F9FAFB] dark:hover:bg-[#1A1A1A] transition-all shadow-xs cursor-pointer"
           >
-            <Download className="w-4 h-4 text-[#D4AF37] dark:text-[#F0D060]" />
-            <span>Export CSV</span>
+            <FileText className="w-4 h-4 text-[#3B82F6] dark:text-[#60A5FA]" />
+            <span>Export PDF / CSV</span>
           </button>
 
           <button

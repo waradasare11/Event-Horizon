@@ -1548,7 +1548,7 @@ app.post("/api/ai/calculate-steps-target", async (req, res) => {
     const weeklyFatLossKg = Number(((estimatedBurnKcal * 7) / 7700).toFixed(2));
 
     const prompt = `You are a World-Class Clinical Biomechanist, Exercise Physiologist, and NEAT Energy Expenditure Specialist.
-Calculate the 100% accurate, scientifically optimal daily steps target and NEAT breakdown for this user:
+Calculate the scientifically optimal daily steps target and NEAT breakdown for this user:
 
 USER BIOMETRICS & LIFESTYLE:
 - Age: ${age} years | Sex: ${sex}
@@ -6473,7 +6473,7 @@ app.post("/api/host/record-login", (req, res) => {
 
     return res.json({
       success: true,
-      message: `Login session recorded 100% accurately for ${cleanEmail}!`,
+      message: `Login session recorded securely for ${cleanEmail}!`,
       session: newLoginRecord,
       totalSessionsRecorded: athleteLoginSessions.length,
     });

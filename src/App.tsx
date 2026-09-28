@@ -90,6 +90,7 @@ import { ExerciseLibraryView } from './components/ExerciseLibraryView';
 import { BiWeeklyProfileReminderBanner } from './components/BiWeeklyProfileReminderBanner';
 import { SyncToast } from './components/SyncToast';
 import { ArohLogo } from './components/ArohLogo';
+import { FileText } from 'lucide-react';
 import { calculateDailyMacrosSum, calculateWorkoutStreak } from './lib/calc/dailyStats';
 import { 
   createInitialTrialSubscription, 
@@ -116,6 +117,7 @@ import { FoodView } from './components/FoodView';
 import { WorkoutView } from './components/WorkoutView';
 import { BottomTabBar } from './components/BottomTabBar';
 import { SettingsModal } from './components/SettingsModal';
+import { PDFPreviewModal } from './components/PDFPreviewModal';
 
 export default function App() {
   const { isOnline, pendingCount, triggerSync } = useSyncStatus();
@@ -123,6 +125,7 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [isGranularExportOpen, setIsGranularExportOpen] = useState<boolean>(false);
+  const [isPDFPreviewOpen, setIsPDFPreviewOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   const [userProfile, setUserProfile] = useState<UserProfile>(() => getStoredProfile(getCurrentActiveEmail()));
@@ -1325,25 +1328,38 @@ export default function App() {
                     : `Pending Sync: ${pendingCount} ${pendingCount === 1 ? 'item is' : 'items are'} queued for local-to-cloud synchronization.`}
                 </span>
               </div>
-              {isOnline && pendingCount > 0 && (
-                <button
-                  onClick={() => {
-                    setIsSyncing(true);
-                    triggerSync()
-                      .then(() => {
-                        triggerSyncToast(
-                          'Cloud Sync Complete',
-                          'All queued athletic records have been successfully reconciled with cloud storage.',
-                          'firestore'
-                        );
-                      })
-                      .finally(() => setIsSyncing(false));
-                  }}
-                  className="px-2.5 py-1 rounded-md bg-gradient-to-r from-[#00D4FF] to-[#0369A1] hover:opacity-90 text-white font-semibold text-[11px] transition-all cursor-pointer shadow-xs"
-                >
-                  Sync Now ({pendingCount})
-                </button>
-              )}
+              <div className="flex items-center gap-2">
+                {!isOnline && (
+                  <button
+                    id="offline-pdf-backup-banner-btn"
+                    onClick={handleExportData}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white font-semibold text-[11px] transition-all cursor-pointer shadow-xs"
+                    title="Export offline static PDF backup of workout and nutrition logs"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Export PDF Backup</span>
+                  </button>
+                )}
+                {isOnline && pendingCount > 0 && (
+                  <button
+                    onClick={() => {
+                      setIsSyncing(true);
+                      triggerSync()
+                        .then(() => {
+                          triggerSyncToast(
+                            'Cloud Sync Complete',
+                            'All queued athletic records have been successfully reconciled with cloud storage.',
+                            'firestore'
+                          );
+                        })
+                        .finally(() => setIsSyncing(false));
+                    }}
+                    className="px-2.5 py-1 rounded-md bg-gradient-to-r from-[#00D4FF] to-[#0369A1] hover:opacity-90 text-white font-semibold text-[11px] transition-all cursor-pointer shadow-xs"
+                  >
+                    Sync Now ({pendingCount})
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}
@@ -1559,6 +1575,16 @@ export default function App() {
           bodyMetrics={bodyMetrics}
         />
 
+        {/* Client-Side PDF Preview & Date Range Export Modal */}
+        <PDFPreviewModal
+          isOpen={isPDFPreviewOpen}
+          onClose={() => setIsPDFPreviewOpen(false)}
+          userProfile={userProfile}
+          mealLogs={mealLogs}
+          workoutLogs={workoutLogs}
+          bodyMetrics={bodyMetrics}
+        />
+
         {/* Cloud-to-Local Sync Success Toast Notification */}
         <SyncToast
           isOpen={syncToastState.isOpen}
@@ -1599,6 +1625,8 @@ export default function App() {
           onOpenHostAdminModal={() => setIsHostAdminOpen(true)}
           onOpenPerformanceDashboard={() => setIsPerformanceDashboardOpen(true)}
           onOpenAuditModal={() => setIsAuditModalOpen(true)}
+          onOpenPDFPreview={() => setIsPDFPreviewOpen(true)}
+          isOnline={isOnline}
           onExportData={handleExportData}
           onForceSync={() => {
             setIsSyncing(true);

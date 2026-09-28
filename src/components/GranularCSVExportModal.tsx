@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { 
   FileSpreadsheet, 
+  FileText,
   Calendar, 
   CheckSquare, 
   Square, 
@@ -17,6 +18,7 @@ import {
 } from 'lucide-react';
 import { UserProfile, BodyMetric, CheckInRecord, WorkoutCompletionLog, MealLog } from '../types';
 import { exportGranularUserDataToCSV, generateGranularCSVString, GranularExportOptions } from '../lib/csvExport';
+import { exportUserDataToPDF } from '../lib/pdfExport';
 
 interface GranularCSVExportModalProps {
   isOpen: boolean;
@@ -54,6 +56,8 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
   const [includeProfileMetadata, setIncludeProfileMetadata] = useState<boolean>(true);
   const [delimiter, setDelimiter] = useState<',' | ';'>(',');
   const [copied, setCopied] = useState<boolean>(false);
+  const [isExportingPDF, setIsExportingPDF] = useState<boolean>(false);
+  const [exportFeedback, setExportFeedback] = useState<string | null>(null);
 
   // Compute active date boundaries
   const activeBoundaries = useMemo(() => {
@@ -132,6 +136,35 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
     onClose();
   };
 
+  const handleTriggerPDFExport = () => {
+    setIsExportingPDF(true);
+    setExportFeedback('Compiling Offline PDF...');
+    try {
+      exportUserDataToPDF({
+        userProfile,
+        mealLogs,
+        workoutLogs,
+        bodyMetrics,
+        startDate: activeBoundaries.start,
+        endDate: activeBoundaries.end,
+        includeMeals,
+        includeWorkouts,
+        includeMetrics,
+        includeProfile: includeProfileMetadata,
+      });
+      setExportFeedback('PDF Saved to Device!');
+      setTimeout(() => {
+        setIsExportingPDF(false);
+        setExportFeedback(null);
+        onClose();
+      }, 700);
+    } catch (err) {
+      console.error('Error generating PDF export:', err);
+      setIsExportingPDF(false);
+      setExportFeedback('Export failed. Try again.');
+    }
+  };
+
   const handleCopyToClipboard = async () => {
     try {
       const text = generateGranularCSVString(exportOptions);
@@ -167,10 +200,10 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                Export Data to CSV
+                Export Data & Offline Backup
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                Filter by date range and select data types for your spreadsheet export
+                Filter by date range and download your complete records as CSV or offline PDF static backup
               </p>
             </div>
           </div>
@@ -185,6 +218,19 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
 
         {/* Modal Body */}
         <div className="p-5 overflow-y-auto space-y-5 text-xs sm:text-sm">
+          {/* Offline Static Backup Badge Banner */}
+          <div className="p-3 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/60 text-blue-900 dark:text-blue-200 flex items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shrink-0" />
+              <span className="text-xs font-semibold">
+                Offline Mode Supported: Export static PDF reports and CSV files directly to your device without internet.
+              </span>
+            </div>
+            <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-blue-600 text-white shrink-0">
+              Offline Ready
+            </span>
+          </div>
+
           {/* 1. Date Range Section */}
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
@@ -281,7 +327,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setIncludeWorkouts(!includeWorkouts)}
                 className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
                   includeWorkouts 
-                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#3B82F6]/50 dark:border-[#2A2416]' 
+                    ? 'bg-blue-50/50 dark:bg-blue-950/20 border-[#3B82F6]/50 dark:border-blue-900/40' 
                     : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
                 }`}
               >
@@ -309,7 +355,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setIncludeMeals(!includeMeals)}
                 className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
                   includeMeals 
-                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#3B82F6]/50 dark:border-[#2A2416]' 
+                    ? 'bg-blue-50/50 dark:bg-blue-950/20 border-[#3B82F6]/50 dark:border-blue-900/40' 
                     : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
                 }`}
               >
@@ -337,7 +383,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setIncludeMetrics(!includeMetrics)}
                 className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
                   includeMetrics 
-                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#3B82F6]/50 dark:border-[#2A2416]' 
+                    ? 'bg-blue-50/50 dark:bg-blue-950/20 border-[#3B82F6]/50 dark:border-blue-900/40' 
                     : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
                 }`}
               >
@@ -365,7 +411,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setIncludeCheckIns(!includeCheckIns)}
                 className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
                   includeCheckIns 
-                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#3B82F6]/50 dark:border-[#2A2416]' 
+                    ? 'bg-blue-50/50 dark:bg-blue-950/20 border-[#3B82F6]/50 dark:border-blue-900/40' 
                     : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
                 }`}
               >
@@ -393,7 +439,7 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
                 onClick={() => setIncludeProfileMetadata(!includeProfileMetadata)}
                 className={`p-3 rounded-xl border flex items-center justify-between gap-3 cursor-pointer transition-colors ${
                   includeProfileMetadata 
-                    ? 'bg-[#FFFBF0]/50 dark:bg-[#2A2416]/20 border-[#3B82F6]/50 dark:border-[#2A2416]' 
+                    ? 'bg-blue-50/50 dark:bg-blue-950/20 border-[#3B82F6]/50 dark:border-blue-900/40' 
                     : 'bg-white dark:bg-[#111111] border-gray-200 dark:border-gray-800'
                 }`}
               >
@@ -451,16 +497,23 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
 
         {/* Footer Summary & Action Controls */}
         <div className="p-4 sm:p-5 border-t border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#111111] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="text-xs text-gray-600 dark:text-gray-400">
-            <span className="font-bold text-gray-900 dark:text-white">{totalSelectedRecords}</span> records selected for export
+          <div className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-2">
+            <span>
+              <span className="font-bold text-gray-900 dark:text-white">{totalSelectedRecords}</span> records selected
+            </span>
+            {exportFeedback && (
+              <span className="px-2 py-0.5 rounded-md bg-blue-100 dark:bg-blue-950/60 text-[#1D4ED8] dark:text-[#60A5FA] font-bold text-[11px] animate-in fade-in">
+                {exportFeedback}
+              </span>
+            )}
           </div>
 
-          <div className="flex items-center gap-2 justify-end">
+          <div className="flex flex-wrap items-center gap-2 justify-end">
             <button
               type="button"
               onClick={handleCopyToClipboard}
               disabled={totalSelectedRecords === 0}
-              className="px-3.5 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1A1A1A] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-[#1A1A1A] text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               title="Copy CSV to clipboard"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-[#1D4ED8]" /> : <Copy className="w-3.5 h-3.5" />}
@@ -472,10 +525,23 @@ export const GranularCSVExportModal: React.FC<GranularCSVExportModalProps> = ({
               type="button"
               onClick={handleTriggerExport}
               disabled={totalSelectedRecords === 0}
-              className="px-5 py-2 rounded-xl bg-[#3B82F6] hover:bg-[#1D4ED8] text-white text-xs sm:text-sm font-bold shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3.5 py-2 rounded-xl bg-gray-100 dark:bg-[#1E2220] hover:bg-gray-200 dark:hover:bg-[#252A28] text-gray-800 dark:text-gray-200 text-xs sm:text-sm font-semibold border border-gray-300 dark:border-gray-700 transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Download raw spreadsheet in CSV format"
             >
               <Download className="w-4 h-4" />
               <span>Download CSV</span>
+            </button>
+
+            <button
+              id="confirm-pdf-export-btn"
+              type="button"
+              onClick={handleTriggerPDFExport}
+              disabled={totalSelectedRecords === 0 || isExportingPDF}
+              className="px-4 py-2 rounded-xl bg-[#3B82F6] hover:bg-[#1D4ED8] text-white text-xs sm:text-sm font-bold shadow-xs transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Export static PDF report directly to your local device (works 100% offline)"
+            >
+              <FileText className="w-4 h-4" />
+              <span>{isExportingPDF ? 'Generating PDF...' : 'Download PDF Report'}</span>
             </button>
           </div>
         </div>

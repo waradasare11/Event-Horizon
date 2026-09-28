@@ -21,12 +21,16 @@ import {
   HelpCircle,
   CheckCircle2,
   CloudOff,
-  AlertCircle
+  AlertCircle,
+  FileText,
+  Eye
 } from 'lucide-react';
 import { UserProfile, WorkoutCompletionLog, MealLog } from '../types';
 import { isHostAdmin, checkIsHostOnServer, computeSubscriptionStatus, getPlanDisplayBadge } from '../lib/subscription';
 import { HelpArticlesModal } from './HelpArticlesModal';
+import { PDFPreviewModal } from './PDFPreviewModal';
 import { subscribeDriveSyncStatus, getDriveStatus, DriveSyncStatus } from '../lib/userMemory';
+import { exportUserDataToPDF } from '../lib/pdfExport';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -46,6 +50,8 @@ interface SettingsModalProps {
   onOpenPerformanceDashboard: () => void;
   onOpenKeepSync?: () => void;
   onOpenAuditModal: () => void;
+  onOpenPDFPreview?: () => void;
+  isOnline?: boolean;
   onExportData: () => void;
   onForceSync: () => void;
   onSignIn: () => void;
@@ -71,6 +77,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onOpenPerformanceDashboard,
   onOpenKeepSync,
   onOpenAuditModal,
+  onOpenPDFPreview,
+  isOnline,
   onExportData,
   onForceSync,
   onSignIn,
@@ -81,6 +89,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [defaultHelpArticleId, setDefaultHelpArticleId] = useState<string>('scan');
   const [driveStatus, setDriveStatus] = useState<DriveSyncStatus>(() => getDriveStatus());
   const [serverIsHost, setServerIsHost] = useState<boolean>(false);
+  const [isInternalPDFPreviewOpen, setIsInternalPDFPreviewOpen] = useState<boolean>(false);
+
+  const isOnlineStatus = isOnline !== undefined ? isOnline : (typeof navigator !== 'undefined' ? navigator.onLine : true);
 
   useEffect(() => {
     return subscribeDriveSyncStatus((status) => {
@@ -224,7 +235,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between px-1">
               <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                Data & Cloud Backups
+                Data Management
               </h3>
               {/* Drive status pill: Synced / Saving / Offline / Reconnect */}
               <div className="flex items-center">
@@ -273,18 +284,93 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {/* Online PDF Report Preview & Export Button */}
+              <button
+                onClick={() => {
+                  if (isOnlineStatus) {
+                    onClose();
+                    if (onOpenPDFPreview) {
+                      onOpenPDFPreview();
+                    } else {
+                      setIsInternalPDFPreviewOpen(true);
+                    }
+                  }
+                }}
+                disabled={!isOnlineStatus}
+                className={`p-3 rounded-2xl border text-left transition-all flex items-center justify-between cursor-pointer ${
+                  isOnlineStatus
+                    ? 'bg-blue-50/70 dark:bg-blue-950/25 border-blue-200 dark:border-blue-900/50 hover:bg-blue-100/70 dark:hover:bg-blue-900/35'
+                    : 'bg-gray-50/50 dark:bg-gray-800/20 border-gray-200 dark:border-gray-800 opacity-50 cursor-not-allowed'
+                }`}
+                title={isOnlineStatus ? "Preview report & customize date range before download" : "Connect online to preview and customize PDF report"}
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 text-[#3B82F6] flex items-center justify-center shrink-0">
+                    <Eye className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                      <span>Export PDF Report</span>
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full bg-blue-600 text-white uppercase">
+                        Online
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-gray-500">Date range preview & download</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </button>
+
+              <button
+                onClick={() => {
+                  try {
+                    exportUserDataToPDF({
+                      userProfile,
+                      mealLogs,
+                      workoutLogs,
+                      includeMeals: true,
+                      includeWorkouts: true,
+                      includeMetrics: true,
+                      includeProfile: true,
+                    });
+                  } catch (err) {
+                    console.error('Failed generating offline PDF report from settings:', err);
+                  }
+                }}
+                className="p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center justify-between cursor-pointer"
+                title="Save complete static PDF report directly to your device (works 100% offline)"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-gray-200/60 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 flex items-center justify-center shrink-0">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                      <span>Offline PDF Backup</span>
+                      <span className="text-[9px] font-extrabold px-1.5 py-0.2 rounded-full bg-slate-600 text-white uppercase">
+                        Offline
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-gray-500">Instant static dossier save</div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+              </button>
+
               <button
                 onClick={() => {
                   onClose();
                   onExportData();
                 }}
-                className="p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center justify-between"
+                className="p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center justify-between cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
-                  <Download className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                  <div className="w-8 h-8 rounded-xl bg-gray-200/60 dark:bg-gray-700/60 text-gray-600 dark:text-gray-400 flex items-center justify-center shrink-0">
+                    <Download className="w-4 h-4" />
+                  </div>
                   <div>
-                    <div className="text-xs font-bold text-gray-900 dark:text-white">Export CSV</div>
-                    <div className="text-[11px] text-gray-500">Download all meals & workouts</div>
+                    <div className="text-xs font-bold text-gray-900 dark:text-white">Export CSV / Custom</div>
+                    <div className="text-[11px] text-gray-500">Date-filtered spreadsheet</div>
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -294,10 +380,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onClick={() => {
                   onForceSync();
                 }}
-                className="p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center justify-between"
+                className="p-3 rounded-2xl bg-gray-50 dark:bg-gray-800/40 border border-gray-200 dark:border-gray-800 text-left hover:bg-gray-100 dark:hover:bg-gray-800 transition-all flex items-center justify-between cursor-pointer"
               >
                 <div className="flex items-center gap-2.5">
-                  <RefreshCw className="w-4 h-4 text-amber-500" />
+                  <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-[#3B82F6] flex items-center justify-center shrink-0">
+                    <RefreshCw className="w-4 h-4 text-[#3B82F6]" />
+                  </div>
                   <div>
                     <div className="text-xs font-bold text-gray-900 dark:text-white">Reconcile Cloud Sync</div>
                     <div className="text-[11px] text-gray-500">Verify Firestore & Drive</div>
@@ -510,6 +598,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         onClose={() => setShowHelpModal(false)}
         defaultArticleId={defaultHelpArticleId}
       />
+
+      {isInternalPDFPreviewOpen && (
+        <PDFPreviewModal
+          isOpen={isInternalPDFPreviewOpen}
+          onClose={() => setIsInternalPDFPreviewOpen(false)}
+          userProfile={userProfile}
+          mealLogs={mealLogs}
+          workoutLogs={workoutLogs}
+        />
+      )}
     </div>
   );
 };

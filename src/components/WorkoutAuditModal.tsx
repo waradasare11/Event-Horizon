@@ -23,13 +23,13 @@ export const WorkoutAuditModal: React.FC<WorkoutAuditModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-in fade-in">
       <div className="bg-white dark:bg-[#111111] rounded-2xl border border-[#E5E7EB] dark:border-[#2A2416] shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 text-left">
         {/* Header */}
-        <div className="p-5 bg-gradient-to-r from-[#D4AF37]/10 via-[#D4AF37]/5 to-transparent border-b border-[#E5E7EB] dark:border-[#2A2416] flex items-center justify-between shrink-0">
+        <div className="p-5 bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-transparent border-b border-gray-200 dark:border-gray-800 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs shrink-0">
               <Database className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#B8922A] dark:text-[#F0D060] flex items-center gap-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Exercise Registry Diagnostic Auditor</span>
               </span>
@@ -40,7 +40,7 @@ export const WorkoutAuditModal: React.FC<WorkoutAuditModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:text-white hover:bg-gray-100 dark:hover:bg-[#202422] transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-[#6B7280] dark:text-[#9EA8A2] hover:text-[#1A1D1B] dark:hover:white hover:bg-gray-100 dark:hover:bg-[#202422] transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -49,10 +49,10 @@ export const WorkoutAuditModal: React.FC<WorkoutAuditModalProps> = ({
         {/* Content */}
         <div className="p-6 overflow-y-auto space-y-6">
           {/* Summary Banner */}
-          <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800/50 p-4 rounded-xl text-xs text-purple-900 dark:text-purple-200 leading-relaxed">
-            <p className="font-semibold flex items-center gap-1.5 text-purple-800 dark:text-[#F0D060] mb-1">
-              <Sparkles className="w-4 h-4 text-[#B8922A]" />
-              100% Precision Registry Cross-Referencing
+          <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/50 p-4 rounded-xl text-xs text-blue-900 dark:text-blue-200 leading-relaxed">
+            <p className="font-semibold flex items-center gap-1.5 text-blue-800 dark:text-blue-300 mb-1">
+              <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              Authoritative Registry Cross-Referencing
             </p>
             This diagnostic tool audits all workout programs against the centralized <span className="font-mono font-bold">ExerciseRegistry.ts</span> database. It standardizes movement names, repairs minor typos, and guarantees verified YouTube coaching queries.
           </div>
@@ -68,7 +68,7 @@ export const WorkoutAuditModal: React.FC<WorkoutAuditModalProps> = ({
               </div>
               <div className="bg-[#FAFAF8] dark:bg-[#1C1F1D] p-3.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416]">
                 <div className="text-[11px] text-[#6B7280] dark:text-[#9EA8A2] font-semibold">Exercises Audited</div>
-                <div className="text-xl font-bold text-[#B8922A] dark:text-[#F0D060] mt-0.5">
+                <div className="text-xl font-bold text-blue-600 dark:text-blue-400 mt-0.5">
                   {report.totalExercisesAudited}
                 </div>
               </div>
@@ -80,14 +80,14 @@ export const WorkoutAuditModal: React.FC<WorkoutAuditModalProps> = ({
               </div>
               <div className="bg-[#FAFAF8] dark:bg-[#1C1F1D] p-3.5 rounded-xl border border-[#E5E7EB] dark:border-[#2A2416]">
                 <div className="text-[11px] text-[#6B7280] dark:text-[#9EA8A2] font-semibold">Links Refreshed</div>
-                <div className="text-xl font-bold text-[#B8922A] dark:text-[#F0D060] mt-0.5">
+                <div className="text-xl font-bold text-blue-600 dark:text-blue-400 mt-0.5">
                   {report.refreshedYouTubeLinksCount}
                 </div>
               </div>
             </div>
           ) : (
             <div className="p-8 text-center border border-dashed border-gray-300 dark:border-gray-700 rounded-xl">
-              <Database className="w-8 h-8 text-[#D4AF37] mx-auto mb-2 opacity-80" />
+              <Database className="w-8 h-8 text-blue-600 dark:text-blue-400 mx-auto mb-2 opacity-80" />
               <p className="text-xs text-[#6B7280] dark:text-[#9EA8A2]">
                 Click below to start a full diagnostic scan across all stored workout splits.
               </p>

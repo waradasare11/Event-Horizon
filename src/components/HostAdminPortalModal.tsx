@@ -1677,7 +1677,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                       <span>Pending UPI payments ({upiPendingTickets.length})</span>
                     </h3>
                     <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-0.5">
-                      Confirm payment arrived in your FamPay app, then click Grant this plan.
+                      Confirm in FamPay, then Grant this plan. Pending tickets may clear if the app is republished — Grant soon after money arrives.
                     </p>
                   </div>
 
@@ -3104,7 +3104,7 @@ export const HostAdminPortalModal: React.FC<HostAdminPortalModalProps> = ({
                   <div className="text-xl font-black text-[#1D4ED8] dark:text-[#60A5FA] mt-0.5">
                     SHA-256
                   </div>
-                  <div className="text-[10px] text-[#1D4ED8] dark:text-[#60A5FA] font-medium">100% Cryptographic</div>
+                  <div className="text-[10px] text-[#1D4ED8] dark:text-[#60A5FA] font-medium">Cryptographically Verified</div>
                 </div>
               </div>
 
